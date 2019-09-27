@@ -1,4 +1,6 @@
-node_modules/
-.cache/
+*.log
+*.pid
 .idea/
-dist
+.cache/
+dist/
+node_modules/
