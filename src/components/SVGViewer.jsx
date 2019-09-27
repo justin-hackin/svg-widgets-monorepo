@@ -1,5 +1,6 @@
 import React from 'react';
 import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
+import { PolygonPath } from './PolygonPath';
 
 export default class SVGViewer extends React.PureComponent {
   componentDidMount() {
@@ -22,6 +23,7 @@ export default class SVGViewer extends React.PureComponent {
         >
           <svg width={617} height={316}>
             {' '}
+            <PolygonPath points={[[108, 108.5], [180, 209.5]]} />
             {/* or <svg viewBox="0 0 617 316" */}
             <g fillOpacity=".5" strokeWidth="4">
               <rect x="400" y="40" width="100" height="200" fill="#4286f4" stroke="#f4f142" />
