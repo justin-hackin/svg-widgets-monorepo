@@ -1,0 +1,22 @@
+{
+  "name": "parcel-reactjs",
+  "version": "1.0.0",
+  "description": "A minimal React.js boilerplate with parcel as bundler",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel ./src/index.html --open"
+  },
+  "keywords": [
+    "parcel",
+    "react"
+  ],
+  "author": "“Robin <“wrobin@gmx.net”> (https://www.robinwieruch.de)",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.3"
+  }
+}
