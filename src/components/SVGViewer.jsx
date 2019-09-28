@@ -10,15 +10,9 @@ export default class SVGViewer extends React.PureComponent {
   render() {
     return (
       <div>
-        <button className="btn" type="button" onClick={() => this.Viewer.zoomOnViewerCenter(1.1)}>Zoom in</button>
-        <button className="btn" type="button" onClick={() => this.Viewer.fitSelection(40, 40, 200, 200)}>Zoom area 200x200</button>
-        <button className="btn" type="button" onClick={() => this.Viewer.fitToViewer()}>Fit</button>
-
-        <hr />
-
         <UncontrolledReactSVGPanZoom
-          width={500}
-          height={500}
+          width={1024}
+          height={576}
           ref={(Viewer) => { this.Viewer = Viewer; }}
         >
           <svg width={617} height={316}>
