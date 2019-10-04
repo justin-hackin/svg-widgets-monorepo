@@ -8,4 +8,4 @@ const pointsToPolygonCommands = (points) => points.map(
 const closedPolygonDefinition = (points) => `${pointsToPolygonCommands(points).join(' ')} Z`;
 
 // eslint-disable-next-line react/prop-types
-export const PolygonPath = ({ points }) => (<path d={closedPolygonDefinition(points)} />);
+export const PolygonPath = ({ points, ...rest }) => (<path {...rest} d={closedPolygonDefinition(points)} />);

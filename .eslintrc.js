@@ -5,6 +5,10 @@ module.exports = {
     document: true,
   },
   rules: {
-    'import/prefer-default-export': 0
+    'import/prefer-default-export': 0,
+    'max-len': ['error', {code: 120}],
+    'react/jsx-props-no-spreading': 0,
+    // TODO: convert to ts or remove following
+    'react/prop-types': 0,
   }
 };

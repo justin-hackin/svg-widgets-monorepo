@@ -13,11 +13,16 @@
   "author": "“Robin <“wrobin@gmx.net”> (https://www.robinwieruch.de)",
   "license": "MIT",
   "dependencies": {
+    "geometric": "^2.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-svg-pan-zoom": "^3.3.0"
+    "react-svg-pan-zoom": "^3.3.0",
+    "vec2": "^1.6.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/plugin-transform-destructuring": "^7.6.0",
+    "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.4.0",
     "eslint-config-airbnb": "^18.0.1",
