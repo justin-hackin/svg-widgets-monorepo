@@ -1,22 +1,16 @@
 import React from 'react';
-import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
 import { PyramidNet } from './PyramidNet';
 
+const svgDimensions = { width: 1024, height: 576 };
 export default class SVGViewer extends React.PureComponent {
   render() {
     return (
       <div>
-        <UncontrolledReactSVGPanZoom
-          width={1024}
-          height={576}
-          ref={(Viewer) => { this.Viewer = Viewer; }}
-        >
-          <svg width={617} height={316}>
-            <g transform="translate(100, 100)">
-              <PyramidNet netSpec={{ faceEdgeLengths: [30, 10, 30], faceCount: 10 }} />
-            </g>
-          </svg>
-        </UncontrolledReactSVGPanZoom>
+        <svg {...svgDimensions}>
+          <g transform="translate(300, 300)">
+            <PyramidNet netSpec={{ faceEdgeLengths: [30, 10, 30], faceCount: 5 }} />
+          </g>
+        </svg>
       </div>
     );
   }
