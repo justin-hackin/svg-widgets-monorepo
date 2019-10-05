@@ -1,10 +1,11 @@
-import { Vector } from '@flatten-js/core';
+import { Line, Point, Vector } from '@flatten-js/core';
 
 import React from 'react';
 import { PolygonPath } from './PolygonPath';
 
-// eslint-disable-next-line func-names
 Vector.prototype.toArray = function () { return [this.x, this.y]; };
+Point.prototype.toArray = function () { return [this.x, this.y]; };
+Vector.prototype.toPoint = function () { return new Point(this.x, this.y); };
 Vector.prototype.angleOfDifference = function (p) { return p.subtract(this).slope; };
 Vector.fromAngle = (angle, length) => new Vector(length, 0).rotate(angle);
 
@@ -30,6 +31,25 @@ const triangleAnglesGivenSides = (sideLengths) => {
   });
 };
 
+
+const insetPoints = (vectors, distance) => {
+  const returnVal = [];
+  for (const i in vectors) {
+    const vec = circularSlice(vectors, i, vectors.length);
+    const l1 = new Line(
+      polarLineExtension(vec[1], vec[0], -Math.PI / 2, distance).toPoint(),
+      polarLineExtension(vec[0], vec[1], Math.PI / 2, distance).toPoint(),
+    );
+    const l2 = new Line(
+      polarLineExtension(vec[2], vec[1], -Math.PI / 2, distance).toPoint(),
+      polarLineExtension(vec[1], vec[2], Math.PI / 2, distance).toPoint(),
+    );
+    const intersections = l1.intersect(l2);
+    returnVal.push(intersections[0]);
+  }
+  return returnVal;
+};
+
 export const PyramidNet = ({ netSpec }) => {
   const { faceEdgeLengths, faceCount } = netSpec;
   const faceInteriorAngles = triangleAnglesGivenSides(faceEdgeLengths);
@@ -43,20 +63,15 @@ export const PyramidNet = ({ netSpec }) => {
 
   v1.y *= -1;
   const p3 = p2.add(v1);
-  const boundaryPoints = [p1.toArray(), p2.toArray(), p3.toArray()];
-  const p4 = polarLineExtension(new Vector(0, 0), p2, 0.4 + Math.PI / 2, 400);
+  const boundaryPoints = [p1, p2, p3];
+  const inset = insetPoints(boundaryPoints, 2);
 
   return (
     <g>
       <symbol id="tile" overflow="visible">
         <g>
-          <PolygonPath fill="none" stroke="#000" points={boundaryPoints} />
-          <line
-            stroke="#2ECC71"
-            {...{
-              x1: p2.x, y1: p2.y, x2: p4.x, y2: p4.y,
-            }}
-          />
+          <PolygonPath fill="none" stroke="#000" points={boundaryPoints.map((pt) => pt.toArray())} />
+          <PolygonPath fill="none" stroke="red" points={inset.map((pt) => pt.toArray())} />
         </g>
       </symbol>
       {range(faceCount).map((index) => (
