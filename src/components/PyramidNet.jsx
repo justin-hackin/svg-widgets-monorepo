@@ -74,13 +74,18 @@ export const PyramidNet = ({ netSpec }) => {
           <PolygonPath fill="none" stroke="red" points={inset.map((pt) => pt.toArray())} />
         </g>
       </symbol>
-      {range(faceCount).map((index) => (
-        <use
-          key={index}
-          transform={`rotate(${(index * faceInteriorAngles[2] * 360) / (2 * Math.PI)})`}
-          xlinkHref="#tile"
-        />
-      ))}
+      {range(faceCount).map((index) => {
+        const isOdd = index % 2;
+        const yScale = isOdd ? -1 : 1;
+        const rotation = ((index + (isOdd ? 1 : 0)) * faceInteriorAngles[2] * 360 * (isOdd ? 1 : -1)) / (2 * Math.PI);
+        return (
+          <use
+            key={index}
+            transform={`scale(1 ${yScale}) rotate(${rotation})`}
+            xlinkHref="#tile"
+          />
+        );
+      })}
     </g>
   );
 };

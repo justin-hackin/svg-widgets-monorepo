@@ -8,7 +8,7 @@ export default class SVGViewer extends React.PureComponent {
       <div>
         <svg {...svgDimensions}>
           <g transform="translate(300, 300)">
-            <PyramidNet netSpec={{ faceEdgeLengths: [30, 10, 30], faceCount: 5 }} />
+            <PyramidNet netSpec={{ faceEdgeLengths: [40, 30, 50], faceCount: 4 }} />
           </g>
         </svg>
       </div>
