@@ -13,11 +13,10 @@
   "author": "“Robin <“wrobin@gmx.net”> (https://www.robinwieruch.de)",
   "license": "MIT",
   "dependencies": {
-    "geometric": "^2.0.1",
+    "@flatten-js/core": "^1.0.17",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-svg-pan-zoom": "^3.3.0",
-    "vectory": "github:justin-barca/vectory"
+    "react-svg-pan-zoom": "^3.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

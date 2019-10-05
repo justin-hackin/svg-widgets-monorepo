@@ -1,9 +1,16 @@
-import React from 'react';
-import Vector from 'vectory';
+import { Vector } from '@flatten-js/core';
 
+import React from 'react';
 import { PolygonPath } from './PolygonPath';
 
-const polarLineExtension = (p1, p2, theta, length) => Vector.fromAngle(p2.angleTo(p1) + theta, length).add(p2);
+// eslint-disable-next-line func-names
+Vector.prototype.toArray = function () { return [this.x, this.y]; };
+Vector.prototype.angleOfDifference = function (p) { return p.subtract(this).slope; };
+Vector.fromAngle = (angle, length) => new Vector(length, 0).rotate(angle);
+
+const polarLineExtension = (p1, p2, theta, length) => Vector.fromAngle(
+  p2.angleOfDifference(p1) + theta, length,
+).add(p2);
 
 const circularSlice = (array, start, elements) => {
   const slice = [];
@@ -62,34 +69,3 @@ export const PyramidNet = ({ netSpec }) => {
     </g>
   );
 };
-
-
-const pt1 = new Vector(0, 0);
-const pt2 = new Vector(1, 0);
-
-const PLOT_COUNT = 16;
-const RADIUS = 100;
-
-const testAgainstPoint = (pt) => {
-  console.log('Testing against point: ', pt.toArray());
-  for (let i = 0; i < PLOT_COUNT; i++) {
-    const exactAngle = Math.PI * 2 * i / PLOT_COUNT;
-    const radialPt = Vector.fromAngle(exactAngle, RADIUS);
-    const ptToRadial = pt.angleTo(radialPt);
-    const radialToPt = radialPt.angleTo(pt);
-    const angleOfDifference = radialPt.sub(pt).angleOf();
-
-    const piClamp = (angle) => angle > Math.PI ? angle - (2 * Math.PI) : angle;
-
-    console.log(
-      'exact angle: ', piClamp(exactAngle),
-      ' angleTo passed to radial: ', ptToRadial,
-      ' angleTo radial to passed: ', radialToPt,
-      ' angleOf difference: ', angleOfDifference,
-      ' angleOf radial pt: ', Vector.angleOf(radialPt),
-    );
-  }
-};
-
-testAgainstPoint(pt1);
-testAgainstPoint(pt2);
