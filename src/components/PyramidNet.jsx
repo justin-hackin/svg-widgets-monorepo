@@ -1,14 +1,17 @@
 import { subtract } from '@flatten-js/boolean-op';
-import { Line, Point, Polygon, Vector } from '@flatten-js/core';
+import {
+  Line, Point, Polygon, Vector,
+} from '@flatten-js/core';
 import React from 'react';
+
 import { PolygonPath } from './PolygonPath';
 
 Vector.prototype.toArray = function () { return [this.x, this.y]; };
 Point.prototype.toArray = function () { return [this.x, this.y]; };
 Vector.prototype.toPoint = function () { return new Point(this.x, this.y); };
 Vector.prototype.angleOfDifference = function (p) { return p.subtract(this).slope; };
-Vector.fromAngle = function(angle, length) { return new Vector(length, 0).rotate(angle); };
-Polygon.prototype.getD = function() { return Array.from(this.faces).map((face) => face.svg()).join(''); };
+Vector.fromAngle = function (angle, length) { return new Vector(length, 0).rotate(angle); };
+Polygon.prototype.getD = function () { return Array.from(this.faces).map((face) => face.svg()).join(''); };
 
 const polarLineExtension = (p1, p2, theta, length) => Vector.fromAngle(
   p2.angleOfDifference(p1) + theta, length,
@@ -32,19 +35,22 @@ const triangleAnglesGivenSides = (sideLengths) => {
   });
 };
 
+// positive distance is to the right moving from pt1 to pt2
+const parallelLineAtDistance = (pt1, pt2, distance) => {
+  const sign = distance < 0 ? -1 : 1;
+  const absDist = Math.abs(distance);
+  return new Line(
+    polarLineExtension(pt2, pt1, sign * (Math.PI / 2), absDist).toPoint(),
+    polarLineExtension(pt1, pt2, -sign * (Math.PI / 2), absDist).toPoint(),
+  );
+};
 
 const insetPoints = (vectors, distance) => {
   const returnVal = [];
   for (const i in vectors) {
     const vec = circularSlice(vectors, i, vectors.length);
-    const l1 = new Line(
-      polarLineExtension(vec[1], vec[0], -Math.PI / 2, distance).toPoint(),
-      polarLineExtension(vec[0], vec[1], Math.PI / 2, distance).toPoint(),
-    );
-    const l2 = new Line(
-      polarLineExtension(vec[2], vec[1], -Math.PI / 2, distance).toPoint(),
-      polarLineExtension(vec[1], vec[2], Math.PI / 2, distance).toPoint(),
-    );
+    const l1 = parallelLineAtDistance(vec[1], vec[0], distance);
+    const l2 = parallelLineAtDistance(vec[2], vec[1], distance);
     const intersections = l1.intersect(l2);
     returnVal.push(intersections[0]);
   }
