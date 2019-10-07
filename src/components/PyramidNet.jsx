@@ -1,5 +1,5 @@
-import { Line, Point, Vector } from '@flatten-js/core';
-
+import { subtract } from '@flatten-js/boolean-op';
+import { Line, Point, Polygon, Vector } from '@flatten-js/core';
 import React from 'react';
 import { PolygonPath } from './PolygonPath';
 
@@ -7,7 +7,8 @@ Vector.prototype.toArray = function () { return [this.x, this.y]; };
 Point.prototype.toArray = function () { return [this.x, this.y]; };
 Vector.prototype.toPoint = function () { return new Point(this.x, this.y); };
 Vector.prototype.angleOfDifference = function (p) { return p.subtract(this).slope; };
-Vector.fromAngle = (angle, length) => new Vector(length, 0).rotate(angle);
+Vector.fromAngle = function(angle, length) { return new Vector(length, 0).rotate(angle); };
+Polygon.prototype.getD = function() { return Array.from(this.faces).map((face) => face.svg()).join(''); };
 
 const polarLineExtension = (p1, p2, theta, length) => Vector.fromAngle(
   p2.angleOfDifference(p1) + theta, length,
@@ -60,11 +61,26 @@ export const PyramidNet = ({ netSpec }) => {
   const range = (length) => Array.from({ length }, (_, i) => i);
 
   const v1 = Vector.fromAngle(Math.PI - faceInteriorAngles[0], faceEdgeLengths[1]);
+  const mapVectorToPoints = (v) => v.toPoint();
+
+  const subtractPointsArrays = (pts1, pts2) => {
+    const polygon1 = new Polygon();
+    polygon1.addFace(pts1);
+
+    const polygon2 = new Polygon();
+    polygon2.addFace(pts2);
+
+    return subtract(polygon1, polygon2);
+  };
 
   v1.y *= -1;
   const p3 = p2.add(v1);
   const boundaryPoints = [p1, p2, p3];
   const inset = insetPoints(boundaryPoints, 2);
+
+  const borderOverlay = subtractPointsArrays(boundaryPoints.map(mapVectorToPoints), inset);
+
+  console.log(borderOverlay.toJSON());
 
   return (
     <g>
@@ -72,6 +88,7 @@ export const PyramidNet = ({ netSpec }) => {
         <g>
           <PolygonPath fill="none" stroke="#000" points={boundaryPoints.map((pt) => pt.toArray())} />
           <PolygonPath fill="none" stroke="red" points={inset.map((pt) => pt.toArray())} />
+          <path fill="#EF9851" stroke="none" d={borderOverlay.getD()} />
         </g>
       </symbol>
       {range(faceCount).map((index) => {
