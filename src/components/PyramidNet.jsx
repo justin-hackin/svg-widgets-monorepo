@@ -13,7 +13,7 @@ Vector.prototype.angleOfDifference = function (p) { return p.subtract(this).slop
 Vector.fromAngle = function (angle, length) { return new Vector(length, 0).rotate(angle); };
 Polygon.prototype.getD = function () { return Array.from(this.faces).map((face) => face.svg()).join(''); };
 
-const polarLineExtension = (p1, p2, theta, length) => Vector.fromAngle(
+const hingedPlot = (p1, p2, theta, length) => Vector.fromAngle(
   p2.angleOfDifference(p1) + theta, length,
 ).add(p2);
 
@@ -40,9 +40,15 @@ const parallelLineAtDistance = (pt1, pt2, distance) => {
   const sign = distance < 0 ? -1 : 1;
   const absDist = Math.abs(distance);
   return new Line(
-    polarLineExtension(pt2, pt1, sign * (Math.PI / 2), absDist).toPoint(),
-    polarLineExtension(pt1, pt2, -sign * (Math.PI / 2), absDist).toPoint(),
+    hingedPlot(pt2, pt1, sign * (Math.PI / 2), absDist).toPoint(),
+    hingedPlot(pt1, pt2, -sign * (Math.PI / 2), absDist).toPoint(),
   );
+};
+
+const hingedPlotByProjectionDistance = (pt1, pt2, angle, projectionDistance) => {
+  const l1 = parallelLineAtDistance(pt1, pt2, projectionDistance);
+  const l2 = new Line(pt2.toPoint(), hingedPlot(pt2, pt1, angle, projectionDistance));
+  return l1.intersect(l2);
 };
 
 const insetPoints = (vectors, distance) => {
@@ -50,6 +56,7 @@ const insetPoints = (vectors, distance) => {
   for (const i in vectors) {
     const vec = circularSlice(vectors, i, vectors.length);
     const l1 = parallelLineAtDistance(vec[1], vec[0], distance);
+    console.log('eee', l1);
     const l2 = parallelLineAtDistance(vec[2], vec[1], distance);
     const intersections = l1.intersect(l2);
     returnVal.push(intersections[0]);
@@ -86,12 +93,16 @@ export const PyramidNet = ({ netSpec }) => {
 
   const borderOverlay = subtractPointsArrays(boundaryPoints.map(mapVectorToPoints), inset);
 
+  const dotPt = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], 10)[0];
+  console.log('DAAaAAAAAAT', dotPt.toJSON());
+
   console.log(borderOverlay.toJSON());
 
   return (
     <g>
       <symbol id="tile" overflow="visible">
         <g>
+          <circle fill="purple" cx={dotPt.x} cy={dotPt.y} r={1} />
           <PolygonPath fill="none" stroke="#000" points={boundaryPoints.map((pt) => pt.toArray())} />
           <PolygonPath fill="none" stroke="red" points={inset.map((pt) => pt.toArray())} />
           <path fill="#EF9851" stroke="none" d={borderOverlay.getD()} />
