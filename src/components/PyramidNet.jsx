@@ -3,9 +3,17 @@ import {
   Line, Point, Polygon, Vector,
 } from '@flatten-js/core';
 import React from 'react';
-
+import { composeSVG, parseSVG } from 'svg-path-parser';
 import { PolygonPath } from './PolygonPath';
 
+// eslint-disable-next-line max-len
+const sampleD = 'M3,7 L5,-6 L1,7 L100,-0.4 m-10,10 l10,0 V27 V89 H23 v10 h10 C33,43 38,47 43,47 c0,5 5,10 10,10 S63,67 63,67 s-10,10 10,10 Q50,50 73,57 q20,-5 0,-10 T70,40 t0,-15 A5,5 45 1,0 40,20 a5,5 20 0,1 -10,-10 Z';
+const sampleDParsed = parseSVG(sampleD);
+console.log('ZAO>>>>>>>>>>>>>>>>>>>', sampleDParsed);
+const sampleDComposed = composeSVG(sampleDParsed);
+
+console.log();
+const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
 Vector.prototype.toArray = function () { return [this.x, this.y]; };
 Point.prototype.toArray = function () { return [this.x, this.y]; };
 Vector.prototype.toPoint = function () { return new Point(this.x, this.y); };
@@ -93,16 +101,20 @@ export const PyramidNet = ({ netSpec }) => {
 
   const borderOverlay = subtractPointsArrays(boundaryPoints.map(mapVectorToPoints), inset);
 
-  const dotPt = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], 10)[0];
-  console.log('DAAaAAAAAAT', dotPt.toJSON());
+  const tabFlapCorners = [
+    p1,
+    hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], 10)[0],
+    hingedPlotByProjectionDistance(p1, p2, degToRad(30), 10)[0],
+  ];
 
   console.log(borderOverlay.toJSON());
 
   return (
     <g>
+      <path stroke="red" strokeWidth={2} d={sampleDComposed}></path>
+      <path stroke="blue" strokeWidth={1} d={sampleD}></path>
       <symbol id="tile" overflow="visible">
         <g>
-          <circle fill="purple" cx={dotPt.x} cy={dotPt.y} r={1} />
           <PolygonPath fill="none" stroke="#000" points={boundaryPoints.map((pt) => pt.toArray())} />
           <PolygonPath fill="none" stroke="red" points={inset.map((pt) => pt.toArray())} />
           <path fill="#EF9851" stroke="none" d={borderOverlay.getD()} />
