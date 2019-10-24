@@ -1,88 +1,29 @@
 import { subtract } from '@flatten-js/boolean-op';
-import {
-  Line, Point, Polygon, Vector,
-} from '@flatten-js/core';
+import { Point, Polygon } from '@flatten-js/core';
 import React from 'react';
-import { composeSVG, parseSVG } from 'svg-path-parser';
-import { PolygonPath } from './PolygonPath';
-
-// eslint-disable-next-line max-len
-const sampleD = 'M3,7 L5,-6 L1,7 L100,-0.4 m-10,10 l10,0 V27 V89 H23 v10 h10 C33,43 38,47 43,47 c0,5 5,10 10,10 S63,67 63,67 s-10,10 10,10 Q50,50 73,57 q20,-5 0,-10 T70,40 t0,-15 A5,5 45 1,0 40,20 a5,5 20 0,1 -10,-10 Z';
-const sampleDParsed = parseSVG(sampleD);
-console.log('ZAO>>>>>>>>>>>>>>>>>>>', sampleDParsed);
-const sampleDComposed = composeSVG(sampleDParsed);
-
-console.log();
-const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
-Vector.prototype.toArray = function () { return [this.x, this.y]; };
-Point.prototype.toArray = function () { return [this.x, this.y]; };
-Vector.prototype.toPoint = function () { return new Point(this.x, this.y); };
-Vector.prototype.angleOfDifference = function (p) { return p.subtract(this).slope; };
-Vector.fromAngle = function (angle, length) { return new Vector(length, 0).rotate(angle); };
-Polygon.prototype.getD = function () { return Array.from(this.faces).map((face) => face.svg()).join(''); };
-
-const hingedPlot = (p1, p2, theta, length) => Vector.fromAngle(
-  p2.angleOfDifference(p1) + theta, length,
-).add(p2);
-
-const circularSlice = (array, start, elements) => {
-  const slice = [];
-  for (let i = 0; i < elements; i += 1) {
-    slice.push(array[(start + i) % array.length]);
-  }
-  return slice;
-};
-
-const triangleAnglesGivenSides = (sideLengths) => {
-  if (sideLengths.length !== 3) {
-    throw new Error('triangleAnglesGivenSides: parameter sideLengths must be array of length 3');
-  }
-  return sideLengths.map((length, index, lengths) => {
-    const [a, b, c] = circularSlice(lengths, index, 3);
-    return Math.acos((a ** 2 + b ** 2 - c ** 2) / (2 * a * b));
-  });
-};
-
-// positive distance is to the right moving from pt1 to pt2
-const parallelLineAtDistance = (pt1, pt2, distance) => {
-  const sign = distance < 0 ? -1 : 1;
-  const absDist = Math.abs(distance);
-  return new Line(
-    hingedPlot(pt2, pt1, sign * (Math.PI / 2), absDist).toPoint(),
-    hingedPlot(pt1, pt2, -sign * (Math.PI / 2), absDist).toPoint(),
-  );
-};
-
-const hingedPlotByProjectionDistance = (pt1, pt2, angle, projectionDistance) => {
-  const l1 = parallelLineAtDistance(pt1, pt2, projectionDistance);
-  const l2 = new Line(pt2.toPoint(), hingedPlot(pt2, pt1, angle, projectionDistance));
-  return l1.intersect(l2);
-};
-
-const insetPoints = (vectors, distance) => {
-  const returnVal = [];
-  for (const i in vectors) {
-    const vec = circularSlice(vectors, i, vectors.length);
-    const l1 = parallelLineAtDistance(vec[1], vec[0], distance);
-    console.log('eee', l1);
-    const l2 = parallelLineAtDistance(vec[2], vec[1], distance);
-    const intersections = l1.intersect(l2);
-    returnVal.push(intersections[0]);
-  }
-  return returnVal;
-};
+import range from 'lodash-es/range';
+import {
+  radToDeg,
+  degToRad, hingedPlot,
+  hingedPlotByProjectionDistance,
+  insetPoints,
+  triangleAnglesGivenSides,
+} from '../util/geom';
+import { PathData } from '../util/path';
+import {
+  ascendantEdgeConnectionTabs,
+  baseEdgeConnectionTab,
+  roundedEdgePath,
+} from '../util/shapes';
 
 export const PyramidNet = ({ netSpec }) => {
   const { faceEdgeLengths, faceCount } = netSpec;
   const faceInteriorAngles = triangleAnglesGivenSides(faceEdgeLengths);
 
-  const p1 = new Vector(0, 0);
-  const p2 = p1.add(new Vector(faceEdgeLengths[0], 0));
+  const p1 = new Point(0, 0);
+  const p2 = p1.add(new Point(faceEdgeLengths[0], 0));
 
-  const range = (length) => Array.from({ length }, (_, i) => i);
-
-  const v1 = Vector.fromAngle(Math.PI - faceInteriorAngles[0], faceEdgeLengths[1]);
-  const mapVectorToPoints = (v) => v.toPoint();
+  const v1 = Point.fromPolar([Math.PI - faceInteriorAngles[0], faceEdgeLengths[1]]);
 
   const subtractPointsArrays = (pts1, pts2) => {
     const polygon1 = new Polygon();
@@ -97,39 +38,69 @@ export const PyramidNet = ({ netSpec }) => {
   v1.y *= -1;
   const p3 = p2.add(v1);
   const boundaryPoints = [p1, p2, p3];
-  const inset = insetPoints(boundaryPoints, 2);
+  const tabThickness = 2;
+  const inset = insetPoints(boundaryPoints, tabThickness);
 
-  const borderOverlay = subtractPointsArrays(boundaryPoints.map(mapVectorToPoints), inset);
+  const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
 
-  const tabFlapCorners = [
-    p1,
-    hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], 10)[0],
-    hingedPlotByProjectionDistance(p1, p2, degToRad(30), 10)[0],
-  ];
+  const retractionDistance = 2;
+  const tabRoundingDistance = 0.3;
+  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -tabThickness);
+  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), tabThickness);
+  const connectionTabsInst = ascendantEdgeConnectionTabs(p2, p1, tabThickness, tabRoundingDistance);
+  const plotProps = { fill: 'none', strokeWidth: 0.1 };
+  const CUT_COLOR = '#FF244D';
+  const SCORE_COLOR = '#BDFF48';
+  const cutProps = { ...plotProps, stroke: CUT_COLOR };
+  const scoreProps = { ...plotProps, stroke: SCORE_COLOR };
 
-  console.log(borderOverlay.toJSON());
+  const faceTabFenceposts = range(faceCount + 1).map(
+    (index) => hingedPlot(
+      p2, p1, Math.PI * 2 - index * faceInteriorAngles[2],
+      index % 2 ? faceEdgeLengths[2] : faceEdgeLengths[0],
+    ),
+  );
 
+  const borderMaskPathAttrs = borderOverlay.pathAttrs({ stroke: 'none', fill: '#EF9851' });
+
+  const baseEdgeTab = baseEdgeConnectionTab(p2, p3, 5, tabRoundingDistance * 5);
   return (
-    <g>
-      <path stroke="red" strokeWidth={2} d={sampleDComposed}></path>
-      <path stroke="blue" strokeWidth={1} d={sampleD}></path>
-      <symbol id="tile" overflow="visible">
+    <g overflow="visible">
+      <symbol id="face-tile" overflow="visible">
         <g>
-          <PolygonPath fill="none" stroke="#000" points={boundaryPoints.map((pt) => pt.toArray())} />
-          <PolygonPath fill="none" stroke="red" points={inset.map((pt) => pt.toArray())} />
-          <path fill="#EF9851" stroke="none" d={borderOverlay.getD()} />
+          <path {...borderMaskPathAttrs} />
         </g>
       </symbol>
+
+      <path {...scoreProps} d={baseEdgeTab.score.getD()} />
+      <path {...cutProps} d={baseEdgeTab.cut.getD()} />
+
       {range(faceCount).map((index) => {
         const isOdd = index % 2;
         const yScale = isOdd ? -1 : 1;
         const rotation = ((index + (isOdd ? 1 : 0)) * faceInteriorAngles[2] * 360 * (isOdd ? 1 : -1)) / (2 * Math.PI);
+        return <use key={index} transform={`scale(1 ${yScale}) rotate(${rotation})`} xlinkHref="#face-tile" />;
+      })}
+      <g transform={`rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`}>
+        <path {...cutProps} d={connectionTabsInst.tabs.getD()} />
+      </g>
+      <path {...cutProps} d={roundedEdgePath([p1, outerPt1, outerPt2, p2], retractionDistance).getD()} />
+      <path {...scoreProps} d={connectionTabsInst.scores.getD()} />
+      <path {...cutProps} d={connectionTabsInst.holes.getD()} />
+      {}
+      {/* eslint-disable-next-line arrow-body-style */}
+      {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
+        // eslint-disable-next-line react/no-array-index-key
+        return (<path key={index} {...scoreProps} d={(new PathData()).move(p1).line(endPt).getD()} />);
+      })}
+      {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
+        const edgePt2 = faceTabFenceposts[index + 1];
+        const tabPaths = baseEdgeConnectionTab(edgePt1, edgePt2, 5, tabRoundingDistance * 5);
         return (
-          <use
-            key={index}
-            transform={`scale(1 ${yScale}) rotate(${rotation})`}
-            xlinkHref="#tile"
-          />
+          <g>
+            <path {...cutProps} d={tabPaths.cut.getD()} />
+            <path {...scoreProps} d={tabPaths.score.getD()} />
+          </g>
         );
       })}
     </g>
