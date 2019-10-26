@@ -91,7 +91,6 @@ export const PyramidNet = ({ netSpec }) => {
       {/* eslint-disable-next-line arrow-body-style */}
       {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
         const pathData = strokeDashPath(p1, endPt, [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90], 10, 0.75);
-        // eslint-disable-next-line react/no-array-index-key
         return (<path key={index} {...scoreProps} d={pathData.getD()} />);
       })}
       {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
@@ -99,8 +98,8 @@ export const PyramidNet = ({ netSpec }) => {
         const tabPaths = baseEdgeConnectionTab(edgePt1, edgePt2, 5, tabRoundingDistance * 5);
         return (
           <g>
-            <path {...cutProps} d={tabPaths.cut.getD()} />
-            <path {...scoreProps} d={tabPaths.score.getD()} />
+            <path key={index} {...cutProps} d={tabPaths.cut.getD()} />
+            <path key={index} {...scoreProps} d={tabPaths.score.getD()} />
           </g>
         );
       })}
