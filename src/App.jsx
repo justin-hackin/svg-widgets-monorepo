@@ -1,5 +1,5 @@
 import React from 'react';
-import SVGViewer from './components/SVGViewer';
+import { SVGViewer } from './components/SVGViewer';
 
 import './App.css';
 

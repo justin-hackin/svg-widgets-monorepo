@@ -18,8 +18,9 @@
     "lodash-es": "^4.17.15",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-svg-pan-zoom": "^3.3.0",
-    "svg-path-parser": "github:justin-barca/svg-path-parser"
+    "react-svg-pan-zoom": "^3.4.0",
+    "svg-path-parser": "github:justin-barca/svg-path-parser",
+    "use-query-params": "^0.4.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
