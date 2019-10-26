@@ -10,7 +10,8 @@ module.exports = {
     'react/jsx-props-no-spreading': 0,
     // TODO: convert to ts or remove following
     'react/prop-types': 0,
-    'react/no-array-index': 0
+    'react/no-array-index': 0,
+    'react/no-array-index-key': 0
   },
   parserOptions: {
     ecmaVersion: 11,
