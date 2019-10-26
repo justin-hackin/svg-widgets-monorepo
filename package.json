@@ -14,12 +14,12 @@
   "license": "MIT",
   "dependencies": {
     "@flatten-js/boolean-op": "^1.1.4",
-    "@flatten-js/core": "^1.0.17",
+    "@flatten-js/core": "git+https://github.com/justin-barca/flatten-js.git",
     "lodash-es": "^4.17.15",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-svg-pan-zoom": "^3.4.0",
-    "svg-path-parser": "github:justin-barca/svg-path-parser",
+    "svg-path-parser": "git+https://github.com/justin-barca/svg-path-parser.git",
     "use-query-params": "^0.4.3"
   },
   "devDependencies": {
@@ -36,6 +36,7 @@
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^1.7.0",
     "parcel-bundler": "^1.12.3",
+    "parcel-plugin-typescript": "^1.0.0",
     "typescript": "^3.6.4"
   }
 }

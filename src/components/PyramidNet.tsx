@@ -1,4 +1,5 @@
 import { subtract } from '@flatten-js/boolean-op';
+// @ts-ignore
 import { Point, Polygon } from '@flatten-js/core';
 import React from 'react';
 import range from 'lodash-es/range';
@@ -87,7 +88,6 @@ export const PyramidNet = ({ netSpec }) => {
       <path {...cutProps} d={roundedEdgePath([p1, outerPt1, outerPt2, p2], retractionDistance).getD()} />
       <path {...scoreProps} d={connectionTabsInst.scores.getD()} />
       <path {...cutProps} d={connectionTabsInst.holes.getD()} />
-      {}
       {/* eslint-disable-next-line arrow-body-style */}
       {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
         const pathData = strokeDashPath(p1, endPt, [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90], 10, 0.75);
@@ -97,9 +97,9 @@ export const PyramidNet = ({ netSpec }) => {
         const edgePt2 = faceTabFenceposts[index + 1];
         const tabPaths = baseEdgeConnectionTab(edgePt1, edgePt2, 5, tabRoundingDistance * 5);
         return (
-          <g>
-            <path key={`${index}-cut`} {...cutProps} d={tabPaths.cut.getD()} />
-            <path key={`${index}-score`} {...scoreProps} d={tabPaths.score.getD()} />
+          <g key={index}>
+            <path {...cutProps} d={tabPaths.cut.getD()} />
+            <path {...scoreProps} d={tabPaths.score.getD()} />
           </g>
         );
       })}
