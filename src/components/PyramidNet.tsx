@@ -98,8 +98,8 @@ export const PyramidNet = ({ netSpec }) => {
         const tabPaths = baseEdgeConnectionTab(edgePt1, edgePt2, 5, tabRoundingDistance * 5);
         return (
           <g>
-            <path key={index} {...cutProps} d={tabPaths.cut.getD()} />
-            <path key={index} {...scoreProps} d={tabPaths.score.getD()} />
+            <path key={`${index}-cut`} {...cutProps} d={tabPaths.cut.getD()} />
+            <path key={`${index}-score`} {...scoreProps} d={tabPaths.score.getD()} />
           </g>
         );
       })}

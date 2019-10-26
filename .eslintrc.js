@@ -1,6 +1,7 @@
 module.exports = {
-  extends: 'airbnb',
-  parser: 'babel-eslint',
+  extends: 'airbnb-typescript',
+  plugins: ['@typescript-eslint'],
+  parser: '@typescript-eslint/parser',
   globals: {
     document: true,
   },
@@ -12,6 +13,20 @@ module.exports = {
     'react/prop-types': 0,
     'react/no-array-index': 0,
     'react/no-array-index-key': 0
+  },
+  settings: {
+    'import/extensions': [".js",".jsx",".ts",".tsx"],
+    'import/parsers': {
+      '@typescript-eslint/parser': [".ts",".tsx"]
+    },
+    'import/resolver': {
+      'node': {
+        'extensions': [".js",".jsx",".ts",".tsx"]
+      }
+    },
+    "react/jsx-filename-extension": [1, {
+      "extensions": [".jsx", ".tsx"]
+    }],
   },
   parserOptions: {
     ecmaVersion: 11,
