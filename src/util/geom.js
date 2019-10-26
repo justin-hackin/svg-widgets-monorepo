@@ -27,6 +27,11 @@ export function hingedPlotLerp(p1, p2, theta, lengthRatio) {
   return Point.fromPolar([difference.angle + theta, difference.length * lengthRatio]).add(p2);
 }
 
+export function lineLerp(start, end, lerp) {
+  const difference = end.subtract(start);
+  return start.add(Point.fromPolar([difference.angle, difference.length * lerp]));
+}
+
 export function parallelLineAtDistance(pt1, pt2, distance) {
   const sign = distance < 0 ? -1 : 1;
   const absDist = Math.abs(distance);

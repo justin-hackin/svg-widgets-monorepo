@@ -9,11 +9,10 @@ import {
   insetPoints,
   triangleAnglesGivenSides,
 } from '../util/geom';
-import { PathData } from '../util/path';
 import {
   ascendantEdgeConnectionTabs,
   baseEdgeConnectionTab,
-  roundedEdgePath,
+  roundedEdgePath, strokeDashPath,
 } from '../util/shapes';
 
 export const PyramidNet = ({ netSpec }) => {
@@ -61,6 +60,7 @@ export const PyramidNet = ({ netSpec }) => {
     ),
   );
 
+
   const borderMaskPathAttrs = borderOverlay.pathAttrs({ stroke: 'none', fill: '#EF9851' });
 
   const baseEdgeTab = baseEdgeConnectionTab(p2, p3, 5, tabRoundingDistance * 5);
@@ -90,8 +90,9 @@ export const PyramidNet = ({ netSpec }) => {
       {}
       {/* eslint-disable-next-line arrow-body-style */}
       {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
+        const pathData = strokeDashPath(p1, endPt, [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90], 10, 0);
         // eslint-disable-next-line react/no-array-index-key
-        return (<path key={index} {...scoreProps} d={(new PathData()).move(p1).line(endPt).getD()} />);
+        return (<path key={index} {...scoreProps} d={pathData.getD()} />);
       })}
       {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
         const edgePt2 = faceTabFenceposts[index + 1];

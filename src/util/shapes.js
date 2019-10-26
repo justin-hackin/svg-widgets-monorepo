@@ -1,12 +1,11 @@
 /* eslint-disable newline-per-chained-call */
-// Abstract codes are special commands that do not map to the SVG path spec command directly
-// instead they may render one or more svg commands and infer their parameters from neighbouring points
 import last from 'lodash-es/last';
 import range from 'lodash-es/range';
+import sum from 'lodash-es/sum';
 import { COMMAND_FACTORY, PathData } from './path';
 import {
   hingedPlot, hingedPlotByProjectionDistance, hingedPlotLerp,
-  intersectLineLine,
+  intersectLineLine, lineLerp,
   parallelLinePointsAtDistance,
   symmetricHingePlot,
   symmetricHingePlotByProjectionDistance,
@@ -86,7 +85,11 @@ export const ascendantEdgeConnectionTabs = (start, end, tabDepth, tabRoundingDis
   return commands;
 };
 
-export function baseEdgeConnectionTab(start, end, tabDepth, roundingDistance, holeDepthToTabDepth = 0.5, holeTaper = Math.PI / 4, holeBreadthToHalfWidth = 0.5, finDepthToTabDepth = 0.7, finTipDepthToFinDepth = 1.1) {
+export function baseEdgeConnectionTab(
+  start, end, tabDepth, roundingDistance,
+  holeDepthToTabDepth = 0.5, holeTaper = Math.PI / 4, holeBreadthToHalfWidth = 0.5, finDepthToTabDepth = 0.7,
+  finTipDepthToFinDepth = 1.1,
+) {
   const cutPath = new PathData();
   const mid = hingedPlotLerp(start, end, 0, 0.5);
 
@@ -122,4 +125,72 @@ export function baseEdgeConnectionTab(start, end, tabDepth, roundingDistance, ho
   const scorePath = new PathData();
   scorePath.move(start).line(holeBases[0]).move(holeBases[1]).line(mid).move(finBases[0]).line(finBases[1]);
   return { cut: cutPath, score: scorePath };
+}
+
+const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
+
+export function lineSeries(startEndArray) {
+  const path = new PathData();
+  for (const [start, end] of startEndArray) {
+    path.move(start).line(end);
+  }
+  return path;
+}
+
+export function strokeDashPath(
+  start, end, relativeStrokeDasharray, strokeDashLength, strokeDashOffsetRatio = 0,
+) {
+  const vector = end.subtract(start);
+  const vectorLength = vector.length;
+  const strokeDashLengthToVectorLength = strokeDashLength / vectorLength;
+  if (strokeDashLengthToVectorLength > 1) {
+    throw new Error('strokeDashLength is greater than length from start to end');
+  }
+
+
+  const dashArrayTotalLength = sum(relativeStrokeDasharray);
+  const startEndLerps = relativeStrokeDasharray.reduce((acc, intervalLength, index) => {
+    const intervalRatio = intervalLength / dashArrayTotalLength;
+    const isStroke = index % 2 === 0;
+    if (isStroke) {
+      acc.lerps.push([acc.at, acc.at + intervalRatio]);
+      acc.at += intervalRatio;
+    } else {
+      acc.at += intervalRatio;
+    }
+    return acc;
+  }, { at: 0, lerps: [] }).lerps;
+
+  const iterationsRequiredForCoverage = Math.ceil(vectorLength / strokeDashLength);
+  const lineStartEndPoints = range(iterationsRequiredForCoverage)
+    // compute the start-end lerps relative to the start - end vector
+    .reduce((acc, iterIndex) => {
+      const lerpOffset = iterIndex * strokeDashLengthToVectorLength;
+      const lerpTransform = (lerp) => lerp * strokeDashLengthToVectorLength + lerpOffset;
+      acc = acc.concat(startEndLerps.map((el) => el.map(lerpTransform)));
+      return acc;
+    }, [])
+    // remove line segments that lie fully outside the start-end vector
+    .filter(([startLerp, endLerp]) => startLerp <= 1 && endLerp <= 1)
+    // nudge the segments forward based on strokeDashOffsetRatio, wrapping and/or splicing where necessary
+    .reduce((acc, startEndLerp) => {
+      const startEndLerpNew = startEndLerp.map((val) => val + strokeDashOffsetRatio);
+      // the whole segment is past the edges of the vector, wrap whole thing
+      if (startEndLerpNew[0] >= 1) {
+        acc.push(startEndLerpNew.map(wrapRatio));
+        return acc;
+      }
+      // start lies within but end lies without, chop at end, and wrap remainder
+      if (startEndLerpNew[1] > 1) {
+        acc.push([startEndLerpNew[0], 1]);
+        acc.push([0, wrapRatio(startEndLerpNew[1])]);
+        return acc;
+      }
+      acc.push(startEndLerpNew);
+      return acc;
+    }, [])
+    // visually this should not make difference but better for plotters that don't optimize
+    // .sort(([start1], [start2]) => (start1 - start2))
+    .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp)));
+  return lineSeries(lineStartEndPoints);
 }
