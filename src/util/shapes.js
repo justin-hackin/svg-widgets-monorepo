@@ -174,7 +174,7 @@ export function strokeDashPath(
     .filter(([startLerp, endLerp]) => startLerp <= 1 && endLerp <= 1)
     // nudge the segments forward based on strokeDashOffsetRatio, wrapping and/or splicing where necessary
     .reduce((acc, startEndLerp) => {
-      const startEndLerpNew = startEndLerp.map((val) => val + strokeDashOffsetRatio);
+      const startEndLerpNew = startEndLerp.map((val) => val + strokeDashOffsetRatio * strokeDashLengthToVectorLength);
       // the whole segment is past the edges of the vector, wrap whole thing
       if (startEndLerpNew[0] >= 1) {
         acc.push(startEndLerpNew.map(wrapRatio));
@@ -190,7 +190,7 @@ export function strokeDashPath(
       return acc;
     }, [])
     // visually this should not make difference but better for plotters that don't optimize
-    // .sort(([start1], [start2]) => (start1 - start2))
+    .sort(([start1], [start2]) => (start1 - start2))
     .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp)));
   return lineSeries(lineStartEndPoints);
 }

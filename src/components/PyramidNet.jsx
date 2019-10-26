@@ -61,7 +61,7 @@ export const PyramidNet = ({ netSpec }) => {
   );
 
 
-  const borderMaskPathAttrs = borderOverlay.pathAttrs({ stroke: 'none', fill: '#EF9851' });
+  const borderMaskPathAttrs = borderOverlay.pathAttrs({ stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' });
 
   const baseEdgeTab = baseEdgeConnectionTab(p2, p3, 5, tabRoundingDistance * 5);
   return (
@@ -90,7 +90,7 @@ export const PyramidNet = ({ netSpec }) => {
       {}
       {/* eslint-disable-next-line arrow-body-style */}
       {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
-        const pathData = strokeDashPath(p1, endPt, [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90], 10, 0);
+        const pathData = strokeDashPath(p1, endPt, [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90], 10, 0.75);
         // eslint-disable-next-line react/no-array-index-key
         return (<path key={index} {...scoreProps} d={pathData.getD()} />);
       })}
