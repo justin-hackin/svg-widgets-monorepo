@@ -1,5 +1,14 @@
 {
   "compilerOptions": {
-    "jsx": "react"
+    "jsx": "react",
+    "allowUmdGlobalAccess": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "~*": ["./src/*"]
+    },
+    "target": "ES5"
   }
 }

@@ -1,5 +1,16 @@
+// @ts-ignore
 import { Line, Point } from '@flatten-js/core';
 import { circularSlice } from './data';
+
+export interface PointLike {
+  x: number,
+  y: number
+}
+
+
+export type PointTuple = [number, number];
+export type Coord = PointTuple | PointLike;
+
 
 export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
 export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);
@@ -17,12 +28,14 @@ export function triangleAnglesGivenSides(sideLengths) {
 }
 
 // positive distance is to the right moving from pt1 to pt2
-export function hingedPlot(p1, p2, theta, length) {
+export function hingedPlot(p1:PointLike, p2:PointLike, theta, length) {
+  // @ts-ignore
   return Point.fromPolar([p1.subtract(p2).angle + theta, length]).add(p2);
 }
 
 // positive distance is to the right moving from pt1 to pt2
-export function hingedPlotLerp(p1, p2, theta, lengthRatio) {
+export function hingedPlotLerp(p1:PointLike, p2:PointLike, theta, lengthRatio) {
+  // @ts-ignore
   const difference = p1.subtract(p2);
   return Point.fromPolar([difference.angle + theta, difference.length * lengthRatio]).add(p2);
 }
@@ -88,12 +101,13 @@ export function symmetricHingePlotIntersection(p1, p2, theta, length) {
 
 export function insetPoints(vectors, distance) {
   const returnVal = [];
-  for (const i in vectors) {
+  vectors.forEach((vector, i) => {
     const vec = circularSlice(vectors, i, vectors.length);
     const l1 = parallelLineAtDistance(vec[1], vec[0], distance);
     const l2 = parallelLineAtDistance(vec[2], vec[1], distance);
     const intersections = l1.intersect(l2);
     returnVal.push(intersections[0]);
-  }
+  });
+
   return returnVal;
 }

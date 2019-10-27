@@ -1,25 +1,26 @@
 import cloneDeep from 'lodash-es/cloneDeep';
-import includes from 'lodash-es/includes';
-import isArray from 'lodash-es/isArray';
-import isNumber from 'lodash-es/isNumber';
+// @ts-ignore
+import { Point } from '@flatten-js/core';
 import isNaN from 'lodash-es/isNaN';
 import {
-  composeSVG, makeAbsolute, parseSVG, Point,
+  composeSVG, makeAbsolute, parseSVG,
 } from 'svg-path-parser';
-import { hingedPlot } from './geom';
+import { PointTuple, Coord } from './geom';
 
-const castToArray = (pt) => {
-  if (isNumber(pt.x) && isNumber(pt.y)) {
-    const arrPt = [pt.x, pt.y];
+const castToArray = (pt: Coord):PointTuple => {
+  if (pt instanceof Point) {
+    // @ts-ignore
+    const arrPt:PointTuple = [pt.x, pt.y];
+    // @ts-ignore
     if (isNaN(pt.x) || isNaN(pt.y)) {
       throw new Error(`point co-ordinates contain NaN: (${arrPt})`);
     }
     return arrPt;
   }
+  // @ts-ignore
   return pt;
 };
 
-type Coord = [number, number] | Point;
 
 export const COMMAND_FACTORY = {
   M: (to:Coord):Command => ({
@@ -76,16 +77,15 @@ interface Command {
 export class PathData {
   private commands: Command[];
 
-  constructor(param) {
+  constructor(param?: Command[] | Coord) {
     // TODO: check instance type
-    if (param) {
-      if (!isArray(param)) {
-        throw new Error(
-          'PathData constructor: optional parameter must be an array of command objects',
-        );
-      }
+    if (!param) {
+      this.commands = [];
+      return this;
     }
-    this.commands = param || [];
+    // @ts-ignore
+    this.commands = param instanceof Point ? [COMMAND_FACTORY.M(param)] : param;
+    return this;
   }
 
   move(to):PathData {
@@ -132,32 +132,6 @@ export class PathData {
 
   static fromDValue(d):PathData {
     return new PathData(makeAbsolute(parseSVG(d)));
-  }
-
-  getInferredControlPoint(index) {
-    const { code } = this.commands[index];
-    const previousCode = this.commands[index - 1].code;
-    if (includes(['S', 'T'], code)) {
-      throw new Error(`command at index ${index} is not a smooth bezier command`);
-    }
-    if (code === 'S') {
-      const { ctrl2, to } = this.commands[index - 1];
-      if (!includes(['S', 'C'], to)) {
-        throw new Error(`svg path command ${code} is preceded by something other than 'S', 'C' command`);
-      }
-      const previousCtrl = previousCode === 'C' ? ctrl2 : this.getInferredControlPoint(index - 1);
-      return hingedPlot(previousCtrl, to, Math.PI, to.subtract(previousCtrl).length);
-    }
-    if (code === 'T') {
-      const { ctrl1, to } = this.commands[index - 1];
-      if (!includes(['T', 'Q'], to)) {
-        throw new Error(`svg path command ${code} is preceded by something other than 'T', 'Q' command`);
-      }
-      const previousCtrl = previousCode === 'Q' ? ctrl1 : this.getInferredControlPoint(index - 1);
-      return hingedPlot(previousCtrl, to, Math.PI, to.subtract(previousCtrl).length);
-    }
-    throw new Error(`attempt to getInferredControlPoint, expected code at index ${index
-    } to be one of 'S', 'T', but instead saw '${code}'`);
   }
 
   concatCommands(commands):PathData {

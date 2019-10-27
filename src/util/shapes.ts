@@ -4,6 +4,7 @@ import range from 'lodash-es/range';
 import sum from 'lodash-es/sum';
 import { COMMAND_FACTORY, PathData } from './path';
 import {
+  PointLike,
   hingedPlot, hingedPlotByProjectionDistance, hingedPlotLerp,
   intersectLineLine, lineLerp,
   parallelLinePointsAtDistance,
@@ -11,10 +12,21 @@ import {
   symmetricHingePlotByProjectionDistance,
 } from './geom';
 
-export const roundedEdgePath = (points, retractionDistance) => {
+interface RoundPoint {
+  point: PointLike,
+  retractionDistance: number
+}
+// TODO: appears this is incoorect
+type RoundPointPointsItem = PointLike | RoundPoint;
+
+// a bit hacky but apparently required
+// https://github.com/alexbol99/flatten-js/issues/14
+export const roundedEdgePath = (points:RoundPointPointsItem[], retractionDistance:number):PathData => {
   const path = (new PathData()).move(points[0]);
   points.slice(1, -1).reduce((acc, point, pointIndex) => {
+    // @ts-ignore
     const thisPoint = point.point || point;
+    // @ts-ignore
     const thisRetractionDistance = point.retractionDistance || retractionDistance;
 
     const toward = points[pointIndex + 2];
@@ -99,7 +111,9 @@ export function baseEdgeConnectionTab(
     hingedPlotLerp(start, mid, 0, holeHandleThicknessRatio),
   ];
   const holeTheta = -holeTaper + Math.PI / 2;
-  const holeEdges = symmetricHingePlotByProjectionDistance(holeBases[0], holeBases[1], holeTheta, tabDepth * holeDepthToTabDepth);
+  const holeEdges = symmetricHingePlotByProjectionDistance(
+    holeBases[0], holeBases[1], holeTheta, tabDepth * holeDepthToTabDepth,
+  );
   const roundedHole = roundedEdgePath([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]], roundingDistance);
   cutPath.concatPath(roundedHole);
   cutPath.close();
@@ -131,9 +145,9 @@ const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number
 
 export function lineSeries(startEndArray) {
   const path = new PathData();
-  for (const [start, end] of startEndArray) {
+  startEndArray.forEach(([start, end]) => {
     path.move(start).line(end);
-  }
+  });
   return path;
 }
 

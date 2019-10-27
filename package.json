@@ -16,8 +16,9 @@
     "@flatten-js/boolean-op": "^1.1.4",
     "@flatten-js/core": "git+https://github.com/justin-barca/flatten-js.git",
     "lodash-es": "^4.17.15",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-resize-detector": "^4.2.1",
     "react-svg-pan-zoom": "^3.4.0",
     "svg-path-parser": "git+https://github.com/justin-barca/svg-path-parser.git",
     "use-query-params": "^0.4.3"
