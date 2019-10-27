@@ -3,7 +3,9 @@ import includes from 'lodash-es/includes';
 import isArray from 'lodash-es/isArray';
 import isNumber from 'lodash-es/isNumber';
 import isNaN from 'lodash-es/isNaN';
-import { composeSVG, makeAbsolute, parseSVG } from 'svg-path-parser';
+import {
+  composeSVG, makeAbsolute, parseSVG, Point,
+} from 'svg-path-parser';
 import { hingedPlot } from './geom';
 
 const castToArray = (pt) => {
@@ -17,47 +19,63 @@ const castToArray = (pt) => {
   return pt;
 };
 
+type Coord = [number, number] | Point;
+
 export const COMMAND_FACTORY = {
-  M: (to) => ({
+  M: (to:Coord):Command => ({
     code: 'M',
     to: castToArray(to),
   }),
-  L: (to) => ({
+  L: (to:Coord):Command => ({
     code: 'L',
     to: castToArray(to),
   }),
-  C: (ctrl1, ctrl2, to) => ({
+  C: (ctrl1:Coord, ctrl2:Coord, to:Coord):Command => ({
     code: 'C',
     to: castToArray(to),
     ctrl1: castToArray(ctrl1),
     ctrl2: castToArray(ctrl2),
   }),
-  S: (ctrl2, to) => ({
+  S: (ctrl2, to):Command => ({
     code: 'S',
     to: castToArray(to),
     ctrl2: castToArray(ctrl2),
   }),
-  Q: (ctrl1, to) => ({
+  Q: (ctrl1:Coord, to:Coord):Command => ({
     code: 'Q',
     to: castToArray(to),
     ctrl1: castToArray(ctrl1),
   }),
-  T: (to) => ({
+  T: (to:Coord):Command => ({
     code: 'T',
     to: castToArray(to),
   }),
-  A: (radiusX, radiusY, sweepFlag, largeArcFlag, to) => ({
+  A: (radiusX, radiusY, sweepFlag, largeArcFlag, xAxisRotation, to):Command => ({
     code: 'A',
     radius: [radiusX, radiusY],
     flags: [sweepFlag, largeArcFlag],
     to: castToArray(to),
+    xAxisRotation,
+
   }),
-  Z: () => ({
+  Z: ():Command => ({
     code: 'Z',
   }),
 };
+interface Command {
+  code: string,
+  to?: Coord,
+  ctrl1?: Coord,
+  ctrl2?: Coord,
+  radius?: Coord,
+  flags?: [boolean, boolean],
+  xAxisRotation?: number,
+  value?: number,
+}
 
 export class PathData {
+  private commands: Command[];
+
   constructor(param) {
     // TODO: check instance type
     if (param) {
@@ -70,49 +88,49 @@ export class PathData {
     this.commands = param || [];
   }
 
-  move(to) {
+  move(to):PathData {
     const command = COMMAND_FACTORY.M(to);
     this.commands.push(command);
     return this;
   }
 
-  line(to) {
+  line(to):PathData {
     const command = COMMAND_FACTORY.L(to);
     this.commands.push(command);
     return this;
   }
 
-  close() {
+  close():PathData {
     const command = COMMAND_FACTORY.Z();
     this.commands.push(command);
     return this;
   }
 
-  cubicBezier(ctrl1, ctrl2, to) {
+  cubicBezier(ctrl1, ctrl2, to):PathData {
     const command = COMMAND_FACTORY.C(ctrl1, ctrl2, to);
     this.commands.push(command);
     return this;
   }
 
-  quadraticBezier(ctrl1, to) {
+  quadraticBezier(ctrl1, to):PathData {
     const command = COMMAND_FACTORY.Q(ctrl1, to);
     this.commands.push(command);
     return this;
   }
 
-  smoothQuadraticBezier(to) {
+  smoothQuadraticBezier(to):PathData {
     const command = COMMAND_FACTORY.T(to);
     this.commands.push(command);
     return this;
   }
 
-  elipticalArc(to, radiusX, radiusY, sweepFlag, largeArcFlag) {
-    const command = COMMAND_FACTORY.A(radiusX, radiusY, sweepFlag, largeArcFlag, to);
+  elipticalArc(to, radiusX, radiusY, sweepFlag, largeArcFlag, xAxisRotation):PathData {
+    const command = COMMAND_FACTORY.A(radiusX, radiusY, sweepFlag, largeArcFlag, xAxisRotation, to);
     this.commands.push(command);
     return this;
   }
 
-  static fromDValue(d) {
+  static fromDValue(d):PathData {
     return new PathData(makeAbsolute(parseSVG(d)));
   }
 
@@ -142,22 +160,22 @@ export class PathData {
     } to be one of 'S', 'T', but instead saw '${code}'`);
   }
 
-  concatCommands(commands) {
+  concatCommands(commands):PathData {
     this.commands = this.commands.concat(cloneDeep(commands));
     return this;
   }
 
-  concatPath(path) {
+  concatPath(path):PathData {
     this.commands = this.commands.concat(cloneDeep(path.commands));
     return this;
   }
 
-  sliceCommandsDangerously(...params) {
+  sliceCommandsDangerously(...params):PathData {
     this.commands = this.commands.slice(...params);
     return this;
   }
 
-  getD() {
+  getD():string {
     return composeSVG(this.commands);
   }
 }
