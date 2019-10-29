@@ -4,13 +4,12 @@ import { circularSlice } from './data';
 
 export interface PointLike {
   x: number,
-  y: number
+  y: number,
+  [x: string]: any,
 }
-
 
 export type PointTuple = [number, number];
 export type Coord = PointTuple | PointLike;
-
 
 export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
 export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);
@@ -29,13 +28,11 @@ export function triangleAnglesGivenSides(sideLengths) {
 
 // positive distance is to the right moving from pt1 to pt2
 export function hingedPlot(p1:PointLike, p2:PointLike, theta, length) {
-  // @ts-ignore
   return Point.fromPolar([p1.subtract(p2).angle + theta, length]).add(p2);
 }
 
 // positive distance is to the right moving from pt1 to pt2
 export function hingedPlotLerp(p1:PointLike, p2:PointLike, theta, lengthRatio) {
-  // @ts-ignore
   const difference = p1.subtract(p2);
   return Point.fromPolar([difference.angle + theta, difference.length * lengthRatio]).add(p2);
 }

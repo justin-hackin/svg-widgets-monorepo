@@ -24,13 +24,10 @@ type RoundPointPointsItem = PointLike | RoundPoint;
 export const roundedEdgePath = (points:RoundPointPointsItem[], retractionDistance:number):PathData => {
   const path = (new PathData()).move(points[0]);
   points.slice(1, -1).reduce((acc, point, pointIndex) => {
-    // @ts-ignore
-    const thisPoint = point.point || point;
-    // @ts-ignore
+    const thisPoint = (point.point || point as PointLike);
     const thisRetractionDistance = point.retractionDistance || retractionDistance;
-
-    const toward = points[pointIndex + 2];
-    const fromPoint = points[pointIndex];
+    const toward = (points[pointIndex + 2].point || points[pointIndex + 2] as PointLike);
+    const fromPoint = (points[pointIndex].point || points[pointIndex] as PointLike);
     const curveStart = hingedPlot(fromPoint, thisPoint, 0, thisRetractionDistance);
     const curveEnd = hingedPlot(toward, thisPoint, 0, thisRetractionDistance);
     acc.line(curveStart);
