@@ -38,16 +38,18 @@ export const PyramidNet = ({ netSpec }) => {
   v1.y *= -1;
   const p3 = p2.add(v1);
   const boundaryPoints = [p1, p2, p3];
-  const tabThickness = 2;
-  const inset = insetPoints(boundaryPoints, tabThickness);
+  const tabDepth = 2;
+  const inset = insetPoints(boundaryPoints, tabDepth);
 
   const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
 
   const retractionDistance = 2;
   const tabRoundingDistance = 0.3;
-  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -tabThickness);
-  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), tabThickness);
-  const connectionTabsInst = ascendantEdgeConnectionTabs(p2, p1, tabThickness, tabRoundingDistance);
+  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -tabDepth);
+  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), tabDepth);
+  const connectionTabsInst = ascendantEdgeConnectionTabs({
+    start: p2, end: p1, tabDepth, tabRoundingDistance,
+  });
   const plotProps = { fill: 'none', strokeWidth: 0.1 };
   const CUT_COLOR = '#FF244D';
   const SCORE_COLOR = '#BDFF48';
@@ -83,11 +85,12 @@ export const PyramidNet = ({ netSpec }) => {
         return <use key={index} transform={`scale(1 ${yScale}) rotate(${rotation})`} xlinkHref="#face-tile" />;
       })}
       <g transform={`rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`}>
-        <path {...cutProps} d={connectionTabsInst.tabs.getD()} />
+        <path {...cutProps} d={connectionTabsInst.male.cut.getD()} />
+        <path {...scoreProps} d={connectionTabsInst.male.score.getD()} />
       </g>
       <path {...cutProps} d={roundedEdgePath([p1, outerPt1, outerPt2, p2], retractionDistance).getD()} />
-      <path {...scoreProps} d={connectionTabsInst.scores.getD()} />
-      <path {...cutProps} d={connectionTabsInst.holes.getD()} />
+      <path {...scoreProps} d={connectionTabsInst.female.score.getD()} />
+      <path {...cutProps} d={connectionTabsInst.female.cut.getD()} />
       {/* eslint-disable-next-line arrow-body-style */}
       {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
         const pathData = strokeDashPath(p1, endPt, [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90], 10, 0.75);

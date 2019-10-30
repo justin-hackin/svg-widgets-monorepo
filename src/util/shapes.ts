@@ -38,17 +38,70 @@ export const roundedEdgePath = (points:RoundPointPointsItem[], retractionDistanc
 };
 const moveLines = (points) => points.map((point, index) => COMMAND_FACTORY[index ? 'L' : 'M'](point));
 
-export const ascendantEdgeConnectionTabs = (start, end, tabDepth, tabRoundingDistance,
-  tabsCount = 3, midpointDepthToTabDepth = 0.6, tabStartGapToTabDepth = 0.5, holeReachToTabDepth = 0.1,
-  holeWidthRatio = 0.4, holeFlapTaperAngle = Math.PI / 10, tabWideningAngle = Math.PI / 6) => {
+
+interface AscendantEdgeConnectionTabsSpec {
+  start: PointLike,
+  end: PointLike,
+  tabDepth: number,
+  tabRoundingDistance: number,
+  tabsCount?: number,
+  midpointDepthToTabDepth?: number,
+  tabStartGapToTabDepth?: number,
+  holeReachToTabDepth?: number,
+  holeWidthRatio?: number,
+  holeFlapTaperAngle?: number,
+  tabWideningAngle?: number,
+}
+
+const AscendantEdgeConnectionTabsDefaults = {
+  tabsCount: 3,
+  midpointDepthToTabDepth: 0.6,
+  tabStartGapToTabDepth: 0.5,
+  holeReachToTabDepth: 0.1,
+  holeWidthRatio: 0.4,
+  holeFlapTaperAngle: Math.PI / 10,
+  tabWideningAngle: Math.PI / 6,
+  bla: 'foo',
+};
+interface AscendantEdgeConnectionPaths {
+  female: {
+    cut: PathData,
+    score: PathData,
+  }
+  male: {
+    cut: PathData,
+    score: PathData,
+  }
+}
+
+export const ascendantEdgeConnectionTabs = (tabSpec: AscendantEdgeConnectionTabsSpec):AscendantEdgeConnectionPaths => {
+  const {
+    start,
+    end,
+    tabDepth,
+    tabRoundingDistance,
+    tabsCount,
+    midpointDepthToTabDepth,
+    tabStartGapToTabDepth,
+    holeReachToTabDepth,
+    holeWidthRatio,
+    holeFlapTaperAngle,
+    tabWideningAngle,
+  } = { ...tabSpec, ...AscendantEdgeConnectionTabsDefaults };
+
   const vector = end.subtract(start);
   const edgeDistance = vector.length;
   const tabTileDistance = edgeDistance / tabsCount;
   const tabWidth = holeWidthRatio * tabTileDistance;
   const commands = {
-    tabs: (new PathData()).move(start),
-    holes: (new PathData()),
-    scores: (new PathData()).move(start),
+    female: {
+      cut: (new PathData()),
+      score: (new PathData()).move(start),
+    },
+    male: {
+      cut: (new PathData()).move(start),
+      score: (new PathData()),
+    },
   };
   const ARBITRARY_LENGTH = 10;
   range(0, tabsCount).forEach((tabNum) => {
@@ -75,21 +128,22 @@ export const ascendantEdgeConnectionTabs = (start, end, tabDepth, tabRoundingDis
       tabBaseStart, tabBaseEnd, -Math.PI / 2 + holeFlapTaperAngle, holeReachToTabDepth * -tabDepth,
     );
 
-    commands.tabs.line(tabBaseStart);
+    commands.male.cut.line(tabBaseStart);
     const tabPath = roundedEdgePath(
       [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], tabRoundingDistance,
     );
+    commands.male.score.move(tabPath.commands[0].to).line(last(tabPath.commands).to);
     tabPath.sliceCommandsDangerously(1);
     // roundedEdgePath assumes first point is move command but we needed and applied line
-    commands.tabs.concatPath(tabPath);
-    commands.holes.concatCommands(moveLines(
+    commands.male.cut.concatPath(tabPath);
+    commands.female.cut.concatCommands(moveLines(
       [tabBaseStart, holeEdgeStart, holeEdgeEnd, tabBaseEnd],
     ));
-    commands.scores.line(tabBaseStart);
-    commands.scores.move(tabBaseEnd);
+    commands.female.score.line(tabBaseStart);
+    commands.female.score.move(tabBaseEnd);
   });
-  commands.tabs.line(end);
-  commands.scores.line(end);
+  commands.male.cut.line(end);
+  commands.female.score.line(end);
 
   return commands;
 };

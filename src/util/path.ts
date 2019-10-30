@@ -75,7 +75,7 @@ interface Command {
 }
 
 export class PathData {
-  private commands: Command[];
+  commands: Command[];
 
   constructor(param?: Command[] | Coord) {
     // TODO: check instance type
