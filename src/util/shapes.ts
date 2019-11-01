@@ -40,29 +40,17 @@ const moveLines = (points) => points.map((point, index) => COMMAND_FACTORY[index
 
 
 interface AscendantEdgeConnectionTabsSpec {
-  start: PointLike,
-  end: PointLike,
   tabDepth: number,
   tabRoundingDistance: number,
-  tabsCount?: number,
-  midpointDepthToTabDepth?: number,
-  tabStartGapToTabDepth?: number,
-  holeReachToTabDepth?: number,
-  holeWidthRatio?: number,
-  holeFlapTaperAngle?: number,
-  tabWideningAngle?: number,
+  tabsCount: number,
+  midpointDepthToTabDepth: number,
+  tabStartGapToTabDepth: number,
+  holeReachToTabDepth: number,
+  holeWidthRatio: number,
+  holeFlapTaperAngle: number,
+  tabWideningAngle: number,
 }
 
-const AscendantEdgeConnectionTabsDefaults = {
-  tabsCount: 3,
-  midpointDepthToTabDepth: 0.6,
-  tabStartGapToTabDepth: 0.5,
-  holeReachToTabDepth: 0.1,
-  holeWidthRatio: 0.4,
-  holeFlapTaperAngle: Math.PI / 10,
-  tabWideningAngle: Math.PI / 6,
-  bla: 'foo',
-};
 interface AscendantEdgeConnectionPaths {
   female: {
     cut: PathData,
@@ -74,10 +62,10 @@ interface AscendantEdgeConnectionPaths {
   }
 }
 
-export const ascendantEdgeConnectionTabs = (tabSpec: AscendantEdgeConnectionTabsSpec):AscendantEdgeConnectionPaths => {
+export const ascendantEdgeConnectionTabs = (
+  start: PointLike, end: PointLike, tabSpec: AscendantEdgeConnectionTabsSpec,
+):AscendantEdgeConnectionPaths => {
   const {
-    start,
-    end,
     tabDepth,
     tabRoundingDistance,
     tabsCount,
@@ -87,7 +75,7 @@ export const ascendantEdgeConnectionTabs = (tabSpec: AscendantEdgeConnectionTabs
     holeWidthRatio,
     holeFlapTaperAngle,
     tabWideningAngle,
-  } = { ...tabSpec, ...AscendantEdgeConnectionTabsDefaults };
+  } = tabSpec;
 
   const vector = end.subtract(start);
   const edgeDistance = vector.length;
@@ -228,16 +216,15 @@ export function strokeDashPath(
 
   const iterationsRequiredForCoverage = Math.ceil(vectorLength / strokeDashLength);
   const lineStartEndPoints = range(iterationsRequiredForCoverage)
-    // compute the start-end lerps relative to the start - end vector
+  // compute the start-end lerps relative to the start - end vector
     .reduce((acc, iterIndex) => {
       const lerpOffset = iterIndex * strokeDashLengthToVectorLength;
       const lerpTransform = (lerp) => lerp * strokeDashLengthToVectorLength + lerpOffset;
-      acc = acc.concat(startEndLerps.map((el) => el.map(lerpTransform)));
-      return acc;
+      return acc.concat(startEndLerps.map((el) => el.map(lerpTransform)));
     }, [])
-    // remove line segments that lie fully outside the start-end vector
+  // remove line segments that lie fully outside the start-end vector
     .filter(([startLerp, endLerp]) => startLerp <= 1 && endLerp <= 1)
-    // nudge the segments forward based on strokeDashOffsetRatio, wrapping and/or splicing where necessary
+  // nudge the segments forward based on strokeDashOffsetRatio, wrapping and/or splicing where necessary
     .reduce((acc, startEndLerp) => {
       const startEndLerpNew = startEndLerp.map((val) => val + strokeDashOffsetRatio * strokeDashLengthToVectorLength);
       // the whole segment is past the edges of the vector, wrap whole thing
@@ -254,7 +241,7 @@ export function strokeDashPath(
       acc.push(startEndLerpNew);
       return acc;
     }, [])
-    // visually this should not make difference but better for plotters that don't optimize
+  // visually this should not make difference but better for plotters that don't optimize
     .sort(([start1], [start2]) => (start1 - start2))
     .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp)));
   return lineSeries(lineStartEndPoints);

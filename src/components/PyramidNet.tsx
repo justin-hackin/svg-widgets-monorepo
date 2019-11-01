@@ -47,8 +47,19 @@ export const PyramidNet = ({ netSpec }) => {
   const tabRoundingDistance = 0.3;
   const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -tabDepth);
   const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), tabDepth);
-  const connectionTabsInst = ascendantEdgeConnectionTabs({
-    start: p2, end: p1, tabDepth, tabRoundingDistance,
+
+  const ascendantEdgeConnectionTabsDefaults = {
+    tabsCount: 3,
+    midpointDepthToTabDepth: 0.6,
+    tabStartGapToTabDepth: 0.5,
+    holeReachToTabDepth: 0.1,
+    holeWidthRatio: 0.4,
+    holeFlapTaperAngle: Math.PI / 10,
+    tabWideningAngle: Math.PI / 6,
+  };
+
+  const connectionTabsInst = ascendantEdgeConnectionTabs(p2, p1, {
+    tabDepth, tabRoundingDistance, ...ascendantEdgeConnectionTabsDefaults,
   });
   const plotProps = { fill: 'none', strokeWidth: 0.1 };
   const CUT_COLOR = '#FF244D';
