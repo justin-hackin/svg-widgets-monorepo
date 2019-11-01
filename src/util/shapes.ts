@@ -136,11 +136,33 @@ export const ascendantEdgeConnectionTabs = (
   return commands;
 };
 
+interface BaseEdgeConnectionTabSpec {
+  tabDepth:number,
+  roundingDistance,
+  holeDepthToTabDepth : number,
+  holeTaper : number,
+  holeBreadthToHalfWidth : number,
+  finDepthToTabDepth : number,
+  finTipDepthToFinDepth : number
+}
+
+interface BaseEdgeConnectionTab {
+  score: PathData,
+  cut: PathData,
+}
+
 export function baseEdgeConnectionTab(
-  start, end, tabDepth, roundingDistance,
-  holeDepthToTabDepth = 0.5, holeTaper = Math.PI / 4, holeBreadthToHalfWidth = 0.5, finDepthToTabDepth = 0.7,
-  finTipDepthToFinDepth = 1.1,
-) {
+  start: PointLike, end: PointLike, tabSpec: BaseEdgeConnectionTabSpec,
+):BaseEdgeConnectionTab {
+  const {
+    tabDepth,
+    roundingDistance,
+    holeDepthToTabDepth,
+    holeTaper,
+    holeBreadthToHalfWidth,
+    finDepthToTabDepth,
+    finTipDepthToFinDepth,
+  } = tabSpec;
   const cutPath = new PathData();
   const mid = hingedPlotLerp(start, end, 0, 0.5);
 

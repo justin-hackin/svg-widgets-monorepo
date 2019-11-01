@@ -77,7 +77,15 @@ export const PyramidNet = ({ netSpec }) => {
 
   const borderMaskPathAttrs = borderOverlay.pathAttrs({ stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' });
 
-  const baseEdgeTab = baseEdgeConnectionTab(p2, p3, 5, tabRoundingDistance * 5);
+  const defaultBaseEdgeConnectionTabSpec = {
+    tabDepth: 5,
+    holeDepthToTabDepth: 0.5,
+    holeTaper: Math.PI / 4,
+    holeBreadthToHalfWidth: 0.5,
+    finDepthToTabDepth: 0.7,
+    finTipDepthToFinDepth: 1.1,
+  };
+
   return (
     <g overflow="visible">
       <symbol id="face-tile" overflow="visible">
@@ -85,9 +93,6 @@ export const PyramidNet = ({ netSpec }) => {
           <path {...borderMaskPathAttrs} />
         </g>
       </symbol>
-
-      <path {...scoreProps} d={baseEdgeTab.score.getD()} />
-      <path {...cutProps} d={baseEdgeTab.cut.getD()} />
 
       {range(faceCount).map((index) => {
         const isOdd = index % 2;
@@ -109,11 +114,13 @@ export const PyramidNet = ({ netSpec }) => {
       })}
       {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
         const edgePt2 = faceTabFenceposts[index + 1];
-        const tabPaths = baseEdgeConnectionTab(edgePt1, edgePt2, 5, tabRoundingDistance * 5);
+        const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, {
+          ...defaultBaseEdgeConnectionTabSpec, roundingDistance: tabRoundingDistance * 5,
+        });
         return (
           <g key={index}>
-            <path {...cutProps} d={tabPaths.cut.getD()} />
-            <path {...scoreProps} d={tabPaths.score.getD()} />
+            <path {...cutProps} d={baseEdgeTab.cut.getD()} />
+            <path {...scoreProps} d={baseEdgeTab.score.getD()} />
           </g>
         );
       })}
