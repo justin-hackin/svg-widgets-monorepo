@@ -65,10 +65,10 @@ export const COMMAND_FACTORY = {
 };
 interface Command {
   code: string,
-  to?: Coord,
-  ctrl1?: Coord,
-  ctrl2?: Coord,
-  radius?: Coord,
+  to?: PointTuple,
+  ctrl1?: PointTuple,
+  ctrl2?: PointTuple,
+  radius?: PointTuple,
   flags?: [boolean, boolean],
   xAxisRotation?: number,
   value?: number,

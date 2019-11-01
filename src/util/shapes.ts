@@ -2,6 +2,8 @@
 import last from 'lodash-es/last';
 import range from 'lodash-es/range';
 import sum from 'lodash-es/sum';
+// @ts-ignore
+import { Point } from '@flatten-js/core';
 import { COMMAND_FACTORY, PathData } from './path';
 import {
   PointLike,
@@ -63,7 +65,7 @@ interface AscendantEdgeConnectionPaths {
 }
 
 export const ascendantEdgeConnectionTabs = (
-  start: PointLike, end: PointLike, tabSpec: AscendantEdgeConnectionTabsSpec,
+  start: PointLike, end: PointLike, tabSpec: AscendantEdgeConnectionTabsSpec, scoreDashSpec: StrokeDashPathSpec,
 ):AscendantEdgeConnectionPaths => {
   const {
     tabDepth,
@@ -81,10 +83,12 @@ export const ascendantEdgeConnectionTabs = (
   const edgeDistance = vector.length;
   const tabTileDistance = edgeDistance / tabsCount;
   const tabWidth = holeWidthRatio * tabTileDistance;
+  const femaleScoreLineIntervals = [[start]];
+  const maleScoreLineIntervals = [];
   const commands = {
     female: {
       cut: (new PathData()),
-      score: (new PathData()).move(start),
+      score: (new PathData()),
     },
     male: {
       cut: (new PathData()).move(start),
@@ -120,19 +124,26 @@ export const ascendantEdgeConnectionTabs = (
     const tabPath = roundedEdgePath(
       [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], tabRoundingDistance,
     );
-    commands.male.score.move(tabPath.commands[0].to).line(last(tabPath.commands).to);
+    maleScoreLineIntervals.push([new Point(...tabPath.commands[0].to), new Point(...last(tabPath.commands).to)]);
     tabPath.sliceCommandsDangerously(1);
     // roundedEdgePath assumes first point is move command but we needed and applied line
     commands.male.cut.concatPath(tabPath);
     commands.female.cut.concatCommands(moveLines(
       [tabBaseStart, holeEdgeStart, holeEdgeEnd, tabBaseEnd],
     ));
-    commands.female.score.line(tabBaseStart);
-    commands.female.score.move(tabBaseEnd);
+    last(femaleScoreLineIntervals).push(tabBaseStart);
+    femaleScoreLineIntervals.push([tabBaseEnd]);
   });
-  commands.male.cut.line(end);
-  commands.female.score.line(end);
 
+  commands.male.cut.line(end);
+  last(femaleScoreLineIntervals).push(end);
+
+  for (const [start, end] of femaleScoreLineIntervals) {
+    commands.female.score.concatPath(strokeDashPath(start, end, scoreDashSpec));
+  }
+  for (const [maleStart, maleEnd] of maleScoreLineIntervals) {
+    commands.male.score.concatPath(strokeDashPath(maleStart, maleEnd, scoreDashSpec));
+  }
   return commands;
 };
 
@@ -152,7 +163,7 @@ interface BaseEdgeConnectionTab {
 }
 
 export function baseEdgeConnectionTab(
-  start: PointLike, end: PointLike, tabSpec: BaseEdgeConnectionTabSpec,
+  start: PointLike, end: PointLike, tabSpec: BaseEdgeConnectionTabSpec, dashSpec: StrokeDashPathSpec,
 ):BaseEdgeConnectionTab {
   const {
     tabDepth,
@@ -198,7 +209,9 @@ export function baseEdgeConnectionTab(
   cutPath.line(finBases[1]);
   cutPath.line(end);
   const scorePath = new PathData();
-  scorePath.move(start).line(holeBases[0]).move(holeBases[1]).line(mid).move(finBases[0]).line(finBases[1]);
+  scorePath.concatPath(strokeDashPath(start, holeBases[0], dashSpec));
+  scorePath.concatPath(strokeDashPath(holeBases[1], mid, dashSpec));
+  scorePath.concatPath(strokeDashPath(finBases[0], finBases[1], dashSpec));
   return { cut: cutPath, score: scorePath };
 }
 
@@ -212,9 +225,20 @@ export function lineSeries(startEndArray) {
   return path;
 }
 
+interface StrokeDashPathSpec {
+  relativeStrokeDasharray: number[],
+  strokeDashLength: number,
+  strokeDashOffsetRatio: number,
+}
+
 export function strokeDashPath(
-  start, end, relativeStrokeDasharray, strokeDashLength, strokeDashOffsetRatio = 0,
+  start: PointLike, end: PointLike, dashSpec:StrokeDashPathSpec,
 ) {
+  const {
+    relativeStrokeDasharray,
+    strokeDashLength,
+    strokeDashOffsetRatio,
+  } = dashSpec;
   const vector = end.subtract(start);
   const vectorLength = vector.length;
   const strokeDashLengthToVectorLength = strokeDashLength / vectorLength;

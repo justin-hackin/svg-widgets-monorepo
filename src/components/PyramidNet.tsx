@@ -58,9 +58,6 @@ export const PyramidNet = ({ netSpec }) => {
     tabWideningAngle: Math.PI / 6,
   };
 
-  const connectionTabsInst = ascendantEdgeConnectionTabs(p2, p1, {
-    tabDepth, tabRoundingDistance, ...ascendantEdgeConnectionTabsDefaults,
-  });
   const plotProps = { fill: 'none', strokeWidth: 0.1 };
   const CUT_COLOR = '#FF244D';
   const SCORE_COLOR = '#BDFF48';
@@ -86,6 +83,22 @@ export const PyramidNet = ({ netSpec }) => {
     finTipDepthToFinDepth: 1.1,
   };
 
+  const ascendantScoreDashSpec = {
+    relativeStrokeDasharray: [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90],
+    strokeDashLength: 10,
+    strokeDashOffsetRatio: 0.75,
+  };
+
+  const tabScoreDashSpec = {
+    relativeStrokeDasharray: [2, 1],
+    strokeDashLength: 0.1,
+    strokeDashOffsetRatio: 0,
+  };
+
+  const connectionTabsInst = ascendantEdgeConnectionTabs(p2, p1, {
+    tabDepth, tabRoundingDistance, ...ascendantEdgeConnectionTabsDefaults,
+  }, tabScoreDashSpec);
+
   return (
     <g overflow="visible">
       <symbol id="face-tile" overflow="visible">
@@ -109,14 +122,14 @@ export const PyramidNet = ({ netSpec }) => {
       <path {...cutProps} d={connectionTabsInst.female.cut.getD()} />
       {/* eslint-disable-next-line arrow-body-style */}
       {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
-        const pathData = strokeDashPath(p1, endPt, [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90], 10, 0.75);
+        const pathData = strokeDashPath(p1, endPt, ascendantScoreDashSpec);
         return (<path key={index} {...scoreProps} d={pathData.getD()} />);
       })}
       {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
         const edgePt2 = faceTabFenceposts[index + 1];
         const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, {
           ...defaultBaseEdgeConnectionTabSpec, roundingDistance: tabRoundingDistance * 5,
-        });
+        }, tabScoreDashSpec);
         return (
           <g key={index}>
             <path {...cutProps} d={baseEdgeTab.cut.getD()} />
