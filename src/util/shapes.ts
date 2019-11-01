@@ -40,181 +40,6 @@ export const roundedEdgePath = (points:RoundPointPointsItem[], retractionDistanc
 };
 const moveLines = (points) => points.map((point, index) => COMMAND_FACTORY[index ? 'L' : 'M'](point));
 
-
-interface AscendantEdgeConnectionTabsSpec {
-  tabDepth: number,
-  tabRoundingDistance: number,
-  tabsCount: number,
-  midpointDepthToTabDepth: number,
-  tabStartGapToTabDepth: number,
-  holeReachToTabDepth: number,
-  holeWidthRatio: number,
-  holeFlapTaperAngle: number,
-  tabWideningAngle: number,
-}
-
-interface AscendantEdgeConnectionPaths {
-  female: {
-    cut: PathData,
-    score: PathData,
-  }
-  male: {
-    cut: PathData,
-    score: PathData,
-  }
-}
-
-export const ascendantEdgeConnectionTabs = (
-  start: PointLike, end: PointLike, tabSpec: AscendantEdgeConnectionTabsSpec, scoreDashSpec: StrokeDashPathSpec,
-):AscendantEdgeConnectionPaths => {
-  const {
-    tabDepth,
-    tabRoundingDistance,
-    tabsCount,
-    midpointDepthToTabDepth,
-    tabStartGapToTabDepth,
-    holeReachToTabDepth,
-    holeWidthRatio,
-    holeFlapTaperAngle,
-    tabWideningAngle,
-  } = tabSpec;
-
-  const vector = end.subtract(start);
-  const edgeDistance = vector.length;
-  const tabTileDistance = edgeDistance / tabsCount;
-  const tabWidth = holeWidthRatio * tabTileDistance;
-  const femaleScoreLineIntervals = [[start]];
-  const maleScoreLineIntervals = [];
-  const commands = {
-    female: {
-      cut: (new PathData()),
-      score: (new PathData()),
-    },
-    male: {
-      cut: (new PathData()).move(start),
-      score: (new PathData()),
-    },
-  };
-  const ARBITRARY_LENGTH = 10;
-  range(0, tabsCount).forEach((tabNum) => {
-    const tabStartSpace = tabStartGapToTabDepth * tabDepth;
-    const startHingeDistance = tabStartSpace + tabTileDistance * tabNum;
-    const tabBaseStart = hingedPlot(end, start, 0, startHingeDistance);
-    const tabBaseEnd = hingedPlot(end, start, 0, startHingeDistance + tabWidth);
-    const [tabEdgeStart, tabEdgeEnd] = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
-    const midpointDepth = tabDepth * midpointDepthToTabDepth;
-    const [tabMidIntersectorStart, tabMidIntersectorEnd] = parallelLinePointsAtDistance(
-      tabBaseStart, tabBaseEnd, midpointDepth,
-    );
-    const [tabStartDeparture, tabEndDeparture] = symmetricHingePlot(
-      tabBaseStart, tabBaseEnd, Math.PI / 2 + tabWideningAngle, ARBITRARY_LENGTH,
-    );
-    const tabMidpointStart = intersectLineLine(
-      tabMidIntersectorStart, tabMidIntersectorEnd, tabBaseStart, tabStartDeparture,
-    );
-    const tabMidpointEnd = intersectLineLine(
-      tabMidIntersectorStart, tabMidIntersectorEnd, tabBaseEnd, tabEndDeparture,
-    );
-
-    const [holeEdgeStart, holeEdgeEnd] = symmetricHingePlotByProjectionDistance(
-      tabBaseStart, tabBaseEnd, -Math.PI / 2 + holeFlapTaperAngle, holeReachToTabDepth * -tabDepth,
-    );
-
-    commands.male.cut.line(tabBaseStart);
-    const tabPath = roundedEdgePath(
-      [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], tabRoundingDistance,
-    );
-    maleScoreLineIntervals.push([new Point(...tabPath.commands[0].to), new Point(...last(tabPath.commands).to)]);
-    tabPath.sliceCommandsDangerously(1);
-    // roundedEdgePath assumes first point is move command but we needed and applied line
-    commands.male.cut.concatPath(tabPath);
-    commands.female.cut.concatCommands(moveLines(
-      [tabBaseStart, holeEdgeStart, holeEdgeEnd, tabBaseEnd],
-    ));
-    last(femaleScoreLineIntervals).push(tabBaseStart);
-    femaleScoreLineIntervals.push([tabBaseEnd]);
-  });
-
-  commands.male.cut.line(end);
-  last(femaleScoreLineIntervals).push(end);
-
-  for (const [start, end] of femaleScoreLineIntervals) {
-    commands.female.score.concatPath(strokeDashPath(start, end, scoreDashSpec));
-  }
-  for (const [maleStart, maleEnd] of maleScoreLineIntervals) {
-    commands.male.score.concatPath(strokeDashPath(maleStart, maleEnd, scoreDashSpec));
-  }
-  return commands;
-};
-
-interface BaseEdgeConnectionTabSpec {
-  tabDepth:number,
-  roundingDistance,
-  holeDepthToTabDepth : number,
-  holeTaper : number,
-  holeBreadthToHalfWidth : number,
-  finDepthToTabDepth : number,
-  finTipDepthToFinDepth : number
-}
-
-interface BaseEdgeConnectionTab {
-  score: PathData,
-  cut: PathData,
-}
-
-export function baseEdgeConnectionTab(
-  start: PointLike, end: PointLike, tabSpec: BaseEdgeConnectionTabSpec, dashSpec: StrokeDashPathSpec,
-):BaseEdgeConnectionTab {
-  const {
-    tabDepth,
-    roundingDistance,
-    holeDepthToTabDepth,
-    holeTaper,
-    holeBreadthToHalfWidth,
-    finDepthToTabDepth,
-    finTipDepthToFinDepth,
-  } = tabSpec;
-  const cutPath = new PathData();
-  const mid = hingedPlotLerp(start, end, 0, 0.5);
-
-  const holeHandleThicknessRatio = (1 - holeBreadthToHalfWidth) / 2;
-  const holeBases = [
-    hingedPlotLerp(mid, start, 0, holeHandleThicknessRatio),
-    hingedPlotLerp(start, mid, 0, holeHandleThicknessRatio),
-  ];
-  const holeTheta = -holeTaper + Math.PI / 2;
-  const holeEdges = symmetricHingePlotByProjectionDistance(
-    holeBases[0], holeBases[1], holeTheta, tabDepth * holeDepthToTabDepth,
-  );
-  const roundedHole = roundedEdgePath([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]], roundingDistance);
-  cutPath.concatPath(roundedHole);
-  cutPath.close();
-
-  const handleEdges = symmetricHingePlotByProjectionDistance(start, mid, holeTheta, tabDepth);
-  cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], mid], roundingDistance));
-
-
-  const finBases = [
-    hingedPlotLerp(end, mid, 0, holeHandleThicknessRatio),
-    hingedPlotLerp(mid, end, 0, holeHandleThicknessRatio),
-  ];
-  const finDepth = finDepthToTabDepth * tabDepth;
-  const backFinEdge = hingedPlotByProjectionDistance(finBases[1], finBases[0], holeTheta, -finDepth);
-  // const frontFinEdge = hingedPlotByProjectionDistance(finBases[0], finBases[1], Math.PI / 2, finDepth);
-  const finMidTip = hingedPlotByProjectionDistance(
-    finBases[0], finBases[1], holeTheta, finDepth * finTipDepthToFinDepth,
-  );
-  const finPath = roundedEdgePath([finBases[0], backFinEdge, finMidTip, finBases[1]], roundingDistance);
-  cutPath.line(finBases[0]).concatPath(finPath.sliceCommandsDangerously(1));
-  cutPath.line(finBases[1]);
-  cutPath.line(end);
-  const scorePath = new PathData();
-  scorePath.concatPath(strokeDashPath(start, holeBases[0], dashSpec));
-  scorePath.concatPath(strokeDashPath(holeBases[1], mid, dashSpec));
-  scorePath.concatPath(strokeDashPath(finBases[0], finBases[1], dashSpec));
-  return { cut: cutPath, score: scorePath };
-}
-
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
 export function lineSeries(startEndArray) {
@@ -291,4 +116,180 @@ export function strokeDashPath(
     .sort(([start1], [start2]) => (start1 - start2))
     .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp)));
   return lineSeries(lineStartEndPoints);
+}
+
+export const ascendantEdgeConnectionTabs = (
+  start: PointLike, end: PointLike, tabSpec: AscendantEdgeConnectionTabsSpec, scoreDashSpec: StrokeDashPathSpec,
+):AscendantEdgeConnectionPaths => {
+  const {
+    tabDepth,
+    tabRoundingDistance,
+    tabsCount,
+    midpointDepthToTabDepth,
+    tabStartGapToTabDepth,
+    holeReachToTabDepth,
+    holeWidthRatio,
+    holeFlapTaperAngle,
+    tabWideningAngle,
+  } = tabSpec;
+
+  const vector = end.subtract(start);
+  const edgeDistance = vector.length;
+  const tabTileDistance = edgeDistance / tabsCount;
+  const tabWidth = holeWidthRatio * tabTileDistance;
+  const femaleScoreLineIntervals = [[start]];
+  const maleScoreLineIntervals = [];
+  const commands = {
+    female: {
+      cut: (new PathData()),
+      score: (new PathData()),
+    },
+    male: {
+      cut: (new PathData()).move(start),
+      score: (new PathData()),
+    },
+  };
+  const ARBITRARY_LENGTH = 10;
+  range(0, tabsCount).forEach((tabNum) => {
+    const tabStartSpace = tabStartGapToTabDepth * tabDepth;
+    const startHingeDistance = tabStartSpace + tabTileDistance * tabNum;
+    const tabBaseStart = hingedPlot(end, start, 0, startHingeDistance);
+    const tabBaseEnd = hingedPlot(end, start, 0, startHingeDistance + tabWidth);
+    const [tabEdgeStart, tabEdgeEnd] = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
+    const midpointDepth = tabDepth * midpointDepthToTabDepth;
+    const [tabMidIntersectorStart, tabMidIntersectorEnd] = parallelLinePointsAtDistance(
+      tabBaseStart, tabBaseEnd, midpointDepth,
+    );
+    const [tabStartDeparture, tabEndDeparture] = symmetricHingePlot(
+      tabBaseStart, tabBaseEnd, Math.PI / 2 + tabWideningAngle, ARBITRARY_LENGTH,
+    );
+    const tabMidpointStart = intersectLineLine(
+      tabMidIntersectorStart, tabMidIntersectorEnd, tabBaseStart, tabStartDeparture,
+    );
+    const tabMidpointEnd = intersectLineLine(
+      tabMidIntersectorStart, tabMidIntersectorEnd, tabBaseEnd, tabEndDeparture,
+    );
+
+    const [holeEdgeStart, holeEdgeEnd] = symmetricHingePlotByProjectionDistance(
+      tabBaseStart, tabBaseEnd, -Math.PI / 2 + holeFlapTaperAngle, holeReachToTabDepth * -tabDepth,
+    );
+
+    commands.male.cut.line(tabBaseStart);
+    const tabPath = roundedEdgePath(
+      [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], tabRoundingDistance,
+    );
+    maleScoreLineIntervals.push([new Point(...tabPath.commands[0].to), new Point(...last(tabPath.commands).to)]);
+    tabPath.sliceCommandsDangerously(1);
+    // roundedEdgePath assumes first point is move command but we needed and applied line
+    commands.male.cut.concatPath(tabPath);
+    commands.female.cut.concatCommands(moveLines(
+      [tabBaseStart, holeEdgeStart, holeEdgeEnd, tabBaseEnd],
+    ));
+    last(femaleScoreLineIntervals).push(tabBaseStart);
+    femaleScoreLineIntervals.push([tabBaseEnd]);
+  });
+
+  commands.male.cut.line(end);
+  last(femaleScoreLineIntervals).push(end);
+
+  for (const [femaleStart, femaleEnd] of femaleScoreLineIntervals) {
+    commands.female.score.concatPath(strokeDashPath(femaleStart, femaleEnd, scoreDashSpec));
+  }
+  for (const [maleStart, maleEnd] of maleScoreLineIntervals) {
+    commands.male.score.concatPath(strokeDashPath(maleStart, maleEnd, scoreDashSpec));
+  }
+  return commands;
+};
+
+
+interface AscendantEdgeConnectionTabsSpec {
+  tabDepth: number,
+  tabRoundingDistance: number,
+  tabsCount: number,
+  midpointDepthToTabDepth: number,
+  tabStartGapToTabDepth: number,
+  holeReachToTabDepth: number,
+  holeWidthRatio: number,
+  holeFlapTaperAngle: number,
+  tabWideningAngle: number,
+}
+
+interface AscendantEdgeConnectionPaths {
+  female: {
+    cut: PathData,
+    score: PathData,
+  }
+  male: {
+    cut: PathData,
+    score: PathData,
+  }
+}
+
+
+interface BaseEdgeConnectionTabSpec {
+  tabDepth:number,
+  roundingDistance,
+  holeDepthToTabDepth : number,
+  holeTaper : number,
+  holeBreadthToHalfWidth : number,
+  finDepthToTabDepth : number,
+  finTipDepthToFinDepth : number
+}
+
+interface BaseEdgeConnectionTab {
+  score: PathData,
+  cut: PathData,
+}
+
+export function baseEdgeConnectionTab(
+  start: PointLike, end: PointLike, tabSpec: BaseEdgeConnectionTabSpec, dashSpec: StrokeDashPathSpec,
+):BaseEdgeConnectionTab {
+  const {
+    tabDepth,
+    roundingDistance,
+    holeDepthToTabDepth,
+    holeTaper,
+    holeBreadthToHalfWidth,
+    finDepthToTabDepth,
+    finTipDepthToFinDepth,
+  } = tabSpec;
+  const cutPath = new PathData();
+  const mid = hingedPlotLerp(start, end, 0, 0.5);
+
+  const holeHandleThicknessRatio = (1 - holeBreadthToHalfWidth) / 2;
+  const holeBases = [
+    hingedPlotLerp(mid, start, 0, holeHandleThicknessRatio),
+    hingedPlotLerp(start, mid, 0, holeHandleThicknessRatio),
+  ];
+  const holeTheta = -holeTaper + Math.PI / 2;
+  const holeEdges = symmetricHingePlotByProjectionDistance(
+    holeBases[0], holeBases[1], holeTheta, tabDepth * holeDepthToTabDepth,
+  );
+  const roundedHole = roundedEdgePath([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]], roundingDistance);
+  cutPath.concatPath(roundedHole);
+  cutPath.close();
+
+  const handleEdges = symmetricHingePlotByProjectionDistance(start, mid, holeTheta, tabDepth);
+  cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], mid], roundingDistance));
+
+
+  const finBases = [
+    hingedPlotLerp(end, mid, 0, holeHandleThicknessRatio),
+    hingedPlotLerp(mid, end, 0, holeHandleThicknessRatio),
+  ];
+  const finDepth = finDepthToTabDepth * tabDepth;
+  const backFinEdge = hingedPlotByProjectionDistance(finBases[1], finBases[0], holeTheta, -finDepth);
+  // const frontFinEdge = hingedPlotByProjectionDistance(finBases[0], finBases[1], Math.PI / 2, finDepth);
+  const finMidTip = hingedPlotByProjectionDistance(
+    finBases[0], finBases[1], holeTheta, finDepth * finTipDepthToFinDepth,
+  );
+  const finPath = roundedEdgePath([finBases[0], backFinEdge, finMidTip, finBases[1]], roundingDistance);
+  cutPath.line(finBases[0]).concatPath(finPath.sliceCommandsDangerously(1));
+  cutPath.line(finBases[1]);
+  cutPath.line(end);
+  const scorePath = new PathData();
+  scorePath.concatPath(strokeDashPath(start, holeBases[0], dashSpec));
+  scorePath.concatPath(strokeDashPath(holeBases[1], mid, dashSpec));
+  scorePath.concatPath(strokeDashPath(finBases[0], finBases[1], dashSpec));
+  return { cut: cutPath, score: scorePath };
 }
