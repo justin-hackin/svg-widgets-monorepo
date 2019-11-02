@@ -55,6 +55,7 @@ export const PyramidNet = ({
   const faceLengthAdjustRatio = desiredFirstLength / relativeFaceEdgeLengths[0];
   const actualFaceEdgeLengths = relativeFaceEdgeLengths.map((len) => len * faceLengthAdjustRatio);
 
+
   const p1 = new Point(0, 0);
   const p2 = p1.add(new Point(actualFaceEdgeLengths[0], 0));
 
@@ -64,12 +65,13 @@ export const PyramidNet = ({
   v1.y *= -1;
   const p3 = p2.add(v1);
   const boundaryPoints = [p1, p2, p3];
-  const inset = insetPoints(boundaryPoints, ascendantEdgeTabsSpec.tabDepth);
+  const ascendantEdgeTabDepth = p1.subtract(p2).length * ascendantEdgeTabsSpec.tabDepthToTraversalLength;
+  const inset = insetPoints(boundaryPoints, ascendantEdgeTabDepth);
 
   const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
 
-  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -ascendantEdgeTabsSpec.tabDepth);
-  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), ascendantEdgeTabsSpec.tabDepth);
+  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -ascendantEdgeTabDepth);
+  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), ascendantEdgeTabDepth);
 
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
   const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };

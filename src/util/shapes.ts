@@ -122,7 +122,7 @@ export const ascendantEdgeConnectionTabs = (
   start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec,
 ):AscendantEdgeConnectionPaths => {
   const {
-    tabDepth,
+    tabDepthToTraversalLength,
     roundingDistance,
     tabsCount,
     midpointDepthToTabDepth,
@@ -133,8 +133,8 @@ export const ascendantEdgeConnectionTabs = (
     tabWideningAngle,
     scoreDashSpec,
   } = tabSpec;
-
   const vector = end.subtract(start);
+  const tabDepth = tabDepthToTraversalLength * vector.length;
   const edgeDistance = vector.length;
   const tabTileDistance = edgeDistance / tabsCount;
   const tabWidth = holeWidthRatio * tabTileDistance;
@@ -203,7 +203,7 @@ export const ascendantEdgeConnectionTabs = (
 };
 
 export interface AscendantEdgeTabsSpec {
-  tabDepth: number,
+  tabDepthToTraversalLength: number,
   roundingDistance: number,
   flapRoundingDistance: number,
   tabsCount: number,

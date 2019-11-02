@@ -31,7 +31,7 @@ const tabScoreDashSpec = {
 };
 
 const ascendantEdgeTabsSpec: AscendantEdgeTabsSpec = {
-  tabDepth: 2,
+  tabDepthToTraversalLength: 0.04810606060599847,
   roundingDistance: 0.3,
   flapRoundingDistance: 2,
   tabsCount: 3,
