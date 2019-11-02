@@ -1,6 +1,5 @@
-import { subtract } from '@flatten-js/boolean-op';
 // @ts-ignore
-import { Point, Polygon } from '@flatten-js/core';
+import { Point } from '@flatten-js/core';
 import React from 'react';
 import range from 'lodash-es/range';
 import {
@@ -8,15 +7,14 @@ import {
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
   insetPoints,
-  triangleAnglesGivenSides,
+  triangleAnglesGivenSides, subtractPointsArrays,
 } from '../util/geom';
 import {
-  AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec,
+  AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec,
   ascendantEdgeConnectionTabs,
   baseEdgeConnectionTab,
   roundedEdgePath, strokeDashPath,
 } from '../util/shapes';
-
 
 interface StyleSpec {
   dieLineProps: object,
@@ -25,11 +23,16 @@ interface StyleSpec {
   designBoundaryProps: object,
 }
 
-interface PyramidNetSpec {
-  pyramidGeometry: PyramidGeometrySpec,
+interface DieLinesSpec {
   ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
   baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
+  interFaceScoreDashSpec: StrokeDashPathSpec,
+}
+
+interface PyramidNetSpec {
+  pyramidGeometry: PyramidGeometrySpec,
   styleSpec: StyleSpec,
+  dieLinesSpec: DieLinesSpec,
 }
 
 interface PyramidGeometrySpec {
@@ -38,7 +41,7 @@ interface PyramidGeometrySpec {
 }
 
 export const PyramidNet = ({
-  pyramidGeometry, ascendantEdgeTabsSpec, baseEdgeTabSpec, styleSpec,
+  pyramidGeometry, styleSpec, dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
 }: PyramidNetSpec) => {
   const { faceEdgeLengths, faceCount } = pyramidGeometry;
   const faceInteriorAngles = triangleAnglesGivenSides(faceEdgeLengths);
@@ -48,15 +51,6 @@ export const PyramidNet = ({
 
   const v1 = Point.fromPolar([Math.PI - faceInteriorAngles[0], faceEdgeLengths[1]]);
 
-  const subtractPointsArrays = (pts1, pts2) => {
-    const polygon1 = new Polygon();
-    polygon1.addFace(pts1);
-
-    const polygon2 = new Polygon();
-    polygon2.addFace(pts2);
-
-    return subtract(polygon1, polygon2);
-  };
 
   v1.y *= -1;
   const p3 = p2.add(v1);
@@ -79,35 +73,16 @@ export const PyramidNet = ({
     ),
   );
 
-  const borderMaskPathAttrs = borderOverlay.pathAttrs(styleSpec.designBoundaryProps);
+  const designBoundaryPathAttrs = borderOverlay.pathAttrs(styleSpec.designBoundaryProps);
 
-  const PHI = (1 + Math.sqrt(5)) / 2;
-  let relativeStrokeDasharray = range(15).reduce((acc, i) => {
-    const mux = Math.sqrt(3) * i;
-    acc.push(mux * PHI, mux);
-    return acc;
-  }, []);
-  relativeStrokeDasharray = relativeStrokeDasharray.concat(relativeStrokeDasharray.slice(0).reverse());
 
-  const ascendantScoreDashSpec = {
-    relativeStrokeDasharray,
-    strokeDashLength: 10,
-    strokeDashOffsetRatio: 0.75,
-  };
-
-  const tabScoreDashSpec = {
-    relativeStrokeDasharray: [2, 1],
-    strokeDashLength: 0.1,
-    strokeDashOffsetRatio: 0,
-  };
-
-  const connectionTabsInst = ascendantEdgeConnectionTabs(p2, p1, ascendantEdgeTabsSpec, tabScoreDashSpec);
+  const baseTabsInst = ascendantEdgeConnectionTabs(p2, p1, ascendantEdgeTabsSpec);
 
   return (
     <g overflow="visible">
       <symbol id="face-tile" overflow="visible">
         <g>
-          <path {...borderMaskPathAttrs} />
+          <path {...designBoundaryPathAttrs} />
         </g>
       </symbol>
 
@@ -117,21 +92,25 @@ export const PyramidNet = ({
         const rotation = ((index + (isOdd ? 1 : 0)) * faceInteriorAngles[2] * 360 * (isOdd ? 1 : -1)) / (2 * Math.PI);
         return <use key={index} transform={`scale(1 ${yScale}) rotate(${rotation})`} xlinkHref="#face-tile" />;
       })}
-      <g transform={`rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`}>
-        <path {...cutProps} d={connectionTabsInst.male.cut.getD()} />
-        <path {...scoreProps} d={connectionTabsInst.male.score.getD()} />
+      <g id="male-tab" transform={`rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`}>
+        <path {...cutProps} d={baseTabsInst.male.cut.getD()} />
+        <path {...scoreProps} d={baseTabsInst.male.score.getD()} />
       </g>
-      <path {...cutProps} d={roundedEdgePath([p1, outerPt1, outerPt2, p2], retractionDistance).getD()} />
-      <path {...scoreProps} d={connectionTabsInst.female.score.getD()} />
-      <path {...cutProps} d={connectionTabsInst.female.cut.getD()} />
+      <g id="female-tab">
+        <path {...cutProps} d={roundedEdgePath([p1, outerPt1, outerPt2, p2], retractionDistance).getD()} />
+        <path {...scoreProps} d={baseTabsInst.female.score.getD()} />
+        <path {...cutProps} d={baseTabsInst.female.cut.getD()} />
+      </g>
       {/* eslint-disable-next-line arrow-body-style */}
-      {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
-        const pathData = strokeDashPath(p1, endPt, ascendantScoreDashSpec);
-        return (<path key={index} {...scoreProps} d={pathData.getD()} />);
-      })}
+      <g id="ascendant-edge-scores">
+        {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
+          const pathData = strokeDashPath(p1, endPt, interFaceScoreDashSpec);
+          return (<path key={index} {...scoreProps} d={pathData.getD()} />);
+        })}
+      </g>
       {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
         const edgePt2 = faceTabFenceposts[index + 1];
-        const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, baseEdgeTabSpec, tabScoreDashSpec);
+        const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, baseEdgeTabSpec);
         return (
           <g key={index}>
             <path {...cutProps} d={baseEdgeTab.cut.getD()} />

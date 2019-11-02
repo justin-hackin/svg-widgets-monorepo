@@ -1,5 +1,7 @@
 // @ts-ignore
-import { Line, Point } from '@flatten-js/core';
+import { Line, Point, Polygon } from '@flatten-js/core';
+import { subtract } from '@flatten-js/boolean-op';
+
 import { circularSlice } from './data';
 
 export interface PointLike {
@@ -108,3 +110,13 @@ export function insetPoints(vectors, distance) {
 
   return returnVal;
 }
+
+export const subtractPointsArrays = (pts1, pts2) => {
+  const polygon1 = new Polygon();
+  polygon1.addFace(pts1);
+
+  const polygon2 = new Polygon();
+  polygon2.addFace(pts2);
+
+  return subtract(polygon1, polygon2);
+};

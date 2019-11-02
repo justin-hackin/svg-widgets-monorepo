@@ -1,4 +1,5 @@
 // import { useQueryParam, StringParam, JsonParam } from 'use-query-params';
+import range from 'lodash-es/range';
 import React, { useState } from 'react';
 import isNaN from 'lodash-es/isNaN';
 import ReactResizeDetector from 'react-resize-detector';
@@ -6,6 +7,25 @@ import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
 import { PyramidNet } from './PyramidNet';
 import { GridPattern } from './GridPattern';
 
+const PHI = (1 + Math.sqrt(5)) / 2;
+let relativeStrokeDasharray = range(15).reduce((acc, i) => {
+  const mux = Math.sqrt(3) * i;
+  acc.push(mux * PHI, mux);
+  return acc;
+}, []);
+relativeStrokeDasharray = relativeStrokeDasharray.concat(relativeStrokeDasharray.slice(0).reverse());
+
+const interFaceScoreDashSpec = {
+  relativeStrokeDasharray,
+  strokeDashLength: 10,
+  strokeDashOffsetRatio: 0.75,
+};
+
+const tabScoreDashSpec = {
+  relativeStrokeDasharray: [2, 1],
+  strokeDashLength: 0.1,
+  strokeDashOffsetRatio: 0,
+};
 
 const ascendantEdgeTabsSpec = {
   tabDepth: 2,
@@ -17,6 +37,7 @@ const ascendantEdgeTabsSpec = {
   holeWidthRatio: 0.4,
   holeFlapTaperAngle: Math.PI / 10,
   tabWideningAngle: Math.PI / 6,
+  scoreDashSpec: tabScoreDashSpec,
 };
 
 const pyramidGeometry = { faceEdgeLengths: [40, 30, 50], faceCount: 4 };
@@ -29,6 +50,7 @@ const baseEdgeTabSpec = {
   holeBreadthToHalfWidth: 0.5,
   finDepthToTabDepth: 1.1,
   finTipDepthToFinDepth: 1.1,
+  scoreDashSpec: tabScoreDashSpec,
 };
 
 const styleSpec = {
@@ -36,6 +58,16 @@ const styleSpec = {
   cutLineProps: { stroke: '#FF244D' },
   scoreLineProps: { stroke: '#BDFF48' },
   designBoundaryProps: { stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' },
+};
+
+const pyramidNetSpec = {
+  pyramidGeometry,
+  styleSpec,
+  dieLinesSpec: {
+    baseEdgeTabSpec,
+    ascendantEdgeTabsSpec,
+    interFaceScoreDashSpec,
+  },
 };
 
 const svgDimensions = { width: 1024, height: 960 };
@@ -68,9 +100,7 @@ export function SVGViewer() {
               <GridPattern patternId={patternId} />
               <g transform="translate(300, 300) scale(4, 4) ">
                 <PyramidNet
-                  {...{
-                    baseEdgeTabSpec, ascendantEdgeTabsSpec, pyramidGeometry, styleSpec,
-                  }}
+                  {...pyramidNetSpec}
                 />
               </g>
             </svg>

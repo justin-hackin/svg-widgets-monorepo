@@ -50,7 +50,7 @@ export function lineSeries(startEndArray) {
   return path;
 }
 
-interface StrokeDashPathSpec {
+export interface StrokeDashPathSpec {
   relativeStrokeDasharray: number[],
   strokeDashLength: number,
   strokeDashOffsetRatio: number,
@@ -119,7 +119,7 @@ export function strokeDashPath(
 }
 
 export const ascendantEdgeConnectionTabs = (
-  start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec,
+  start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec,
 ):AscendantEdgeConnectionPaths => {
   const {
     tabDepth,
@@ -131,6 +131,7 @@ export const ascendantEdgeConnectionTabs = (
     holeWidthRatio,
     holeFlapTaperAngle,
     tabWideningAngle,
+    scoreDashSpec,
   } = tabSpec;
 
   const vector = end.subtract(start);
@@ -211,6 +212,7 @@ export interface AscendantEdgeTabsSpec {
   holeWidthRatio: number,
   holeFlapTaperAngle: number,
   tabWideningAngle: number,
+  scoreDashSpec: StrokeDashPathSpec,
 }
 
 interface AscendantEdgeConnectionPaths {
@@ -224,7 +226,6 @@ interface AscendantEdgeConnectionPaths {
   }
 }
 
-
 export interface BaseEdgeConnectionTabSpec {
   tabDepth:number,
   roundingDistance: number,
@@ -232,7 +233,8 @@ export interface BaseEdgeConnectionTabSpec {
   holeTaper : number,
   holeBreadthToHalfWidth : number,
   finDepthToTabDepth : number,
-  finTipDepthToFinDepth : number
+  finTipDepthToFinDepth : number,
+  scoreDashSpec: StrokeDashPathSpec,
 }
 
 export interface BaseEdgeConnectionTab {
@@ -241,7 +243,7 @@ export interface BaseEdgeConnectionTab {
 }
 
 export function baseEdgeConnectionTab(
-  start: PointLike, end: PointLike, tabSpec: BaseEdgeConnectionTabSpec, dashSpec: StrokeDashPathSpec,
+  start: PointLike, end: PointLike, tabSpec: BaseEdgeConnectionTabSpec,
 ):BaseEdgeConnectionTab {
   const {
     tabDepth,
@@ -251,6 +253,7 @@ export function baseEdgeConnectionTab(
     holeBreadthToHalfWidth,
     finDepthToTabDepth,
     finTipDepthToFinDepth,
+    scoreDashSpec,
   } = tabSpec;
   const cutPath = new PathData();
   const mid = hingedPlotLerp(start, end, 0, 0.5);
@@ -287,8 +290,8 @@ export function baseEdgeConnectionTab(
   cutPath.line(finBases[1]);
   cutPath.line(end);
   const scorePath = new PathData();
-  scorePath.concatPath(strokeDashPath(start, holeBases[0], dashSpec));
-  scorePath.concatPath(strokeDashPath(holeBases[1], mid, dashSpec));
-  scorePath.concatPath(strokeDashPath(finBases[0], finBases[1], dashSpec));
+  scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
+  scorePath.concatPath(strokeDashPath(holeBases[1], mid, scoreDashSpec));
+  scorePath.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));
   return { cut: cutPath, score: scorePath };
 }
