@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import isNaN from 'lodash-es/isNaN';
 import ReactResizeDetector from 'react-resize-detector';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
-import { PyramidNet } from './PyramidNet';
+import { PyramidNet, StyleSpec, PyramidNetSpec } from './PyramidNet';
 import { GridPattern } from './GridPattern';
+import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 let relativeStrokeDasharray = range(15).reduce((acc, i) => {
@@ -27,7 +28,7 @@ const tabScoreDashSpec = {
   strokeDashOffsetRatio: 0,
 };
 
-const ascendantEdgeTabsSpec = {
+const ascendantEdgeTabsSpec: AscendantEdgeTabsSpec = {
   tabDepth: 2,
   roundingDistance: 0.3,
   tabsCount: 3,
@@ -42,7 +43,7 @@ const ascendantEdgeTabsSpec = {
 
 const pyramidGeometry = { faceEdgeLengths: [40, 30, 50], faceCount: 4 };
 
-const baseEdgeTabSpec = {
+const baseEdgeTabSpec:BaseEdgeConnectionTabSpec = {
   tabDepth: 3,
   roundingDistance: 1.5,
   holeDepthToTabDepth: 0.5,
@@ -53,14 +54,14 @@ const baseEdgeTabSpec = {
   scoreDashSpec: tabScoreDashSpec,
 };
 
-const styleSpec = {
+const styleSpec:StyleSpec = {
   dieLineProps: { fill: 'none', strokeWidth: 0.05 },
   cutLineProps: { stroke: '#FF244D' },
   scoreLineProps: { stroke: '#BDFF48' },
   designBoundaryProps: { stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' },
 };
 
-const pyramidNetSpec = {
+const pyramidNetSpec: PyramidNetSpec = {
   pyramidGeometry,
   styleSpec,
   dieLinesSpec: {

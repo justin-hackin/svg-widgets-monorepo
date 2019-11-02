@@ -16,7 +16,7 @@ import {
   roundedEdgePath, strokeDashPath,
 } from '../util/shapes';
 
-interface StyleSpec {
+export interface StyleSpec {
   dieLineProps: object,
   cutLineProps: object,
   scoreLineProps: object,
@@ -29,7 +29,7 @@ interface DieLinesSpec {
   interFaceScoreDashSpec: StrokeDashPathSpec,
 }
 
-interface PyramidNetSpec {
+export interface PyramidNetSpec {
   pyramidGeometry: PyramidGeometrySpec,
   styleSpec: StyleSpec,
   dieLinesSpec: DieLinesSpec,
