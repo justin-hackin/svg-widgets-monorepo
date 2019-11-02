@@ -58,7 +58,7 @@ export const PyramidNet = ({ netSpec }) => {
     tabWideningAngle: Math.PI / 6,
   };
 
-  const plotProps = { fill: 'none', strokeWidth: 0.1 };
+  const plotProps = { fill: 'none', strokeWidth: 0.05 };
   const CUT_COLOR = '#FF244D';
   const SCORE_COLOR = '#BDFF48';
   const cutProps = { ...plotProps, stroke: CUT_COLOR };
@@ -75,11 +75,11 @@ export const PyramidNet = ({ netSpec }) => {
   const borderMaskPathAttrs = borderOverlay.pathAttrs({ stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' });
 
   const defaultBaseEdgeConnectionTabSpec = {
-    tabDepth: 5,
+    tabDepth: 3,
     holeDepthToTabDepth: 0.5,
-    holeTaper: Math.PI / 4,
+    holeTaper: Math.PI / 4.5,
     holeBreadthToHalfWidth: 0.5,
-    finDepthToTabDepth: 0.7,
+    finDepthToTabDepth: 1.1,
     finTipDepthToFinDepth: 1.1,
   };
 
@@ -93,7 +93,7 @@ export const PyramidNet = ({ netSpec }) => {
 
   const ascendantScoreDashSpec = {
     relativeStrokeDasharray,
-    strokeDashLength: 2,
+    strokeDashLength: 10,
     strokeDashOffsetRatio: 0.75,
   };
 
