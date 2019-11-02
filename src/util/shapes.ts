@@ -119,11 +119,11 @@ export function strokeDashPath(
 }
 
 export const ascendantEdgeConnectionTabs = (
-  start: PointLike, end: PointLike, tabSpec: AscendantEdgeConnectionTabsSpec, scoreDashSpec: StrokeDashPathSpec,
+  start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec,
 ):AscendantEdgeConnectionPaths => {
   const {
     tabDepth,
-    tabRoundingDistance,
+    roundingDistance,
     tabsCount,
     midpointDepthToTabDepth,
     tabStartGapToTabDepth,
@@ -176,7 +176,7 @@ export const ascendantEdgeConnectionTabs = (
 
     commands.male.cut.line(tabBaseStart);
     const tabPath = roundedEdgePath(
-      [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], tabRoundingDistance,
+      [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], roundingDistance,
     );
     maleScoreLineIntervals.push([new Point(...tabPath.commands[0].to), new Point(...last(tabPath.commands).to)]);
     tabPath.sliceCommandsDangerously(1);
@@ -201,10 +201,9 @@ export const ascendantEdgeConnectionTabs = (
   return commands;
 };
 
-
-interface AscendantEdgeConnectionTabsSpec {
+export interface AscendantEdgeTabsSpec {
   tabDepth: number,
-  tabRoundingDistance: number,
+  roundingDistance: number,
   tabsCount: number,
   midpointDepthToTabDepth: number,
   tabStartGapToTabDepth: number,
@@ -226,9 +225,9 @@ interface AscendantEdgeConnectionPaths {
 }
 
 
-interface BaseEdgeConnectionTabSpec {
+export interface BaseEdgeConnectionTabSpec {
   tabDepth:number,
-  roundingDistance,
+  roundingDistance: number,
   holeDepthToTabDepth : number,
   holeTaper : number,
   holeBreadthToHalfWidth : number,
@@ -236,7 +235,7 @@ interface BaseEdgeConnectionTabSpec {
   finTipDepthToFinDepth : number
 }
 
-interface BaseEdgeConnectionTab {
+export interface BaseEdgeConnectionTab {
   score: PathData,
   cut: PathData,
 }

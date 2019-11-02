@@ -11,13 +11,36 @@ import {
   triangleAnglesGivenSides,
 } from '../util/geom';
 import {
+  AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec,
   ascendantEdgeConnectionTabs,
   baseEdgeConnectionTab,
   roundedEdgePath, strokeDashPath,
 } from '../util/shapes';
 
-export const PyramidNet = ({ netSpec }) => {
-  const { faceEdgeLengths, faceCount } = netSpec;
+
+interface StyleSpec {
+  dieLineProps: object,
+  cutLineProps: object,
+  scoreLineProps: object,
+  designBoundaryProps: object,
+}
+
+interface PyramidNetSpec {
+  pyramidGeometry: PyramidGeometrySpec,
+  ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
+  baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
+  styleSpec: StyleSpec,
+}
+
+interface PyramidGeometrySpec {
+  faceEdgeLengths: number[],
+  faceCount: number
+}
+
+export const PyramidNet = ({
+  pyramidGeometry, ascendantEdgeTabsSpec, baseEdgeTabSpec, styleSpec,
+}: PyramidNetSpec) => {
+  const { faceEdgeLengths, faceCount } = pyramidGeometry;
   const faceInteriorAngles = triangleAnglesGivenSides(faceEdgeLengths);
 
   const p1 = new Point(0, 0);
@@ -38,31 +61,16 @@ export const PyramidNet = ({ netSpec }) => {
   v1.y *= -1;
   const p3 = p2.add(v1);
   const boundaryPoints = [p1, p2, p3];
-  const tabDepth = 2;
-  const inset = insetPoints(boundaryPoints, tabDepth);
+  const inset = insetPoints(boundaryPoints, ascendantEdgeTabsSpec.tabDepth);
 
   const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
 
   const retractionDistance = 2;
-  const tabRoundingDistance = 0.3;
-  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -tabDepth);
-  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), tabDepth);
+  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -ascendantEdgeTabsSpec.tabDepth);
+  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), ascendantEdgeTabsSpec.tabDepth);
 
-  const ascendantEdgeConnectionTabsDefaults = {
-    tabsCount: 3,
-    midpointDepthToTabDepth: 0.6,
-    tabStartGapToTabDepth: 0.5,
-    holeReachToTabDepth: 0.1,
-    holeWidthRatio: 0.4,
-    holeFlapTaperAngle: Math.PI / 10,
-    tabWideningAngle: Math.PI / 6,
-  };
-
-  const plotProps = { fill: 'none', strokeWidth: 0.05 };
-  const CUT_COLOR = '#FF244D';
-  const SCORE_COLOR = '#BDFF48';
-  const cutProps = { ...plotProps, stroke: CUT_COLOR };
-  const scoreProps = { ...plotProps, stroke: SCORE_COLOR };
+  const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
+  const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
 
   const faceTabFenceposts = range(faceCount + 1).map(
     (index) => hingedPlot(
@@ -71,17 +79,7 @@ export const PyramidNet = ({ netSpec }) => {
     ),
   );
 
-
-  const borderMaskPathAttrs = borderOverlay.pathAttrs({ stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' });
-
-  const defaultBaseEdgeConnectionTabSpec = {
-    tabDepth: 3,
-    holeDepthToTabDepth: 0.5,
-    holeTaper: Math.PI / 4.5,
-    holeBreadthToHalfWidth: 0.5,
-    finDepthToTabDepth: 1.1,
-    finTipDepthToFinDepth: 1.1,
-  };
+  const borderMaskPathAttrs = borderOverlay.pathAttrs(styleSpec.designBoundaryProps);
 
   const PHI = (1 + Math.sqrt(5)) / 2;
   let relativeStrokeDasharray = range(15).reduce((acc, i) => {
@@ -103,9 +101,7 @@ export const PyramidNet = ({ netSpec }) => {
     strokeDashOffsetRatio: 0,
   };
 
-  const connectionTabsInst = ascendantEdgeConnectionTabs(p2, p1, {
-    tabDepth, tabRoundingDistance, ...ascendantEdgeConnectionTabsDefaults,
-  }, tabScoreDashSpec);
+  const connectionTabsInst = ascendantEdgeConnectionTabs(p2, p1, ascendantEdgeTabsSpec, tabScoreDashSpec);
 
   return (
     <g overflow="visible">
@@ -135,9 +131,7 @@ export const PyramidNet = ({ netSpec }) => {
       })}
       {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
         const edgePt2 = faceTabFenceposts[index + 1];
-        const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, {
-          ...defaultBaseEdgeConnectionTabSpec, roundingDistance: tabRoundingDistance * 5,
-        }, tabScoreDashSpec);
+        const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, baseEdgeTabSpec, tabScoreDashSpec);
         return (
           <g key={index}>
             <path {...cutProps} d={baseEdgeTab.cut.getD()} />
