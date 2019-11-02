@@ -83,9 +83,17 @@ export const PyramidNet = ({ netSpec }) => {
     finTipDepthToFinDepth: 1.1,
   };
 
+  const PHI = (1 + Math.sqrt(5)) / 2;
+  let relativeStrokeDasharray = range(15).reduce((acc, i) => {
+    const mux = Math.sqrt(3) * i;
+    acc.push(mux * PHI, mux);
+    return acc;
+  }, []);
+  relativeStrokeDasharray = relativeStrokeDasharray.concat(relativeStrokeDasharray.slice(0).reverse());
+
   const ascendantScoreDashSpec = {
-    relativeStrokeDasharray: [13, 9, 1, 2, 1, 2, 24, 10, 45, 7, 66, 66, 90, 90],
-    strokeDashLength: 10,
+    relativeStrokeDasharray,
+    strokeDashLength: 2,
     strokeDashOffsetRatio: 0.75,
   };
 
