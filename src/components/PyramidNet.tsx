@@ -7,6 +7,7 @@ import {
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
   insetPoints,
+  CM_TO_PIXELS_RATIO,
   triangleAnglesGivenSides, subtractPointsArrays,
 } from '../util/geom';
 import {
@@ -33,23 +34,31 @@ export interface PyramidNetSpec {
   pyramidGeometry: PyramidGeometrySpec,
   styleSpec: StyleSpec,
   dieLinesSpec: DieLinesSpec,
+  shapeHeightInCm: number,
 }
 
-interface PyramidGeometrySpec {
-  faceEdgeLengths: number[],
+export interface PyramidGeometrySpec {
+  relativeFaceEdgeLengths: [number, number, number],
+  firstEdgeLengthToShapeHeight: number,
   faceCount: number
 }
 
 export const PyramidNet = ({
-  pyramidGeometry, styleSpec, dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
+  pyramidGeometry, styleSpec, shapeHeightInCm,
+  dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
 }: PyramidNetSpec) => {
-  const { faceEdgeLengths, faceCount } = pyramidGeometry;
-  const faceInteriorAngles = triangleAnglesGivenSides(faceEdgeLengths);
+  const { relativeFaceEdgeLengths, faceCount } = pyramidGeometry;
+  const faceInteriorAngles = triangleAnglesGivenSides(relativeFaceEdgeLengths);
+
+  const heightInPixels = CM_TO_PIXELS_RATIO * shapeHeightInCm;
+  const desiredFirstLength = heightInPixels / pyramidGeometry.firstEdgeLengthToShapeHeight;
+  const faceLengthAdjustRatio = desiredFirstLength / relativeFaceEdgeLengths[0];
+  const actualFaceEdgeLengths = relativeFaceEdgeLengths.map((len) => len * faceLengthAdjustRatio);
 
   const p1 = new Point(0, 0);
-  const p2 = p1.add(new Point(faceEdgeLengths[0], 0));
+  const p2 = p1.add(new Point(actualFaceEdgeLengths[0], 0));
 
-  const v1 = Point.fromPolar([Math.PI - faceInteriorAngles[0], faceEdgeLengths[1]]);
+  const v1 = Point.fromPolar([Math.PI - faceInteriorAngles[0], actualFaceEdgeLengths[1]]);
 
 
   v1.y *= -1;
@@ -59,7 +68,6 @@ export const PyramidNet = ({
 
   const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
 
-  const retractionDistance = 2;
   const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -ascendantEdgeTabsSpec.tabDepth);
   const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), ascendantEdgeTabsSpec.tabDepth);
 
@@ -69,7 +77,7 @@ export const PyramidNet = ({
   const faceTabFenceposts = range(faceCount + 1).map(
     (index) => hingedPlot(
       p2, p1, Math.PI * 2 - index * faceInteriorAngles[2],
-      index % 2 ? faceEdgeLengths[2] : faceEdgeLengths[0],
+      index % 2 ? actualFaceEdgeLengths[2] : actualFaceEdgeLengths[0],
     ),
   );
 
@@ -77,7 +85,7 @@ export const PyramidNet = ({
 
 
   const baseTabsInst = ascendantEdgeConnectionTabs(p2, p1, ascendantEdgeTabsSpec);
-
+  debugger; // eslint-disable-line no-debugger
   return (
     <g overflow="visible">
       <symbol id="face-tile" overflow="visible">
@@ -97,7 +105,10 @@ export const PyramidNet = ({
         <path {...scoreProps} d={baseTabsInst.male.score.getD()} />
       </g>
       <g id="female-tab">
-        <path {...cutProps} d={roundedEdgePath([p1, outerPt1, outerPt2, p2], retractionDistance).getD()} />
+        <path
+          {...cutProps}
+          d={roundedEdgePath([p1, outerPt1, outerPt2, p2], ascendantEdgeTabsSpec.flapRoundingDistance).getD()}
+        />
         <path {...scoreProps} d={baseTabsInst.female.score.getD()} />
         <path {...cutProps} d={baseTabsInst.female.cut.getD()} />
       </g>

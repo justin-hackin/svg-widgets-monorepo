@@ -205,6 +205,7 @@ export const ascendantEdgeConnectionTabs = (
 export interface AscendantEdgeTabsSpec {
   tabDepth: number,
   roundingDistance: number,
+  flapRoundingDistance: number,
   tabsCount: number,
   midpointDepthToTabDepth: number,
   tabStartGapToTabDepth: number,

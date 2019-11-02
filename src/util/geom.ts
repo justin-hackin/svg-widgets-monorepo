@@ -4,6 +4,7 @@ import { subtract } from '@flatten-js/boolean-op';
 
 import { circularSlice } from './data';
 
+// TODO: use ts defs in project
 export interface PointLike {
   x: number,
   y: number,
@@ -12,6 +13,8 @@ export interface PointLike {
 
 export type PointTuple = [number, number];
 export type Coord = PointTuple | PointLike;
+
+export const CM_TO_PIXELS_RATIO = 37.7952755906;
 
 export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
 export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);

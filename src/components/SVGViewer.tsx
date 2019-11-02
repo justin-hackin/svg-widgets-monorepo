@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import isNaN from 'lodash-es/isNaN';
 import ReactResizeDetector from 'react-resize-detector';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
-import { PyramidNet, StyleSpec, PyramidNetSpec } from './PyramidNet';
+import {
+  PyramidNet, StyleSpec, PyramidNetSpec, PyramidGeometrySpec,
+} from './PyramidNet';
 import { GridPattern } from './GridPattern';
 import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
 
@@ -31,6 +33,7 @@ const tabScoreDashSpec = {
 const ascendantEdgeTabsSpec: AscendantEdgeTabsSpec = {
   tabDepth: 2,
   roundingDistance: 0.3,
+  flapRoundingDistance: 2,
   tabsCount: 3,
   midpointDepthToTabDepth: 0.6,
   tabStartGapToTabDepth: 0.5,
@@ -41,7 +44,11 @@ const ascendantEdgeTabsSpec: AscendantEdgeTabsSpec = {
   scoreDashSpec: tabScoreDashSpec,
 };
 
-const pyramidGeometry = { faceEdgeLengths: [40, 30, 50], faceCount: 4 };
+const pyramidGeometry:PyramidGeometrySpec = {
+  relativeFaceEdgeLengths: [40, 30, 50],
+  faceCount: 4,
+  firstEdgeLengthToShapeHeight: 2,
+};
 
 const baseEdgeTabSpec:BaseEdgeConnectionTabSpec = {
   tabDepth: 3,
@@ -64,6 +71,7 @@ const styleSpec:StyleSpec = {
 const pyramidNetSpec: PyramidNetSpec = {
   pyramidGeometry,
   styleSpec,
+  shapeHeightInCm: 2.2,
   dieLinesSpec: {
     baseEdgeTabSpec,
     ascendantEdgeTabsSpec,
