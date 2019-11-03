@@ -123,7 +123,7 @@ export const PyramidNet = ({
       </g>
       {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
         const edgePt2 = faceTabFenceposts[index + 1];
-        const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, baseEdgeTabSpec);
+        const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabSpec);
         return (
           <g key={index}>
             <path {...cutProps} d={baseEdgeTab.cut.getD()} />

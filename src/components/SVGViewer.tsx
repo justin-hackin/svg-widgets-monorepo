@@ -51,7 +51,7 @@ const pyramidGeometry:PyramidGeometrySpec = {
 };
 
 const baseEdgeTabSpec:BaseEdgeConnectionTabSpec = {
-  tabDepth: 3,
+  tabDepthToAscendantEdgeLength: 1.5,
   roundingDistance: 1.5,
   holeDepthToTabDepth: 0.5,
   holeTaper: Math.PI / 4.5,

@@ -228,7 +228,7 @@ interface AscendantEdgeConnectionPaths {
 }
 
 export interface BaseEdgeConnectionTabSpec {
-  tabDepth:number,
+  tabDepthToAscendantEdgeLength:number,
   roundingDistance: number,
   holeDepthToTabDepth : number,
   holeTaper : number,
@@ -244,10 +244,10 @@ export interface BaseEdgeConnectionTab {
 }
 
 export function baseEdgeConnectionTab(
-  start: PointLike, end: PointLike, tabSpec: BaseEdgeConnectionTabSpec,
+  start: PointLike, end: PointLike, ascendantEdgeTabDepth, tabSpec: BaseEdgeConnectionTabSpec,
 ):BaseEdgeConnectionTab {
   const {
-    tabDepth,
+    tabDepthToAscendantEdgeLength,
     roundingDistance,
     holeDepthToTabDepth,
     holeTaper,
@@ -256,6 +256,7 @@ export function baseEdgeConnectionTab(
     finTipDepthToFinDepth,
     scoreDashSpec,
   } = tabSpec;
+  const tabDepth = tabDepthToAscendantEdgeLength * ascendantEdgeTabDepth
   const cutPath = new PathData();
   const mid = hingedPlotLerp(start, end, 0, 0.5);
 
