@@ -15,6 +15,7 @@
   "dependencies": {
     "@flatten-js/boolean-op": "^1.1.4",
     "@flatten-js/core": "git+https://github.com/justin-barca/flatten-js.git",
+    "@flatten-js/polygon-offset": "^1.0.5",
     "lodash-es": "^4.17.15",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",

@@ -54,30 +54,21 @@ export const PyramidNet = ({
   const desiredFirstLength = heightInPixels / pyramidGeometry.firstEdgeLengthToShapeHeight;
   const faceLengthAdjustRatio = desiredFirstLength / relativeFaceEdgeLengths[0];
   const actualFaceEdgeLengths = relativeFaceEdgeLengths.map((len) => len * faceLengthAdjustRatio);
-
+  const ascendantEdgeTabDepth = actualFaceEdgeLengths[0] * ascendantEdgeTabsSpec.tabDepthToTraversalLength;
 
   const p1 = new Point(0, 0);
   const p2 = p1.add(new Point(actualFaceEdgeLengths[0], 0));
-
   const v1 = Point.fromPolar([Math.PI - faceInteriorAngles[0], actualFaceEdgeLengths[1]]);
-
-
   v1.y *= -1;
   const p3 = p2.add(v1);
+
   const boundaryPoints = [p1, p2, p3];
-  const ascendantEdgeTabDepth = p1.subtract(p2).length * ascendantEdgeTabsSpec.tabDepthToTraversalLength;
+  // TODO: can be converted to a path inset using @flatten-js/polygon-offset
   const inset = insetPoints(boundaryPoints, ascendantEdgeTabDepth);
-
   const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
-
-  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -ascendantEdgeTabDepth);
-  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), ascendantEdgeTabDepth);
 
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
   const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
-
-  const designBoundaryPathAttrs = borderOverlay.pathAttrs(styleSpec.designBoundaryProps);
-
 
   const cutPathAggregate = new PathData();
   const scorePathAggregate = new PathData();
@@ -95,6 +86,8 @@ export const PyramidNet = ({
   });
 
   // female tab outer flap
+  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -ascendantEdgeTabDepth);
+  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), ascendantEdgeTabDepth);
   cutPathAggregate.concatPath(
     roundedEdgePath([p1, outerPt1, outerPt2, p2], ascendantEdgeTabsSpec.flapRoundingDistance),
   );
@@ -123,7 +116,7 @@ export const PyramidNet = ({
     <g overflow="visible">
       <symbol id="face-tile" overflow="visible">
         <g>
-          <path {...designBoundaryPathAttrs} />
+          <path {...styleSpec.designBoundaryProps} d={borderOverlay.pathAttrs().d} />
         </g>
       </symbol>
 
