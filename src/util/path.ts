@@ -1,6 +1,8 @@
 import cloneDeep from 'lodash-es/cloneDeep';
+import includes from 'lodash-es/includes';
+import intersection from 'lodash-es/intersection';
 // @ts-ignore
-import { Point } from '@flatten-js/core';
+import {Matrix, Point} from '@flatten-js/core';
 import isNaN from 'lodash-es/isNaN';
 import {
   composeSVG, makeAbsolute, parseSVG,
@@ -74,6 +76,9 @@ interface Command {
   value?: number,
 }
 
+const UNTRANSFORMABLE_COMMANDS = ['A', 'V', 'H'];
+const TRANSFORMABLE_COMMAND_PROPS = ['to', 'ctrl1', 'ctrl2'];
+
 export class PathData {
   commands: Command[];
 
@@ -86,6 +91,10 @@ export class PathData {
     // @ts-ignore
     this.commands = param instanceof Point ? [COMMAND_FACTORY.M(param)] : param;
     return this;
+  }
+
+  static fromDValue(d):PathData {
+    return new PathData(makeAbsolute(parseSVG(d)));
   }
 
   move(to):PathData {
@@ -130,10 +139,6 @@ export class PathData {
     return this;
   }
 
-  static fromDValue(d):PathData {
-    return new PathData(makeAbsolute(parseSVG(d)));
-  }
-
   concatCommands(commands):PathData {
     this.commands = this.commands.concat(cloneDeep(commands));
     return this;
@@ -147,6 +152,19 @@ export class PathData {
   sliceCommandsDangerously(...params):PathData {
     this.commands = this.commands.slice(...params);
     return this;
+  }
+
+  transformPoints(matrix:Matrix) {
+    this.commands.forEach((command) => {
+      if (includes(UNTRANSFORMABLE_COMMANDS, command.code.toUpperCase())) {
+        throw new Error('can not apply matrix transformation to arc');
+      }
+      const propsToTransform = intersection(Object.keys(command), TRANSFORMABLE_COMMAND_PROPS);
+      propsToTransform.forEach((prop) => {
+        // eslint-disable-next-line no-param-reassign
+        command[prop] = matrix.transform(command[prop]);
+      });
+    });
   }
 
   getD():string {

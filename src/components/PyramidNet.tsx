@@ -1,9 +1,8 @@
 // @ts-ignore
-import { Point } from '@flatten-js/core';
+import { Point, Matrix } from '@flatten-js/core';
 import React from 'react';
 import range from 'lodash-es/range';
 import {
-  radToDeg,
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
   insetPoints,
@@ -16,6 +15,7 @@ import {
   baseEdgeConnectionTab,
   roundedEdgePath, strokeDashPath,
 } from '../util/shapes';
+import { PathData } from '../util/path';
 
 export interface StyleSpec {
   dieLineProps: object,
@@ -76,18 +76,49 @@ export const PyramidNet = ({
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
   const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
 
+  const designBoundaryPathAttrs = borderOverlay.pathAttrs(styleSpec.designBoundaryProps);
+
+
+  const cutPathAggregate = new PathData();
+  const scorePathAggregate = new PathData();
+
+  // inter-face scoring
   const faceTabFenceposts = range(faceCount + 1).map(
     (index) => hingedPlot(
       p2, p1, Math.PI * 2 - index * faceInteriorAngles[2],
       index % 2 ? actualFaceEdgeLengths[2] : actualFaceEdgeLengths[0],
     ),
   );
+  faceTabFenceposts.slice(1, -1).forEach((endPt) => {
+    const pathData = strokeDashPath(p1, endPt, interFaceScoreDashSpec);
+    scorePathAggregate.concatPath(pathData);
+  });
 
-  const designBoundaryPathAttrs = borderOverlay.pathAttrs(styleSpec.designBoundaryProps);
+  // female tab outer flap
+  cutPathAggregate.concatPath(
+    roundedEdgePath([p1, outerPt1, outerPt2, p2], ascendantEdgeTabsSpec.flapRoundingDistance),
+  );
 
+  // base edge tabs
+  faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
+    const edgePt2 = faceTabFenceposts[index + 1];
+    const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabSpec);
+    cutPathAggregate.concatPath(baseEdgeTab.cut);
+    scorePathAggregate.concatPath(baseEdgeTab.score);
+  });
 
-  const baseTabsInst = ascendantEdgeConnectionTabs(p2, p1, ascendantEdgeTabsSpec);
-  debugger; // eslint-disable-line no-debugger
+  // male tabs
+  const ascendantTabs = ascendantEdgeConnectionTabs(p2, p1, ascendantEdgeTabsSpec);
+  const rotationMatrix = (new Matrix()).rotate(-faceCount * faceInteriorAngles[2]);
+  ascendantTabs.male.cut.transformPoints(rotationMatrix);
+  ascendantTabs.male.score.transformPoints(rotationMatrix);
+  cutPathAggregate.concatPath(ascendantTabs.male.cut);
+  scorePathAggregate.concatPath(ascendantTabs.male.score);
+
+  // female inner
+  cutPathAggregate.concatPath(ascendantTabs.female.cut);
+  scorePathAggregate.concatPath(ascendantTabs.female.score);
+
   return (
     <g overflow="visible">
       <symbol id="face-tile" overflow="visible">
@@ -102,35 +133,11 @@ export const PyramidNet = ({
         const rotation = ((index + (isOdd ? 1 : 0)) * faceInteriorAngles[2] * 360 * (isOdd ? 1 : -1)) / (2 * Math.PI);
         return <use key={index} transform={`scale(1 ${yScale}) rotate(${rotation})`} xlinkHref="#face-tile" />;
       })}
-      <g id="male-tab" transform={`rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`}>
-        <path {...cutProps} d={baseTabsInst.male.cut.getD()} />
-        <path {...scoreProps} d={baseTabsInst.male.score.getD()} />
+
+      <g id="die-lines">
+        <path {...scoreProps} d={scorePathAggregate.getD()} />
+        <path {...cutProps} d={cutPathAggregate.getD()} />
       </g>
-      <g id="female-tab">
-        <path
-          {...cutProps}
-          d={roundedEdgePath([p1, outerPt1, outerPt2, p2], ascendantEdgeTabsSpec.flapRoundingDistance).getD()}
-        />
-        <path {...scoreProps} d={baseTabsInst.female.score.getD()} />
-        <path {...cutProps} d={baseTabsInst.female.cut.getD()} />
-      </g>
-      {/* eslint-disable-next-line arrow-body-style */}
-      <g id="ascendant-edge-scores">
-        {faceTabFenceposts.slice(1, -1).map((endPt, index) => {
-          const pathData = strokeDashPath(p1, endPt, interFaceScoreDashSpec);
-          return (<path key={index} {...scoreProps} d={pathData.getD()} />);
-        })}
-      </g>
-      {faceTabFenceposts.slice(0, -1).map((edgePt1, index) => {
-        const edgePt2 = faceTabFenceposts[index + 1];
-        const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabSpec);
-        return (
-          <g key={index}>
-            <path {...cutProps} d={baseEdgeTab.cut.getD()} />
-            <path {...scoreProps} d={baseEdgeTab.score.getD()} />
-          </g>
-        );
-      })}
     </g>
   );
 };
