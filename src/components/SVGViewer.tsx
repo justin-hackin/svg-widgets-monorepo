@@ -9,8 +9,8 @@ import {
 } from './PyramidNet';
 import { GridPattern } from './GridPattern';
 import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
+import { PHI } from '../util/geom';
 
-const PHI = (1 + Math.sqrt(5)) / 2;
 let relativeStrokeDasharray = range(15).reduce((acc, i) => {
   const mux = Math.sqrt(3) * i;
   acc.push(mux * PHI, mux);
