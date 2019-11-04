@@ -15,7 +15,7 @@ import {
   baseEdgeConnectionTab,
   roundedEdgePath, strokeDashPath,
 } from '../util/shapes';
-import { PathData } from '../util/path';
+import { PathData } from '../util/PathData';
 
 export interface StyleSpec {
   dieLineProps: object,
@@ -72,7 +72,6 @@ export const PyramidNet = ({
 
   const cutPathAggregate = new PathData();
   const scorePathAggregate = new PathData();
-
   // inter-face scoring
   const faceTabFenceposts = range(faceCount + 1).map(
     (index) => hingedPlot(

@@ -2,10 +2,10 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import includes from 'lodash-es/includes';
 import intersection from 'lodash-es/intersection';
 // @ts-ignore
-import {Matrix, Point} from '@flatten-js/core';
+import { Matrix, Point } from '@flatten-js/core';
 import isNaN from 'lodash-es/isNaN';
 import {
-  composeSVG, makeAbsolute, parseSVG,
+  composeSVG, parseSVG,
 } from 'svg-path-parser';
 import { PointTuple, Coord } from './geom';
 
@@ -65,6 +65,7 @@ export const COMMAND_FACTORY = {
     code: 'Z',
   }),
 };
+
 interface Command {
   code: string,
   to?: PointTuple,
@@ -94,7 +95,7 @@ export class PathData {
   }
 
   static fromDValue(d):PathData {
-    return new PathData(makeAbsolute(parseSVG(d)));
+    return new PathData(parseSVG(d));
   }
 
   move(to):PathData {
@@ -149,6 +150,8 @@ export class PathData {
     return this;
   }
 
+  // this could lead to the rendering of invalid svg
+  // meant to be used in conjunction with concatPath to fuse paths that start and end at same the point
   sliceCommandsDangerously(...params):PathData {
     this.commands = this.commands.slice(...params);
     return this;

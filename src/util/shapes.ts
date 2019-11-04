@@ -4,7 +4,7 @@ import range from 'lodash-es/range';
 import sum from 'lodash-es/sum';
 // @ts-ignore
 import { Point } from '@flatten-js/core';
-import { COMMAND_FACTORY, PathData } from './path';
+import { COMMAND_FACTORY, PathData } from './PathData';
 import {
   PointLike,
   hingedPlot, hingedPlotByProjectionDistance, hingedPlotLerp,
