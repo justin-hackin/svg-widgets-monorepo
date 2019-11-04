@@ -4,12 +4,16 @@ import React, { useState } from 'react';
 import isNaN from 'lodash-es/isNaN';
 import ReactResizeDetector from 'react-resize-detector';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
+import { ThemeProvider } from '@material-ui/styles';
+import { createMuiTheme } from '@material-ui/core';
 import {
   PyramidNet, StyleSpec, PyramidNetSpec, PyramidGeometrySpec,
 } from './PyramidNet';
 import { GridPattern } from './GridPattern';
 import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
 import { PHI } from '../util/geom';
+import darkTheme from '../data/material-ui-dark-theme.json';
+import { PersistentDrawerLeft } from './drawer';
 
 let relativeStrokeDasharray = range(15).reduce((acc, i) => {
   const mux = Math.sqrt(3) * i;
@@ -88,6 +92,8 @@ export function SVGViewer() {
   const [value, setValue] = useState(INITIAL_VALUE);
   const [tool, setTool] = useState(TOOL_PAN);
   const patternId = 'grid-pattern';
+  // @ts-ignore
+  // @ts-ignore
   return (
     <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
       <ReactResizeDetector handleWidth handleHeight>
@@ -116,6 +122,10 @@ export function SVGViewer() {
           </ReactSVGPanZoom>
         ))}
       </ReactResizeDetector>
+
+      <ThemeProvider theme={createMuiTheme(darkTheme)}>
+        <PersistentDrawerLeft />
+      </ThemeProvider>
     </div>
 
   );
