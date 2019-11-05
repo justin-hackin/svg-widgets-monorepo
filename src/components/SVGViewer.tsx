@@ -7,13 +7,17 @@ import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
 import {
-  PyramidNet, StyleSpec, PyramidNetSpec, PyramidGeometrySpec,
+  PyramidNet, StyleSpec, PyramidNetSpec,
 } from './PyramidNet';
-import { GridPattern } from './GridPattern';
-import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
-import { PHI } from '../util/geom';
 import darkTheme from '../data/material-ui-dark-theme.json';
+import { polyhedra } from '../data/polyhedra';
+import { PHI } from '../util/geom';
+import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
+// eslint-disable-next-line import/no-cycle
 import { PersistentDrawerLeft } from './drawer';
+import { GridPattern } from './GridPattern';
+// eslint-disable-next-line import/no-cycle
+import { NetConfigContext } from '../App';
 
 let relativeStrokeDasharray = range(15).reduce((acc, i) => {
   const mux = Math.sqrt(3) * i;
@@ -48,12 +52,6 @@ const ascendantEdgeTabsSpec: AscendantEdgeTabsSpec = {
   scoreDashSpec: tabScoreDashSpec,
 };
 
-const pyramidGeometry:PyramidGeometrySpec = {
-  relativeFaceEdgeLengths: [40, 30, 50],
-  faceCount: 4,
-  firstEdgeLengthToShapeHeight: 2,
-};
-
 const baseEdgeTabSpec:BaseEdgeConnectionTabSpec = {
   tabDepthToAscendantEdgeLength: 1.5,
   roundingDistance: 1.5,
@@ -72,16 +70,6 @@ const styleSpec:StyleSpec = {
   designBoundaryProps: { stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' },
 };
 
-const pyramidNetSpec: PyramidNetSpec = {
-  pyramidGeometry,
-  styleSpec,
-  shapeHeightInCm: 2.2,
-  dieLinesSpec: {
-    baseEdgeTabSpec,
-    ascendantEdgeTabsSpec,
-    interFaceScoreDashSpec,
-  },
-};
 
 const svgDimensions = { width: 1024, height: 960 };
 const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
@@ -89,8 +77,22 @@ export function SVGViewer() {
   // TODO: make this work
   // const [value = INITIAL_VALUE, setValue] = useQueryParam('ReactSVGPanZoomValue', JsonParam);
   // const [tool = TOOL_PAN, setTool] = useQueryParam('ReactSVGPanZoomTool', StringParam);
-  const [value, setValue] = useState(INITIAL_VALUE);
+  const [viewValue, setValue] = useState(INITIAL_VALUE);
   const [tool, setTool] = useState(TOOL_PAN);
+  const [selectedPolyhedron, setSelectedPolyhedron] = useState('small-stellated-dodecahedron');
+
+
+  const pyramidNetSpec: PyramidNetSpec = {
+    pyramidGeometry: polyhedra[selectedPolyhedron],
+    styleSpec,
+    shapeHeightInCm: 2.2,
+    dieLinesSpec: {
+      baseEdgeTabSpec,
+      ascendantEdgeTabsSpec,
+      interFaceScoreDashSpec,
+    },
+  };
+
   const patternId = 'grid-pattern';
   // @ts-ignore
   // @ts-ignore
@@ -99,7 +101,7 @@ export function SVGViewer() {
       <ReactResizeDetector handleWidth handleHeight>
         {({ width, height }) => ((!isValidNumber(width) || !isValidNumber(height)) ? <div /> : (
           <ReactSVGPanZoom
-            value={value}
+            value={viewValue}
             width={width}
             height={height}
             background="#454545"
@@ -122,10 +124,16 @@ export function SVGViewer() {
           </ReactSVGPanZoom>
         ))}
       </ReactResizeDetector>
-
-      <ThemeProvider theme={createMuiTheme(darkTheme)}>
-        <PersistentDrawerLeft />
-      </ThemeProvider>
+      <NetConfigContext.Provider value={{
+        selectedPolyhedron,
+        setSelectedPolyhedron,
+        polyhedra,
+      }}
+      >
+        <ThemeProvider theme={createMuiTheme(darkTheme)}>
+          <PersistentDrawerLeft />
+        </ThemeProvider>
+      </NetConfigContext.Provider>
     </div>
 
   );
