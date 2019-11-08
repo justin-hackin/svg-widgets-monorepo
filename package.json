@@ -26,7 +26,8 @@
     "react-resize-detector": "^4.2.1",
     "react-svg-pan-zoom": "^3.4.0",
     "svg-path-parser": "git+https://github.com/justin-hackin/svg-path-parser.git",
-    "use-query-params": "^0.4.3"
+    "use-query-params": "^0.4.3",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

@@ -15,47 +15,11 @@ import startCase from 'lodash-es/startCase';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
 
 // eslint-disable-next-line import/no-cycle
 import { NetConfigContext } from '../App';
-
-const drawerWidth = 360;
-
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  root: {
-    display: 'flex',
-  },
-  menuButton: {
-    top: theme.spacing(1),
-    left: theme.spacing(1),
-    position: 'fixed',
-  },
-  hide: {
-    display: 'none',
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
-  },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-}));
+import { PanelSelect } from './inputs/PanelSelect';
+import { useStyles } from './style';
 
 export function PersistentDrawerLeft() {
   // @ts-ignore
@@ -63,6 +27,7 @@ export function PersistentDrawerLeft() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme = useTheme();
   const { selectedPolyhedron, setSelectedPolyhedron, polyhedra } = React.useContext(NetConfigContext);
+  const polyhedronOptions = Object.keys(polyhedra).map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
   const [open, setOpen] = React.useState(false);
 
@@ -99,22 +64,12 @@ export function PersistentDrawerLeft() {
           </IconButton>
         </div>
         <Divider />
-
-        <FormControl className={classes.formControl}>
-          <InputLabel id="demo-simple-select-label">Polyhedron</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={selectedPolyhedron}
-            onChange={(e) => {
-              setSelectedPolyhedron(e.target.value);
-            }}
-          >
-            {Object.keys(polyhedra).map((polyhedraKey, i) => (
-              <MenuItem key={i} value={polyhedraKey}>{startCase(polyhedraKey)}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <PanelSelect
+          label="Polyhedron"
+          value={selectedPolyhedron}
+          options={polyhedronOptions}
+          setter={setSelectedPolyhedron}
+        />
       </Drawer>
     </div>
   );

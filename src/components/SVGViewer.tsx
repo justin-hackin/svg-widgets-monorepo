@@ -1,5 +1,4 @@
 // import { useQueryParam, StringParam, JsonParam } from 'use-query-params';
-import range from 'lodash-es/range';
 import React, { useState } from 'react';
 import isNaN from 'lodash-es/isNaN';
 import ReactResizeDetector from 'react-resize-detector';
@@ -19,16 +18,9 @@ import { GridPattern } from './GridPattern';
 // eslint-disable-next-line import/no-cycle
 import { NetConfigContext } from '../App';
 
-let relativeStrokeDasharray = range(15).reduce((acc, i) => {
-  const mux = Math.sqrt(3) * i;
-  acc.push(mux * PHI, mux);
-  return acc;
-}, []);
-relativeStrokeDasharray = relativeStrokeDasharray.concat(relativeStrokeDasharray.slice(0).reverse());
-
 const interFaceScoreDashSpec = {
-  relativeStrokeDasharray,
-  strokeDashLength: 10,
+  relativeStrokeDasharray: [PHI, 1, 1 / PHI, 1, PHI],
+  strokeDashLength: 1,
   strokeDashOffsetRatio: 0.75,
 };
 
@@ -63,6 +55,8 @@ const baseEdgeTabSpec:BaseEdgeConnectionTabSpec = {
   scoreDashSpec: tabScoreDashSpec,
 };
 
+
+
 const styleSpec:StyleSpec = {
   dieLineProps: { fill: 'none', strokeWidth: 0.05 },
   cutLineProps: { stroke: '#FF244D' },
@@ -70,7 +64,8 @@ const styleSpec:StyleSpec = {
   designBoundaryProps: { stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' },
 };
 
-
+// @ts-ignore
+const theme = createMuiTheme(darkTheme);
 const svgDimensions = { width: 1024, height: 960 };
 const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
 export function SVGViewer() {
@@ -94,8 +89,6 @@ export function SVGViewer() {
   };
 
   const patternId = 'grid-pattern';
-  // @ts-ignore
-  // @ts-ignore
   return (
     <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
       <ReactResizeDetector handleWidth handleHeight>
@@ -130,7 +123,7 @@ export function SVGViewer() {
         polyhedra,
       }}
       >
-        <ThemeProvider theme={createMuiTheme(darkTheme)}>
+        <ThemeProvider theme={theme}>
           <PersistentDrawerLeft />
         </ThemeProvider>
       </NetConfigContext.Provider>
