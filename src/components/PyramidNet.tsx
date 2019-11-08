@@ -8,14 +8,14 @@ import {
   insetPoints,
   CM_TO_PIXELS_RATIO,
   triangleAnglesGivenSides, subtractPointsArrays,
-} from '../util/geom';
+} from '~util/geom';
 import {
   AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec,
   ascendantEdgeConnectionTabs,
   baseEdgeConnectionTab,
   roundedEdgePath, strokeDashPath,
-} from '../util/shapes';
-import { PathData } from '../util/PathData';
+} from '~util/shapes';
+import { PathData } from '~util/PathData';
 
 export interface StyleSpec {
   dieLineProps: object,

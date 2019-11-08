@@ -1,10 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import {
-  makeStyles,
   useTheme,
-  Theme,
-  createStyles,
 } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
@@ -17,7 +14,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
 // eslint-disable-next-line import/no-cycle
-import { NetConfigContext } from '../App';
+import { NetConfigContext } from '~App';
 import { PanelSelect } from './inputs/PanelSelect';
 import { useStyles } from './style';
 

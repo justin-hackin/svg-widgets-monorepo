@@ -8,15 +8,15 @@ import { createMuiTheme } from '@material-ui/core';
 import {
   PyramidNet, StyleSpec, PyramidNetSpec,
 } from './PyramidNet';
-import darkTheme from '../data/material-ui-dark-theme.json';
-import { polyhedra } from '../data/polyhedra';
-import { PHI } from '../util/geom';
-import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
+import darkTheme from '~/data/material-ui-dark-theme.json';
+import { polyhedra } from '~data/polyhedra';
+import { PHI } from '~util/geom';
+import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '~util/shapes';
 // eslint-disable-next-line import/no-cycle
 import { PersistentDrawerLeft } from './drawer';
 import { GridPattern } from './GridPattern';
 // eslint-disable-next-line import/no-cycle
-import { NetConfigContext } from '../App';
+import { NetConfigContext } from '~App';
 
 const interFaceScoreDashSpec = {
   relativeStrokeDasharray: [PHI, 1, 1 / PHI, 1, PHI],
