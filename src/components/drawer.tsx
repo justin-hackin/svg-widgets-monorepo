@@ -1,4 +1,6 @@
 import React from 'react';
+import { observer } from 'mobx-react';
+import startCase from 'lodash-es/startCase';
 import clsx from 'clsx';
 import {
   useTheme,
@@ -7,24 +9,21 @@ import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Fab from '@material-ui/core/Fab';
-
-import startCase from 'lodash-es/startCase';
-
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
-// eslint-disable-next-line import/no-cycle
-import { NetConfigContext } from '~App';
 import { PanelSelect } from './inputs/PanelSelect';
 import { useStyles } from './style';
 
-export function PersistentDrawerLeft() {
+export const PersistentDrawerLeft = observer(({ store }) => {
   // @ts-ignore
   const classes = useStyles();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme = useTheme();
-  const { selectedPolyhedron, setSelectedPolyhedron, polyhedra } = React.useContext(NetConfigContext);
-  const polyhedronOptions = Object.keys(polyhedra).map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
+  const { selectedShape, polyhedraPyramidGeometries } = store;
+  const setSelectedPolyhedron = store.getSetter('selectedShape');
+  const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
+    .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
   const [open, setOpen] = React.useState(false);
 
@@ -63,11 +62,11 @@ export function PersistentDrawerLeft() {
         <Divider />
         <PanelSelect
           label="Polyhedron"
-          value={selectedPolyhedron}
+          value={selectedShape}
           options={polyhedronOptions}
           setter={setSelectedPolyhedron}
         />
       </Drawer>
     </div>
   );
-}
+});

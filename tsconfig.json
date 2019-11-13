@@ -3,6 +3,7 @@
     "jsx": "react",
     "allowUmdGlobalAccess": true,
     "esModuleInterop": true,
+    "experimentalDecorators": true,
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,

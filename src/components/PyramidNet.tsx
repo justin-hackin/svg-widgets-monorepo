@@ -1,5 +1,6 @@
 // @ts-ignore
 import { Point, Matrix } from '@flatten-js/core';
+import { observer } from 'mobx-react';
 import React from 'react';
 import range from 'lodash-es/range';
 import {
@@ -24,7 +25,7 @@ export interface StyleSpec {
   designBoundaryProps: object,
 }
 
-interface DieLinesSpec {
+export interface DieLinesSpec {
   ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
   baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
   interFaceScoreDashSpec: StrokeDashPathSpec,
@@ -43,10 +44,12 @@ export interface PyramidGeometrySpec {
   faceCount: number
 }
 
-export const PyramidNet = ({
-  pyramidGeometry, styleSpec, shapeHeightInCm,
-  dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
-}: PyramidNetSpec) => {
+
+export const PyramidNet = observer(({ store }) => {
+  const {
+    pyramidGeometry, styleSpec, shapeHeightInCm,
+    dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
+  } = store;
   const { relativeFaceEdgeLengths, faceCount } = pyramidGeometry;
   const faceInteriorAngles = triangleAnglesGivenSides(relativeFaceEdgeLengths);
 
@@ -132,4 +135,4 @@ export const PyramidNet = ({
       </g>
     </g>
   );
-};
+});
