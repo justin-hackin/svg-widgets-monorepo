@@ -24,8 +24,8 @@ export class Store implements PyramidNetSpec {
   public dieLinesSpec:DieLinesSpec = {
     ascendantEdgeTabsSpec: {
       tabDepthToTraversalLength: 0.04810606060599847,
-      roundingDistance: 0.3,
-      flapRoundingDistance: 2,
+      tabRoundingDistanceRatio: 0.75,
+      flapRoundingDistanceRatio: 1,
       tabsCount: 3,
       midpointDepthToTabDepth: 0.6,
       tabStartGapToTabDepth: 0.5,

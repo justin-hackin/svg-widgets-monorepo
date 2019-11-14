@@ -123,7 +123,7 @@ export const ascendantEdgeConnectionTabs = (
 ):AscendantEdgeConnectionPaths => {
   const {
     tabDepthToTraversalLength,
-    roundingDistance,
+    tabRoundingDistanceRatio,
     tabsCount,
     midpointDepthToTabDepth,
     tabStartGapToTabDepth,
@@ -174,10 +174,15 @@ export const ascendantEdgeConnectionTabs = (
     const [holeEdgeStart, holeEdgeEnd] = symmetricHingePlotByProjectionDistance(
       tabBaseStart, tabBaseEnd, -Math.PI / 2 + holeFlapTaperAngle, holeReachToTabDepth * -tabDepth,
     );
-
+    // don't let the retraction happen any more than half the length of shortest the non-rounded edge
+    // otherwise the control points may criss-cross causing odd loops
+    const tabRoundingDistance = tabRoundingDistanceRatio * 0.5 * Math.min(
+      tabBaseStart.subtract(tabMidpointStart).length,
+      tabMidpointStart.subtract(tabEdgeStart).length,
+    );
     commands.male.cut.line(tabBaseStart);
     const tabPath = roundedEdgePath(
-      [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], roundingDistance,
+      [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], tabRoundingDistance,
     );
     maleScoreLineIntervals.push([new Point(...tabPath.commands[0].to), new Point(...last(tabPath.commands).to)]);
     tabPath.sliceCommandsDangerously(1);
@@ -204,8 +209,8 @@ export const ascendantEdgeConnectionTabs = (
 
 export interface AscendantEdgeTabsSpec {
   tabDepthToTraversalLength: number,
-  roundingDistance: number,
-  flapRoundingDistance: number,
+  tabRoundingDistanceRatio: number,
+  flapRoundingDistanceRatio: number,
   tabsCount: number,
   midpointDepthToTabDepth: number,
   tabStartGapToTabDepth: number,
@@ -256,7 +261,7 @@ export function baseEdgeConnectionTab(
     finTipDepthToFinDepth,
     scoreDashSpec,
   } = tabSpec;
-  const tabDepth = tabDepthToAscendantEdgeLength * ascendantEdgeTabDepth
+  const tabDepth = tabDepthToAscendantEdgeLength * ascendantEdgeTabDepth;
   const cutPath = new PathData();
   const mid = hingedPlotLerp(start, end, 0, 0.5);
 

@@ -45,7 +45,7 @@ export interface PyramidGeometrySpec {
 }
 
 
-export const PyramidNet = observer(({ store }) => {
+export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   const {
     pyramidGeometry, styleSpec, shapeHeightInCm,
     dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
@@ -90,8 +90,12 @@ export const PyramidNet = observer(({ store }) => {
   // female tab outer flap
   const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -ascendantEdgeTabDepth);
   const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), ascendantEdgeTabDepth);
+  const maxRoundingDistance = Math.min(p1.subtract(outerPt1).length, p2.subtract(outerPt2).length);
   cutPathAggregate.concatPath(
-    roundedEdgePath([p1, outerPt1, outerPt2, p2], ascendantEdgeTabsSpec.flapRoundingDistance),
+    roundedEdgePath(
+      [p1, outerPt1, outerPt2, p2],
+      ascendantEdgeTabsSpec.flapRoundingDistanceRatio * maxRoundingDistance,
+    ),
   );
 
   // base edge tabs
