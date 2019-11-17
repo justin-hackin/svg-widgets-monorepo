@@ -11,7 +11,7 @@ import {
   intersectLineLine, lineLerp,
   parallelLinePointsAtDistance,
   symmetricHingePlot,
-  symmetricHingePlotByProjectionDistance,
+  symmetricHingePlotByProjectionDistance, distanceBetweenPoints,
 } from './geom';
 
 interface RoundPoint {
@@ -234,7 +234,7 @@ interface AscendantEdgeConnectionPaths {
 
 export interface BaseEdgeConnectionTabSpec {
   tabDepthToAscendantEdgeLength:number,
-  roundingDistance: number,
+  roundingDistanceRatio: number,
   holeDepthToTabDepth : number,
   holeTaper : number,
   holeBreadthToHalfWidth : number,
@@ -253,7 +253,7 @@ export function baseEdgeConnectionTab(
 ):BaseEdgeConnectionTab {
   const {
     tabDepthToAscendantEdgeLength,
-    roundingDistance,
+    roundingDistanceRatio,
     holeDepthToTabDepth,
     holeTaper,
     holeBreadthToHalfWidth,
@@ -274,13 +274,8 @@ export function baseEdgeConnectionTab(
   const holeEdges = symmetricHingePlotByProjectionDistance(
     holeBases[0], holeBases[1], holeTheta, tabDepth * holeDepthToTabDepth,
   );
-  const roundedHole = roundedEdgePath([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]], roundingDistance);
-  cutPath.concatPath(roundedHole);
-  cutPath.close();
 
   const handleEdges = symmetricHingePlotByProjectionDistance(start, mid, holeTheta, tabDepth);
-  cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], mid], roundingDistance));
-
 
   const finBases = [
     hingedPlotLerp(end, mid, 0, holeHandleThicknessRatio),
@@ -292,6 +287,21 @@ export function baseEdgeConnectionTab(
   const finMidTip = hingedPlotByProjectionDistance(
     finBases[0], finBases[1], holeTheta, finDepth * finTipDepthToFinDepth,
   );
+
+  const roundingEdgeLengths: number[] = [
+    [holeBases[0], holeEdges[0]],
+    [holeEdges[0], holeEdges[1]],
+    //  handle edges are always longer than hole edges
+    [finBases[0], backFinEdge],
+    [backFinEdge, finMidTip],
+  ].map(([pt1, pt2]) => distanceBetweenPoints(pt1, pt2));
+  const roundingDistance = roundingDistanceRatio * Math.min(...roundingEdgeLengths);
+  const roundedHole = roundedEdgePath([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]], roundingDistance);
+  cutPath.concatPath(roundedHole);
+  cutPath.close();
+
+  cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], mid], roundingDistance));
+
   const finPath = roundedEdgePath([finBases[0], backFinEdge, finMidTip, finBases[1]], roundingDistance);
   cutPath.line(finBases[0]).concatPath(finPath.sliceCommandsDangerously(1));
   cutPath.line(finBases[1]);

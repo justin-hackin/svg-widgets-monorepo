@@ -124,3 +124,5 @@ export const subtractPointsArrays = (pts1, pts2) => {
 
   return subtract(polygon1, polygon2);
 };
+
+export const distanceBetweenPoints = (pt1, pt2) => pt1.subtract(pt2).length;

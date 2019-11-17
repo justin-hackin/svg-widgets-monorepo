@@ -37,7 +37,7 @@ export class Store implements PyramidNetSpec {
     },
     baseEdgeTabSpec: {
       tabDepthToAscendantEdgeLength: 1.5,
-      roundingDistance: 1.5,
+      roundingDistanceRatio: 1.0,
       holeDepthToTabDepth: 0.5,
       holeTaper: Math.PI / 4.5,
       holeBreadthToHalfWidth: 0.5,
