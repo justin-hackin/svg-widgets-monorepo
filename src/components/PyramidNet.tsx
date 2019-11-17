@@ -88,8 +88,16 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   });
 
   // female tab outer flap
-  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, faceInteriorAngles[2], -ascendantEdgeTabDepth);
-  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, degToRad(-60), ascendantEdgeTabDepth);
+  const remainderGapAngle = 2 * Math.PI - faceInteriorAngles[2] * faceCount;
+  if (remainderGapAngle < 0) {
+    throw new Error('too many faces: the sum of angles at apex is greater than 360 degrees');
+  }
+  const FLAP_APEX_IMPINGE_MARGIN = Math.PI / 12;
+  const FLAP_BASE_ANGLE = degToRad(60);
+
+  const flapApexAngle = Math.min(remainderGapAngle - FLAP_APEX_IMPINGE_MARGIN, faceInteriorAngles[2]);
+  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, flapApexAngle, -ascendantEdgeTabDepth);
+  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, -FLAP_BASE_ANGLE, ascendantEdgeTabDepth);
   const maxRoundingDistance = Math.min(p1.subtract(outerPt1).length, p2.subtract(outerPt2).length);
   cutPathAggregate.concatPath(
     roundedEdgePath(
