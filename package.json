@@ -4,7 +4,9 @@
   "description": "A minimal React.js boilerplate with parcel as bundler",
   "main": "index.js",
   "scripts": {
-    "start": "parcel ./src/index.html"
+    "start": "parcel ./src/index.html",
+    "postinstall": "prisma2 generate",
+    "seed-db": "node seed-db.js"
   },
   "keywords": [
     "parcel",
@@ -31,6 +33,7 @@
     "use-query-params": "^0.4.3",
     "uuid": "^3.3.3"
   },
+  "bundledDependencies": ["@generated/photon"],
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/plugin-transform-destructuring": "^7.6.0",

@@ -1,0 +1,38 @@
+{
+  "great-stellated-dodecahedron": {
+    "relativeFaceEdgeLengths": [
+      1.618033988749895,
+      1.000000000000001,
+      1.618033988749895
+    ],
+    "faceCount": 3,
+    "firstEdgeLengthToShapeHeight": 2.2
+  },
+  "small-stellated-dodecahedron": {
+    "relativeFaceEdgeLengths": [
+      1.618033988749895,
+      1.000000000000001,
+      1.618033988749895
+    ],
+    "faceCount": 5,
+    "firstEdgeLengthToShapeHeight": 2.2
+  },
+  "earth-grid": {
+    "relativeFaceEdgeLengths": [
+      275.38,
+      446.97,
+      406.09
+    ],
+    "faceCount": 4,
+    "firstEdgeLengthToShapeHeight": 5
+  },
+  "icosphere": {
+    "relativeFaceEdgeLengths": [
+      0.6180339887498948,
+      1.000000000000001,
+      0.6180339887498948
+    ],
+    "faceCount": 3,
+    "firstEdgeLengthToShapeHeight": 4
+  }
+}
