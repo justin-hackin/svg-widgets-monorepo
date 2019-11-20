@@ -6,7 +6,8 @@
   "scripts": {
     "start": "parcel ./src/index.html",
     "postinstall": "prisma2 generate",
-    "seed-db": "node seed-db.js"
+    "seed-db": "node seed-db.js",
+    "dev-server": "prisma2 dev"
   },
   "keywords": [
     "parcel",
