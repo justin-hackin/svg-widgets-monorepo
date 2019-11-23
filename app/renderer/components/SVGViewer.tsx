@@ -5,11 +5,11 @@ import ReactResizeDetector from 'react-resize-detector';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
-import { store } from '~/data/state';
-import {
-  PyramidNet,
-} from './PyramidNet';
-import darkTheme from '~/data/material-ui-dark-theme.json';
+
+import darkTheme from '../data/material-ui-dark-theme.json';
+import { store } from '../data/state';
+import { PyramidNet } from './PyramidNet';
+
 // eslint-disable-next-line import/no-cycle
 import { PersistentDrawerLeft } from './drawer';
 import { GridPattern } from './GridPattern';
