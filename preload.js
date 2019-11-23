@@ -11,3 +11,6 @@ window.addEventListener('DOMContentLoaded', () => {
     replaceText(`${type}-version`, process.versions[type]);
   }
 });
+
+// eslint-disable-next-line no-undef,import/no-extraneous-dependencies
+window.ipcRenderer = require('electron').ipcRenderer;

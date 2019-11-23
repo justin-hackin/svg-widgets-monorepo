@@ -61,6 +61,12 @@ export class Store implements PyramidNetSpec {
   @observable
   public shapeHeightInCm: number = 2.2;
 
+  savePyramidNet() {
+    console.log('SAVING...');
+    // @ts-ignore
+    window.ipcRenderer.send('save-string', './test.svg', 'poo');// eslint-disable-line no-undef, max-len
+  }
+
   @computed
   get pyramidGeometry() { return this.polyhedraPyramidGeometries[this.selectedShape]; }
 

@@ -2,11 +2,11 @@
   "name": "parcel-reactjs",
   "version": "1.0.0",
   "description": "A minimal React.js boilerplate with parcel as bundler",
-  "main": "main.js",
+  "main": "main.ts",
   "scripts": {
     "dev": "concurrently --kill-others --success first \"npm run parcel-dev\" \"npm run electron-dev\"",
     "parcel-dev": "parcel ./src/index.html",
-    "electron-dev": "electron . --start-dev",
+    "electron-dev": "electron -r ts-node/register . --start-dev",
     "start": "electron .",
     "parcel-build": "rm -rf build/ && parcel build ./src/index.html -d build/ --public-url ./ && cp assets/icon.ico build/icon.ico",
     "electron-pack": "electron-builder --dir",
@@ -92,6 +92,7 @@
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^1.7.0",
     "parcel-bundler": "^1.12.3",
+    "ts-node": "^8.5.2",
     "typescript": "^3.6.4"
   }
 }

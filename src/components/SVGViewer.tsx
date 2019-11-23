@@ -25,7 +25,6 @@ export function SVGViewer() {
   const [viewValue, setValue] = useState(INITIAL_VALUE);
   const [tool, setTool] = useState(TOOL_PAN);
 
-
   const patternId = 'grid-pattern';
   return (
     <div style={{ width: '100%', height: '100%', position: 'absolute' }}>

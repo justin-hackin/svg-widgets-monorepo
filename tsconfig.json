@@ -6,6 +6,7 @@
     ],
     "jsx": "react",
     "allowUmdGlobalAccess": true,
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "allowJs": true,
@@ -15,6 +16,6 @@
     "paths": {
       "~*": ["./src/*"]
     },
-    "target": "ES5"
+    "target": "es2015"
   }
 }

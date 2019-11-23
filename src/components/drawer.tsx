@@ -11,7 +11,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-
+import SaveIcon from '@material-ui/icons/Save';
 import { PanelSelect } from './inputs/PanelSelect';
 import { useStyles } from './style';
 
@@ -55,11 +55,20 @@ export const PersistentDrawerLeft = observer(({ store }) => {
         }}
       >
         <div className={classes.drawerHeader}>
+          <IconButton
+            aria-label="save"
+            onClick={() => {
+              store.savePyramidNet();
+            }}
+          >
+            <SaveIcon />
+          </IconButton>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
         </div>
         <Divider />
+
         <PanelSelect
           label="Polyhedron"
           value={selectedShape}
