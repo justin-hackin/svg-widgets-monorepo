@@ -12,6 +12,9 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "paths": {
+      "~*": ["./app/*"]
+    },
     "target": "es2015"
   }
 }

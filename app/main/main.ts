@@ -24,7 +24,6 @@ app.on('ready', async () => {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
-    // if (isDev) { mainWindow.webContents.openDevTools(); }
   });
 
   const devPath = 'http://localhost:1124';
