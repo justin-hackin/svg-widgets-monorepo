@@ -2,6 +2,7 @@
   "name": "parcel-reactjs",
   "version": "1.0.0",
   "description": "A minimal React.js boilerplate with parcel as bundler",
+  "main": "app/main/.parcel/main.js",
   "scripts": {
     "start": "run-s main:build watch",
     "release": "run-s parcel:build \"electron:build {@}\" --",
