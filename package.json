@@ -2,12 +2,48 @@
   "name": "parcel-reactjs",
   "version": "1.0.0",
   "description": "A minimal React.js boilerplate with parcel as bundler",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "parcel ./src/index.html",
-    "postinstall": "prisma2 generate",
-    "seed-db": "node seed-db.js",
-    "dev-server": "prisma2 dev"
+    "dev": "concurrently --kill-others --success first \"npm run parcel-dev\" \"npm run electron-dev\"",
+    "parcel-dev": "parcel ./src/index.html",
+    "electron-dev": "electron . --start-dev",
+    "start": "electron .",
+    "parcel-build": "rm -rf build/ && parcel build ./src/index.html -d build/ --public-url ./ && cp assets/icon.ico build/icon.ico",
+    "electron-pack": "electron-builder --dir",
+    "electron-dist": "electron-builder",
+    "electron-postinstall": "electron-builder install-app-deps",
+    "dist": "npm run parcel-build && npm run electron-dist && npm run electron-postinstall"
+  },
+  "build": {
+    "appId": "com.playful.geometer.spacecraft-net-factory",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "msi",
+      "icon": "build/icon.ico"
+    },
+    "files": [
+      "main.js",
+      "build/*"
+    ]
   },
   "keywords": [
     "parcel",
@@ -34,7 +70,9 @@
     "use-query-params": "^0.4.3",
     "uuid": "^3.3.3"
   },
-  "bundledDependencies": ["@generated/photon"],
+  "bundledDependencies": [
+    "@generated/photon"
+  ],
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/plugin-transform-destructuring": "^7.6.0",
@@ -42,6 +80,10 @@
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.6.1",
     "babel-eslint": "^10.0.3",
+    "concurrently": "^5.0.0",
+    "electron": "^7.1.2",
+    "electron-builder": "^21.2.0",
+    "electron-reload": "^1.5.0",
     "eslint": "^6.4.0",
     "eslint-config-airbnb-typescript": "^6.0.0",
     "eslint-import-resolver-typescript": "^2.0.0",
