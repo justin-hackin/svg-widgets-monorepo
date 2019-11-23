@@ -2,17 +2,20 @@
   "name": "parcel-reactjs",
   "version": "1.0.0",
   "description": "A minimal React.js boilerplate with parcel as bundler",
-  "main": "main.ts",
+  "main": "app/main/main.ts",
   "scripts": {
-    "dev": "concurrently --kill-others --success first \"npm run parcel-dev\" \"npm run electron-dev\"",
-    "parcel-dev": "parcel ./src/index.html",
-    "electron-dev": "electron -r ts-node/register . --start-dev",
-    "start": "electron .",
-    "parcel-build": "rm -rf build/ && parcel build ./src/index.html -d build/ --public-url ./ && cp assets/icon.ico build/icon.ico",
-    "electron-pack": "electron-builder --dir",
-    "electron-dist": "electron-builder",
-    "electron-postinstall": "electron-builder install-app-deps",
-    "dist": "npm run parcel-build && npm run electron-dist && npm run electron-postinstall"
+    "start": "run-s main:build watch",
+    "release": "run-s parcel:build \"electron:build {@}\" --",
+    "watch": "run-p -r parcel:watch electron:start",
+    "electron:start": "nodemon --watch app/main/.parcel --exec \"electron .\"",
+    "electron:build": "build --x64 --publish=never",
+    "parcel:watch": "run-p -r main:watch renderer:watch",
+    "main:watch": "parcel watch app/main/main.ts --out-dir app/main/.parcel --out-file main --target electron",
+    "renderer:watch": "parcel app/renderer/index.html --port 1124 --out-dir app/renderer/.parcel/development",
+    "parcel:build": "run-s main:build renderer:build",
+    "main:build": "parcel build app/main/main.ts --out-dir app/main/.parcel --out-file main --target electron",
+    "renderer:build": "parcel build app/renderer/index.html --public-url ./ --out-dir app/renderer/.parcel/production",
+    "lint": "eslint app/**/*.ts{,x}"
   },
   "build": {
     "appId": "com.playful.geometer.spacecraft-net-factory",
@@ -70,19 +73,17 @@
     "use-query-params": "^0.4.3",
     "uuid": "^3.3.3"
   },
-  "bundledDependencies": [
-    "@generated/photon"
-  ],
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/plugin-transform-destructuring": "^7.6.0",
     "@babel/preset-react": "^7.0.0",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.6.1",
+    "app-root-path": "^3.0.0",
     "babel-eslint": "^10.0.3",
-    "concurrently": "^5.0.0",
     "electron": "^7.1.2",
     "electron-builder": "^21.2.0",
+    "electron-is-dev": "^1.1.0",
     "electron-reload": "^1.5.0",
     "eslint": "^6.4.0",
     "eslint-config-airbnb-typescript": "^6.0.0",
@@ -91,8 +92,9 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^1.7.0",
+    "nodemon": "^2.0.1",
+    "npm-run-all": "^4.1.5",
     "parcel-bundler": "^1.12.3",
-    "ts-node": "^8.5.2",
     "typescript": "^3.6.4"
   }
 }
