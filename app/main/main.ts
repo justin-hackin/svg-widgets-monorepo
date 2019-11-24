@@ -1,6 +1,8 @@
 // Basic init from https://github.com/aimerib/electron-react-parcel/
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { app, BrowserWindow, ipcMain } = require('electron');
+const {
+  app, BrowserWindow, ipcMain, dialog,
+} = require('electron');
 const { format } = require('url');
 const isDev = require('electron-is-dev');
 const fs = require('fs');
@@ -11,15 +13,27 @@ const writeFileAsync = promisify(fs.writeFile);
 
 const saveStringToDisk = (filePath, data) => writeFileAsync(filePath, data);
 
-ipcMain.on('save-string', (e, filePath, string) => {
-  saveStringToDisk(filePath, string);
-});
+ipcMain.handle('save-string', (e, string) => dialog.showSaveDialog({
+  title: 'HEY',
+  message: 'HO',
+  filters: [{
+    name: 'SVG - Scalable Vector Graphics',
+    extensions: ['svg'],
+  }],
+}).then(({ canceled, filePath }) => {
+  if (canceled) { return null; }
+  return saveStringToDisk(filePath, string);
+}));
 
 app.on('ready', async () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      preload: resolve('app/main/preload.js'),
+    },
   });
 
   mainWindow.once('ready-to-show', () => {

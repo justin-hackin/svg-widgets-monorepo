@@ -58,7 +58,16 @@ export const PersistentDrawerLeft = observer(({ store }) => {
           <IconButton
             aria-label="save"
             onClick={() => {
-              store.savePyramidNet();
+              // @ts-ignore
+              ipcRenderer.invoke('save-string', 'poo') //eslint-disable-line
+                .then((result) => {
+                  if (result) {
+                    console.log('File saved');
+                  } else {
+                    console.log('File save cancelled');
+                  }
+                });
+
             }}
           >
             <SaveIcon />
