@@ -1,9 +1,9 @@
 import set from 'lodash-es/set';
 import { observable, computed } from 'mobx';
 
-import { DieLinesSpec, PyramidNetSpec, StyleSpec } from '~/components/PyramidNet';
-import { PHI } from '~util/geom';
-import { polyhedra } from '~data/polyhedra';
+import { DieLinesSpec, PyramidNetSpec, StyleSpec } from '../components/PyramidNet';
+import { PHI } from '../util/geom';
+import { polyhedra } from './polyhedra';
 
 const tabScoreDashSpec = {
   relativeStrokeDasharray: [2, 1],
