@@ -1,7 +1,11 @@
 import set from 'lodash-es/set';
 import { observable, computed } from 'mobx';
+import ReactDOMServer from 'react-dom/server';
+import React from 'react';
 
-import { DieLinesSpec, PyramidNetSpec, StyleSpec } from '../components/PyramidNet';
+import {
+  DieLinesSpec, PyramidNet, PyramidNetSpec, StyleSpec,
+} from '../components/PyramidNet';
 import { PHI } from '../util/geom';
 import { polyhedra } from './polyhedra';
 
@@ -73,6 +77,10 @@ export class Store implements PyramidNetSpec {
   // eslint-disable-next-line class-methods-use-this
   getSetter(path) {
     return (value) => { set(this, path, value); };
+  }
+
+  renderPyramidNetToString() {
+    return ReactDOMServer.renderToString(React.createElement(PyramidNet, { store: this }));
   }
 }
 

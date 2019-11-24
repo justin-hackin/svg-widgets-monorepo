@@ -59,7 +59,7 @@ export const PersistentDrawerLeft = observer(({ store }) => {
             aria-label="save"
             onClick={() => {
               // @ts-ignore
-              ipcRenderer.invoke('save-string', 'poo') //eslint-disable-line
+              ipcRenderer.invoke('save-string', store.renderPyramidNetToString()) //eslint-disable-line
                 .then((result) => {
                   if (result) {
                     console.log('File saved');
@@ -67,7 +67,6 @@ export const PersistentDrawerLeft = observer(({ store }) => {
                     console.log('File save cancelled');
                   }
                 });
-
             }}
           >
             <SaveIcon />
