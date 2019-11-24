@@ -1,5 +1,6 @@
 // import { useQueryParam, StringParam, JsonParam } from 'use-query-params';
 import React, { useState } from 'react';
+import { observer } from 'mobx-react';
 import isNaN from 'lodash-es/isNaN';
 import ReactResizeDetector from 'react-resize-detector';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
@@ -16,9 +17,8 @@ import { GridPattern } from './GridPattern';
 
 // @ts-ignore
 const theme = createMuiTheme(darkTheme);
-const svgDimensions = { width: 1024, height: 960 };
 const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
-export function SVGViewer() {
+export const SVGViewer = observer(() => {
   // TODO: make this work
   // const [value = INITIAL_VALUE, setValue] = useQueryParam('ReactSVGPanZoomValue', JsonParam);
   // const [tool = TOOL_PAN, setTool] = useQueryParam('ReactSVGPanZoomTool', StringParam);
@@ -43,7 +43,7 @@ export function SVGViewer() {
             onChangeTool={setTool}
             id="viewer"
           >
-            <svg {...svgDimensions}>
+            <svg {...store.svgDimensions}>
               <GridPattern patternId={patternId} />
               <g transform="translate(300, 300) scale(4, 4) ">
                 <PyramidNet store={store} />
@@ -58,4 +58,4 @@ export function SVGViewer() {
     </div>
 
   );
-}
+});

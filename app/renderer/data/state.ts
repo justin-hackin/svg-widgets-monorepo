@@ -4,10 +4,11 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import {
-  DieLinesSpec, PyramidNet, PyramidNetSpec, StyleSpec,
+  DieLinesSpec, PyramidNetSpec, StyleSpec,
 } from '../components/PyramidNet';
 import { PHI } from '../util/geom';
 import { polyhedra } from './polyhedra';
+import { SVGWrapper } from '../components/SVGWrapper';
 
 const tabScoreDashSpec = {
   relativeStrokeDasharray: [2, 1],
@@ -18,10 +19,10 @@ const tabScoreDashSpec = {
 export class Store implements PyramidNetSpec {
   @observable
   public styleSpec:StyleSpec = {
-    dieLineProps: { fill: 'none', strokeWidth: 0.05 },
+    dieLineProps: { fill: 'none', strokeWidth: 0.1 },
     cutLineProps: { stroke: '#FF244D' },
     scoreLineProps: { stroke: '#BDFF48' },
-    designBoundaryProps: { stroke: 'none', fill: 'rgba(0, 52, 255, 0.53)' },
+    designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
   };
 
   @observable
@@ -65,12 +66,6 @@ export class Store implements PyramidNetSpec {
   @observable
   public shapeHeightInCm: number = 2.2;
 
-  savePyramidNet() {
-    console.log('SAVING...');
-    // @ts-ignore
-    window.ipcRenderer.send('save-string', './test.svg', 'poo');// eslint-disable-line no-undef, max-len
-  }
-
   @computed
   get pyramidGeometry() { return this.polyhedraPyramidGeometries[this.selectedShape]; }
 
@@ -79,8 +74,11 @@ export class Store implements PyramidNetSpec {
     return (value) => { set(this, path, value); };
   }
 
+  @observable
+  public svgDimensions = { width: 1024, height: 960 };
+
   renderPyramidNetToString() {
-    return ReactDOMServer.renderToString(React.createElement(PyramidNet, { store: this }));
+    return ReactDOMServer.renderToString(React.createElement(SVGWrapper, { ...this.svgDimensions, store: this }));
   }
 }
 
