@@ -2,9 +2,6 @@ module.exports = {
   extends: 'airbnb-typescript',
   plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',
-  globals: {
-    document: true,
-  },
   rules: {
     'import/prefer-default-export': 0,
     'max-len': ['error', {code: 120}],
