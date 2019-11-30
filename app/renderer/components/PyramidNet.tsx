@@ -1,12 +1,11 @@
 // @ts-ignore
-import { Point, Matrix } from '@flatten-js/core';
+import { Matrix } from '@flatten-js/core';
 import { observer } from 'mobx-react';
 import React from 'react';
 import range from 'lodash-es/range';
 import {
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
-  CM_TO_PIXELS_RATIO,
 } from '../util/geom';
 import {
   AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec,
@@ -154,8 +153,8 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
       {range(faceCount).map((index) => {
         const isOdd = index % 2;
         const yScale = isOdd ? -1 : 1;
-        const rotation = ((index + (isOdd ? 1 : 0)) * faceInteriorAngles[2] * 360 * (isOdd ? 1 : -1)) / (2 * Math.PI);
-        return <use key={index} transform={`scale(1 ${yScale}) rotate(${rotation})`} xlinkHref="#face-tile" />;
+        const rotation = -(index * faceInteriorAngles[2] * 360) / (2 * Math.PI);
+        return <use key={index} transform={`rotate(${rotation}) scale(${yScale} 1)`} xlinkHref="#face-tile" />;
       })}
 
       <g id="die-lines">

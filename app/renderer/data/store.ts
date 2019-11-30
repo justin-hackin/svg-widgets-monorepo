@@ -2,14 +2,16 @@ import set from 'lodash-es/set';
 import { observable, computed } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import { offset } from '@flatten-js/polygon-offset';
+import { subtract } from '@flatten-js/boolean-op';
 
 // @ts-ignore
-import { Point } from '@flatten-js/core';
+import { Point, Polygon } from '@flatten-js/core';
 import {
-  DieLinesSpec, PyramidNetSpec, StyleSpec, FaceBoundary, PyramidNet, FaceBoundarySVG,
+  DieLinesSpec, PyramidNetSpec, StyleSpec, PyramidNet, FaceBoundarySVG,
 } from '../components/PyramidNet';
 import {
-  CM_TO_PIXELS_RATIO, insetPoints, PHI, subtractPointsArrays, triangleAnglesGivenSides,
+  CM_TO_PIXELS_RATIO, hingedPlot, PHI, triangleAnglesGivenSides,
 } from '../util/geom';
 import { polyhedra } from './polyhedra';
 import { SVGWrapper } from '../components/SVGWrapper';
@@ -82,17 +84,15 @@ export class Store implements PyramidNetSpec {
   public svgDimensions = { width: 1024, height: 960 };
 
   @computed
-  get faceInteriorAngles() {
+  get faceInteriorAngles():number[] {
     return triangleAnglesGivenSides(this.pyramidGeometry.relativeFaceEdgeLengths);
   }
 
   @computed
   get boundaryPoints() {
     const p1 = new Point(0, 0);
-    const p2 = p1.add(new Point(this.actualFaceEdgeLengths[0], 0));
-    const v1 = Point.fromPolar([Math.PI - this.faceInteriorAngles[0], this.actualFaceEdgeLengths[1]]);
-    v1.y *= -1;
-    const p3 = p2.add(v1);
+    const p2 = Point.fromPolar([Math.PI / 2 + this.faceInteriorAngles[2] / 2, this.actualFaceEdgeLengths[0]]);
+    const p3 = hingedPlot(p1, p2, this.faceInteriorAngles[0], this.actualFaceEdgeLengths[1]);
     return [p1, p2, p3];
   }
 
@@ -118,8 +118,10 @@ export class Store implements PyramidNetSpec {
   @computed
   get borderOverlay() {
     // TODO: can be converted to a path inset using @flatten-js/polygon-offset
-    const inset = insetPoints(this.boundaryPoints, this.ascendantEdgeTabDepth);
-    return subtractPointsArrays(this.boundaryPoints, inset);
+    const borderOutline = new Polygon();
+    borderOutline.addFace(this.boundaryPoints);
+    const inset = offset(borderOutline, -this.ascendantEdgeTabDepth);
+    return subtract(borderOutline, inset);
   }
 
   renderPyramidNetToString() {

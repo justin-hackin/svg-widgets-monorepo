@@ -102,27 +102,4 @@ export function symmetricHingePlotIntersection(p1, p2, theta, length) {
   return intersectLineLine(p1, pp1, p2, pp2);
 }
 
-export function insetPoints(vectors, distance) {
-  const returnVal = [];
-  vectors.forEach((vector, i) => {
-    const vec = circularSlice(vectors, i, vectors.length);
-    const l1 = parallelLineAtDistance(vec[1], vec[0], distance);
-    const l2 = parallelLineAtDistance(vec[2], vec[1], distance);
-    const intersections = l1.intersect(l2);
-    returnVal.push(intersections[0]);
-  });
-
-  return returnVal;
-}
-
-export const subtractPointsArrays = (pts1, pts2) => {
-  const polygon1 = new Polygon();
-  polygon1.addFace(pts1);
-
-  const polygon2 = new Polygon();
-  polygon2.addFace(pts2);
-
-  return subtract(polygon1, polygon2);
-};
-
 export const distanceBetweenPoints = (pt1, pt2) => pt1.subtract(pt2).length;
