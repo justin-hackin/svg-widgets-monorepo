@@ -1,8 +1,7 @@
 import React from 'react';
-import { PyramidNet } from './PyramidNet';
 
-export const SVGWrapper = ({ store, ...rest }) => (
+export const SVGWrapper = ({ children, ...rest }) => (
   <svg {...rest}>
-    <PyramidNet store={store} />
+    {...children}
   </svg>
 );

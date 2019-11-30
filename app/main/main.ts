@@ -13,16 +13,15 @@ const writeFileAsync = promisify(fs.writeFile);
 
 const saveStringToDisk = (filePath, data) => writeFileAsync(filePath, data);
 
-ipcMain.handle('save-string', (e, string) => dialog.showSaveDialog({
-  title: 'HEY',
-  message: 'HO',
+ipcMain.handle('save-svg', (e, fileContent, message) => dialog.showSaveDialog({
+  message,
   filters: [{
     name: 'SVG - Scalable Vector Graphics',
     extensions: ['svg'],
   }],
 }).then(({ canceled, filePath }) => {
   if (canceled) { return null; }
-  return saveStringToDisk(filePath, string);
+  return saveStringToDisk(filePath, fileContent);
 }));
 
 app.on('ready', async () => {

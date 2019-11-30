@@ -6,9 +6,7 @@ import range from 'lodash-es/range';
 import {
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
-  insetPoints,
   CM_TO_PIXELS_RATIO,
-  triangleAnglesGivenSides, subtractPointsArrays,
 } from '../util/geom';
 import {
   AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec,
@@ -44,54 +42,43 @@ export interface PyramidGeometrySpec {
   faceCount: number
 }
 
-const getActualFaceEdgeLengths = (relativeFaceEdgeLengths, shapeHeightInCm, firstEdgeLengthToShapeHeight) => {
-  const heightInPixels = CM_TO_PIXELS_RATIO * shapeHeightInCm;
-  const desiredFirstLength = heightInPixels / firstEdgeLengthToShapeHeight;
-  const faceLengthAdjustRatio = desiredFirstLength / relativeFaceEdgeLengths[0];
-  return relativeFaceEdgeLengths.map((len) => len * faceLengthAdjustRatio);
-};
-
-const getBoundaryPoints = (l1, l2, a1) => {
-  const p1 = new Point(0, 0);
-  const p2 = p1.add(new Point(l1, 0));
-  const v1 = Point.fromPolar([Math.PI - a1, l2]);
-  v1.y *= -1;
-  const p3 = p2.add(v1);
-  return [p1, p2, p3];
-};
-
-const FaceBoundary = ({ store }:{store: PyramidNetSpec}) => {
+export const FaceBoundary = ({ store }:{store: PyramidNetSpec}) => {
   const {
-    dieLinesSpec: { ascendantEdgeTabsSpec: { tabDepthToTraversalLength } },
-    pyramidGeometry: { relativeFaceEdgeLengths, firstEdgeLengthToShapeHeight },
-    styleSpec: { designBoundaryProps }, shapeHeightInCm,
+    styleSpec: { designBoundaryProps },
+    // @ts-ignore
+    borderOverlay,
   } = store;
-  const faceInteriorAngles = triangleAnglesGivenSides(relativeFaceEdgeLengths);
-  const actualFaceEdgeLengths = getActualFaceEdgeLengths(
-    relativeFaceEdgeLengths, shapeHeightInCm, firstEdgeLengthToShapeHeight,
-  );
-  const ascendantEdgeTabDepth = actualFaceEdgeLengths[0] * tabDepthToTraversalLength;
 
-  const boundaryPoints = getBoundaryPoints(actualFaceEdgeLengths[0], actualFaceEdgeLengths[1], faceInteriorAngles[0]);
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
-  const inset = insetPoints(boundaryPoints, ascendantEdgeTabDepth);
-  const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
   return (<path {...designBoundaryProps} d={borderOverlay.pathAttrs().d} />);
+};
+
+export const FaceBoundarySVG = ({ store }:{store: PyramidNetSpec}) => {
+  const {
+    styleSpec: { designBoundaryProps },
+    // @ts-ignore
+    borderOverlay,
+  } = store;
+  const {
+    xmin, xmax, ymin, ymax,
+  } = borderOverlay.box;
+
+  // TODO: can be converted to a path inset using @flatten-js/polygon-offset
+  return (
+    <svg viewBox={`${xmin} ${ymin} ${xmax - xmin} ${ymax - ymin}`}>
+      <path {...designBoundaryProps} d={borderOverlay.pathAttrs().d} />
+    </svg>
+  );
 };
 
 export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   const {
-    pyramidGeometry, styleSpec, shapeHeightInCm,
+    pyramidGeometry: { faceCount }, styleSpec,
     dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
+    // @ts-ignore
+    boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth,
   } = store;
-  const { relativeFaceEdgeLengths, faceCount, firstEdgeLengthToShapeHeight } = pyramidGeometry;
-  const faceInteriorAngles = triangleAnglesGivenSides(relativeFaceEdgeLengths);
-  const actualFaceEdgeLengths = getActualFaceEdgeLengths(
-    relativeFaceEdgeLengths, shapeHeightInCm, firstEdgeLengthToShapeHeight,
-  );
-  const ascendantEdgeTabDepth = actualFaceEdgeLengths[0] * ascendantEdgeTabsSpec.tabDepthToTraversalLength;
 
-  const boundaryPoints = getBoundaryPoints(actualFaceEdgeLengths[0], actualFaceEdgeLengths[1], faceInteriorAngles[0]);
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
 
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };

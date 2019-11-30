@@ -60,21 +60,17 @@ export const ControlPanel = observer(({ store }) => {
             aria-label="save"
             onClick={() => {
               // @ts-ignore
-              ipcRenderer.invoke('save-string', store.renderPyramidNetToString()) //eslint-disable-line
-                .then((result) => {
-                  if (result) {
-                    console.log('File saved');
-                  } else {
-                    console.log('File save cancelled');
-                  }
-                });
+              ipcRenderer.invoke('save-svg', store.renderPyramidNetToString(), 'Save pyramid net dielines');
             }}
           >
             <SaveIcon />
           </IconButton>
           <IconButton
             aria-label="save"
-            onClick={() => {}}
+            onClick={() => {
+              // @ts-ignore
+              ipcRenderer.invoke('save-svg', store.renderFaceBoundaryToString(), 'Save face template');
+            }}
           >
             <SaveAltIcon />
           </IconButton>
