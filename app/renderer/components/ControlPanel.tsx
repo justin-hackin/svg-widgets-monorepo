@@ -12,6 +12,7 @@ import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import SaveIcon from '@material-ui/icons/Save';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import { PanelSelect } from './inputs/PanelSelect';
 import { useStyles } from './style';
 
@@ -70,6 +71,12 @@ export const ControlPanel = observer(({ store }) => {
             }}
           >
             <SaveIcon />
+          </IconButton>
+          <IconButton
+            aria-label="save"
+            onClick={() => {}}
+          >
+            <SaveAltIcon />
           </IconButton>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />

@@ -8,3 +8,5 @@ node_modules/
 prisma/migrations/**
 prisma/dev.db
 build/
+app/renderer/.parcel/
+app/main/.parcel/

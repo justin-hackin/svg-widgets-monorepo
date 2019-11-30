@@ -60,6 +60,25 @@ const getBoundaryPoints = (l1, l2, a1) => {
   return [p1, p2, p3];
 };
 
+const FaceBoundary = ({ store }:{store: PyramidNetSpec}) => {
+  const {
+    dieLinesSpec: { ascendantEdgeTabsSpec: { tabDepthToTraversalLength } },
+    pyramidGeometry: { relativeFaceEdgeLengths, firstEdgeLengthToShapeHeight },
+    styleSpec: { designBoundaryProps }, shapeHeightInCm,
+  } = store;
+  const faceInteriorAngles = triangleAnglesGivenSides(relativeFaceEdgeLengths);
+  const actualFaceEdgeLengths = getActualFaceEdgeLengths(
+    relativeFaceEdgeLengths, shapeHeightInCm, firstEdgeLengthToShapeHeight,
+  );
+  const ascendantEdgeTabDepth = actualFaceEdgeLengths[0] * tabDepthToTraversalLength;
+
+  const boundaryPoints = getBoundaryPoints(actualFaceEdgeLengths[0], actualFaceEdgeLengths[1], faceInteriorAngles[0]);
+  // TODO: can be converted to a path inset using @flatten-js/polygon-offset
+  const inset = insetPoints(boundaryPoints, ascendantEdgeTabDepth);
+  const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
+  return (<path {...designBoundaryProps} d={borderOverlay.pathAttrs().d} />);
+};
+
 export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   const {
     pyramidGeometry, styleSpec, shapeHeightInCm,
@@ -74,8 +93,6 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
 
   const boundaryPoints = getBoundaryPoints(actualFaceEdgeLengths[0], actualFaceEdgeLengths[1], faceInteriorAngles[0]);
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
-  const inset = insetPoints(boundaryPoints, ascendantEdgeTabDepth);
-  const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
 
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
   const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
@@ -143,7 +160,7 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
     <g overflow="visible">
       <symbol id="face-tile" overflow="visible">
         <g>
-          <path {...styleSpec.designBoundaryProps} d={borderOverlay.pathAttrs().d} />
+          <FaceBoundary store={store} />
         </g>
       </symbol>
 
