@@ -12,7 +12,7 @@ import { store } from '../data/store';
 import { PyramidNet } from './PyramidNet';
 
 // eslint-disable-next-line import/no-cycle
-import { PersistentDrawerLeft } from './drawer';
+import { ControlPanel } from './ControlPanel';
 import { GridPattern } from './GridPattern';
 
 // @ts-ignore
@@ -53,7 +53,7 @@ export const SVGViewer = observer(() => {
         ))}
       </ReactResizeDetector>
       <ThemeProvider theme={theme}>
-        <PersistentDrawerLeft store={store} />
+        <ControlPanel store={store} />
       </ThemeProvider>
     </div>
 

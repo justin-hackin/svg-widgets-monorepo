@@ -15,7 +15,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import { PanelSelect } from './inputs/PanelSelect';
 import { useStyles } from './style';
 
-export const PersistentDrawerLeft = observer(({ store }) => {
+export const ControlPanel = observer(({ store }) => {
   // @ts-ignore
   const classes = useStyles();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
