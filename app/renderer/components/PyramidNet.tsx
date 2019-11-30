@@ -44,28 +44,35 @@ export interface PyramidGeometrySpec {
   faceCount: number
 }
 
+const getActualFaceEdgeLengths = (relativeFaceEdgeLengths, shapeHeightInCm, firstEdgeLengthToShapeHeight) => {
+  const heightInPixels = CM_TO_PIXELS_RATIO * shapeHeightInCm;
+  const desiredFirstLength = heightInPixels / firstEdgeLengthToShapeHeight;
+  const faceLengthAdjustRatio = desiredFirstLength / relativeFaceEdgeLengths[0];
+  return relativeFaceEdgeLengths.map((len) => len * faceLengthAdjustRatio);
+};
+
+const getBoundaryPoints = (l1, l2, a1) => {
+  const p1 = new Point(0, 0);
+  const p2 = p1.add(new Point(l1, 0));
+  const v1 = Point.fromPolar([Math.PI - a1, l2]);
+  v1.y *= -1;
+  const p3 = p2.add(v1);
+  return [p1, p2, p3];
+};
 
 export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   const {
     pyramidGeometry, styleSpec, shapeHeightInCm,
     dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
   } = store;
-  const { relativeFaceEdgeLengths, faceCount } = pyramidGeometry;
+  const { relativeFaceEdgeLengths, faceCount, firstEdgeLengthToShapeHeight } = pyramidGeometry;
   const faceInteriorAngles = triangleAnglesGivenSides(relativeFaceEdgeLengths);
-
-  const heightInPixels = CM_TO_PIXELS_RATIO * shapeHeightInCm;
-  const desiredFirstLength = heightInPixels / pyramidGeometry.firstEdgeLengthToShapeHeight;
-  const faceLengthAdjustRatio = desiredFirstLength / relativeFaceEdgeLengths[0];
-  const actualFaceEdgeLengths = relativeFaceEdgeLengths.map((len) => len * faceLengthAdjustRatio);
+  const actualFaceEdgeLengths = getActualFaceEdgeLengths(
+    relativeFaceEdgeLengths, shapeHeightInCm, firstEdgeLengthToShapeHeight,
+  );
   const ascendantEdgeTabDepth = actualFaceEdgeLengths[0] * ascendantEdgeTabsSpec.tabDepthToTraversalLength;
 
-  const p1 = new Point(0, 0);
-  const p2 = p1.add(new Point(actualFaceEdgeLengths[0], 0));
-  const v1 = Point.fromPolar([Math.PI - faceInteriorAngles[0], actualFaceEdgeLengths[1]]);
-  v1.y *= -1;
-  const p3 = p2.add(v1);
-
-  const boundaryPoints = [p1, p2, p3];
+  const boundaryPoints = getBoundaryPoints(actualFaceEdgeLengths[0], actualFaceEdgeLengths[1], faceInteriorAngles[0]);
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
   const inset = insetPoints(boundaryPoints, ascendantEdgeTabDepth);
   const borderOverlay = subtractPointsArrays(boundaryPoints, inset);
@@ -78,12 +85,12 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   // inter-face scoring
   const faceTabFenceposts = range(faceCount + 1).map(
     (index) => hingedPlot(
-      p2, p1, Math.PI * 2 - index * faceInteriorAngles[2],
+      boundaryPoints[1], boundaryPoints[0], Math.PI * 2 - index * faceInteriorAngles[2],
       index % 2 ? actualFaceEdgeLengths[2] : actualFaceEdgeLengths[0],
     ),
   );
   faceTabFenceposts.slice(1, -1).forEach((endPt) => {
-    const pathData = strokeDashPath(p1, endPt, interFaceScoreDashSpec);
+    const pathData = strokeDashPath(boundaryPoints[0], endPt, interFaceScoreDashSpec);
     scorePathAggregate.concatPath(pathData);
   });
 
@@ -96,12 +103,18 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   const FLAP_BASE_ANGLE = degToRad(60);
 
   const flapApexAngle = Math.min(remainderGapAngle - FLAP_APEX_IMPINGE_MARGIN, faceInteriorAngles[2]);
-  const outerPt1 = hingedPlotByProjectionDistance(p2, p1, flapApexAngle, -ascendantEdgeTabDepth);
-  const outerPt2 = hingedPlotByProjectionDistance(p1, p2, -FLAP_BASE_ANGLE, ascendantEdgeTabDepth);
-  const maxRoundingDistance = Math.min(p1.subtract(outerPt1).length, p2.subtract(outerPt2).length);
+  const outerPt1 = hingedPlotByProjectionDistance(
+    boundaryPoints[1], boundaryPoints[0], flapApexAngle, -ascendantEdgeTabDepth,
+  );
+  const outerPt2 = hingedPlotByProjectionDistance(
+    boundaryPoints[0], boundaryPoints[1], -FLAP_BASE_ANGLE, ascendantEdgeTabDepth,
+  );
+  const maxRoundingDistance = Math.min(
+    boundaryPoints[0].subtract(outerPt1).length, boundaryPoints[1].subtract(outerPt2).length,
+  );
   cutPathAggregate.concatPath(
     roundedEdgePath(
-      [p1, outerPt1, outerPt2, p2],
+      [boundaryPoints[0], outerPt1, outerPt2, boundaryPoints[1]],
       ascendantEdgeTabsSpec.flapRoundingDistanceRatio * maxRoundingDistance,
     ),
   );
@@ -115,7 +128,7 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   });
 
   // male tabs
-  const ascendantTabs = ascendantEdgeConnectionTabs(p2, p1, ascendantEdgeTabsSpec);
+  const ascendantTabs = ascendantEdgeConnectionTabs(boundaryPoints[1], boundaryPoints[0], ascendantEdgeTabsSpec);
   const rotationMatrix = (new Matrix()).rotate(-faceCount * faceInteriorAngles[2]);
   ascendantTabs.male.cut.transformPoints(rotationMatrix);
   ascendantTabs.male.score.transformPoints(rotationMatrix);
