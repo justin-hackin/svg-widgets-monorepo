@@ -70,7 +70,7 @@ export class Store implements PyramidNetSpec {
   public selectedShape: string = 'great-stellated-dodecahedron';
 
   @observable
-  public shapeHeightInCm: number = 2.2;
+  public shapeHeightInCm: number = 30;
 
   @computed
   get pyramidGeometry() { return this.polyhedraPyramidGeometries[this.selectedShape]; }
@@ -80,8 +80,9 @@ export class Store implements PyramidNetSpec {
     return (value) => { set(this, path, value); };
   }
 
+  // set to Glowforge bed dimensions
   @observable
-  public svgDimensions = { width: 1024, height: 960 };
+  public svgDimensions = { width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 };
 
   @computed
   get faceInteriorAngles():number[] {

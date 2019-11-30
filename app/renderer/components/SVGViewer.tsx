@@ -45,7 +45,7 @@ export const SVGViewer = observer(() => {
           >
             <svg {...store.svgDimensions}>
               <GridPattern patternId={patternId} />
-              <g transform="translate(300, 300) scale(4, 4) ">
+              <g transform="translate(300, 300)">
                 <PyramidNet store={store} />
               </g>
             </svg>
