@@ -148,7 +148,7 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
         <g>
           <FaceBoundary store={store} />
           {/* eslint-disable-next-line react/no-danger */}
-          <path {...cutProps} d={activeCutHolePatternD} />
+          { activeCutHolePatternD && (<path {...cutProps} d={activeCutHolePatternD} />)}
         </g>
       </symbol>
 

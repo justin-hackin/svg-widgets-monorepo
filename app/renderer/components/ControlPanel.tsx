@@ -96,7 +96,10 @@ export const ControlPanel = observer(({ store }) => {
           label="Polyhedron"
           value={selectedShape}
           options={polyhedronOptions}
-          setter={setSelectedPolyhedron}
+          setter={(val) => {
+            setSelectedPolyhedron(val);
+            store.clearFaceHolePattern();
+          }}
         />
       </Drawer>
     </div>

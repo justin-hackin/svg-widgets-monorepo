@@ -73,7 +73,7 @@ export class Store implements PyramidNetSpec {
   public shapeHeightInCm: number = 30;
 
   @observable
-  public activeCutHolePatternD = null;
+  public activeCutHolePatternD = '';
 
   @computed
   get pyramidGeometry() { return this.polyhedraPyramidGeometries[this.selectedShape]; }
@@ -135,6 +135,11 @@ export class Store implements PyramidNetSpec {
     this.activeCutHolePatternD = doc.querySelector('path:last-of-type').getAttribute('d');
   }
 
+  @action
+  clearFaceHolePattern() {
+    this.activeCutHolePatternD = '';
+  }
+
   renderPyramidNetToString() {
     return ReactDOMServer.renderToString(React.createElement(
       // @ts-ignore
@@ -149,3 +154,5 @@ export class Store implements PyramidNetSpec {
 }
 
 export const store = new Store();
+// @ts-ignore
+window.store = store;
