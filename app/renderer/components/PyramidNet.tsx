@@ -75,7 +75,7 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
     pyramidGeometry: { faceCount }, styleSpec,
     dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
     // @ts-ignore
-    boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth,
+    boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD,
   } = store;
 
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
@@ -147,6 +147,8 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
       <symbol id="face-tile" overflow="visible">
         <g>
           <FaceBoundary store={store} />
+          {/* eslint-disable-next-line react/no-danger */}
+          <path {...cutProps} d={activeCutHolePatternD} />
         </g>
       </symbol>
 

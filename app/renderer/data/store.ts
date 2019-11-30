@@ -1,5 +1,5 @@
 import set from 'lodash-es/set';
-import { observable, computed } from 'mobx';
+import { observable, computed, action } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { offset } from '@flatten-js/polygon-offset';
@@ -18,14 +18,14 @@ import { SVGWrapper } from '../components/SVGWrapper';
 
 const tabScoreDashSpec = {
   relativeStrokeDasharray: [2, 1],
-  strokeDashLength: 0.1,
+  strokeDashLength: 3,
   strokeDashOffsetRatio: 0,
 };
 
 export class Store implements PyramidNetSpec {
   @observable
   public styleSpec:StyleSpec = {
-    dieLineProps: { fill: 'none', strokeWidth: 0.1 },
+    dieLineProps: { fill: 'none', strokeWidth: 1 },
     cutLineProps: { stroke: '#FF244D' },
     scoreLineProps: { stroke: '#BDFF48' },
     designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
@@ -58,7 +58,7 @@ export class Store implements PyramidNetSpec {
     },
     interFaceScoreDashSpec: {
       relativeStrokeDasharray: [PHI, 1, 1 / PHI, 1, PHI],
-      strokeDashLength: 1,
+      strokeDashLength: 10,
       strokeDashOffsetRatio: 0.75,
     },
   };
@@ -71,6 +71,9 @@ export class Store implements PyramidNetSpec {
 
   @observable
   public shapeHeightInCm: number = 30;
+
+  @observable
+  public activeCutHolePatternD = null;
 
   @computed
   get pyramidGeometry() { return this.polyhedraPyramidGeometries[this.selectedShape]; }
@@ -123,6 +126,13 @@ export class Store implements PyramidNetSpec {
     borderOutline.addFace(this.boundaryPoints);
     const inset = offset(borderOutline, -this.ascendantEdgeTabDepth);
     return subtract(borderOutline, inset);
+  }
+
+  @action
+  applyFaceHolePattern(svgString) {
+    const parser = new window.DOMParser();
+    const doc = parser.parseFromString(svgString, 'image/svg+xml');
+    this.activeCutHolePatternD = doc.querySelector('path:last-of-type').getAttribute('d');
   }
 
   renderPyramidNetToString() {

@@ -13,6 +13,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import SaveIcon from '@material-ui/icons/Save';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import PublishIcon from '@material-ui/icons/Publish';
 import { PanelSelect } from './inputs/PanelSelect';
 import { useStyles } from './style';
 
@@ -73,6 +74,17 @@ export const ControlPanel = observer(({ store }) => {
             }}
           >
             <SaveAltIcon />
+          </IconButton>
+          <IconButton
+            aria-label="save"
+            onClick={() => {
+              // @ts-ignore
+              ipcRenderer.invoke('open-svg', 'Upload face cut pattern').then((svgString) => {
+                store.applyFaceHolePattern(svgString);
+              });
+            }}
+          >
+            <PublishIcon />
           </IconButton>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />

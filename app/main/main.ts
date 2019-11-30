@@ -5,24 +5,31 @@ const {
 } = require('electron');
 const { format } = require('url');
 const isDev = require('electron-is-dev');
-const fs = require('fs');
-const { promisify } = require('util');
+const fsPromises = require('fs').promises;
 const { resolve } = require('app-root-path');
 
-const writeFileAsync = promisify(fs.writeFile);
 
-const saveStringToDisk = (filePath, data) => writeFileAsync(filePath, data);
+const svgFilters = [{
+  name: 'SVG - Scalable Vector Graphics',
+  extensions: ['svg'],
+}];
 
 ipcMain.handle('save-svg', (e, fileContent, message) => dialog.showSaveDialog({
   message,
-  filters: [{
-    name: 'SVG - Scalable Vector Graphics',
-    extensions: ['svg'],
-  }],
+  filters: svgFilters,
 }).then(({ canceled, filePath }) => {
   if (canceled) { return null; }
-  return saveStringToDisk(filePath, fileContent);
+  return fsPromises.writeFile(filePath, fileContent);
 }));
+
+ipcMain.handle('open-svg', async (e, message) => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    message,
+    filters: svgFilters,
+  });
+  if (canceled) { return null; }
+  return fsPromises.readFile(filePaths[0], 'utf8');
+});
 
 app.on('ready', async () => {
   const mainWindow = new BrowserWindow({
