@@ -95,7 +95,7 @@ export class Store implements PyramidNetSpec {
   @computed
   get boundaryPoints() {
     const p1 = new Point(0, 0);
-    const p2 = Point.fromPolar([Math.PI / 2 + this.faceInteriorAngles[2] / 2, this.actualFaceEdgeLengths[0]]);
+    const p2 = Point.fromPolar([Math.PI - this.faceInteriorAngles[0], this.actualFaceEdgeLengths[0]]);
     const p3 = hingedPlot(p1, p2, this.faceInteriorAngles[0], this.actualFaceEdgeLengths[1]);
     return [p1, p2, p3];
   }

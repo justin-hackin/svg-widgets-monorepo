@@ -5,7 +5,7 @@ import React from 'react';
 import range from 'lodash-es/range';
 import {
   degToRad, hingedPlot,
-  hingedPlotByProjectionDistance,
+  hingedPlotByProjectionDistance, radToDeg,
 } from '../util/geom';
 import {
   AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec,
@@ -153,10 +153,12 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
       </symbol>
 
       {range(faceCount).map((index) => {
-        const isOdd = index % 2;
+        const isOdd = !!(index % 2);
         const yScale = isOdd ? -1 : 1;
-        const rotation = -(index * faceInteriorAngles[2] * 360) / (2 * Math.PI);
-        return <use key={index} transform={`rotate(${rotation}) scale(${yScale} 1)`} xlinkHref="#face-tile" />;
+
+        const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+        const rotation = radToDeg(-1 * yScale * index * faceInteriorAngles[2] + asymetryNudge);
+        return <use key={index} transform={`scale(${yScale} 1) rotate(${rotation}) `} xlinkHref="#face-tile" />;
       })}
 
       <g id="die-lines">
