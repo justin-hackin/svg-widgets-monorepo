@@ -16,12 +16,6 @@ import {
 import { polyhedra } from './polyhedra';
 import { SVGWrapper } from '../components/SVGWrapper';
 
-const tabScoreDashSpec = {
-  relativeStrokeDasharray: [2, 1],
-  strokeDashLength: 3,
-  strokeDashOffsetRatio: 0,
-};
-
 export class Store implements PyramidNetSpec {
   @observable
   public styleSpec:StyleSpec = {
@@ -44,7 +38,6 @@ export class Store implements PyramidNetSpec {
       holeWidthRatio: 0.4,
       holeFlapTaperAngle: Math.PI / 10,
       tabWideningAngle: Math.PI / 6,
-      scoreDashSpec: tabScoreDashSpec,
     },
     baseEdgeTabSpec: {
       tabDepthToAscendantEdgeLength: 1.5,
@@ -54,7 +47,11 @@ export class Store implements PyramidNetSpec {
       holeBreadthToHalfWidth: 0.5,
       finDepthToTabDepth: 1.1,
       finTipDepthToFinDepth: 1.1,
-      scoreDashSpec: tabScoreDashSpec,
+    },
+    baseScoreDashSpec: {
+      relativeStrokeDasharray: [2, 1],
+      strokeDashLength: 3,
+      strokeDashOffsetRatio: 0,
     },
     interFaceScoreDashSpec: {
       relativeStrokeDasharray: [PHI, 1, 1 / PHI, 1, PHI],

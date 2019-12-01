@@ -119,7 +119,7 @@ export function strokeDashPath(
 }
 
 export const ascendantEdgeConnectionTabs = (
-  start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec,
+  start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec,
 ):AscendantEdgeConnectionPaths => {
   const {
     tabDepthToTraversalLength,
@@ -131,7 +131,6 @@ export const ascendantEdgeConnectionTabs = (
     holeWidthRatio,
     holeFlapTaperAngle,
     tabWideningAngle,
-    scoreDashSpec,
   } = tabSpec;
   const vector = end.subtract(start);
   const tabDepth = tabDepthToTraversalLength * vector.length;
@@ -218,7 +217,6 @@ export interface AscendantEdgeTabsSpec {
   holeWidthRatio: number,
   holeFlapTaperAngle: number,
   tabWideningAngle: number,
-  scoreDashSpec: StrokeDashPathSpec,
 }
 
 interface AscendantEdgeConnectionPaths {
@@ -240,7 +238,6 @@ export interface BaseEdgeConnectionTabSpec {
   holeBreadthToHalfWidth : number,
   finDepthToTabDepth : number,
   finTipDepthToFinDepth : number,
-  scoreDashSpec: StrokeDashPathSpec,
 }
 
 export interface BaseEdgeConnectionTab {
@@ -249,7 +246,8 @@ export interface BaseEdgeConnectionTab {
 }
 
 export function baseEdgeConnectionTab(
-  start: PointLike, end: PointLike, ascendantEdgeTabDepth, tabSpec: BaseEdgeConnectionTabSpec,
+  start: PointLike, end: PointLike,
+  ascendantEdgeTabDepth, tabSpec: BaseEdgeConnectionTabSpec, scoreDashSpec: StrokeDashPathSpec,
 ):BaseEdgeConnectionTab {
   const {
     tabDepthToAscendantEdgeLength,
@@ -259,7 +257,6 @@ export function baseEdgeConnectionTab(
     holeBreadthToHalfWidth,
     finDepthToTabDepth,
     finTipDepthToFinDepth,
-    scoreDashSpec,
   } = tabSpec;
   const tabDepth = tabDepthToAscendantEdgeLength * ascendantEdgeTabDepth;
   const cutPath = new PathData();

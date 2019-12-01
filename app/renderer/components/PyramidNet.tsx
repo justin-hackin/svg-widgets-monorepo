@@ -26,6 +26,7 @@ export interface DieLinesSpec {
   ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
   baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
   interFaceScoreDashSpec: StrokeDashPathSpec,
+  baseScoreDashSpec: StrokeDashPathSpec,
 }
 
 export interface PyramidNetSpec {
@@ -73,7 +74,9 @@ export const FaceBoundarySVG = ({ store }:{store: PyramidNetSpec}) => {
 export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   const {
     pyramidGeometry: { faceCount }, styleSpec,
-    dieLinesSpec: { ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec },
+    dieLinesSpec: {
+      ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec, baseScoreDashSpec,
+    },
     // @ts-ignore
     boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD,
   } = store;
@@ -125,13 +128,17 @@ export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   // base edge tabs
   faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
     const edgePt2 = faceTabFenceposts[index + 1];
-    const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabSpec);
+    const baseEdgeTab = baseEdgeConnectionTab(
+      edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabSpec, baseScoreDashSpec,
+    );
     cutPathAggregate.concatPath(baseEdgeTab.cut);
     scorePathAggregate.concatPath(baseEdgeTab.score);
   });
 
   // male tabs
-  const ascendantTabs = ascendantEdgeConnectionTabs(boundaryPoints[1], boundaryPoints[0], ascendantEdgeTabsSpec);
+  const ascendantTabs = ascendantEdgeConnectionTabs(
+    boundaryPoints[1], boundaryPoints[0], ascendantEdgeTabsSpec, baseScoreDashSpec,
+  );
   const rotationMatrix = (new Matrix()).rotate(-faceCount * faceInteriorAngles[2]);
   ascendantTabs.male.cut.transformPoints(rotationMatrix);
   ascendantTabs.male.score.transformPoints(rotationMatrix);
