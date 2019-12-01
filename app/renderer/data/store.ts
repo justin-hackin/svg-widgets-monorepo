@@ -48,16 +48,20 @@ export class Store implements PyramidNetSpec {
       finDepthToTabDepth: 1.1,
       finTipDepthToFinDepth: 1.1,
     },
-    baseScoreDashSpec: {
-      relativeStrokeDasharray: [2, 1],
-      strokeDashLength: 3,
-      strokeDashOffsetRatio: 0,
-    },
-    interFaceScoreDashSpec: {
-      relativeStrokeDasharray: [PHI, 1, 1 / PHI, 1, PHI],
-      strokeDashLength: 10,
-      strokeDashOffsetRatio: 0.75,
-    },
+  };
+
+  @observable
+  public baseScoreDashSpec = {
+    relativeStrokeDasharray: [2, 1],
+    strokeDashLength: 3,
+    strokeDashOffsetRatio: 0,
+  };
+
+  @observable
+  public interFaceScoreDashSpec = {
+    relativeStrokeDasharray: [PHI, 1, 1 / PHI, 1, PHI],
+    strokeDashLength: 10,
+    strokeDashOffsetRatio: 0.75,
   };
 
   @observable

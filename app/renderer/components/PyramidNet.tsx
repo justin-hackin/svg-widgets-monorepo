@@ -25,13 +25,13 @@ export interface StyleSpec {
 export interface DieLinesSpec {
   ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
   baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
-  interFaceScoreDashSpec: StrokeDashPathSpec,
-  baseScoreDashSpec: StrokeDashPathSpec,
 }
 
 export interface PyramidNetSpec {
   pyramidGeometry: PyramidGeometrySpec,
   styleSpec: StyleSpec,
+  interFaceScoreDashSpec: StrokeDashPathSpec,
+  baseScoreDashSpec: StrokeDashPathSpec,
   dieLinesSpec: DieLinesSpec,
   shapeHeightInCm: number,
 }
@@ -74,8 +74,9 @@ export const FaceBoundarySVG = ({ store }:{store: PyramidNetSpec}) => {
 export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
   const {
     pyramidGeometry: { faceCount }, styleSpec,
+    interFaceScoreDashSpec, baseScoreDashSpec,
     dieLinesSpec: {
-      ascendantEdgeTabsSpec, baseEdgeTabSpec, interFaceScoreDashSpec, baseScoreDashSpec,
+      ascendantEdgeTabsSpec, baseEdgeTabSpec,
     },
     // @ts-ignore
     boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD,
