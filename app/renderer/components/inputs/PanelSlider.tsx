@@ -1,0 +1,30 @@
+import uuid from 'uuid/v1';
+import FormControl from '@material-ui/core/FormControl';
+import React from 'react';
+import Slider from '@material-ui/core/Slider';
+import Typography from '@material-ui/core/Typography';
+import { useStyles } from '../style';
+
+export const PanelSlider = ({
+  label, setter, value, ...rest
+}) => {
+  // @ts-ignore
+  const classes = useStyles();
+  const labelId = uuid();
+  return (
+    <FormControl className={classes.formControl}>
+      <Typography id={labelId} gutterBottom>
+        {label}
+      </Typography>
+      {/* @ts-ignore */}
+      <Slider
+        value={value}
+        aria-labelledby={labelId}
+        onChange={(e:any, val:number) => {
+          setter(val);
+        }}
+        {...rest}
+      />
+    </FormControl>
+  );
+};

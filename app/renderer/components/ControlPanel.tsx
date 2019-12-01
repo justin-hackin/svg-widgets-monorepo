@@ -15,6 +15,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import PublishIcon from '@material-ui/icons/Publish';
 import { PanelSelect } from './inputs/PanelSelect';
+import { PanelSlider } from './inputs/PanelSlider';
 import { useStyles } from './style';
 
 export const ControlPanel = observer(({ store }) => {
@@ -24,6 +25,7 @@ export const ControlPanel = observer(({ store }) => {
   const theme = useTheme();
   const { selectedShape, polyhedraPyramidGeometries } = store;
   const setSelectedPolyhedron = store.getSetter('selectedShape');
+  const setStrokeWidth = store.getSetter('styleSpec.dieLineProps.strokeWidth');
   const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
@@ -36,7 +38,6 @@ export const ControlPanel = observer(({ store }) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
   return (
     <div className={classes.root}>
       <Fab
@@ -100,6 +101,15 @@ export const ControlPanel = observer(({ store }) => {
             setSelectedPolyhedron(val);
             store.clearFaceHolePattern();
           }}
+        />
+
+        <PanelSlider
+          label="Dieline Stroke"
+          min={0}
+          max={3}
+          step={0.01}
+          value={store.styleSpec.dieLineProps.strokeWidth}
+          setter={setStrokeWidth}
         />
       </Drawer>
     </div>
