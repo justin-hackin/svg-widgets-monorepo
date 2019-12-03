@@ -71,10 +71,13 @@ export class Store implements PyramidNetSpec {
   public selectedShape: string = 'great-stellated-dodecahedron';
 
   @observable
-  public shapeHeightInCm: number = 30;
+  public shapeHeightInCm: number = 40;
 
   @observable
-  public activeCutHolePatternD = '';
+  public activeCutHolePatternD: string = '';
+
+  @observable
+  public textureImportWidth:number = 0;
 
   @computed
   get pyramidGeometry() { return this.polyhedraPyramidGeometries[this.selectedShape]; }
@@ -141,8 +144,9 @@ export class Store implements PyramidNetSpec {
   @computed
   get borderInsetFaceHoleTransform() {
     // borderPolygon ymin is 0
+    const textureDifferenceScale = this.borderPolygon.box.width / this.textureImportWidth;
     return `translate(0, ${this.insetPolygon.box.ymin}) scale(${
-      this.insetPolygon.box.width / this.borderPolygon.box.width
+      (textureDifferenceScale * this.insetPolygon.box.width) / this.borderPolygon.box.width
     })`;
   }
 
@@ -150,6 +154,9 @@ export class Store implements PyramidNetSpec {
   applyFaceHolePattern(svgString) {
     const parser = new window.DOMParser();
     const doc = parser.parseFromString(svgString, 'image/svg+xml');
+    this.textureImportWidth = parseFloat(
+      doc.querySelector('svg').getAttribute('viewBox').split(' ')[2],
+    );
     this.activeCutHolePatternD = doc.querySelector('path:last-of-type').getAttribute('d');
   }
 
