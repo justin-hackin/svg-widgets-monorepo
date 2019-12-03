@@ -121,12 +121,29 @@ export class Store implements PyramidNetSpec {
   }
 
   @computed
+  get borderPolygon() {
+    const poly = new Polygon();
+    poly.addFace(this.boundaryPoints);
+    return poly;
+  }
+
+  @computed
+  get insetPolygon() {
+    return offset(this.borderPolygon, -this.ascendantEdgeTabDepth);
+  }
+
+  @computed
   get borderOverlay() {
     // TODO: can be converted to a path inset using @flatten-js/polygon-offset
-    const borderOutline = new Polygon();
-    borderOutline.addFace(this.boundaryPoints);
-    const inset = offset(borderOutline, -this.ascendantEdgeTabDepth);
-    return subtract(borderOutline, inset);
+    return subtract(this.borderPolygon, this.insetPolygon);
+  }
+
+  @computed
+  get borderInsetFaceHoleTransform() {
+    // borderPolygon ymin is 0
+    return `translate(0, ${this.insetPolygon.box.ymin}) scale(${
+      this.insetPolygon.box.width / this.borderPolygon.box.width
+    })`;
   }
 
   @action
