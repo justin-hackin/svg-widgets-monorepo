@@ -14,6 +14,11 @@ const svgFilters = [{
   extensions: ['svg'],
 }];
 
+const jsonFilters = [{
+  name: 'JSON',
+  extensions: ['json'],
+}];
+
 ipcMain.handle('save-svg', (e, fileContent, message) => dialog.showSaveDialog({
   message,
   filters: svgFilters,
@@ -22,14 +27,31 @@ ipcMain.handle('save-svg', (e, fileContent, message) => dialog.showSaveDialog({
   return fsPromises.writeFile(filePath, fileContent);
 }));
 
-ipcMain.handle('open-svg', async (e, message) => {
-  const { canceled, filePaths } = await dialog.showOpenDialog({
-    message,
-    filters: svgFilters,
-  });
+const resolveStringDataFromDialog = async (dialogOptions) => {
+  const { canceled, filePaths } = await dialog.showOpenDialog(dialogOptions);
   if (canceled) { return null; }
   return fsPromises.readFile(filePaths[0], 'utf8');
-});
+};
+
+ipcMain.handle('save-net-with-data', (e, svgContent, jsonContent, message) => dialog.showSaveDialog({
+  message,
+  filters: svgFilters,
+}).then(({ canceled, filePath }) => {
+  if (canceled) { return null; }
+  return Promise.all([
+    fsPromises.writeFile(filePath, svgContent),
+    fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, jsonContent)]);
+}));
+
+ipcMain.handle('load-net-spec', () => resolveStringDataFromDialog(
+  { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },
+).then((jsonString) => JSON.parse(jsonString)));
+
+
+ipcMain.handle('open-svg', async (e, message) => resolveStringDataFromDialog({
+  message,
+  filters: svgFilters,
+}));
 
 app.on('ready', async () => {
   const mainWindow = new BrowserWindow({

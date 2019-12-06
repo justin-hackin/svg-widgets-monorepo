@@ -12,8 +12,9 @@ import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import SaveIcon from '@material-ui/icons/Save';
-import SaveAltIcon from '@material-ui/icons/SaveAlt';
-import PublishIcon from '@material-ui/icons/Publish';
+import ArchiveIcon from '@material-ui/icons/Archive';
+import BlurOnIcon from '@material-ui/icons/BlurOn';
+import DescriptionIcon from '@material-ui/icons/Description';
 import { PanelSelect } from './inputs/PanelSelect';
 import { PanelSlider } from './inputs/PanelSlider';
 import { useStyles } from './style';
@@ -61,7 +62,24 @@ export const ControlPanel = observer(({ store }) => {
             aria-label="save"
             onClick={() => {
               // @ts-ignore
-              ipcRenderer.invoke('save-svg', store.renderPyramidNetToString(), 'Save pyramid net dielines');
+              ipcRenderer.invoke('load-net-spec').then((netSpecData) => {
+                store.pyramidNetSpec.loadSpec(netSpecData);
+              });
+            }}
+          >
+            <DescriptionIcon />
+          </IconButton>
+
+          <IconButton
+            aria-label="save"
+            onClick={() => {
+              // @ts-ignore
+              ipcRenderer.invoke(
+                'save-net-with-data',
+                store.renderPyramidNetToString(),
+                store.pyramidNetSpec.exportToJSONString(),
+                'Save pyramid net dielines and model',
+              );
             }}
           >
             <SaveIcon />
@@ -73,18 +91,19 @@ export const ControlPanel = observer(({ store }) => {
               ipcRenderer.invoke('save-svg', store.renderFaceBoundaryToString(), 'Save face template');
             }}
           >
-            <SaveAltIcon />
+            <ArchiveIcon />
           </IconButton>
           <IconButton
             aria-label="save"
             onClick={() => {
               // @ts-ignore
-              ipcRenderer.invoke('open-svg', 'Upload face cut pattern').then((svgString) => {
-                store.applyFaceHolePattern(svgString);
-              });
+              ipcRenderer.invoke('open-svg', 'Upload face cut pattern')
+                .then((svgString) => {
+                  store.pyramidNetSpec.applyFaceHolePattern(svgString);
+                });
             }}
           >
-            <PublishIcon />
+            <BlurOnIcon />
           </IconButton>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
@@ -97,7 +116,6 @@ export const ControlPanel = observer(({ store }) => {
           value={store.pyramidNetSpec.pyramidGeometryId}
           options={polyhedronOptions}
           setter={(val) => {
-            // eslint-disable-next-line no-param-reassign
             store.pyramidNetSpec.setPyramidGeometryId(val);
           }}
         />

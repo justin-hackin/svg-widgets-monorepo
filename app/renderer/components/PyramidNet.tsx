@@ -86,7 +86,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
         ascendantEdgeTabsSpec, baseEdgeTabSpec,
       },
       // @ts-ignore
-      boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, borderInsetFaceHoleTransform, // eslint-disable-line
+      boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, textureImportWidth, borderInsetFaceHoleTransform, // eslint-disable-line
     },
   } = store;
 
@@ -164,7 +164,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
         <g>
           <FaceBoundary store={store} />
           {/* eslint-disable-next-line react/no-danger */}
-          { activeCutHolePatternD
+          { activeCutHolePatternD && textureImportWidth
           && (<path {...cutProps} d={activeCutHolePatternD} transform={borderInsetFaceHoleTransform} />)}
         </g>
       </symbol>

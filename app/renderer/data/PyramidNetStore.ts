@@ -146,4 +146,12 @@ export class PyramidNetStore implements PyramidNetSpec {
   clearFaceHolePattern() {
     this.activeCutHolePatternD = '';
   }
+
+  exportToJSONString() {
+    return JSON.stringify(this, null, 2);
+  }
+
+  loadSpec(specData) {
+    Object.assign(this, specData);
+  }
 }
