@@ -1,21 +1,13 @@
-/* eslint-disable max-classes-per-file */
-import set from 'lodash-es/set';
-import { observable, computed, action } from 'mobx';
-import ReactDOMServer from 'react-dom/server';
-import React from 'react';
-import { offset } from '@flatten-js/polygon-offset';
-import { subtract } from '@flatten-js/boolean-op';
-
+import { action, computed, observable } from 'mobx';
 // @ts-ignore
 import { Point, Polygon } from '@flatten-js/core';
-import {
-  DieLinesSpec, PyramidNetSpec, StyleSpec, PyramidNet, FaceBoundarySVG, StoreSpec,
-} from '../components/PyramidNet';
+import { offset } from '@flatten-js/polygon-offset';
+import { subtract } from '@flatten-js/boolean-op';
+import { DieLinesSpec, PyramidNetSpec } from '../components/PyramidNet';
+import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, hingedPlot, PHI, triangleAnglesGivenSides,
 } from '../util/geom';
-import { polyhedra } from './polyhedra';
-import { SVGWrapper } from '../components/SVGWrapper';
 
 export class PyramidNetStore implements PyramidNetSpec {
   @observable
@@ -29,10 +21,12 @@ export class PyramidNetStore implements PyramidNetSpec {
   }
 
   @computed
-  get pyramidGeometry() { return polyhedra[this.pyramidGeometryId]; }
+  get pyramidGeometry() {
+    return polyhedra[this.pyramidGeometryId];
+  }
 
   @observable
-  public dieLinesSpec:DieLinesSpec = {
+  public dieLinesSpec: DieLinesSpec = {
     ascendantEdgeTabsSpec: {
       tabDepthToTraversalLength: 0.04810606060599847,
       tabRoundingDistanceRatio: 0.75,
@@ -77,10 +71,10 @@ export class PyramidNetStore implements PyramidNetSpec {
   public activeCutHolePatternD: string = '';
 
   @observable
-  public textureImportWidth:number = 0;
+  public textureImportWidth: number = 0;
 
   @computed
-  get faceInteriorAngles():number[] {
+  get faceInteriorAngles(): number[] {
     return triangleAnglesGivenSides(this.pyramidGeometry.relativeFaceEdgeLengths);
   }
 
@@ -153,44 +147,3 @@ export class PyramidNetStore implements PyramidNetSpec {
     this.activeCutHolePatternD = '';
   }
 }
-
-export class Store implements StoreSpec {
-  @observable
-  public pyramidNetSpec = new PyramidNetStore();
-
-  @observable
-  public styleSpec:StyleSpec = {
-    dieLineProps: { fill: 'none', strokeWidth: 1 },
-    cutLineProps: { stroke: '#FF244D' },
-    scoreLineProps: { stroke: '#BDFF48' },
-    designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
-  };
-
-  @observable
-  public polyhedraPyramidGeometries = polyhedra;
-
-  // eslint-disable-next-line class-methods-use-this
-  getSetter(path) {
-    return (value) => { set(this, path, value); };
-  }
-
-  // set to Glowforge bed dimensions
-  @observable
-  public svgDimensions = { width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 };
-
-  renderPyramidNetToString() {
-    return ReactDOMServer.renderToString(React.createElement(
-      // @ts-ignore
-      SVGWrapper, this.svgDimensions,
-      React.createElement(PyramidNet, { store: this }),
-    ));
-  }
-
-  renderFaceBoundaryToString() {
-    return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: this }));
-  }
-}
-
-export const store = new Store();
-// @ts-ignore
-window.store = store;

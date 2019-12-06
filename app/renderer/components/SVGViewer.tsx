@@ -8,7 +8,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
 
 import darkTheme from '../data/material-ui-dark-theme.json';
-import { store } from '../data/store';
+import { store } from '../data/PyramidNetMakerStore';
 import { PyramidNet } from './PyramidNet';
 
 // eslint-disable-next-line import/no-cycle
