@@ -23,8 +23,7 @@ export const ControlPanel = observer(({ store }) => {
   const classes = useStyles();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme = useTheme();
-  const { selectedShape, polyhedraPyramidGeometries } = store;
-  const setSelectedPolyhedron = store.getSetter('selectedShape');
+  const { polyhedraPyramidGeometries } = store;
   const setStrokeWidth = store.getSetter('styleSpec.dieLineProps.strokeWidth');
   const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
@@ -95,11 +94,11 @@ export const ControlPanel = observer(({ store }) => {
 
         <PanelSelect
           label="Polyhedron"
-          value={selectedShape}
+          value={store.pyramidNetSpec.pyramidGeometryId}
           options={polyhedronOptions}
           setter={(val) => {
-            setSelectedPolyhedron(val);
-            store.clearFaceHolePattern();
+            // eslint-disable-next-line no-param-reassign
+            store.pyramidNetSpec.setPyramidGeometryId(val);
           }}
         />
 

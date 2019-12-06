@@ -27,9 +27,14 @@ export interface DieLinesSpec {
   baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
 }
 
-export interface PyramidNetSpec {
-  pyramidGeometry: PyramidGeometrySpec,
+export interface StoreSpec {
   styleSpec: StyleSpec,
+  pyramidNetSpec: PyramidNetSpec,
+}
+
+export interface PyramidNetSpec {
+  pyramidGeometryId: string,
+  pyramidGeometry: PyramidGeometrySpec,
   interFaceScoreDashSpec: StrokeDashPathSpec,
   baseScoreDashSpec: StrokeDashPathSpec,
   dieLinesSpec: DieLinesSpec,
@@ -42,22 +47,22 @@ export interface PyramidGeometrySpec {
   faceCount: number
 }
 
-export const FaceBoundary = ({ store }:{store: PyramidNetSpec}) => {
+export const FaceBoundary = ({ store }:{store: StoreSpec}) => {
   const {
     styleSpec: { designBoundaryProps },
     // @ts-ignore
-    borderOverlay,
+    pyramidNetSpec: { borderOverlay },
   } = store;
 
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
   return (<path {...designBoundaryProps} d={borderOverlay.pathAttrs().d} />);
 };
 
-export const FaceBoundarySVG = ({ store }:{store: PyramidNetSpec}) => {
+export const FaceBoundarySVG = ({ store }:{store: StoreSpec}) => {
   const {
     styleSpec: { designBoundaryProps },
     // @ts-ignore
-    borderOverlay,
+    pyramidNetSpec: { borderOverlay },
   } = store;
   const {
     xmin, xmax, ymin, ymax,
@@ -71,15 +76,18 @@ export const FaceBoundarySVG = ({ store }:{store: PyramidNetSpec}) => {
   );
 };
 
-export const PyramidNet = observer(({ store }: {store: PyramidNetSpec}) => {
+export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
   const {
-    pyramidGeometry: { faceCount }, styleSpec,
-    interFaceScoreDashSpec, baseScoreDashSpec,
-    dieLinesSpec: {
-      ascendantEdgeTabsSpec, baseEdgeTabSpec,
+    styleSpec,
+    pyramidNetSpec: {
+      pyramidGeometry: { faceCount },
+      interFaceScoreDashSpec, baseScoreDashSpec,
+      dieLinesSpec: {
+        ascendantEdgeTabsSpec, baseEdgeTabSpec,
+      },
+      // @ts-ignore
+      boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, borderInsetFaceHoleTransform, // eslint-disable-line
     },
-    // @ts-ignore
-    boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, borderInsetFaceHoleTransform, // eslint-disable-line
   } = store;
 
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset

@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import set from 'lodash-es/set';
 import { observable, computed, action } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
@@ -8,7 +9,7 @@ import { subtract } from '@flatten-js/boolean-op';
 // @ts-ignore
 import { Point, Polygon } from '@flatten-js/core';
 import {
-  DieLinesSpec, PyramidNetSpec, StyleSpec, PyramidNet, FaceBoundarySVG,
+  DieLinesSpec, PyramidNetSpec, StyleSpec, PyramidNet, FaceBoundarySVG, StoreSpec,
 } from '../components/PyramidNet';
 import {
   CM_TO_PIXELS_RATIO, hingedPlot, PHI, triangleAnglesGivenSides,
@@ -16,14 +17,19 @@ import {
 import { polyhedra } from './polyhedra';
 import { SVGWrapper } from '../components/SVGWrapper';
 
-export class Store implements PyramidNetSpec {
+export class PyramidNetStore implements PyramidNetSpec {
   @observable
-  public styleSpec:StyleSpec = {
-    dieLineProps: { fill: 'none', strokeWidth: 1 },
-    cutLineProps: { stroke: '#FF244D' },
-    scoreLineProps: { stroke: '#BDFF48' },
-    designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
-  };
+  public pyramidGeometryId = 'icosphere';
+
+  @action
+  setPyramidGeometryId(id) {
+    this.activeCutHolePatternD = '';
+    this.textureImportWidth = 0;
+    this.pyramidGeometryId = id;
+  }
+
+  @computed
+  get pyramidGeometry() { return polyhedra[this.pyramidGeometryId]; }
 
   @observable
   public dieLinesSpec:DieLinesSpec = {
@@ -65,12 +71,6 @@ export class Store implements PyramidNetSpec {
   };
 
   @observable
-  public polyhedraPyramidGeometries = polyhedra;
-
-  @observable
-  public selectedShape: string = 'great-stellated-dodecahedron';
-
-  @observable
   public shapeHeightInCm: number = 40;
 
   @observable
@@ -78,18 +78,6 @@ export class Store implements PyramidNetSpec {
 
   @observable
   public textureImportWidth:number = 0;
-
-  @computed
-  get pyramidGeometry() { return this.polyhedraPyramidGeometries[this.selectedShape]; }
-
-  // eslint-disable-next-line class-methods-use-this
-  getSetter(path) {
-    return (value) => { set(this, path, value); };
-  }
-
-  // set to Glowforge bed dimensions
-  @observable
-  public svgDimensions = { width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 };
 
   @computed
   get faceInteriorAngles():number[] {
@@ -164,6 +152,31 @@ export class Store implements PyramidNetSpec {
   clearFaceHolePattern() {
     this.activeCutHolePatternD = '';
   }
+}
+
+export class Store implements StoreSpec {
+  @observable
+  public pyramidNetSpec = new PyramidNetStore();
+
+  @observable
+  public styleSpec:StyleSpec = {
+    dieLineProps: { fill: 'none', strokeWidth: 1 },
+    cutLineProps: { stroke: '#FF244D' },
+    scoreLineProps: { stroke: '#BDFF48' },
+    designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
+  };
+
+  @observable
+  public polyhedraPyramidGeometries = polyhedra;
+
+  // eslint-disable-next-line class-methods-use-this
+  getSetter(path) {
+    return (value) => { set(this, path, value); };
+  }
+
+  // set to Glowforge bed dimensions
+  @observable
+  public svgDimensions = { width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 };
 
   renderPyramidNetToString() {
     return ReactDOMServer.renderToString(React.createElement(
