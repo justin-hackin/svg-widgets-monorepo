@@ -1,6 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import startCase from 'lodash-es/startCase';
+import get from 'lodash-es/get';
 import clsx from 'clsx';
 import {
   useTheme,
@@ -25,11 +26,49 @@ export const ControlPanel = observer(({ store }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme = useTheme();
   const { polyhedraPyramidGeometries } = store;
-  const setStrokeWidth = store.getSetter('styleSpec.dieLineProps.strokeWidth');
   const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
   const [open, setOpen] = React.useState(false);
+
+  const controlsSpec = [{
+    component: PanelSlider,
+    valuePath: 'styleSpec.dieLineProps.strokeWidth',
+    props: {
+      label: 'Dieline Stroke',
+      min: 0,
+      max: 3,
+      step: 0.01,
+    },
+  }, {
+    component: PanelSelect,
+    valuePath: 'pyramidNetSpec.pyramidGeometryId',
+    props: {
+      label: 'Polyhedron', options: polyhedronOptions,
+    },
+  }, {
+    component: PanelSlider,
+    valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabDepthToAscendantEdgeLength',
+    props: {
+      label: 'Tab Depth To Ascendant Edge Length', min: 0, max: 3, step: 0.01,
+    },
+  }, {
+    component: PanelSlider,
+    valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabsCount',
+    props: {
+      label: 'Ascendant Tab Count', min: 2, max: 5, step: 1,
+    },
+  }];
+
+  const controlElements = controlsSpec.map(({ props, component, valuePath }) => {
+    const storeProps = {
+      setter: (value) => { store.setValueAtPath(valuePath, value); },
+      value: get(store, valuePath),
+      key: valuePath,
+    };
+    return React.createElement(component, { ...props, ...storeProps });
+  });
+
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -111,23 +150,7 @@ export const ControlPanel = observer(({ store }) => {
         </div>
         <Divider />
 
-        <PanelSelect
-          label="Polyhedron"
-          value={store.pyramidNetSpec.pyramidGeometryId}
-          options={polyhedronOptions}
-          setter={(val) => {
-            store.pyramidNetSpec.setPyramidGeometryId(val);
-          }}
-        />
-
-        <PanelSlider
-          label="Dieline Stroke"
-          min={0}
-          max={3}
-          step={0.01}
-          value={store.styleSpec.dieLineProps.strokeWidth}
-          setter={setStrokeWidth}
-        />
+        {controlElements}
       </Drawer>
     </div>
   );

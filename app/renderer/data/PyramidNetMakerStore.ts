@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import set from 'lodash-es/set';
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 // @ts-ignore
@@ -46,6 +46,11 @@ export class PyramidNetMakerStore implements StoreSpec {
 
   renderFaceBoundaryToString() {
     return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: this }));
+  }
+
+  @action
+  setValueAtPath(path, value) {
+    set(this, path, value);
   }
 }
 

@@ -22,11 +22,6 @@ export interface StyleSpec {
   designBoundaryProps: object,
 }
 
-export interface DieLinesSpec {
-  ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
-  baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
-}
-
 export interface StoreSpec {
   styleSpec: StyleSpec,
   pyramidNetSpec: PyramidNetSpec,
@@ -37,7 +32,8 @@ export interface PyramidNetSpec {
   pyramidGeometry: PyramidGeometrySpec,
   interFaceScoreDashSpec: StrokeDashPathSpec,
   baseScoreDashSpec: StrokeDashPathSpec,
-  dieLinesSpec: DieLinesSpec,
+  ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
+  baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
   shapeHeightInCm: number,
 }
 
@@ -82,9 +78,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
     pyramidNetSpec: {
       pyramidGeometry: { faceCount },
       interFaceScoreDashSpec, baseScoreDashSpec,
-      dieLinesSpec: {
-        ascendantEdgeTabsSpec, baseEdgeTabSpec,
-      },
+      ascendantEdgeTabsSpec, baseEdgeTabSpec,
       // @ts-ignore
       boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, textureImportWidth, borderInsetFaceHoleTransform, // eslint-disable-line
     },
