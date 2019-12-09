@@ -19,6 +19,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import { PanelSelect } from './inputs/PanelSelect';
 import { PanelSlider } from './inputs/PanelSlider';
 import { useStyles } from './style';
+import { ControlsExpansionPanel } from './ControlsExpansionPanel';
 
 export const ControlPanel = observer(({ store }) => {
   // @ts-ignore
@@ -149,8 +150,9 @@ export const ControlPanel = observer(({ store }) => {
           </IconButton>
         </div>
         <Divider />
-
-        {controlElements}
+        <ControlsExpansionPanel summary="Controls">
+          {controlElements}
+        </ControlsExpansionPanel>
       </Drawer>
     </div>
   );

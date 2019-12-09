@@ -33,4 +33,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+  controlPaper: {
+    display: 'grid',
+  },
 }));
