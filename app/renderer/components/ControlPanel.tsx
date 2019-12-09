@@ -23,6 +23,8 @@ import { PanelSlider } from './inputs/PanelSlider';
 import { useStyles } from './style';
 import { ControlsExpansionPanel } from './ControlsExpansionPanel';
 
+const VERY_SMALL_NUMBER = 0.00000001;
+
 export const ControlPanel = observer(({ store }) => {
   // @ts-ignore
   const classes = useStyles();
@@ -46,37 +48,70 @@ export const ControlPanel = observer(({ store }) => {
     return React.createElement(component, { ...props, ...extraProps });
   };
 
-  const controlsSpec = [{
+  const styleControls = [{
     component: PanelSlider,
     valuePath: 'styleSpec.dieLineProps.strokeWidth',
     label: 'Dieline Stroke',
     min: 0,
     max: 3,
     step: 0.01,
-  }, {
+  }].map(mapControlsSpecToComponents);
+
+  const topLevelControls = [{
     component: PanelSelect,
     valuePath: 'pyramidNetSpec.pyramidGeometryId',
     label: 'Polyhedron',
     options: polyhedronOptions,
-  }].map(mapControlsSpecToComponents);
+  }, {
+    component: PanelSlider,
+    valuePath: 'pyramidNetSpec.shapeHeightInCm',
+    min: 20,
+    max: 60,
+    step: VERY_SMALL_NUMBER,
+  }]
+  // @ts-ignore
+    .map(mapControlsSpecToComponents);
 
   const ratioSliderProps = { min: 0, max: 1, step: 0.00001 };
-  //
-  // const baseEdgeTabControl = [
-  //   {
-  //     component: PanelSlider,
-  //     valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finDepthToTabDepth',
-  //     ...ratioSliderProps,
-  //   }, {
-  //     component: PanelSlider,
-  //     valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finTipDepthToFinDepth',
-  //     min: 0.9,
-  //     max: 1.5,
-  //     step: 0.0001,
-  //   },
-  // ];
-  //
-  const VERY_SMALL_NUMBER = 0.00000001;
+
+  const baseEdgeTabControl = [
+    {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finDepthToTabDepth',
+      ...ratioSliderProps,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finTipDepthToFinDepth',
+      min: 0.9,
+      max: 1.5,
+      step: 0.0001,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeBreadthToHalfWidth',
+      ...ratioSliderProps,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeDepthToTabDepth',
+      ...ratioSliderProps,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeTaper',
+      min: Math.PI / 8,
+      max: Math.PI / 3,
+      step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.roundingDistanceRatio',
+      ...ratioSliderProps,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.tabDepthToAscendantEdgeLength',
+      min: 0.6,
+      max: 2,
+      step: VERY_SMALL_NUMBER,
+    },
+    // @ts-ignore
+  ].map(mapControlsSpecToComponents);
   const ascendantEdgeTabsControl = [
     {
       component: PanelSlider,
@@ -133,9 +168,8 @@ export const ControlPanel = observer(({ store }) => {
       max: Math.PI / 4,
       step: VERY_SMALL_NUMBER,
     },
+    // @ts-ignore
   ].map(mapControlsSpecToComponents);
-
-  // @ts-ignore
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -216,12 +250,19 @@ export const ControlPanel = observer(({ store }) => {
           </IconButton>
         </div>
         <Divider />
-        <ControlsExpansionPanel summary="Controls">
-          {controlsSpec}
+
+        <ControlsExpansionPanel summary="Path Styles">
+          {styleControls}
         </ControlsExpansionPanel>
+
+        {topLevelControls}
+
         <ControlsExpansionPanel summary="Ascendant Edge Tabs">
-          {/* @ts-ignore */}
           {ascendantEdgeTabsControl}
+        </ControlsExpansionPanel>
+
+        <ControlsExpansionPanel summary="Base Edge Tab">
+          {baseEdgeTabControl}
         </ControlsExpansionPanel>
       </Drawer>
     </div>
