@@ -28,27 +28,27 @@ export class PyramidNetStore implements PyramidNetSpec {
 
   @observable
   public ascendantEdgeTabsSpec: AscendantEdgeTabsSpec = {
-    tabDepthToTraversalLength: 0.04810606060599847,
-    tabRoundingDistanceRatio: 0.75,
     flapRoundingDistanceRatio: 1,
-    tabsCount: 3,
-    midpointDepthToTabDepth: 0.6,
-    tabStartGapToTabDepth: 0.5,
+    holeFlapTaperAngle: Math.PI / 10,
     holeReachToTabDepth: 0.1,
     holeWidthRatio: 0.4,
-    holeFlapTaperAngle: Math.PI / 10,
+    midpointDepthToTabDepth: 0.6,
+    tabDepthToTraversalLength: 0.04810606060599847,
+    tabRoundingDistanceRatio: 0.75,
+    tabsCount: 3,
+    tabStartGapToTabDepth: 0.5,
     tabWideningAngle: Math.PI / 6,
   };
 
   @observable
   public baseEdgeTabSpec: BaseEdgeConnectionTabSpec = {
-    tabDepthToAscendantEdgeLength: 1.5,
-    roundingDistanceRatio: 1.0,
-    holeDepthToTabDepth: 0.5,
-    holeTaper: Math.PI / 4.5,
-    holeBreadthToHalfWidth: 0.5,
     finDepthToTabDepth: 1.1,
     finTipDepthToFinDepth: 1.1,
+    holeBreadthToHalfWidth: 0.5,
+    holeDepthToTabDepth: 0.5,
+    holeTaper: Math.PI / 4.5,
+    roundingDistanceRatio: 1.0,
+    tabDepthToAscendantEdgeLength: 1.5,
   };
 
   @observable
@@ -100,7 +100,7 @@ export class PyramidNetStore implements PyramidNetSpec {
 
   @computed
   get ascendantEdgeTabDepth() {
-    const  { ascendantEdgeTabsSpec: { tabDepthToTraversalLength } } = this;
+    const { ascendantEdgeTabsSpec: { tabDepthToTraversalLength } } = this;
     return this.actualFaceEdgeLengths[0] * tabDepthToTraversalLength;
   }
 

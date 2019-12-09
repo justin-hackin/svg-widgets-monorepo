@@ -34,32 +34,6 @@ export const ControlPanel = observer(({ store }) => {
 
   const [open, setOpen] = React.useState(false);
 
-  const controlsSpec = [{
-    component: PanelSlider,
-    valuePath: 'styleSpec.dieLineProps.strokeWidth',
-    label: 'Dieline Stroke',
-    min: 0,
-    max: 3,
-    step: 0.01,
-  }, {
-    component: PanelSelect,
-    valuePath: 'pyramidNetSpec.pyramidGeometryId',
-    label: 'Polyhedron',
-    options: polyhedronOptions,
-  }, {
-    component: PanelSlider,
-    valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabDepthToTraversalLength',
-    min: 0.03,
-    max: 0.05,
-    step: 0.0001,
-  }, {
-    component: PanelSlider,
-    valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabsCount',
-    min: 2,
-    max: 5,
-    step: 1,
-  }];
-
   const mapControlsSpecToComponents = ({
     component, valuePath, label, ...props
   }) => {
@@ -72,8 +46,96 @@ export const ControlPanel = observer(({ store }) => {
     return React.createElement(component, { ...props, ...extraProps });
   };
 
+  const controlsSpec = [{
+    component: PanelSlider,
+    valuePath: 'styleSpec.dieLineProps.strokeWidth',
+    label: 'Dieline Stroke',
+    min: 0,
+    max: 3,
+    step: 0.01,
+  }, {
+    component: PanelSelect,
+    valuePath: 'pyramidNetSpec.pyramidGeometryId',
+    label: 'Polyhedron',
+    options: polyhedronOptions,
+  }].map(mapControlsSpecToComponents);
+
+  const ratioSliderProps = { min: 0, max: 1, step: 0.00001 };
+  //
+  // const baseEdgeTabControl = [
+  //   {
+  //     component: PanelSlider,
+  //     valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finDepthToTabDepth',
+  //     ...ratioSliderProps,
+  //   }, {
+  //     component: PanelSlider,
+  //     valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finTipDepthToFinDepth',
+  //     min: 0.9,
+  //     max: 1.5,
+  //     step: 0.0001,
+  //   },
+  // ];
+  //
+  const VERY_SMALL_NUMBER = 0.00000001;
+  const ascendantEdgeTabsControl = [
+    {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.flapRoundingDistanceRatio',
+      ...ratioSliderProps,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeFlapTaperAngle',
+      min: Math.PI / 12,
+      max: Math.PI / 8,
+      step: 0.00000001,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeReachToTabDepth',
+      min: 0.05,
+      max: 0.2,
+      step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeWidthRatio',
+      min: 0.1,
+      max: 0.9,
+      step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.midpointDepthToTabDepth',
+      ...ratioSliderProps,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabDepthToTraversalLength',
+      min: 0.03,
+      max: 0.05,
+      step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabRoundingDistanceRatio',
+      ...ratioSliderProps,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabsCount',
+      min: 2,
+      max: 5,
+      step: 1,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabStartGapToTabDepth',
+      min: 0.3,
+      max: 1,
+      step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabWideningAngle',
+      min: Math.PI / 8,
+      max: Math.PI / 4,
+      step: VERY_SMALL_NUMBER,
+    },
+  ].map(mapControlsSpecToComponents);
+
   // @ts-ignore
-  const controlElements = controlsSpec.map(mapControlsSpecToComponents);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -155,7 +217,11 @@ export const ControlPanel = observer(({ store }) => {
         </div>
         <Divider />
         <ControlsExpansionPanel summary="Controls">
-          {controlElements}
+          {controlsSpec}
+        </ControlsExpansionPanel>
+        <ControlsExpansionPanel summary="Ascendant Edge Tabs">
+          {/* @ts-ignore */}
+          {ascendantEdgeTabsControl}
         </ControlsExpansionPanel>
       </Drawer>
     </div>
