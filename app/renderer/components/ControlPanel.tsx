@@ -1,6 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import startCase from 'lodash-es/startCase';
+import last from 'lodash-es/last';
+
 import get from 'lodash-es/get';
 import clsx from 'clsx';
 import {
@@ -35,41 +37,43 @@ export const ControlPanel = observer(({ store }) => {
   const controlsSpec = [{
     component: PanelSlider,
     valuePath: 'styleSpec.dieLineProps.strokeWidth',
-    props: {
-      label: 'Dieline Stroke',
-      min: 0,
-      max: 3,
-      step: 0.01,
-    },
+    label: 'Dieline Stroke',
+    min: 0,
+    max: 3,
+    step: 0.01,
   }, {
     component: PanelSelect,
     valuePath: 'pyramidNetSpec.pyramidGeometryId',
-    props: {
-      label: 'Polyhedron', options: polyhedronOptions,
-    },
+    label: 'Polyhedron',
+    options: polyhedronOptions,
   }, {
     component: PanelSlider,
-    valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabDepthToAscendantEdgeLength',
-    props: {
-      label: 'Tab Depth To Ascendant Edge Length', min: 0, max: 3, step: 0.01,
-    },
+    valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabDepthToTraversalLength',
+    min: 0.03,
+    max: 0.05,
+    step: 0.0001,
   }, {
     component: PanelSlider,
     valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabsCount',
-    props: {
-      label: 'Ascendant Tab Count', min: 2, max: 5, step: 1,
-    },
+    min: 2,
+    max: 5,
+    step: 1,
   }];
 
-  const controlElements = controlsSpec.map(({ props, component, valuePath }) => {
-    const storeProps = {
+  const mapControlsSpecToComponents = ({
+    component, valuePath, label, ...props
+  }) => {
+    const extraProps = {
       setter: (value) => { store.setValueAtPath(valuePath, value); },
       value: get(store, valuePath),
       key: valuePath,
+      label: label || startCase(last((valuePath.split('.')))),
     };
-    return React.createElement(component, { ...props, ...storeProps });
-  });
+    return React.createElement(component, { ...props, ...extraProps });
+  };
 
+  // @ts-ignore
+  const controlElements = controlsSpec.map(mapControlsSpecToComponents);
 
   const handleDrawerOpen = () => {
     setOpen(true);
