@@ -119,24 +119,19 @@ export function strokeDashPath(
 }
 
 export const ascendantEdgeConnectionTabs = (
-  start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec,
+  start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec, tabIntervalRatios,
 ):AscendantEdgeConnectionPaths => {
   const {
     tabDepthToTraversalLength,
     tabRoundingDistanceRatio,
     tabsCount,
     midpointDepthToTabDepth,
-    tabStartGapToTabDepth,
     holeReachToTabDepth,
-    holeWidthRatio,
     holeFlapTaperAngle,
     tabWideningAngle,
   } = tabSpec;
   const vector = end.subtract(start);
   const tabDepth = tabDepthToTraversalLength * vector.length;
-  const edgeDistance = vector.length;
-  const tabTileDistance = edgeDistance / tabsCount;
-  const tabWidth = holeWidthRatio * tabTileDistance;
   const femaleScoreLineIntervals = [[start]];
   const maleScoreLineIntervals = [];
   const commands = {
@@ -151,10 +146,8 @@ export const ascendantEdgeConnectionTabs = (
   };
   const ARBITRARY_LENGTH = 10;
   range(0, tabsCount).forEach((tabNum) => {
-    const tabStartSpace = tabStartGapToTabDepth * tabDepth;
-    const startHingeDistance = tabStartSpace + tabTileDistance * tabNum;
-    const tabBaseStart = hingedPlot(end, start, 0, startHingeDistance);
-    const tabBaseEnd = hingedPlot(end, start, 0, startHingeDistance + tabWidth);
+    const tabBaseStart = lineLerp(start, end, tabIntervalRatios[tabNum][0]);
+    const tabBaseEnd = lineLerp(start, end, tabIntervalRatios[tabNum][1]);
     const [tabEdgeStart, tabEdgeEnd] = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
     const midpointDepth = tabDepth * midpointDepthToTabDepth;
     const [tabMidIntersectorStart, tabMidIntersectorEnd] = parallelLinePointsAtDistance(

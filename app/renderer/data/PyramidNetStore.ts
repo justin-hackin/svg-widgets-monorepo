@@ -3,6 +3,7 @@ import { action, computed, observable } from 'mobx';
 import { Point, Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 import { subtract } from '@flatten-js/boolean-op';
+import range from 'lodash-es/range';
 import { PyramidNetSpec } from '../components/PyramidNet';
 import { polyhedra } from './polyhedra';
 import {
@@ -85,6 +86,21 @@ export class PyramidNetStore implements PyramidNetSpec {
     const p2 = Point.fromPolar([Math.PI - this.faceInteriorAngles[0], this.actualFaceEdgeLengths[0]]);
     const p3 = hingedPlot(p1, p2, this.faceInteriorAngles[0], this.actualFaceEdgeLengths[1]);
     return [p1, p2, p3];
+  }
+
+  @computed
+  get tabIntervalRatios() {
+    const {
+      tabsCount, tabStartGapToTabDepth, tabDepthToTraversalLength, holeWidthRatio,
+    } = this.ascendantEdgeTabsSpec;
+    const offsetRatio = tabDepthToTraversalLength * tabStartGapToTabDepth;
+    const intervalRatio = (1 - offsetRatio) / tabsCount;
+    const tabWidthRatio = intervalRatio * holeWidthRatio;
+    return range(tabsCount)
+      .map((index) => [
+        offsetRatio + index * intervalRatio,
+        offsetRatio + index * intervalRatio + tabWidthRatio,
+      ]);
   }
 
   @computed
