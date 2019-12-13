@@ -31,8 +31,8 @@ const validateRange = (rangeSeries) => {
 const getPositionInRangeSeries = (rangeSeries, number) => sortedIndex(flatten(rangeSeries), number);
 
 export const subtractRangeSet = (baseSet, subtractSet) => {
-  // validateRange(baseSet);
-  // validateRange(subtractSet);
+  validateRange(baseSet);
+  validateRange(subtractSet);
   if (subtractSet[0][0] >= last(baseSet)[1] || last(subtractSet)[1] <= baseSet[0][0]) {
     return baseSet;
   }

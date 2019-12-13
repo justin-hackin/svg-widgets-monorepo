@@ -12,6 +12,13 @@ import {
   CM_TO_PIXELS_RATIO, hingedPlot, PHI, triangleAnglesGivenSides,
 } from '../util/geom';
 import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
+import { convertMessageToMorseBooleanString } from './morse';
+
+const scoreMessage = convertMessageToMorseBooleanString('playful geometer is symmetrically excellent')
+  .reduce((acc, isLong) => {
+    acc.push(isLong ? PHI ** 2 : 1 / PHI, 1);
+    return acc;
+  }, []);
 
 export class PyramidNetStore implements PyramidNetSpec {
   @observable
@@ -63,8 +70,8 @@ export class PyramidNetStore implements PyramidNetSpec {
 
   @observable
   public interFaceScoreDashSpec = {
-    relativeStrokeDasharray: [PHI, 1, 1 / PHI, 1, PHI],
-    strokeDashLength: 10,
+    relativeStrokeDasharray: scoreMessage,
+    strokeDashLength: 300,
     strokeDashOffsetRatio: 0.75,
   };
 
