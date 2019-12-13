@@ -80,7 +80,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
       interFaceScoreDashSpec, baseScoreDashSpec,
       ascendantEdgeTabsSpec, baseEdgeTabSpec,
       // @ts-ignore
-      tabIntervalRatios, boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, textureImportWidth, borderInsetFaceHoleTransform, // eslint-disable-line
+      tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, textureImportWidth, borderInsetFaceHoleTransform, // eslint-disable-line
     },
   } = store;
 
@@ -140,7 +140,8 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
 
   // male tabs
   const ascendantTabs = ascendantEdgeConnectionTabs(
-    boundaryPoints[1], boundaryPoints[0], ascendantEdgeTabsSpec, baseScoreDashSpec, tabIntervalRatios,
+    boundaryPoints[1], boundaryPoints[0],
+    ascendantEdgeTabsSpec, interFaceScoreDashSpec, tabIntervalRatios, tabGapIntervalRatios,
   );
   const rotationMatrix = (new Matrix()).rotate(-faceCount * faceInteriorAngles[2]);
   ascendantTabs.male.cut.transformPoints(rotationMatrix);

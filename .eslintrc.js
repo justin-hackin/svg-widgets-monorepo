@@ -10,7 +10,8 @@ module.exports = {
     'react/prop-types': 0,
     'react/no-array-index': 0,
     'react/no-array-index-key': 0,
-    'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement']
+    'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
+    'no-continue': 0,
   },
   settings: {
     'import/extensions': [".js",".jsx",".ts",".tsx"],

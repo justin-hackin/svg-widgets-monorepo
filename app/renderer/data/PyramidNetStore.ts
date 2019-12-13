@@ -3,6 +3,8 @@ import { action, computed, observable } from 'mobx';
 import { Point, Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 import { subtract } from '@flatten-js/boolean-op';
+import chunk from 'lodash-es/chunk';
+import flatten from 'lodash-es/flatten';
 import range from 'lodash-es/range';
 import { PyramidNetSpec } from '../components/PyramidNet';
 import { polyhedra } from './polyhedra';
@@ -101,6 +103,11 @@ export class PyramidNetStore implements PyramidNetSpec {
         offsetRatio + index * intervalRatio,
         offsetRatio + index * intervalRatio + tabWidthRatio,
       ]);
+  }
+
+  @computed
+  get tabGapIntervalRatios() {
+    return chunk([0, ...flatten(this.tabIntervalRatios), 1], 2);
   }
 
   @computed

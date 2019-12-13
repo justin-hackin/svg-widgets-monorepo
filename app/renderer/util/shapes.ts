@@ -13,6 +13,7 @@ import {
   symmetricHingePlot,
   symmetricHingePlotByProjectionDistance, distanceBetweenPoints,
 } from './geom';
+import { subtractRangeSet } from '../data/range';
 
 interface RoundPoint {
   point: PointLike,
@@ -56,7 +57,8 @@ export interface StrokeDashPathSpec {
   strokeDashOffsetRatio: number,
 }
 
-export function strokeDashPath(
+
+function strokeDashPathRatios(
   start: PointLike, end: PointLike, dashSpec:StrokeDashPathSpec,
 ) {
   const {
@@ -86,7 +88,7 @@ export function strokeDashPath(
   }, { at: 0, lerps: [] }).lerps;
 
   const iterationsRequiredForCoverage = Math.ceil(vectorLength / strokeDashLength);
-  const lineStartEndPoints = range(iterationsRequiredForCoverage)
+  return range(iterationsRequiredForCoverage)
   // compute the start-end lerps relative to the start - end vector
     .reduce((acc, iterIndex) => {
       const lerpOffset = iterIndex * strokeDashLengthToVectorLength;
@@ -113,13 +115,19 @@ export function strokeDashPath(
       return acc;
     }, [])
   // visually this should not make difference but better for plotters that don't optimize
-    .sort(([start1], [start2]) => (start1 - start2))
-    .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp)));
-  return lineSeries(lineStartEndPoints);
+    .sort(([start1], [start2]) => (start1 - start2));
+}
+
+export function strokeDashPath(
+  start: PointLike, end: PointLike, dashSpec:StrokeDashPathSpec,
+) {
+  return lineSeries(strokeDashPathRatios(start, end, dashSpec)
+    .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp))));
 }
 
 export const ascendantEdgeConnectionTabs = (
-  start: PointLike, end: PointLike, tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec, tabIntervalRatios,
+  start: PointLike, end: PointLike,
+  tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec, tabIntervalRatios, tabGapIntervalRatios,
 ):AscendantEdgeConnectionPaths => {
   const {
     tabDepthToTraversalLength,
@@ -189,12 +197,15 @@ export const ascendantEdgeConnectionTabs = (
 
   commands.male.cut.line(end);
   last(femaleScoreLineIntervals).push(end);
+  const dashRatios = strokeDashPathRatios(start, end, scoreDashSpec);
+  const tabDashRatios = subtractRangeSet(dashRatios, tabIntervalRatios);
+  const tabGapDashRatios = subtractRangeSet(dashRatios, tabGapIntervalRatios);
 
-  for (const [femaleStart, femaleEnd] of femaleScoreLineIntervals) {
-    commands.female.score.concatPath(strokeDashPath(femaleStart, femaleEnd, scoreDashSpec));
+  for (const [femaleStart, femaleEnd] of tabDashRatios) {
+    commands.female.score.move(lineLerp(start, end, femaleStart)).line(lineLerp(start, end, femaleEnd));
   }
-  for (const [maleStart, maleEnd] of maleScoreLineIntervals) {
-    commands.male.score.concatPath(strokeDashPath(maleStart, maleEnd, scoreDashSpec));
+  for (const [maleStart, maleEnd] of tabGapDashRatios) {
+    commands.male.score.move(lineLerp(start, end, maleStart)).line(lineLerp(start, end, maleEnd));
   }
   return commands;
 };
