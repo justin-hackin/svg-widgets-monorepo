@@ -43,7 +43,7 @@ export interface PyramidGeometrySpec {
   faceCount: number
 }
 
-export const FaceBoundary = ({ store }:{store: StoreSpec}) => {
+export const FaceBoundary = observer(({ store }:{store: StoreSpec}) => {
   const {
     styleSpec: { designBoundaryProps },
     // @ts-ignore
@@ -52,7 +52,7 @@ export const FaceBoundary = ({ store }:{store: StoreSpec}) => {
 
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
   return (<path {...designBoundaryProps} d={borderOverlay.pathAttrs().d} />);
-};
+});
 
 export const FaceBoundarySVG = ({ store }:{store: StoreSpec}) => {
   const {

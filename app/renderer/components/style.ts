@@ -33,6 +33,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     margin: theme.spacing(1),
     minWidth: 120,
   },
+  colorPickerInputPaper: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
   heading: {
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightRegular,

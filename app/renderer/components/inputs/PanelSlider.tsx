@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { useStyles } from '../style';
 
 export const PanelSlider = ({
-  label, setter, value, ...rest
+  label, setter, value, valuePath, ...rest
 }) => {
   // @ts-ignore
   const classes = useStyles();
@@ -18,6 +18,7 @@ export const PanelSlider = ({
       </Typography>
       {/* @ts-ignore */}
       <Slider
+        name={valuePath}
         value={value}
         aria-labelledby={labelId}
         onChange={(e:any, val:number) => {

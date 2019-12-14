@@ -22,6 +22,7 @@ import { PanelSelect } from './inputs/PanelSelect';
 import { PanelSlider } from './inputs/PanelSlider';
 import { useStyles } from './style';
 import { ControlsExpansionPanel } from './ControlsExpansionPanel';
+import { PanelColorPicker } from './inputs/PanelColorPicker';
 
 const VERY_SMALL_NUMBER = 0.00000001;
 
@@ -42,6 +43,7 @@ export const ControlPanel = observer(({ store }) => {
     const extraProps = {
       setter: (value) => { store.setValueAtPath(valuePath, value); },
       value: get(store, valuePath),
+      valuePath,
       key: valuePath,
       label: label || startCase(last((valuePath.split('.')))),
     };
@@ -55,7 +57,21 @@ export const ControlPanel = observer(({ store }) => {
     min: 0,
     max: 3,
     step: 0.01,
-  }].map(mapControlsSpecToComponents);
+  }, {
+    component: PanelColorPicker,
+    label: 'Cut Stroke Color',
+    valuePath: 'styleSpec.cutLineProps.stroke',
+  }, {
+    component: PanelColorPicker,
+    label: 'Score Stroke Color',
+    valuePath: 'styleSpec.scoreLineProps.stroke',
+  }, {
+    component: PanelColorPicker,
+    label: 'Design Boundary Fill',
+    valuePath: 'styleSpec.designBoundaryProps.fill',
+  }]
+  // @ts-ignore
+    .map(mapControlsSpecToComponents);
 
   const topLevelControls = [{
     component: PanelSelect,
