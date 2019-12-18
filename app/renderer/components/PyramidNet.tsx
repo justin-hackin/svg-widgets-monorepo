@@ -29,7 +29,7 @@ export interface StoreSpec {
 
 export interface PyramidNetSpec {
   pyramidGeometryId: string,
-  pyramidGeometry: PyramidGeometrySpec,
+  pyramidGeometry?: PyramidGeometrySpec,
   interFaceScoreDashSpec: StrokeDashPathSpec,
   baseScoreDashSpec: StrokeDashPathSpec,
   ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,

@@ -6,13 +6,13 @@ import { subtract } from '@flatten-js/boolean-op';
 import chunk from 'lodash-es/chunk';
 import flatten from 'lodash-es/flatten';
 import range from 'lodash-es/range';
-import { PyramidNetSpec } from '../components/PyramidNet';
 import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, hingedPlot, PHI, triangleAnglesGivenSides,
 } from '../util/geom';
-import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec } from '../util/shapes';
+import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec } from '../util/shapes';
 import { convertMessageToMorseBooleanString } from './morse';
+import { PyramidNetSpec } from '../components/PyramidNet';
 
 const scoreMessage = convertMessageToMorseBooleanString('playful geometer is symmetrically excellent')
   .reduce((acc, isLong) => {
@@ -20,9 +20,46 @@ const scoreMessage = convertMessageToMorseBooleanString('playful geometer is sym
     return acc;
   }, []);
 
-export class PyramidNetStore implements PyramidNetSpec {
+
+const defaultNet:PyramidNetSpec = {
+  pyramidGeometryId: 'icosphere',
+  ascendantEdgeTabsSpec: {
+    flapRoundingDistanceRatio: 1,
+    holeFlapTaperAngle: Math.PI / 10,
+    holeReachToTabDepth: 0.1,
+    holeWidthRatio: 0.4,
+    midpointDepthToTabDepth: 0.6,
+    tabDepthToTraversalLength: 0.04810606060599847,
+    tabRoundingDistanceRatio: 0.75,
+    tabsCount: 3,
+    tabStartGapToTabDepth: 0.5,
+    tabWideningAngle: Math.PI / 6,
+  },
+  baseEdgeTabSpec: {
+    finDepthToTabDepth: 1.1,
+    finTipDepthToFinDepth: 1.1,
+    holeBreadthToHalfWidth: 0.5,
+    holeDepthToTabDepth: 0.5,
+    holeTaper: Math.PI / 4.5,
+    roundingDistanceRatio: 1.0,
+    tabDepthToAscendantEdgeLength: 1.5,
+  },
+  baseScoreDashSpec: {
+    relativeStrokeDasharray: [2, 1],
+    strokeDashLength: 3,
+    strokeDashOffsetRatio: 0,
+  },
+  interFaceScoreDashSpec: {
+    relativeStrokeDasharray: scoreMessage,
+    strokeDashLength: 300,
+    strokeDashOffsetRatio: 0.75,
+  },
+  shapeHeightInCm: 40,
+};
+
+export class PyramidNetStore {
   @observable
-  public pyramidGeometryId = 'icosphere';
+  public pyramidGeometryId;
 
   @action
   setPyramidGeometryId(id) {
@@ -37,52 +74,29 @@ export class PyramidNetStore implements PyramidNetSpec {
   }
 
   @observable
-  public ascendantEdgeTabsSpec: AscendantEdgeTabsSpec = {
-    flapRoundingDistanceRatio: 1,
-    holeFlapTaperAngle: Math.PI / 10,
-    holeReachToTabDepth: 0.1,
-    holeWidthRatio: 0.4,
-    midpointDepthToTabDepth: 0.6,
-    tabDepthToTraversalLength: 0.04810606060599847,
-    tabRoundingDistanceRatio: 0.75,
-    tabsCount: 3,
-    tabStartGapToTabDepth: 0.5,
-    tabWideningAngle: Math.PI / 6,
-  };
+  public ascendantEdgeTabsSpec: AscendantEdgeTabsSpec;
 
   @observable
-  public baseEdgeTabSpec: BaseEdgeConnectionTabSpec = {
-    finDepthToTabDepth: 1.1,
-    finTipDepthToFinDepth: 1.1,
-    holeBreadthToHalfWidth: 0.5,
-    holeDepthToTabDepth: 0.5,
-    holeTaper: Math.PI / 4.5,
-    roundingDistanceRatio: 1.0,
-    tabDepthToAscendantEdgeLength: 1.5,
-  };
+  public baseEdgeTabSpec: BaseEdgeConnectionTabSpec;
 
   @observable
-  public baseScoreDashSpec = {
-    relativeStrokeDasharray: [2, 1],
-    strokeDashLength: 3,
-    strokeDashOffsetRatio: 0,
-  };
+  public baseScoreDashSpec: StrokeDashPathSpec;
 
   @observable
-  public interFaceScoreDashSpec = {
-    relativeStrokeDasharray: scoreMessage,
-    strokeDashLength: 300,
-    strokeDashOffsetRatio: 0.75,
-  };
+  public interFaceScoreDashSpec: StrokeDashPathSpec;
 
   @observable
-  public shapeHeightInCm: number = 40;
+  public shapeHeightInCm: number;
 
   @observable
-  public activeCutHolePatternD: string = '';
+  public activeCutHolePatternD: string;
 
   @observable
-  public textureImportWidth: number = 0;
+  public textureImportWidth: number;
+
+  constructor(data = defaultNet) {
+    this.loadSpec(data);
+  }
 
   @computed
   get faceInteriorAngles(): number[] {
@@ -180,7 +194,7 @@ export class PyramidNetStore implements PyramidNetSpec {
     return JSON.stringify(this, null, 2);
   }
 
-  loadSpec(specData) {
+  loadSpec(specData: PyramidNetSpec) {
     Object.assign(this, specData);
   }
 }

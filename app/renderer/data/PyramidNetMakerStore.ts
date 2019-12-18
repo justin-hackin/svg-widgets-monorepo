@@ -5,7 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 // @ts-ignore
 import {
-  FaceBoundarySVG, PyramidNet, StoreSpec, StyleSpec,
+  FaceBoundarySVG, PyramidNet, PyramidNetSpec, StoreSpec, StyleSpec,
 } from '../components/PyramidNet';
 import { CM_TO_PIXELS_RATIO } from '../util/geom';
 import { polyhedra } from './polyhedra';
@@ -14,7 +14,7 @@ import { PyramidNetStore } from './PyramidNetStore';
 
 export class PyramidNetMakerStore implements StoreSpec {
   @observable
-  public pyramidNetSpec = new PyramidNetStore();
+  public pyramidNetSpec:PyramidNetSpec = new PyramidNetStore();
 
   @observable
   public styleSpec:StyleSpec = {
