@@ -50,9 +50,14 @@ export function lineSeries(startEndArray) {
   });
   return path;
 }
+interface StrokeDashPathPatternSpec {
+  relativeStrokeDasharray: number[],
+  label: string,
+}
 
 export interface StrokeDashPathSpec {
-  relativeStrokeDasharray: number[],
+  strokeDashPathPatternId: string,
+  strokeDashPathPattern?:StrokeDashPathPatternSpec,
   strokeDashLength: number,
   strokeDashOffsetRatio: number,
 }
@@ -62,7 +67,7 @@ function strokeDashPathRatios(
   start: PointLike, end: PointLike, dashSpec:StrokeDashPathSpec,
 ) {
   const {
-    relativeStrokeDasharray,
+    strokeDashPathPattern:{relativeStrokeDasharray},
     strokeDashLength,
     strokeDashOffsetRatio,
   } = dashSpec;

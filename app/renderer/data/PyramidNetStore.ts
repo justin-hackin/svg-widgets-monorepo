@@ -8,18 +8,11 @@ import flatten from 'lodash-es/flatten';
 import range from 'lodash-es/range';
 import { polyhedra } from './polyhedra';
 import {
-  CM_TO_PIXELS_RATIO, hingedPlot, PHI, triangleAnglesGivenSides,
+  CM_TO_PIXELS_RATIO, hingedPlot, triangleAnglesGivenSides,
 } from '../util/geom';
 import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec } from '../util/shapes';
-import { convertMessageToMorseBooleanString } from './morse';
 import { PyramidNetSpec } from '../components/PyramidNet';
-
-const scoreMessage = convertMessageToMorseBooleanString('playful geometer is symmetrically excellent')
-  .reduce((acc, isLong) => {
-    acc.push(isLong ? PHI ** 2 : 1 / PHI, 1);
-    return acc;
-  }, []);
-
+import { DashPatternStore } from './DashPatternStore';
 
 const defaultNet:PyramidNetSpec = {
   pyramidGeometryId: 'icosphere',
@@ -45,12 +38,12 @@ const defaultNet:PyramidNetSpec = {
     tabDepthToAscendantEdgeLength: 1.5,
   },
   baseScoreDashSpec: {
-    relativeStrokeDasharray: [2, 1],
+    strokeDashPathPatternId: 'base',
     strokeDashLength: 3,
     strokeDashOffsetRatio: 0,
   },
   interFaceScoreDashSpec: {
-    relativeStrokeDasharray: scoreMessage,
+    strokeDashPathPatternId: 'interface',
     strokeDashLength: 300,
     strokeDashOffsetRatio: 0.75,
   },
@@ -195,6 +188,17 @@ export class PyramidNetStore {
   }
 
   loadSpec(specData: PyramidNetSpec) {
-    Object.assign(this, specData);
+    const { baseScoreDashSpec, interFaceScoreDashSpec, ...rest } = specData;
+    Object.assign(this, rest);
+    this.baseScoreDashSpec = new DashPatternStore(
+      baseScoreDashSpec.strokeDashPathPatternId,
+      baseScoreDashSpec.strokeDashLength,
+      baseScoreDashSpec.strokeDashOffsetRatio,
+    );
+    this.interFaceScoreDashSpec = new DashPatternStore(
+      interFaceScoreDashSpec.strokeDashPathPatternId,
+      interFaceScoreDashSpec.strokeDashLength,
+      interFaceScoreDashSpec.strokeDashOffsetRatio,
+    );
   }
 }
