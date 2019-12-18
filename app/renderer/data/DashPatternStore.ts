@@ -1,4 +1,4 @@
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import { StrokeDashPathSpec } from '../util/shapes';
 import { dashPatterns } from './dash-patterns';
 
@@ -7,10 +7,13 @@ interface DashPatternDefs {
 }
 
 export class DashPatternStore implements StrokeDashPathSpec {
+  @observable
   public strokeDashPathPatternId: string;
 
+  @observable
   public strokeDashLength: number;
 
+  @observable
   public strokeDashOffsetRatio: number;
 
   constructor(strokeDashPathPatternId: string, strokeDashLength: number, strokeDashOffsetRatio: number) {

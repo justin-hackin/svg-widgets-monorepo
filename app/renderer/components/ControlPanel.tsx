@@ -23,6 +23,7 @@ import { PanelSlider } from './inputs/PanelSlider';
 import { useStyles } from './style';
 import { ControlsExpansionPanel } from './ControlsExpansionPanel';
 import { PanelColorPicker } from './inputs/PanelColorPicker';
+import { dashPatterns } from '../data/dash-patterns';
 
 const VERY_SMALL_NUMBER = 0.00000001;
 
@@ -49,6 +50,8 @@ export const ControlPanel = observer(({ store }) => {
     };
     return React.createElement(component, { ...props, ...extraProps });
   };
+  const ratioSliderProps = { min: 0, max: 1, step: VERY_SMALL_NUMBER };
+  const strokeLengthProps = { min: 1, max: 3000, step: VERY_SMALL_NUMBER };
 
   const styleControls = [{
     component: PanelSlider,
@@ -72,6 +75,40 @@ export const ControlPanel = observer(({ store }) => {
   }]
   // @ts-ignore
     .map(mapControlsSpecToComponents);
+  const dashPatternOptions = Object.entries(dashPatterns).map(([key, { label }]) => ({ value: key, label }));
+  const strokeControls = [{
+    component: PanelSelect,
+    valuePath: 'pyramidNetSpec.interFaceScoreDashSpec.strokeDashPathPatternId',
+    label: 'Inter-face Stroke Pattern',
+    options: dashPatternOptions,
+  }, {
+    component: PanelSlider,
+    valuePath: 'pyramidNetSpec.interFaceScoreDashSpec.strokeDashLength',
+    label: 'Inter-face Stroke Dash Length',
+    ...strokeLengthProps,
+  }, {
+    component: PanelSlider,
+    valuePath: 'pyramidNetSpec.interFaceScoreDashSpec.strokeDashOffsetRatio',
+    label: 'Inter-face Stroke Dash Offset Ratio',
+    ...ratioSliderProps,
+  }, {
+    component: PanelSelect,
+    valuePath: 'pyramidNetSpec.baseScoreDashSpec.strokeDashPathPatternId',
+    label: 'Base Stroke Pattern',
+    options: dashPatternOptions,
+  }, {
+    component: PanelSlider,
+    valuePath: 'pyramidNetSpec.baseScoreDashSpec.strokeDashLength',
+    label: 'Base Stroke Dash Length',
+    ...strokeLengthProps,
+  }, {
+    component: PanelSlider,
+    valuePath: 'pyramidNetSpec.baseScoreDashSpec.strokeDashOffsetRatio',
+    label: 'Base Stroke Dash Offset Ratio',
+    ...ratioSliderProps,
+  }]
+  // @ts-ignore
+    .map(mapControlsSpecToComponents);
 
   const topLevelControls = [{
     component: PanelSelect,
@@ -88,7 +125,6 @@ export const ControlPanel = observer(({ store }) => {
   // @ts-ignore
     .map(mapControlsSpecToComponents);
 
-  const ratioSliderProps = { min: 0, max: 1, step: 0.00001 };
 
   const baseEdgeTabControl = [
     {
@@ -272,6 +308,10 @@ export const ControlPanel = observer(({ store }) => {
         </ControlsExpansionPanel>
 
         {topLevelControls}
+
+        <ControlsExpansionPanel summary="Stroke">
+          {strokeControls}
+        </ControlsExpansionPanel>
 
         <ControlsExpansionPanel summary="Ascendant Edge Tabs">
           {ascendantEdgeTabsControl}
