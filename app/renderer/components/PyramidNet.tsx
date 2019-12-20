@@ -40,7 +40,8 @@ export interface PyramidNetSpec {
 export interface PyramidGeometrySpec {
   relativeFaceEdgeLengths: [number, number, number],
   firstEdgeLengthToShapeHeight: number,
-  faceCount: number
+  faceCount: number,
+  copiesNeeded: number,
 }
 
 export const FaceBoundary = observer(({ store }:{store: StoreSpec}) => {

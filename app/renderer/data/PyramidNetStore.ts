@@ -15,7 +15,7 @@ import { PyramidNetSpec } from '../components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
 
 const defaultNet:PyramidNetSpec = {
-  pyramidGeometryId: 'icosphere',
+  pyramidGeometryId: 'great-stellated-dodecahedron',
   ascendantEdgeTabsSpec: {
     flapRoundingDistanceRatio: 1,
     holeFlapTaperAngle: Math.PI / 10,
