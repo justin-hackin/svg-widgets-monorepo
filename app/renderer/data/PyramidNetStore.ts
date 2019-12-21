@@ -44,7 +44,7 @@ const defaultNet:PyramidNetSpec = {
   },
   interFaceScoreDashSpec: {
     strokeDashPathPatternId: 'interface',
-    strokeDashLength: 300,
+    strokeDashLength: 100,
     strokeDashOffsetRatio: 0.75,
   },
   shapeHeightInCm: 40,
@@ -127,10 +127,11 @@ export class PyramidNetStore {
   @computed
   get actualFaceEdgeLengths() {
     const {
-      pyramidGeometry: { relativeFaceEdgeLengths, firstEdgeLengthToShapeHeight }, shapeHeightInCm,
+      pyramidGeometry: { relativeFaceEdgeLengths, diameter }, shapeHeightInCm,
     } = this;
+    const baseEdgeLengthToShapeHeight = diameter / relativeFaceEdgeLengths[1];
     const heightInPixels = CM_TO_PIXELS_RATIO * shapeHeightInCm;
-    const desiredFirstLength = heightInPixels / firstEdgeLengthToShapeHeight;
+    const desiredFirstLength = heightInPixels / baseEdgeLengthToShapeHeight;
     const faceLengthAdjustRatio = desiredFirstLength / relativeFaceEdgeLengths[0];
     return relativeFaceEdgeLengths.map((len) => len * faceLengthAdjustRatio);
   }

@@ -39,7 +39,7 @@ export interface PyramidNetSpec {
 
 export interface PyramidGeometrySpec {
   relativeFaceEdgeLengths: [number, number, number],
-  firstEdgeLengthToShapeHeight: number,
+  diameter: number,
   faceCount: number,
   copiesNeeded: number,
 }
