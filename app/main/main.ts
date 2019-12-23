@@ -19,8 +19,8 @@ const jsonFilters = [{
   extensions: ['json'],
 }];
 
-ipcMain.handle('save-svg', (e, fileContent, message) => dialog.showSaveDialog({
-  message,
+ipcMain.handle('save-svg', (e, fileContent, options) => dialog.showSaveDialog({
+  ...options,
   filters: svgFilters,
 }).then(({ canceled, filePath }) => {
   if (canceled) { return null; }

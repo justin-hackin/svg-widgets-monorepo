@@ -280,7 +280,10 @@ export const ControlPanel = observer(({ store }) => {
             aria-label="save"
             onClick={() => {
               // @ts-ignore
-              ipcRenderer.invoke('save-svg', store.renderFaceBoundaryToString(), 'Save face template');
+              ipcRenderer.invoke('save-svg', store.renderFaceBoundaryToString(), {
+                message: 'Save face template',
+                defaultPath: `${store.pyramidNetSpec.pyramidGeometryId}__template.svg`,
+              });
             }}
           >
             <ArchiveIcon />
