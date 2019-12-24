@@ -1,6 +1,5 @@
 // @ts-ignore
-import { Line, Point, Polygon } from '@flatten-js/core';
-import { subtract } from '@flatten-js/boolean-op';
+import { Line, Point } from '@flatten-js/core';
 
 import { circularSlice } from './data';
 

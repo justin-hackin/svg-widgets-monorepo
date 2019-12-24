@@ -162,9 +162,8 @@ export class PyramidNetStore {
 
   @computed
   get borderInsetFaceHoleTransform() {
-    // borderPolygon ymin is 0
     const textureDifferenceScale = this.borderPolygon.box.width / this.textureImportWidth;
-    return `translate(0, ${this.insetPolygon.box.ymin}) scale(${
+    return `translate(${this.insetPolygon.vertices[0].x}, ${this.insetPolygon.vertices[0].y}) scale(${
       (textureDifferenceScale * this.insetPolygon.box.width) / this.borderPolygon.box.width
     })`;
   }
