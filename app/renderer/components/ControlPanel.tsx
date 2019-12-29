@@ -48,7 +48,7 @@ export const ControlPanel = observer(({ store }) => {
       key: valuePath,
       label: label || startCase(last((valuePath.split('.')))),
     };
-    return React.createElement(component, { ...props, ...extraProps });
+    return React.createElement(component, { ...extraProps, ...props });
   };
   const ratioSliderProps = { min: 0, max: 1, step: VERY_SMALL_NUMBER };
   const strokeLengthProps = { min: 1, max: 3000, step: VERY_SMALL_NUMBER };
@@ -113,6 +113,10 @@ export const ControlPanel = observer(({ store }) => {
   const topLevelControls = [{
     component: PanelSelect,
     valuePath: 'pyramidNetSpec.pyramidGeometryId',
+    setter: (value) => {
+      store.pyramidNetSpec.clearFaceHolePattern();
+      store.setValueAtPath('pyramidNetSpec.pyramidGeometryId', value);
+    },
     label: 'Polyhedron',
     options: polyhedronOptions,
   }, {
