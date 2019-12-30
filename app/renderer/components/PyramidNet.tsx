@@ -57,9 +57,8 @@ export const FaceBoundary = observer(({ store }:{store: StoreSpec}) => {
 
 export const FaceBoundarySVG = ({ store }:{store: StoreSpec}) => {
   const {
-    styleSpec: { designBoundaryProps },
     // @ts-ignore
-    pyramidNetSpec: { borderOverlay },
+    pyramidNetSpec: { borderPolygon, borderOverlay },
   } = store;
   const {
     xmin, xmax, ymin, ymax,
@@ -68,7 +67,7 @@ export const FaceBoundarySVG = ({ store }:{store: StoreSpec}) => {
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
   return (
     <svg viewBox={`${xmin} ${ymin} ${xmax - xmin} ${ymax - ymin}`}>
-      <path {...designBoundaryProps} d={borderOverlay.pathAttrs().d} />
+      <path fill="#FFD900" stroke="#000" d={borderPolygon.pathAttrs().d} />
     </svg>
   );
 };
