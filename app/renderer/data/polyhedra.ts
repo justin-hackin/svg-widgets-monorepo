@@ -79,6 +79,12 @@ export const polyhedra:PolyhedraDefs = {
     faceCount: 4,
     copiesNeeded: 6,
   },
+  'small-icosacronic-hexecontahedron': {
+    relativeFaceEdgeLengths: [5.42583, 7.0255, 9.11151],
+    faceCount: 6,
+    diameter: 29.872,
+    copiesNeeded: 20,
+  },
   rhombicosacron: {
     relativeFaceEdgeLengths: [6.79529, 7.14265, 10.6476],
     diameter: 34.7693,
@@ -95,12 +101,6 @@ export const polyhedra:PolyhedraDefs = {
     relativeFaceEdgeLengths: [17.5295, 9.29021, 23.3727],
     faceCount: 6,
     diameter: 65.5024,
-    copiesNeeded: 20,
-  },
-  'small-icosacronic-hexecontahedron': {
-    relativeFaceEdgeLengths: [5.42583, 7.0255, 9.11151],
-    faceCount: 6,
-    diameter: 29.872,
     copiesNeeded: 20,
   },
   tetrakishexahedron: {
