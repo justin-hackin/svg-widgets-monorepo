@@ -103,12 +103,13 @@ export const polyhedra:PolyhedraDefs = {
     diameter: 65.5024,
     copiesNeeded: 20,
   },
-  tetrakishexahedron: {
-    relativeFaceEdgeLengths: [13.3605, 17.8139, 13.3605],
-    faceCount: 4,
-    diameter: 30.8546,
-    copiesNeeded: 6,
-  },
+  // boxy and boring ...
+  // tetrakishexahedron: {
+  //   relativeFaceEdgeLengths: [13.3605, 17.8139, 13.3605],
+  //   faceCount: 4,
+  //   diameter: 30.8546,
+  //   copiesNeeded: 6,
+  // },
   triakisoctahedron: {
     relativeFaceEdgeLengths: [14.9287, 25.4848, 14.9287],
     diameter: 36.041,
