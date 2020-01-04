@@ -11,10 +11,10 @@
     "electron:build": "build --x64 --publish=never",
     "parcel:watch": "run-p -r main:watch renderer:watch",
     "main:watch": "parcel watch app/main/main.ts --out-dir app/main/.parcel --out-file main --target electron",
-    "renderer:watch": "parcel app/renderer/index.html --port 1124 --out-dir app/renderer/.parcel/development",
+    "renderer:watch": "parcel app/renderer/die-line-viewer/index.html --port 1124 --out-dir app/renderer/.parcel/development",
     "parcel:build": "run-s main:build renderer:build",
     "main:build": "parcel build app/main/main.ts --out-dir app/main/.parcel --out-file main --target electron",
-    "renderer:build": "parcel build app/renderer/index.html --public-url ./ --out-dir app/renderer/.parcel/production",
+    "renderer:build": "parcel build app/renderer/die-line-viewer/index.html --public-url ./ --out-dir app/renderer/.parcel/production",
     "lint": "eslint app/**/*.ts{,x}"
   },
   "build": {
