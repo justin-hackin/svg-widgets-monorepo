@@ -6,35 +6,57 @@ export class MoveableTexture extends Component {
   constructor() {
     super();
     this.state = {
-      scaleX: 1, scaleY: 1, translateX: 100, translateY: 100, rotate: 0,
+      transform: {
+        scaleX: 1, scaleY: 1, translateX: 100, translateY: 100, rotate: 0,
+      },
     };
+    this.textureRef = React.createRef();
+    this.moveableRef = React.createRef();
+    this.setTransform = this.setTransform.bind(this);
   }
 
   async componentDidMount(): void {
-    const Net = await import('../../../common/images/3-uniform_54.svg');
-    this.textureRef = React.createRef();
-    this.setState({ Net: Net.default });
+    const fileList = await ipcRenderer.invoke('list-texture-files');
+    this.setState({ fileList, selectedFileIndex: 0 });
+  }
+
+  setTransform(transform) {
+    this.setState((state) => ({ transform: { ...state.transform, ...transform } }));
   }
 
   render() {
-    const { state: { Net, ...state }, setState } = this;
-    if (!Net || !this.textureRef) { return null; }
+    const { state: { transform, fileList, selectedFileIndex } } = this;
+    if (!fileList) { return null; }
+    const fileLink = fileList[selectedFileIndex];
     const transformStr = `translate(${
-      state.translateX}, ${state.translateY}) rotate(${state.rotate}) scale(${
-      state.scaleX}, ${state.scaleY}) `;
+      transform.translateX}, ${transform.translateY}) rotate(${transform.rotate}) scale(${
+      transform.scaleX}, ${transform.scaleY}) `;
     return (
       <>
         <div>
-          {JSON.stringify(state, null, 2)}
+          {JSON.stringify(transform, null, 2)}
         </div>
-        <MoveableControls {...{ setTransform: setState.bind(this), transform: state, textureRef: this.textureRef }} />
-        <Net ref={this.textureRef} transform={transformStr} />
+        <MoveableControls
+          ref={this.moveableRef}
+          {...{ setTransform: this.setTransform, transform, textureRef: this.textureRef }}
+        />
+        <svg width="100%" height="100%" style={{ height: '-webkit-fill-available', width: '-webkit-fill-available' }}>
+          <image
+            onLoad={() => {
+              this.moveableRef.current.updateRect();
+            }}
+            ref={this.textureRef}
+            transform={transformStr}
+            style={{ transformOrigin: 'center center' }}
+            xlinkHref={`./images/${fileLink}`}
+          />
+        </svg>
       </>
     );
   }
 }
 
-const MoveableControls = ({ textureRef, setTransform, transform }) => {
+const MoveableControls = React.forwardRef(({ textureRef, setTransform, transform }, ref) => {
   const [renderMovable, settRenderMovable] = React.useState(false);
 
   React.useEffect(() => {
@@ -46,6 +68,7 @@ const MoveableControls = ({ textureRef, setTransform, transform }) => {
   return (
     <>
       <Moveable
+        ref={ref}
         target={textureRef.current}
         scalable
         rotatable
@@ -65,4 +88,4 @@ const MoveableControls = ({ textureRef, setTransform, transform }) => {
       />
     </>
   );
-};
+});

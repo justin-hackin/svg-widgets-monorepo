@@ -4,6 +4,7 @@ const {
   app, BrowserWindow, ipcMain, dialog,
 } = require('electron');
 const { format } = require('url');
+const path = require('path');
 const isDev = require('electron-is-dev');
 const fsPromises = require('fs').promises;
 const { resolve } = require('app-root-path');
@@ -43,7 +44,8 @@ ipcMain.handle('save-net-with-data', (e, svgContent, jsonContent, message) => di
     fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, jsonContent)]);
 }));
 
-ipcMain.handle('list-texture-files', () => fsPromises.readdir('../common/images'));
+ipcMain.handle('list-texture-files', () => fsPromises.readdir('app/static/images')
+  .then((filesList) => filesList.filter((fileName) => path.extname(fileName) === '.svg')));
 
 ipcMain.handle('load-net-spec', () => resolveStringDataFromDialog(
   { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },

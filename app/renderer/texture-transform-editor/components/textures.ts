@@ -10,7 +10,7 @@ export default new Promise(async ($export) => {
   const textures = {};
   for (const tileItem of tileItems) {
     // eslint-disable-next-line no-await-in-loop
-    textures[tileItem] = await import(`../../../common/images`);
+    textures[tileItem] = await import(`../../../static`);
   }
 
   $export(textures);
