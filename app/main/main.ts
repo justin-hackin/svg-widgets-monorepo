@@ -43,6 +43,8 @@ ipcMain.handle('save-net-with-data', (e, svgContent, jsonContent, message) => di
     fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, jsonContent)]);
 }));
 
+ipcMain.handle('list-texture-files', () => fsPromises.readdir('../common/images'));
+
 ipcMain.handle('load-net-spec', () => resolveStringDataFromDialog(
   { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },
 ).then((jsonString) => JSON.parse(jsonString)));
@@ -65,6 +67,8 @@ app.on('ready', async () => {
   });
 
   mainWindow.once('ready-to-show', () => {
+    // @ts-ignore
+    // mainWindow.toggleDevTools();
     mainWindow.show();
   });
 
