@@ -1,5 +1,6 @@
 // @ts-ignore
 import { Line, Point } from '@flatten-js/core';
+import isNaN from 'lodash-es/isNaN';
 
 import { circularSlice } from './data';
 
@@ -102,3 +103,4 @@ export function symmetricHingePlotIntersection(p1, p2, theta, length) {
 }
 
 export const distanceBetweenPoints = (pt1, pt2) => pt1.subtract(pt2).length;
+export const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);

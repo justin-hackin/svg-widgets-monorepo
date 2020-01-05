@@ -1,23 +1,21 @@
 // import { useQueryParam, StringParam, JsonParam } from 'use-query-params';
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
-import isNaN from 'lodash-es/isNaN';
-import ReactResizeDetector from 'react-resize-detector';
-import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
+import { INITIAL_VALUE, ReactSVGPanZoom, TOOL_PAN } from 'react-svg-pan-zoom';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
 
 import darkTheme from '../data/material-ui-dark-theme.json';
 import { store } from '../data/PyramidNetMakerStore';
 import { PyramidNet } from './PyramidNet';
-
 // eslint-disable-next-line import/no-cycle
 import { ControlPanel } from './ControlPanel';
 import { GridPattern } from './GridPattern';
+import { ResizeDetector } from './ResizeDetector';
+
 
 // @ts-ignore
 const theme = createMuiTheme(darkTheme);
-const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
 export const SVGViewer = observer(() => {
   // TODO: make this work
   // const [value = INITIAL_VALUE, setValue] = useQueryParam('ReactSVGPanZoomValue', JsonParam);
@@ -28,8 +26,8 @@ export const SVGViewer = observer(() => {
   const patternId = 'grid-pattern';
   return (
     <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
-      <ReactResizeDetector handleWidth handleHeight>
-        {({ width, height }) => ((!isValidNumber(width) || !isValidNumber(height)) ? <div /> : (
+      <ResizeDetector>
+        {({ width, height }) => (
           <ReactSVGPanZoom
             value={viewValue}
             width={width}
@@ -50,8 +48,8 @@ export const SVGViewer = observer(() => {
               </g>
             </svg>
           </ReactSVGPanZoom>
-        ))}
-      </ReactResizeDetector>
+        )}
+      </ResizeDetector>
       <ThemeProvider theme={theme}>
         <ControlPanel store={store} />
       </ThemeProvider>

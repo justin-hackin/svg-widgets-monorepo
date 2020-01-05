@@ -18,7 +18,7 @@ class MoveableTextureLOC extends Component {
     this.state = {
       keepRatio: true,
       transform: {
-        scaleX: 1, scaleY: 1, translateX: 100, translateY: 100, rotate: 0,
+        scaleX: 0.5, scaleY: 0.5, translateX: 0, translateY: 0, rotate: 0,
       },
     };
     this.textureRef = React.createRef();
@@ -50,6 +50,7 @@ class MoveableTextureLOC extends Component {
     const {
       state: {
         transform, fileList, selectedFileIndex, keepRatio,
+        imageDimensions: { height: imageHeight = 0, width: imageWidth = 0 } = {},
       },
     } = this;
     if (!fileList) { return null; }
@@ -87,14 +88,25 @@ class MoveableTextureLOC extends Component {
             ref={this.moveableRef}
             {...{ setTransform: this.setTransform, transform, textureRef: this.textureRef }}
           />
-          <svg width="100%" height="100%" style={{ height: '-webkit-fill-available', width: '-webkit-fill-available' }}>
+          <svg
+            width="100%"
+            height="100%"
+            style={{ height: '-webkit-fill-available', width: '-webkit-fill-available', transformOrigin: '50% 50%' }}
+          >
             <image
               onLoad={() => {
-                this.moveableRef.current.updateRect();
+                // eslint-disable-next-line no-shadow
+                const { height, width } = this.textureRef.current.getBBox();
+                this.setState({ imageDimensions: { height, width } });
+                // the movable attempts to calculate the bounds before the image has loaded, hence below
+                // deferred by a tick so that style changes from above take effect beforehand
+                setTimeout(() => {
+                  this.moveableRef.current.updateRect();
+                });
               }}
               ref={this.textureRef}
               transform={transformStr}
-              style={{ transformOrigin: 'center center' }}
+              style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
               xlinkHref={`./images/${fileLink}`}
             />
           </svg>
