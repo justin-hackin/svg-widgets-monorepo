@@ -1,11 +1,22 @@
 // @ts-nocheck
 import React, { Component } from 'react';
 import Moveable from 'react-moveable';
+import { ThemeProvider } from '@material-ui/styles';
+import { createMuiTheme, withStyles } from '@material-ui/core/styles';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
-export class MoveableTexture extends Component {
+import { Box } from '@material-ui/core';
+import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
+import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
+
+export const theme = createMuiTheme(darkTheme);
+
+class MoveableTextureLOC extends Component {
   constructor() {
     super();
     this.state = {
+      keepRatio: true,
       transform: {
         scaleX: 1, scaleY: 1, translateX: 100, translateY: 100, rotate: 0,
       },
@@ -13,6 +24,8 @@ export class MoveableTexture extends Component {
     this.textureRef = React.createRef();
     this.moveableRef = React.createRef();
     this.setTransform = this.setTransform.bind(this);
+    this.setFileIndex = this.setFileIndex.bind(this);
+    this.toggleKeepRatio = this.toggleKeepRatio.bind(this);
   }
 
   async componentDidMount(): void {
@@ -24,39 +37,85 @@ export class MoveableTexture extends Component {
     this.setState((state) => ({ transform: { ...state.transform, ...transform } }));
   }
 
+  setFileIndex(selectedFileIndex) {
+    this.setState({ selectedFileIndex: parseInt(selectedFileIndex, 10) });
+  }
+
+  toggleKeepRatio() {
+    this.setState((state) => ({ keepRatio: !state.keepRatio }));
+  }
+
   render() {
-    const { state: { transform, fileList, selectedFileIndex } } = this;
+    const { classes } = this.props;
+    const {
+      state: {
+        transform, fileList, selectedFileIndex, keepRatio,
+      },
+    } = this;
     if (!fileList) { return null; }
     const fileLink = fileList[selectedFileIndex];
     const transformStr = `translate(${
       transform.translateX}, ${transform.translateY}) rotate(${transform.rotate}) scale(${
       transform.scaleX}, ${transform.scaleY}) `;
+    const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
+
     return (
-      <>
-        <div>
-          {JSON.stringify(transform, null, 2)}
-        </div>
-        <MoveableControls
-          ref={this.moveableRef}
-          {...{ setTransform: this.setTransform, transform, textureRef: this.textureRef }}
-        />
-        <svg width="100%" height="100%" style={{ height: '-webkit-fill-available', width: '-webkit-fill-available' }}>
-          <image
-            onLoad={() => {
-              this.moveableRef.current.updateRect();
-            }}
-            ref={this.textureRef}
-            transform={transformStr}
-            style={{ transformOrigin: 'center center' }}
-            xlinkHref={`./images/${fileLink}`}
+      <ThemeProvider theme={theme}>
+        <Box className={classes.root}>
+          <PanelSelect
+            className={classes.select}
+            label="Tile"
+            value={selectedFileIndex}
+            setter={this.setFileIndex}
+            options={options}
           />
-        </svg>
-      </>
+          <FormControlLabel
+            className={classes.checkboxControlLabel}
+            control={(
+              <Checkbox
+                checked={keepRatio}
+                onChange={this.toggleKeepRatio}
+                value="checkedB"
+                color="primary"
+              />
+            )}
+            label="Preserve ratio"
+          />
+
+          <MoveableControls
+            controllerProps={{ keepRatio }}
+            ref={this.moveableRef}
+            {...{ setTransform: this.setTransform, transform, textureRef: this.textureRef }}
+          />
+          <svg width="100%" height="100%" style={{ height: '-webkit-fill-available', width: '-webkit-fill-available' }}>
+            <image
+              onLoad={() => {
+                this.moveableRef.current.updateRect();
+              }}
+              ref={this.textureRef}
+              transform={transformStr}
+              style={{ transformOrigin: 'center center' }}
+              xlinkHref={`./images/${fileLink}`}
+            />
+          </svg>
+        </Box>
+      </ThemeProvider>
     );
   }
 }
+export const MoveableTexture = withStyles({
+  root: { backgroundColor: '#333', display: 'block' },
+  select: {
+    display: 'block', position: 'absolute', top: 0, right: 0,
+  },
+  checkboxControlLabel: {
+    display: 'block', position: 'absolute', top: 0, left: 0, color: '#fff',
+  },
+})(MoveableTextureLOC);
 
-const MoveableControls = React.forwardRef(({ textureRef, setTransform, transform }, ref) => {
+const MoveableControls = React.forwardRef(({
+  textureRef, setTransform, transform, controllerProps,
+}, ref) => {
   const [renderMovable, settRenderMovable] = React.useState(false);
 
   React.useEffect(() => {
@@ -73,11 +132,13 @@ const MoveableControls = React.forwardRef(({ textureRef, setTransform, transform
         scalable
         rotatable
         draggable
+        {...controllerProps}
         onRotate={({ beforeDelta }) => {
           setTransform({ rotate: transform.rotate + beforeDelta });
         }}
         onScale={({ delta }) => {
           setTransform({ scaleX: transform.scaleX * delta[0], scaleY: transform.scaleY * delta[1] });
+          ref.current.updateRect();
         }}
         onDrag={({ beforeDelta }) => {
           setTransform({

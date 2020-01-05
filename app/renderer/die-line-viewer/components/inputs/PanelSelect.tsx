@@ -7,13 +7,13 @@ import React from 'react';
 import { useStyles } from '../style';
 
 export const PanelSelect = ({
-  label, options, setter, value,
+  label, options, setter, value, className,
 }) => {
   // @ts-ignore
   const classes = useStyles();
   const labelId = `${label}__${uuid()}`;
   return (
-    <FormControl className={classes.formControl}>
+    <FormControl className={`${classes.formControl} ${className}`}>
       <InputLabel id={labelId}>{ label }</InputLabel>
       <Select
         labelId={labelId}

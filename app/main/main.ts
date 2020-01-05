@@ -8,7 +8,7 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const fsPromises = require('fs').promises;
 const { resolve } = require('app-root-path');
-
+const os = require('os');
 
 const svgFilters = [{
   name: 'SVG - Scalable Vector Graphics',
@@ -67,6 +67,12 @@ app.on('ready', async () => {
       preload: resolve('app/main/preload.js'),
     },
   });
+
+  // eslint-disable-next-line max-len
+  const reactExtension = '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.3.0_0';
+  BrowserWindow.addDevToolsExtension(
+    path.join(os.homedir(), reactExtension),
+  );
 
   mainWindow.once('ready-to-show', () => {
     // @ts-ignore
