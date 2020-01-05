@@ -44,7 +44,7 @@ ipcMain.handle('save-net-with-data', (e, svgContent, jsonContent, message) => di
     fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, jsonContent)]);
 }));
 
-ipcMain.handle('list-texture-files', () => fsPromises.readdir('app/static/images')
+ipcMain.handle('list-texture-files', () => fsPromises.readdir('app/static/images/textures')
   .then((filesList) => filesList.filter((fileName) => path.extname(fileName) === '.svg')));
 
 ipcMain.handle('load-net-spec', () => resolveStringDataFromDialog(

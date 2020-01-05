@@ -4,8 +4,11 @@ import { isValidNumber } from '../util/geom';
 
 export const ResizeDetector = (props) => (
   <ReactResizeDetector handleWidth handleHeight>
-    {({ width, height }) => ((!isValidNumber(width) || !isValidNumber(height))
-      ? (<div />)
-      : props.children({ width, height }))}
+    {({ width, height }) => {
+      console.log(height, width);
+      return ((!isValidNumber(width) || !isValidNumber(height))
+        ? (<div />)
+        : props.children({ width, height }));
+    }}
   </ReactResizeDetector>
 );

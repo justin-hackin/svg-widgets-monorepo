@@ -22,8 +22,8 @@ import { useStyles } from './style';
 import { ControlsExpansionPanel } from './ControlsExpansionPanel';
 import { PanelColorPicker } from './inputs/PanelColorPicker';
 import { dashPatterns } from '../data/dash-patterns';
+import { VERY_SMALL_NUMBER } from '../util/geom';
 
-const VERY_SMALL_NUMBER = 0.00000001;
 
 export const ControlPanel = observer(({ store }) => {
   // @ts-ignore

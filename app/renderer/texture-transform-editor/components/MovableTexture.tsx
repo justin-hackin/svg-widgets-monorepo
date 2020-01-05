@@ -5,10 +5,12 @@ import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-
 import { Box } from '@material-ui/core';
+
+import { VERY_SMALL_NUMBER } from '../../die-line-viewer/util/geom';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
+import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
 
 export const theme = createMuiTheme(darkTheme);
 
@@ -20,15 +22,24 @@ class MoveableTextureLOC extends Component {
       transform: {
         scaleX: 0.5, scaleY: 0.5, translateX: 0, translateY: 0, rotate: 0,
       },
+      faceScale: 3,
     };
     this.textureRef = React.createRef();
     this.moveableRef = React.createRef();
+    this.backdropRef = React.createRef();
+
     this.setTransform = this.setTransform.bind(this);
     this.setFileIndex = this.setFileIndex.bind(this);
     this.toggleKeepRatio = this.toggleKeepRatio.bind(this);
+    this.setScreenDimensions = this.setScreenDimensions.bind(this);
   }
 
   async componentDidMount(): void {
+    window.onresize = () => {
+      this.setScreenDimensions(window.outerWidth, window.outerHeight);
+    };
+    window.onresize();
+
     const fileList = await ipcRenderer.invoke('list-texture-files');
     this.setState({ fileList, selectedFileIndex: 0 });
   }
@@ -45,12 +56,19 @@ class MoveableTextureLOC extends Component {
     this.setState((state) => ({ keepRatio: !state.keepRatio }));
   }
 
+  setScreenDimensions(width, height) {
+    this.setState({ screenDimensions: { width, height } });
+  }
+
   render() {
     const { classes } = this.props;
     const {
       state: {
+        faceScale,
         transform, fileList, selectedFileIndex, keepRatio,
         imageDimensions: { height: imageHeight = 0, width: imageWidth = 0 } = {},
+        faceDimensions: { height: faceHeight = 0, width: faceWidth = 0 } = {},
+        screenDimensions: { height: screenHeight = 0, width: screenWidth = 0 } = {},
       },
     } = this;
     if (!fileList) { return null; }
@@ -63,25 +81,37 @@ class MoveableTextureLOC extends Component {
     return (
       <ThemeProvider theme={theme}>
         <Box className={classes.root}>
-          <PanelSelect
-            className={classes.select}
-            label="Tile"
-            value={selectedFileIndex}
-            setter={this.setFileIndex}
-            options={options}
-          />
-          <FormControlLabel
-            className={classes.checkboxControlLabel}
-            control={(
-              <Checkbox
-                checked={keepRatio}
-                onChange={this.toggleKeepRatio}
-                value="checkedB"
-                color="primary"
-              />
-            )}
-            label="Preserve ratio"
-          />
+          <div className={classes.select}>
+            <PanelSelect
+              label="Tile"
+              value={selectedFileIndex}
+              setter={this.setFileIndex}
+              options={options}
+            />
+            <FormControlLabel
+              className={classes.checkboxControlLabel}
+              control={(
+                <Checkbox
+                  checked={keepRatio}
+                  onChange={this.toggleKeepRatio}
+                  value="checkedB"
+                  color="primary"
+                />
+              )}
+              label="Preserve ratio"
+            />
+            <PanelSlider
+              label="Face scale"
+              value={faceScale}
+              setter={(val) => {
+                this.setState({ faceScale: val });
+              }}
+              step={VERY_SMALL_NUMBER}
+              max={5}
+              min={1}
+            />
+          </div>
+
 
           <MoveableControls
             controllerProps={{ keepRatio }}
@@ -93,6 +123,18 @@ class MoveableTextureLOC extends Component {
             height="100%"
             style={{ height: '-webkit-fill-available', width: '-webkit-fill-available', transformOrigin: '50% 50%' }}
           >
+            <image
+              transform={`translate(${
+                (screenWidth - faceWidth * faceScale) / 2} ${(screenHeight - faceHeight * faceScale) / 2}) scale(${
+                faceScale} ${faceScale}) `}
+              ref={this.backdropRef}
+              onLoad={(e) => {
+                // eslint-disable-next-line no-shadow
+                const { height, width } = e.target.getBBox();
+                this.setState({ faceDimensions: { height, width } });
+              }}
+              xlinkHref="/images/shape-templates/great-disdyakisdodecahedron__template__ink.svg"
+            />
             <image
               onLoad={() => {
                 // eslint-disable-next-line no-shadow
@@ -107,7 +149,7 @@ class MoveableTextureLOC extends Component {
               ref={this.textureRef}
               transform={transformStr}
               style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
-              xlinkHref={`./images/${fileLink}`}
+              xlinkHref={`/images/textures/${fileLink}`}
             />
           </svg>
         </Box>
@@ -118,10 +160,10 @@ class MoveableTextureLOC extends Component {
 export const MoveableTexture = withStyles({
   root: { backgroundColor: '#333', display: 'block' },
   select: {
-    display: 'block', position: 'absolute', top: 0, right: 0,
+    display: 'flex', position: 'absolute', top: 0, right: 0,
   },
   checkboxControlLabel: {
-    display: 'block', position: 'absolute', top: 0, left: 0, color: '#fff',
+    color: '#fff',
   },
 })(MoveableTextureLOC);
 
