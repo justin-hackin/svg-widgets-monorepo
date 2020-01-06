@@ -13,6 +13,12 @@ const os = require('os');
 require('./ipc');
 
 app.on('ready', async () => {
+  // eslint-disable-next-line max-len
+  const reactExtension = '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.3.0_0';
+  BrowserWindow.addDevToolsExtension(
+    path.join(os.homedir(), reactExtension),
+  );
+
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -23,28 +29,40 @@ app.on('ready', async () => {
     },
   });
 
-  // eslint-disable-next-line max-len
-  const reactExtension = '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.3.0_0';
-  BrowserWindow.addDevToolsExtension(
-    path.join(os.homedir(), reactExtension),
-  );
-
   mainWindow.once('ready-to-show', () => {
     // @ts-ignore
     // mainWindow.toggleDevTools();
     mainWindow.show();
   });
 
-  const devPath = 'http://localhost:1124';
-  const prodPath = format({
-    pathname: resolve('app/renderer/.parcel/production/index.html'),
+  const getUrl = (fileName, isDevUrl) => (isDevUrl ? `http://localhost:1124/${fileName}` : format({
+    pathname: resolve(`app/renderer/.parcel/production/${fileName}`),
     protocol: 'file:',
     slashes: true,
-  });
-  const url = isDev ? devPath : prodPath;
+  }));
 
   mainWindow.setMenu(null);
-  mainWindow.loadURL(url);
+  mainWindow.loadURL(getUrl('die-line-viewer/indx.html', isDev));
+
+
+  const textureWindow = new BrowserWindow({
+    width: 400,
+    height: 400,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      preload: resolve('app/main/preload.js'),
+    },
+  });
+
+  textureWindow.once('ready-to-show', () => {
+    // @ts-ignore
+    // mainWindow.toggleDevTools();
+    textureWindow.show();
+  });
+
+  textureWindow.setMenu(null);
+  textureWindow.loadURL(getUrl('texture-transform-editor/texture.html', isDev));
 });
 
 app.on('window-all-closed', app.quit);
