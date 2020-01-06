@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+
+import '../common/style/index.css';
+import { MoveableTexture } from './components/MovableTexture';
+
 
 ReactDOM.render(
-  <App />,
+  <MoveableTexture />,
   document.getElementById('root'),
 );

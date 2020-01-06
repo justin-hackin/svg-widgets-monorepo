@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+// eslint-disable-next-line import/no-cycle
+import { SVGViewer } from './components/SVGViewer';
+
+import '../common/style/index.css';
+import './data/PyramidNetMakerStore';
 
 ReactDOM.render(
-  <App />,
+  <SVGViewer />,
   document.getElementById('root'),
 );

@@ -19,6 +19,13 @@ app.on('ready', async () => {
     path.join(os.homedir(), reactExtension),
   );
 
+  const getUrl = (fileName, isDevUrl) => (isDevUrl ? `http://localhost:1124/${fileName}` : format({
+    pathname: resolve(`app/renderer/.parcel/production/${fileName}`),
+    protocol: 'file:',
+    slashes: true,
+  }));
+
+
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -35,19 +42,13 @@ app.on('ready', async () => {
     mainWindow.show();
   });
 
-  const getUrl = (fileName, isDevUrl) => (isDevUrl ? `http://localhost:1124/${fileName}` : format({
-    pathname: resolve(`app/renderer/.parcel/production/${fileName}`),
-    protocol: 'file:',
-    slashes: true,
-  }));
-
   mainWindow.setMenu(null);
   mainWindow.loadURL(getUrl('die-line-viewer/indx.html', isDev));
 
 
   const textureWindow = new BrowserWindow({
-    width: 400,
-    height: 400,
+    width: 800,
+    height: 600,
     show: false,
     webPreferences: {
       nodeIntegration: true,
@@ -62,7 +63,7 @@ app.on('ready', async () => {
   });
 
   textureWindow.setMenu(null);
-  textureWindow.loadURL(getUrl('texture-transform-editor/texture.html', isDev));
+  textureWindow.loadURL(getUrl('texture-transform-editor/indx.html', isDev));
 });
 
 app.on('window-all-closed', app.quit);
