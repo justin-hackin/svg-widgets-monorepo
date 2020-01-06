@@ -57,6 +57,10 @@ ipcMain.handle('open-svg', async (e, message) => resolveStringDataFromDialog({
   filters: svgFilters,
 }));
 
+ipcMain.handle('get-svg-string-by-path', (e, pathRelativeStatic) => fsPromises.readFile(
+  `app/static/${pathRelativeStatic}`, 'utf8',
+));
+
 app.on('ready', async () => {
   const mainWindow = new BrowserWindow({
     width: 800,

@@ -6,13 +6,16 @@ import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { Box } from '@material-ui/core';
+import FingerprintIcon from '@material-ui/icons/Fingerprint';
 
 import { VERY_SMALL_NUMBER } from '../../die-line-viewer/util/geom';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
 import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
+import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 
 export const theme = createMuiTheme(darkTheme);
+const tilePathRel = '/images/shape-templates/great-disdyakisdodecahedron__template__ink.svg';
 
 class MoveableTextureLOC extends Component {
   constructor() {
@@ -53,18 +56,36 @@ class MoveableTextureLOC extends Component {
     this.setState({ selectedFileIndex: parseInt(selectedFileIndex, 10) });
   }
 
-  toggleKeepRatio() {
-    this.setState((state) => ({ keepRatio: !state.keepRatio }));
-  }
-
   setScreenDimensions(width, height) {
     this.setState({ screenDimensions: { width, height } });
+  }
+
+  getTextureUrl() {
+    const { fileList, selectedFileIndex } = this.state;
+    return `/images/textures/${fileList[selectedFileIndex]}`;
+  }
+
+  async getTextureDValue() {
+    const { current } = this.textureRef;
+    if (!current) { return null; }
+    const pathFragment = current.getAttribute('xlink:href');
+    if (!pathFragment) { return null; }
+
+    const svgString = await ipcRenderer.invoke('get-svg-string-by-path', this.getTextureUrl());
+    const {
+      a, b, c, d, e, f,
+    } = this.textureRef.current.transform.baseVal.consolidate().matrix;
+    return { d: extractCutHolesFromSvgString(svgString), transform: `matrix(${a} ${b} ${c} ${d} ${e} ${f})` };
   }
 
   updateTextureRect() {
     if (this.moveableRef && this.moveableRef.current) {
       this.moveableRef.current.updateRect();
     }
+  }
+
+  toggleKeepRatio() {
+    this.setState((state) => ({ keepRatio: !state.keepRatio }));
   }
 
   render() {
@@ -79,7 +100,6 @@ class MoveableTextureLOC extends Component {
       },
     } = this;
     if (!fileList) { return null; }
-    const fileLink = fileList[selectedFileIndex];
     const transformStr = `translate(${
       transform.translateX}, ${transform.translateY}) rotate(${transform.rotate}) scale(${
       transform.scaleX}, ${transform.scaleY}) `;
@@ -89,6 +109,12 @@ class MoveableTextureLOC extends Component {
       <ThemeProvider theme={theme}>
         <Box className={classes.root}>
           <div className={classes.select}>
+            <FingerprintIcon onClick={async () => {
+              const val = await this.getTextureDValue();
+              // eslint-disable-next-line no-undef
+              console.log('>>>>>', val);
+            }}
+            />
             <PanelSelect
               label="Tile"
               value={selectedFileIndex}
@@ -138,7 +164,7 @@ class MoveableTextureLOC extends Component {
                 const { height, width } = e.target.getBBox();
                 this.setState({ faceDimensions: { height, width } });
               }}
-              xlinkHref="/images/shape-templates/great-disdyakisdodecahedron__template__ink.svg"
+              xlinkHref={tilePathRel}
             />
             <image
               onLoad={() => {
@@ -154,7 +180,7 @@ class MoveableTextureLOC extends Component {
               ref={this.textureRef}
               transform={transformStr}
               style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
-              xlinkHref={`/images/textures/${fileLink}`}
+              xlinkHref={this.getTextureUrl()}
             />
           </svg>
         </Box>
@@ -164,13 +190,10 @@ class MoveableTextureLOC extends Component {
 }
 export const MoveableTexture = withStyles({
   root: {
-    backgroundColor: '#333', display: 'block', width: '100%', height: '100%', position: 'absolute',
+    backgroundColor: '#333', display: 'block', width: '100%', height: '100%', position: 'absolute', color: '#fff',
   },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
-  },
-  checkboxControlLabel: {
-    color: '#fff',
   },
 })(MoveableTextureLOC);
 

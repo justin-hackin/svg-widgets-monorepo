@@ -13,6 +13,7 @@ import {
 import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec } from '../util/shapes';
 import { PyramidNetSpec } from '../components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
+import { extractCutHolesFromSvgString, extractViewBoxFromSvg } from '../util/svg';
 
 const defaultNet:PyramidNetSpec = {
   pyramidGeometryId: 'great-stellated-dodecahedron',
@@ -170,12 +171,8 @@ export class PyramidNetStore {
 
   @action
   applyFaceHolePattern(svgString) {
-    const parser = new window.DOMParser();
-    const doc = parser.parseFromString(svgString, 'image/svg+xml');
-    this.textureImportWidth = parseFloat(
-      doc.querySelector('svg').getAttribute('viewBox').split(' ')[2],
-    );
-    this.activeCutHolePatternD = doc.querySelector('path:last-of-type').getAttribute('d');
+    this.textureImportWidth = parseFloat(extractViewBoxFromSvg(svgString).split(' ')[2]);
+    this.activeCutHolePatternD = extractCutHolesFromSvgString(svgString);
   }
 
   @action
