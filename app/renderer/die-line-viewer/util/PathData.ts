@@ -168,6 +168,7 @@ export class PathData {
         command[prop] = matrix.transform(command[prop]);
       });
     });
+    return this;
   }
 
   getD():string {

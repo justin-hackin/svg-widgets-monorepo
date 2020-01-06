@@ -7,12 +7,14 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { Box } from '@material-ui/core';
 import FingerprintIcon from '@material-ui/icons/Fingerprint';
+import { Matrix } from '@flatten-js/core';
 
 import { VERY_SMALL_NUMBER } from '../../die-line-viewer/util/geom';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
 import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
 import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
+import { PathData } from '../../die-line-viewer/util/PathData';
 
 export const theme = createMuiTheme(darkTheme);
 const tilePathRel = '/images/shape-templates/great-disdyakisdodecahedron__template__ink.svg';
@@ -30,6 +32,7 @@ class MoveableTextureLOC extends Component {
     this.textureRef = React.createRef();
     this.moveableRef = React.createRef();
     this.backdropRef = React.createRef();
+    this.outerSvgRef = React.createRef();
 
     this.setTransform = this.setTransform.bind(this);
     this.setFileIndex = this.setFileIndex.bind(this);
@@ -72,10 +75,20 @@ class MoveableTextureLOC extends Component {
     if (!pathFragment) { return null; }
 
     const svgString = await ipcRenderer.invoke('get-svg-string-by-path', this.getTextureUrl());
+
+    const { baseVal } = this.textureRef.current.cloneNode().transform;
+    const extraScale = this.outerSvgRef.current.createSVGTransform();
+    const { faceScale } = this.state;
+    extraScale.setScale(1 / faceScale, 1 / faceScale);
+    baseVal.appendItem(extraScale);
+    const consolidatedMatrix = baseVal.consolidate().matrix;
     const {
       a, b, c, d, e, f,
-    } = this.textureRef.current.transform.baseVal.consolidate().matrix;
-    return { d: extractCutHolesFromSvgString(svgString), transform: `matrix(${a} ${b} ${c} ${d} ${e} ${f})` };
+    } = consolidatedMatrix;
+    const dee = extractCutHolesFromSvgString(svgString);
+    console.log(dee);
+    const path = PathData.fromDValue(dee);
+    return path.transformPoints(new Matrix(a, b, c, d, e, f)).getD();
   }
 
   updateTextureRect() {
@@ -152,6 +165,7 @@ class MoveableTextureLOC extends Component {
             {...{ setTransform: this.setTransform, transform, textureRef: this.textureRef }}
           />
           <svg
+            ref={this.outerSvgRef}
             transform={`translate(${
               (screenWidth - faceWidth * faceScale) / 2} ${(screenHeight - faceHeight * faceScale) / 2})`}
             style={{ transformOrigin: '50% 50%' }}
@@ -179,7 +193,7 @@ class MoveableTextureLOC extends Component {
               }}
               ref={this.textureRef}
               transform={transformStr}
-              style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
+              // style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
               xlinkHref={this.getTextureUrl()}
             />
           </svg>
