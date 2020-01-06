@@ -2,3 +2,7 @@ body {
   /* prevents bounce on scroll, see https://stackoverflow.com/a/28181319 */
   overflow: hidden;
 }
+
+svg, symbol {
+  overflow: visible;
+}

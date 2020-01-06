@@ -1,13 +1,9 @@
-import React, { createContext } from 'react';
+import React from 'react';
 // eslint-disable-next-line import/no-cycle
-import { SVGViewer } from './components/MovableTexture';
-
-// @ts-ignore
-export const NetConfigContext = createContext();
-
+import { MoveableTexture } from './components/MovableTexture';
 
 const App = () => (
-  <SVGViewer />
+  <MoveableTexture />
 );
 
 export default App;

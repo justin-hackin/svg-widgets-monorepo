@@ -154,8 +154,8 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
   scorePathAggregate.concatPath(ascendantTabs.female.score);
 
   return (
-    <g overflow="visible">
-      <symbol id="face-tile" overflow="visible">
+    <g>
+      <symbol id="face-tile">
         <g>
           <FaceBoundary store={store} />
           {/* eslint-disable-next-line react/no-danger */}
