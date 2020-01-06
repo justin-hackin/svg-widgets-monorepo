@@ -37,6 +37,7 @@ class MoveableTextureLOC extends Component {
   async componentDidMount(): void {
     window.onresize = () => {
       this.setScreenDimensions(window.outerWidth, window.outerHeight);
+      this.updateTextureRect();
     };
     window.onresize();
 
@@ -58,6 +59,12 @@ class MoveableTextureLOC extends Component {
 
   setScreenDimensions(width, height) {
     this.setState({ screenDimensions: { width, height } });
+  }
+
+  updateTextureRect() {
+    if (this.moveableRef && this.moveableRef.current) {
+      this.moveableRef.current.updateRect();
+    }
   }
 
   render() {
@@ -119,14 +126,12 @@ class MoveableTextureLOC extends Component {
             {...{ setTransform: this.setTransform, transform, textureRef: this.textureRef }}
           />
           <svg
-            width="100%"
-            height="100%"
-            style={{ height: '-webkit-fill-available', width: '-webkit-fill-available', transformOrigin: '50% 50%' }}
+            transform={`translate(${
+              (screenWidth - faceWidth * faceScale) / 2} ${(screenHeight - faceHeight * faceScale) / 2})`}
+            style={{ transformOrigin: '50% 50%' }}
           >
             <image
-              transform={`translate(${
-                (screenWidth - faceWidth * faceScale) / 2} ${(screenHeight - faceHeight * faceScale) / 2}) scale(${
-                faceScale} ${faceScale}) `}
+              transform={`scale(${faceScale} ${faceScale}) `}
               ref={this.backdropRef}
               onLoad={(e) => {
                 // eslint-disable-next-line no-shadow
@@ -143,7 +148,7 @@ class MoveableTextureLOC extends Component {
                 // the movable attempts to calculate the bounds before the image has loaded, hence below
                 // deferred by a tick so that style changes from above take effect beforehand
                 setTimeout(() => {
-                  this.moveableRef.current.updateRect();
+                  this.updateTextureRect();
                 });
               }}
               ref={this.textureRef}
@@ -158,7 +163,9 @@ class MoveableTextureLOC extends Component {
   }
 }
 export const MoveableTexture = withStyles({
-  root: { backgroundColor: '#333', display: 'block' },
+  root: {
+    backgroundColor: '#333', display: 'block', width: '100%', height: '100%', position: 'absolute',
+  },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
   },
