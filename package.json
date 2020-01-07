@@ -1,7 +1,7 @@
 {
   "name": "spacecraft-net-factory",
   "version": "1.0.0",
-  "description": "A minimal React.js boilerplate with parcel as bundler",
+  "description": "A toolkit for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra, something playfully referred to as SpaceCrafts",
   "main": "app/main/.parcel/main.js",
   "scripts": {
     "start": "run-s main:build watch",
@@ -41,12 +41,16 @@
     },
     "win": {
       "target": "msi",
-      "icon": "build/icon.ico"
+      "icon": "build/logo.ico"
     },
     "files": [
       "main.js",
-      "build/*"
-    ]
+      "build/*",
+      "build-resources/*"
+    ],
+    "directories": {
+      "buildResources": "build-resources"
+    }
   },
   "keywords": [
     "parcel",

@@ -1,7 +1,7 @@
 // Basic init from https://github.com/aimerib/electron-react-parcel/
 // eslint-disable-next-line import/no-extraneous-dependencies
 const {
-  app, BrowserWindow,
+  app, BrowserWindow, nativeImage,
 } = require('electron');
 const { format } = require('url');
 // @ts-ignore
@@ -9,6 +9,10 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const { resolve } = require('app-root-path');
 const os = require('os');
+
+// TODO: doesn't seem to work
+const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/256x256.png`);
+// where public folder on the root dir
 
 require('./ipc');
 
@@ -30,6 +34,7 @@ app.on('ready', async () => {
     width: 800,
     height: 600,
     show: false,
+    icon,
     webPreferences: {
       nodeIntegration: true,
       preload: resolve('app/main/preload.js'),
@@ -50,6 +55,7 @@ app.on('ready', async () => {
     width: 800,
     height: 600,
     show: false,
+    icon,
     webPreferences: {
       nodeIntegration: true,
       preload: resolve('app/main/preload.js'),
