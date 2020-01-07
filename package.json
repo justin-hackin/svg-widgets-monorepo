@@ -11,10 +11,10 @@
     "electron:build": "build --x64 --publish=never",
     "parcel:watch": "run-p -r main:watch renderer:watch",
     "main:watch": "parcel watch app/main/main.ts --out-dir app/main/.parcel --out-file main --target electron",
-    "renderer:watch": "parcel app/renderer/die-line-viewer/indx.html app/renderer/texture-transform-editor/indx.html --port 1124 --out-dir app/renderer/.parcel/development",
-    "parcel:build": "run-s main:build renderer:build",
     "main:build": "parcel build app/main/main.ts --out-dir app/main/.parcel --out-file main --target electron",
+    "renderer:watch": "parcel app/renderer/die-line-viewer/indx.html app/renderer/texture-transform-editor/indx.html --port 1124 --out-dir app/renderer/.parcel/development",
     "renderer:build": "parcel build app/renderer/die-line-viewer/indx.html --public-url ./ --out-dir app/renderer/.parcel/production",
+    "parcel:build": "run-s main:build renderer:build",
     "lint": "eslint app/**/*.ts{,x}"
   },
   "build": {
@@ -57,8 +57,12 @@
     "react"
   ],
   "staticFiles": {
-    "staticPath": "app/static",
-    "watcherGlob": "**"
+    "staticPath": [
+      {
+        "outDirPattern": "**/app/renderer/.parcel/development",
+        "staticPath": "app/static"
+      }
+    ]
   },
   "author": "“Robin <“wrobin@gmx.net”> (https://www.robinwieruch.de)",
   "license": "MIT",
