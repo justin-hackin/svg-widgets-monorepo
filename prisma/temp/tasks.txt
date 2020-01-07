@@ -1,4 +1,0 @@
- "postinstall": "prisma2 generate",
-    "seed-db": "node seed-db.js",
-    "dev-server": "prisma2 dev"
-

@@ -5,8 +5,6 @@
 dist/
 node_modules/
 **/.DS_Store
-prisma/migrations/**
-prisma/dev.db
 build/
 app/renderer/.parcel/
 app/main/.parcel/
