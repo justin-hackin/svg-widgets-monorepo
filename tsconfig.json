@@ -15,6 +15,7 @@
       "~*": ["./app/*"]
     },
     "target": "es2015",
-    "module": "esnext"
+    "module": "esnext",
+    "moduleResolution": "node"
   }
 }
