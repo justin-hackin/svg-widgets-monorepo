@@ -124,6 +124,7 @@ class MoveableTextureLOC extends Component {
           <div className={classes.select}>
             <FingerprintIcon onClick={async () => {
               const val = await this.getTextureDValue();
+              ipcRenderer.send('die>set-die-line-cut-holes', val, 162.49241760601677);
               // eslint-disable-next-line no-undef
               console.log('>>>>>', val);
             }}

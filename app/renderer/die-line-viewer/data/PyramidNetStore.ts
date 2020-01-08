@@ -176,6 +176,12 @@ export class PyramidNetStore {
   }
 
   @action
+  setFaceHoleProperties(d, width) {
+    this.activeCutHolePatternD = d;
+    this.textureImportWidth = width;
+  }
+
+  @action
   clearFaceHolePattern() {
     this.activeCutHolePatternD = '';
   }
