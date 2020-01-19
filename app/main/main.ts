@@ -21,7 +21,8 @@ setupIpc(ipcMain);
 
 app.on('ready', async () => {
   // eslint-disable-next-line max-len
-  const reactExtension = '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.3.0_0';
+  const reactExtension = '/Library/Application Support/Google/Chrome/'
+    + 'Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.4.0_0';
   BrowserWindow.addDevToolsExtension(
     path.join(os.homedir(), reactExtension),
   );
