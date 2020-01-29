@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React, { Component } from 'react';
-import Moveable from 'react-moveable';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -15,6 +14,7 @@ import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
 import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
 import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { PathData } from '../../die-line-viewer/util/PathData';
+import { MoveableSvgGroup } from './MovableControls';
 
 export const theme = createMuiTheme(darkTheme);
 const tilePathRel = '/images/shape-templates/great-disdyakisdodecahedron__template__ink.svg';
@@ -24,13 +24,11 @@ class MoveableTextureLOC extends Component {
     super();
     this.state = {
       keepRatio: true,
-      transform: {
-        scaleX: 0.5, scaleY: 0.5, translateX: 0, translateY: 0, rotate: 0,
-      },
       faceScale: 3,
+      renderToggle: false,
     };
     this.textureRef = React.createRef();
-    this.moveableRef = React.createRef();
+    this.portalRef = React.createRef();
     this.backdropRef = React.createRef();
     this.outerSvgRef = React.createRef();
 
@@ -92,9 +90,8 @@ class MoveableTextureLOC extends Component {
   }
 
   updateTextureRect() {
-    if (this.moveableRef && this.moveableRef.current) {
-      this.moveableRef.current.updateRect();
-    }
+    // eslint-disable-next-line react/destructuring-assignment
+    this.setState(({ renderToggle }) => ({ renderToggle: !renderToggle }));
   }
 
   toggleKeepRatio() {
@@ -106,16 +103,14 @@ class MoveableTextureLOC extends Component {
     const {
       state: {
         faceScale,
-        transform, fileList, selectedFileIndex, keepRatio,
-        imageDimensions: { height: imageHeight = 0, width: imageWidth = 0 } = {},
+        fileList, selectedFileIndex, keepRatio,
+        imageDimensions = {},
         faceDimensions: { height: faceHeight = 0, width: faceWidth = 0 } = {},
         screenDimensions: { height: screenHeight = 0, width: screenWidth = 0 } = {},
+        renderToggle,
       },
     } = this;
     if (!fileList) { return null; }
-    const transformStr = `translate(${
-      transform.translateX}, ${transform.translateY}) rotate(${transform.rotate}) scale(${
-      transform.scaleX}, ${transform.scaleY}) `;
     const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
 
     return (
@@ -159,17 +154,20 @@ class MoveableTextureLOC extends Component {
             />
           </div>
 
+          {/*
+              controls are rendered as HTML not SVG so
+              we need to pass a ref to ReactMoveableSvgElement so it can render via portal here
+          */}
+          <div className="controls-container" ref={this.portalRef} />
 
-          <MoveableControls
-            controllerProps={{ keepRatio }}
-            ref={this.moveableRef}
-            {...{ setTransform: this.setTransform, transform, textureRef: this.textureRef }}
-          />
           <svg
+            className="root-svg"
+            width="100%"
+            height="100%"
             ref={this.outerSvgRef}
-            transform={`translate(${
-              (screenWidth - faceWidth * faceScale) / 2} ${(screenHeight - faceHeight * faceScale) / 2})`}
-            style={{ transformOrigin: '50% 50%' }}
+            // transform={`translate(${
+            //   (screenWidth - faceWidth * faceScale) / 2} ${(screenHeight - faceHeight * faceScale) / 2})`}
+            // style={{ transformOrigin: '50% 50%' }}
           >
             <image
               transform={`scale(${faceScale} ${faceScale}) `}
@@ -181,22 +179,21 @@ class MoveableTextureLOC extends Component {
               }}
               xlinkHref={tilePathRel}
             />
-            <image
-              onLoad={() => {
-                // eslint-disable-next-line no-shadow
-                const { height, width } = this.textureRef.current.getBBox();
-                this.setState({ imageDimensions: { height, width } });
-                // the movable attempts to calculate the bounds before the image has loaded, hence below
-                // deferred by a tick so that style changes from above take effect beforehand
-                setTimeout(() => {
-                  this.updateTextureRect();
-                });
-              }}
-              ref={this.textureRef}
-              transform={transformStr}
-              // style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
-              xlinkHref={this.getTextureUrl()}
-            />
+            <MoveableSvgGroup outerTransform={renderToggle} portalRef={this.portalRef}>
+              <image
+                {...imageDimensions}
+                onLoad={() => {
+                  // eslint-disable-next-line no-shadow
+                  const { height, width } = this.textureRef.current.getBBox();
+                  this.setState((prevState) => ({ ...prevState, imageDimensions: { height, width } }));
+                  // the movable attempts to calculate the bounds before the image has loaded, hence below
+                  // deferred by a tick so that style changes from above take effect beforehand
+                }}
+                ref={this.textureRef}
+                // style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
+                xlinkHref={this.getTextureUrl()}
+              />
+            </MoveableSvgGroup>
           </svg>
         </Box>
       </ThemeProvider>
@@ -211,41 +208,3 @@ export const MoveableTexture = withStyles({
     display: 'flex', position: 'absolute', top: 0, right: 0,
   },
 })(MoveableTextureLOC);
-
-const MoveableControls = React.forwardRef(({
-  textureRef, setTransform, transform, controllerProps,
-}, ref) => {
-  const [renderMovable, settRenderMovable] = React.useState(false);
-
-  React.useEffect(() => {
-    settRenderMovable(true);
-  }, []);
-
-  if (!renderMovable) return null;
-
-  return (
-    <>
-      <Moveable
-        ref={ref}
-        target={textureRef.current}
-        scalable
-        rotatable
-        draggable
-        {...controllerProps}
-        onRotate={({ beforeDelta }) => {
-          setTransform({ rotate: transform.rotate + beforeDelta });
-        }}
-        onScale={({ delta }) => {
-          setTransform({ scaleX: transform.scaleX * delta[0], scaleY: transform.scaleY * delta[1] });
-          ref.current.updateRect();
-        }}
-        onDrag={({ beforeDelta }) => {
-          setTransform({
-            translateX: transform.translateX + beforeDelta[0],
-            translateY: transform.translateY + beforeDelta[1],
-          });
-        }}
-      />
-    </>
-  );
-});
