@@ -8,10 +8,8 @@ import { Box } from '@material-ui/core';
 import FingerprintIcon from '@material-ui/icons/Fingerprint';
 import { Matrix } from '@flatten-js/core';
 
-import { VERY_SMALL_NUMBER } from '../../die-line-viewer/util/geom';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
-import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
 import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { PathData } from '../../die-line-viewer/util/PathData';
 import { MoveableSvgGroup } from './MovableControls';
@@ -24,7 +22,6 @@ class MoveableTextureLOC extends Component {
     super();
     this.state = {
       keepRatio: true,
-      faceScale: 3,
       renderToggle: false,
     };
     this.textureRef = React.createRef();
@@ -32,33 +29,18 @@ class MoveableTextureLOC extends Component {
     this.backdropRef = React.createRef();
     this.outerSvgRef = React.createRef();
 
-    this.setTransform = this.setTransform.bind(this);
     this.setFileIndex = this.setFileIndex.bind(this);
+    this.updateTextureRect = this.updateTextureRect.bind(this);
     this.toggleKeepRatio = this.toggleKeepRatio.bind(this);
-    this.setScreenDimensions = this.setScreenDimensions.bind(this);
   }
 
   async componentDidMount(): void {
-    window.onresize = () => {
-      this.setScreenDimensions(window.outerWidth, window.outerHeight);
-      this.updateTextureRect();
-    };
-    window.onresize();
-
     const fileList = await ipcRenderer.invoke('list-texture-files');
     this.setState({ fileList, selectedFileIndex: 0 });
   }
 
-  setTransform(transform) {
-    this.setState((state) => ({ transform: { ...state.transform, ...transform } }));
-  }
-
   setFileIndex(selectedFileIndex) {
     this.setState({ selectedFileIndex: parseInt(selectedFileIndex, 10) });
-  }
-
-  setScreenDimensions(width, height) {
-    this.setState({ screenDimensions: { width, height } });
   }
 
   getTextureUrl() {
@@ -102,11 +84,7 @@ class MoveableTextureLOC extends Component {
     const { classes } = this.props;
     const {
       state: {
-        faceScale,
         fileList, selectedFileIndex, keepRatio,
-        imageDimensions = {},
-        faceDimensions: { height: faceHeight = 0, width: faceWidth = 0 } = {},
-        screenDimensions: { height: screenHeight = 0, width: screenWidth = 0 } = {},
         renderToggle,
       },
     } = this;
@@ -142,16 +120,6 @@ class MoveableTextureLOC extends Component {
               )}
               label="Preserve ratio"
             />
-            <PanelSlider
-              label="Face scale"
-              value={faceScale}
-              setter={(val) => {
-                this.setState({ faceScale: val });
-              }}
-              step={VERY_SMALL_NUMBER}
-              max={5}
-              min={1}
-            />
           </div>
 
           {/*
@@ -165,31 +133,15 @@ class MoveableTextureLOC extends Component {
             width="100%"
             height="100%"
             ref={this.outerSvgRef}
-            // transform={`translate(${
-            //   (screenWidth - faceWidth * faceScale) / 2} ${(screenHeight - faceHeight * faceScale) / 2})`}
-            // style={{ transformOrigin: '50% 50%' }}
           >
             <image
-              transform={`scale(${faceScale} ${faceScale}) `}
               ref={this.backdropRef}
-              onLoad={(e) => {
-                // eslint-disable-next-line no-shadow
-                const { height, width } = e.target.getBBox();
-                this.setState({ faceDimensions: { height, width } });
-              }}
               xlinkHref={tilePathRel}
             />
             <MoveableSvgGroup outerTransform={renderToggle} portalRef={this.portalRef}>
               <image
-                {...imageDimensions}
-                onLoad={() => {
-                  // eslint-disable-next-line no-shadow
-                  const { height, width } = this.textureRef.current.getBBox();
-                  this.setState((prevState) => ({ ...prevState, imageDimensions: { height, width } }));
-                  // the movable attempts to calculate the bounds before the image has loaded, hence below
-                  // deferred by a tick so that style changes from above take effect beforehand
-                }}
                 ref={this.textureRef}
+                onLoad={this.updateTextureRect}
                 // style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
                 xlinkHref={this.getTextureUrl()}
               />

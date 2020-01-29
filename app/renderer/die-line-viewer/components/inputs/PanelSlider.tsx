@@ -22,7 +22,7 @@ export const PanelSlider = ({
         value={value}
         aria-labelledby={labelId}
         valueLabelDisplay="auto"
-        valueLabelFormat={(val) => val.toFixed(2)}
+        valueLabelFormat={(val) => val && val.toFixed(2)}
         onChange={(e:any, val:number) => {
           setter(val);
         }}
