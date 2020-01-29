@@ -11,49 +11,23 @@ import { PyramidNet } from './PyramidNet';
 // eslint-disable-next-line import/no-cycle
 import { ControlPanel } from './ControlPanel';
 import { GridPattern } from './GridPattern';
-import { ResizeDetector } from './ResizeDetector';
+import { ResizableZoomPan } from './ResizableZoomPan';
 
-
+const patternId = 'grid-pattern';
 // @ts-ignore
 const theme = createMuiTheme(darkTheme);
-export const SVGViewer = observer(() => {
-  // TODO: make this work
-  // const [value = INITIAL_VALUE, setValue] = useQueryParam('ReactSVGPanZoomValue', JsonParam);
-  // const [tool = TOOL_PAN, setTool] = useQueryParam('ReactSVGPanZoomTool', StringParam);
-  const [viewValue, setValue] = useState(INITIAL_VALUE);
-  const [tool, setTool] = useState(TOOL_PAN);
-
-  const patternId = 'grid-pattern';
-  return (
-    <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
-      <ResizeDetector>
-        {({ width, height }) => (
-          <ReactSVGPanZoom
-            value={viewValue}
-            width={width}
-            height={height}
-            background="#454545"
-            SVGBackground={`url(#${patternId})`}
-            tool={tool}
-            onChangeValue={(val) => {
-              setValue(val);
-            }}
-            onChangeTool={setTool}
-            id="viewer"
-          >
-            <svg {...store.svgDimensions}>
-              <GridPattern patternId={patternId} />
-              <g transform="translate(300, 300)">
-                <PyramidNet store={store} />
-              </g>
-            </svg>
-          </ReactSVGPanZoom>
-        )}
-      </ResizeDetector>
-      <ThemeProvider theme={theme}>
-        <ControlPanel store={store} />
-      </ThemeProvider>
-    </div>
-
-  );
-});
+export const SVGViewer = observer(() => (
+  <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
+    <ThemeProvider theme={theme}>
+      <ControlPanel store={store} />
+    </ThemeProvider>
+    <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
+      <svg {...store.svgDimensions}>
+        <GridPattern patternId={patternId} />
+        <g transform="translate(300, 300)">
+          <PyramidNet store={store} />
+        </g>
+      </svg>
+    </ResizableZoomPan>
+  </div>
+));
