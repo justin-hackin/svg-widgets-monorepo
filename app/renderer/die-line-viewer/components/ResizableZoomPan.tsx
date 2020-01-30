@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
 import { ResizeDetector } from './ResizeDetector';
 
-export const ResizableZoomPan = ({ children, ...props }) => {
+export const ResizableZoomPan = ({ children, onChange = null, ...props }) => {
   const [viewValue, setValue] = useState(INITIAL_VALUE);
   const [tool, setTool] = useState(TOOL_PAN);
   return (
@@ -13,7 +13,11 @@ export const ResizableZoomPan = ({ children, ...props }) => {
             value={viewValue}
             background="#454545"
             tool={tool}
+            customMiniature={() => null}
             onChangeValue={(val) => {
+              if (onChange) {
+                onChange(val);
+              }
               setValue(val);
             }}
             onChangeTool={setTool}
