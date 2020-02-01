@@ -1,6 +1,6 @@
-import {hingedPlot, PointLike} from '../geom';
-import {COMMAND_FACTORY, PathData} from '../PathData';
 import last from 'lodash-es/last';
+import { hingedPlot, PointLike } from '../geom';
+import { PathData } from '../PathData';
 
 interface RoundPoint {
   point: PointLike,
@@ -25,4 +25,12 @@ export const roundedEdgePath = (points: RoundPointPointsItem[], retractionDistan
   }, path);
   return path.line(last(points));
 };
-export const moveLines = (points) => points.map((point, index) => COMMAND_FACTORY[index ? 'L' : 'M'](point));
+
+export const connectedLineSegments = (points) => {
+  const path = new PathData();
+  path.move(points[0]);
+  for (const pt of points.slice(1)) {
+    path.line(pt);
+  }
+  return path;
+};

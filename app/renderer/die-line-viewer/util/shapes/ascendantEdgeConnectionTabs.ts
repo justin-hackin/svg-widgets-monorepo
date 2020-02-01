@@ -13,7 +13,7 @@ import {
 } from '../geom';
 import { strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
-import { roundedEdgePath, moveLines } from './generic';
+import { roundedEdgePath, connectedLineSegments } from './generic';
 
 export const ascendantEdgeConnectionTabs = (
   start: PointLike, end: PointLike,
@@ -78,7 +78,7 @@ export const ascendantEdgeConnectionTabs = (
     tabPath.sliceCommandsDangerously(1);
     // roundedEdgePath assumes first point is move command but we needed and applied line
     commands.male.cut.concatPath(tabPath);
-    commands.female.cut.concatCommands(moveLines(
+    commands.female.cut.concatPath(connectedLineSegments(
       [tabBaseStart, holeEdgeStart, holeEdgeEnd, tabBaseEnd],
     ));
     last(femaleScoreLineIntervals).push(tabBaseStart);
