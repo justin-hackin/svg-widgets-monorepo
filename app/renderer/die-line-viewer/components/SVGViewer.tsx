@@ -17,9 +17,6 @@ const patternId = 'grid-pattern';
 const theme = createMuiTheme(darkTheme);
 export const SVGViewer = observer(() => (
   <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
-    <ThemeProvider theme={theme}>
-      <ControlPanel store={store} />
-    </ThemeProvider>
     <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
       <svg {...store.svgDimensions}>
         <GridPattern patternId={patternId} />
@@ -28,5 +25,8 @@ export const SVGViewer = observer(() => (
         </g>
       </svg>
     </ResizableZoomPan>
+    <ThemeProvider theme={theme}>
+      <ControlPanel store={store} />
+    </ThemeProvider>
   </div>
 ));
