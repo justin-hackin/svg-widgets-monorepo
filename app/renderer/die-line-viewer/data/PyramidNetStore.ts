@@ -10,10 +10,12 @@ import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, hingedPlot, triangleAnglesGivenSides,
 } from '../util/geom';
-import { AscendantEdgeTabsSpec, BaseEdgeConnectionTabSpec, StrokeDashPathSpec } from '../util/shapes';
 import { PyramidNetSpec } from '../components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
 import { extractCutHolesFromSvgString, extractViewBoxFromSvg } from '../util/svg';
+import { AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
+import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
+import { BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 
 const defaultNet:PyramidNetSpec = {
   pyramidGeometryId: 'great-stellated-dodecahedron',
