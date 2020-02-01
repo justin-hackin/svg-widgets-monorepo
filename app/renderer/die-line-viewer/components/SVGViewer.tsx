@@ -1,7 +1,6 @@
 // import { useQueryParam, StringParam, JsonParam } from 'use-query-params';
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react';
-import { INITIAL_VALUE, ReactSVGPanZoom, TOOL_PAN } from 'react-svg-pan-zoom';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
 
