@@ -34,3 +34,5 @@ export const connectedLineSegments = (points) => {
   }
   return path;
 };
+
+export const closedPolygonPath = (points) => connectedLineSegments(points).close();

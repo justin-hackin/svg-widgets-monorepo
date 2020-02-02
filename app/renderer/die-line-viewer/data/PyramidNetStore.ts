@@ -54,6 +54,14 @@ const defaultNet:PyramidNetSpec = {
 };
 
 export class PyramidNetStore {
+  constructor(data = defaultNet) {
+    // @ts-ignore
+    ipcRenderer.on('die>request-boundary-points', () => {
+      this.sendBoundaryPoints();
+    });
+    this.loadSpec(data);
+  }
+
   @observable
   public pyramidGeometryId;
 
@@ -62,6 +70,13 @@ export class PyramidNetStore {
     this.activeCutHolePatternD = '';
     this.textureImportWidth = 0;
     this.pyramidGeometryId = id;
+    this.sendBoundaryPoints();
+  }
+
+  @action
+  sendBoundaryPoints() {
+    // @ts-ignore
+    ipcRenderer.send('tex>update-face-outline', this.boundaryPoints.map((pt) => pt.toArray()));
   }
 
   @computed
@@ -89,10 +104,6 @@ export class PyramidNetStore {
 
   @observable
   public textureImportWidth: number;
-
-  constructor(data = defaultNet) {
-    this.loadSpec(data);
-  }
 
   @computed
   get faceInteriorAngles(): number[] {

@@ -11,6 +11,5 @@ export const extractCutHolesFromSvgString = (svgString) => {
 
 export const extractViewBoxFromSvg = (svgString) => {
   const doc = parseString(svgString);
-  debugger; // eslint-disable-line no-debugger
   return doc.querySelector('svg').getAttribute('viewBox');
 };

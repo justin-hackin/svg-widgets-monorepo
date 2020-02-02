@@ -112,8 +112,7 @@ export const ControlPanel = observer(({ store }) => {
     component: PanelSelect,
     valuePath: 'pyramidNetSpec.pyramidGeometryId',
     setter: (value) => {
-      store.pyramidNetSpec.clearFaceHolePattern();
-      store.setValueAtPath('pyramidNetSpec.pyramidGeometryId', value);
+      store.pyramidNetSpec.setPyramidGeometryId(value);
     },
     label: 'Polyhedron',
     options: polyhedronOptions,
