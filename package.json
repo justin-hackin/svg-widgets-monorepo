@@ -77,6 +77,7 @@
     "react-moveable": "^0.16.4",
     "react-resize-detector": "^4.2.1",
     "react-svg-pan-zoom": "^3.4.0",
+    "react-use-gesture": "^7.0.1",
     "svg-path-parser": "git+https://github.com/justin-hackin/svg-path-parser.git",
     "use-query-params": "^0.4.3",
     "uuid": "^3.3.3"

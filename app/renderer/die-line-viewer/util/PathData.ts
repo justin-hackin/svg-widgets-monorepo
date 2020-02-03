@@ -7,7 +7,11 @@ import isNaN from 'lodash-es/isNaN';
 import {
   composeSVG, parseSVG,
 } from 'svg-path-parser';
+import isNumber from 'lodash-es/isNumber';
+
 import { PointTuple, Coord } from './geom';
+
+/* eslint-disable no-param-reassign */
 
 const castToArray = (pt: Coord):PointTuple => {
   if (pt instanceof Point) {
@@ -77,7 +81,6 @@ interface Command {
   value?: number,
 }
 
-const UNTRANSFORMABLE_COMMANDS = ['A', 'V', 'H'];
 const TRANSFORMABLE_COMMAND_PROPS = ['to', 'ctrl1', 'ctrl2'];
 
 export class PathData {
@@ -140,6 +143,46 @@ export class PathData {
     return this;
   }
 
+  getLastMoveIndex(index) {
+    for (let i = index - 1; i >= 0; i -= 1) {
+      if (this.commands[i].code.toUpperCase() === 'M') {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  makePathAbsolute() {
+    this.commands = this.commands.reduce((acc, command, index, commandsArray) => {
+      const isRelative = command.code.toUpperCase() === command.code;
+      if (command.value) {
+        // command is vert or horiz line (relative or abs)
+        command.code = 'L';
+        // @ts-ignore
+        command.to = [...acc.at];
+        const modParam = command.code.toUpperCase() === 'V' ? 1 : 0;
+        if (isRelative) {
+          command.to[modParam] += command.value;
+        } else {
+          command.to[modParam] = command.value;
+        }
+        delete command.value;
+      } else if (isRelative) {
+        // command is relative
+        Object.keys(command).filter((prop) => TRANSFORMABLE_COMMAND_PROPS.includes(prop))
+          .forEach((prop) => {
+            command[prop] = [acc.at[0] + command[prop][0], acc.at[1] + command[prop][1]];
+          });
+        command.code = command.code.toUpperCase();
+      }
+      // @ts-ignore
+      acc.at = command.code === 'Z' ? commandsArray[this.getLastMoveIndex(index)] : command.to;
+      acc.commands.push(command);
+      return acc;
+    }, { at: [0, 0], commands: [] }).commands;
+    return this;
+  }
+
   concatCommands(commands):PathData {
     this.commands = this.commands.concat(cloneDeep(commands));
     return this;
@@ -158,15 +201,21 @@ export class PathData {
   }
 
   transformPoints(matrix:Matrix) {
+    // this.makePathAbsolute();
     this.commands.forEach((command) => {
-      if (includes(UNTRANSFORMABLE_COMMANDS, command.code.toUpperCase())) {
-        throw new Error('can not apply matrix transformation to arc');
-      }
       const propsToTransform = intersection(Object.keys(command), TRANSFORMABLE_COMMAND_PROPS);
       propsToTransform.forEach((prop) => {
-        // eslint-disable-next-line no-param-reassign
         command[prop] = matrix.transform(command[prop]);
       });
+      const rotDelta = Math.atan(matrix.c / matrix.d);
+      if (command.code === 'A') {
+        if (isNumber(rotDelta) && !isNaN(rotDelta)) {
+          command.xAxisRotation += (360 * rotDelta) / (2 * Math.PI);
+          if (command.xAxisRotation > 360) {
+            command.xAxisRotation -= 360;
+          }
+        }
+      }
     });
     return this;
   }

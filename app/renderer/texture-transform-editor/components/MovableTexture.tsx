@@ -1,5 +1,9 @@
 // @ts-nocheck
-import React, { Component } from 'react';
+import React, {
+  createRef, useEffect, useState,
+} from 'react';
+import { useDrag } from 'react-use-gesture';
+
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
@@ -22,79 +26,79 @@ const getFitScale = ({ width: boundsWidth, height: boundsHeight }, { width: imag
 
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
-class MoveableTextureLOC extends Component {
-  constructor() {
-    super();
-    this.state = {
-      boundaryPoints: null,
-      boundaryViewBoxAttrs: null,
-      boundaryPath: null,
-      faceScaleRatio: 1,
+const MoveableTextureLOC = (props) => {
+  const textureRef = createRef();
+  const outerSvgRef = createRef();
+
+  const [screenDimensions, setScreenDimensions] = useState({ width: 1, height: 1 });
+  const [imageDimensions, setImageDimensions] = useState({ width: 1, height: 1 });
+
+  const [faceScaleRatio, setFaceScaleRatio] = useState(1);
+
+  const [textureScaleRatio, setTextureScaleRatio] = useState(0.5);
+
+  const [textureRotation, setTextureRotation] = useState(0);
+
+  const [fileList, setFileList] = useState();
+
+  const [fileIndex, setFileIndex] = useState();
+
+  const [textureTranslation, setTextureTranslation] = useState([0, 0]);
+
+  const [boundary, setBoundary] = useState({});
+
+  const setBoundaryWithPoints = (points) => {
+    const poly = new Polygon();
+    poly.addFace(points);
+    const {
+      xmin, ymin, xmax, ymax,
+    } = poly.box;
+    const viewBoxAttrs = {
+      xmin, ymin, width: xmax - xmin, height: ymax - ymin,
     };
+    setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) });
+  };
 
-    this.textureRef = React.createRef();
-    this.portalRef = React.createRef();
-    this.backdropRef = React.createRef();
-    this.outerSvgRef = React.createRef();
-
-    this.setTransform = this.setTransform.bind(this);
-    this.setFileIndex = this.setFileIndex.bind(this);
-    this.setScreenDimensions = this.setScreenDimensions.bind(this);
-  }
-
-  async componentDidMount(): void {
+  useEffect(() => {
     ipcRenderer.on('tex>update-face-outline', (e, points) => {
-      this.setBoundaryPoints(points.map((pt) => new Point(pt[0], pt[1])));
+      setBoundaryWithPoints(points.map((pt) => new Point(pt[0], pt[1])));
     });
     ipcRenderer.send('die>request-boundary-points');
 
     window.onresize = () => {
-      this.setScreenDimensions(window.outerWidth, window.outerHeight);
+      const { outerWidth: width, outerHeight: height } = window;
+      setScreenDimensions({ width, height });
     };
     window.onresize();
+    ipcRenderer.invoke('list-texture-files').then((list) => {
+      setFileIndex(0);
+      setFileList(list);
+    });
+  }, []);
 
-    const fileList = await ipcRenderer.invoke('list-texture-files');
-    this.setState({ fileList, selectedFileIndex: 0 });
-  }
+  const { viewBoxAttrs, path } = boundary;
 
-  setBoundaryPoints(boundaryPoints) {
-    const poly = new Polygon();
-    poly.addFace(boundaryPoints);
-    const {
-      xmin, ymin, xmax, ymax,
-    } = poly.box;
-    const boundaryViewBoxAttrs = {
-      xmin, ymin, width: xmax - xmin, height: ymax - ymin,
-    };
-    this.setState({ boundaryPoints, boundaryViewBoxAttrs, boundaryPath: closedPolygonPath(boundaryPoints) });
-  }
 
-  setTransform(transform) {
-    this.setState((state) => ({ transform: { ...state.transform, ...transform } }));
-  }
+  const bind = useDrag(({ down, offset }) => {
+    if (down) {
+      setTextureTranslation(offset);
+    }
+  });
 
-  setFileIndex(selectedFileIndex) {
-    this.setState({ selectedFileIndex: parseInt(selectedFileIndex, 10) });
-  }
+  if (!fileList || !viewBoxAttrs) { return null; }
+  // slider component should enforce range and prevent tile from going outside bounds on change of window size
+  const textureFittingScale = getFitScale(viewBoxAttrs, imageDimensions);
 
-  setScreenDimensions(width, height) {
-    this.setState({ screenDimensions: { width, height } });
-  }
-
-  getTextureUrl() {
-    const { fileList, selectedFileIndex } = this.state;
-    return `/images/textures/${fileList[selectedFileIndex]}`;
-  }
-
-  async getTextureDValue() {
-    const { current } = this.textureRef;
+  const getTextureUrl = () => `/images/textures/${fileList[fileIndex]}`;
+  const getTextureDValue = async () => {
+    const { current } = textureRef;
     if (!current) { return null; }
     const pathFragment = current.getAttribute('xlink:href');
     if (!pathFragment) { return null; }
 
-    const svgString = await ipcRenderer.invoke('get-svg-string-by-path', this.getTextureUrl());
+    const svgString = await ipcRenderer.invoke('get-svg-string-by-path', getTextureUrl());
 
-    const { baseVal } = this.textureRef.current.cloneNode().transform;
+    const { baseVal } = textureRef.current.cloneNode().transform;
     const consolidatedMatrix = baseVal.consolidate().matrix;
     const {
       a, b, c, d, e, f,
@@ -103,90 +107,98 @@ class MoveableTextureLOC extends Component {
     console.log(dee);
     const path = PathData.fromDValue(dee);
     return path.transformPoints(new Matrix(a, b, c, d, e, f)).getD();
-  }
+  };
 
 
-  render() {
-    const { classes } = this.props;
-    const {
-      state: {
-        faceScaleRatio,
-        fileList, selectedFileIndex,
-        imageDimensions = {},
-        screenDimensions,
-        boundaryViewBoxAttrs,
-        boundaryPath,
-      },
-    } = this;
+  const { classes } = props;
+  const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
+  const { width: faceWidth, height: faceHeight } = viewBoxAttrs;
 
-    if (!fileList || !boundaryViewBoxAttrs) { return null; }
-
-    const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
-    const { width: faceWidth, height: faceHeight } = boundaryViewBoxAttrs;
-
-    // slider component should enforce range and prevent tile from going outside bounds on change of window size
-    const textureFittingScale = getFitScale(boundaryViewBoxAttrs, imageDimensions);
-    const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
-    return (
-      <ThemeProvider theme={theme}>
-        <Box className={classes.root}>
-          {/*
-              controls are rendered as HTML not SVG so
-              we need to pass a ref to ReactMoveableSvgElement so it can render via portal here
-          */}
-
-          <svg
-            className="root-svg"
-            ref={this.outerSvgRef}
-            viewBox={viewBoxAttrsToString(boundaryViewBoxAttrs)}
-            transform={`scale(${faceScaleRatio})`}
-          >
-            <g>
-              <path fill="#FFD900" stroke="#000" d={boundaryPath.getD()} />
-              <image
-                transform={Number.isNaN(textureFittingScale) ? null : `scale(${textureFittingScale})`}
-                onLoad={() => {
-                  // eslint-disable-next-line no-shadow
-                  const { height, width } = this.textureRef.current.getBBox();
-                  this.setState((prevState) => ({ ...prevState, imageDimensions: { height, width } }));
-                  // the movable attempts to calculate the bounds before the image has loaded, hence below
-                  // deferred by a tick so that style changes from above take effect beforehand
-                }}
-                ref={this.textureRef}
-                // style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
-                xlinkHref={this.getTextureUrl()}
-              />
-            </g>
-          </svg>
-
-          <div className={classes.select}>
-            <FingerprintIcon onClick={async () => {
-              const val = await this.getTextureDValue();
-              ipcRenderer.send('die>set-die-line-cut-holes', val, faceWidth);
-            }}
-            />
-            <PanelSelect
-              label="Tile"
-              value={selectedFileIndex}
-              setter={this.setFileIndex}
-              options={options}
-            />
-            <PanelSlider
-              label="View scale"
-              value={faceScaleRatio}
-              setter={(val) => {
-                this.setState({ faceScaleRatio: val });
+  const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
+  const TEXTURE_RANGE_MULT = 2;
+  const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
+  const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
+  const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatio;
+  const toSign = (bool) => (bool ? 1 : -1);
+  const getTransformString = (x, y, negate = false) => `translate(${toSign(negate) * x}  ${toSign(negate) * y})`;
+  const centerVector = [imageDimensions.width / 2, imageDimensions.height / 2];
+  return (
+    <ThemeProvider theme={theme}>
+      <Box className={classes.root}>
+        <svg
+          className="root-svg"
+          ref={outerSvgRef}
+          viewBox={viewBoxAttrsToString(viewBoxAttrs)}
+          transform={`scale(${faceScaleRatio})`}
+          {...bind()}
+        >
+          <g>
+            <path fill="#FFD900" stroke="#000" d={path.getD()} />
+            <image
+              transform={`
+                scale(${textureScaleValue})
+                ${getTransformString(...textureTranslation, true)} 
+                ${getTransformString(...centerVector, true)} 
+                rotate(${textureRotation}) 
+                ${getTransformString(...centerVector)} 
+              `}
+              onLoad={() => {
+                // eslint-disable-next-line no-shadow
+                const { height, width } = textureRef.current.getBBox();
+                setImageDimensions({ height, width });
+                // the movable attempts to calculate the bounds before the image has loaded, hence below
+                // deferred by a tick so that style changes from above take effect beforehand
               }}
-              step={VERY_SMALL_NUMBER}
-              max={1}
-              min={0.3}
+              ref={textureRef}
+                // style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
+              xlinkHref={getTextureUrl()}
             />
-          </div>
-        </Box>
-      </ThemeProvider>
-    );
-  }
-}
+          </g>
+        </svg>
+
+        <div className={classes.select}>
+          <FingerprintIcon onClick={async () => {
+            const val = await getTextureDValue();
+            ipcRenderer.send('die>set-die-line-cut-holes', val, faceWidth);
+          }}
+          />
+          <PanelSelect
+            label="Tile"
+            value={fileIndex}
+            setter={(val) => {
+              setFileIndex(parseInt(val, 10));
+            }}
+            options={options}
+          />
+          <PanelSlider
+            label="View scale"
+            value={faceScaleRatio}
+            setter={setFaceScaleRatio}
+            step={VERY_SMALL_NUMBER}
+            max={1}
+            min={0.3}
+          />
+          <PanelSlider
+            label="Texture scale"
+            value={textureScaleRatio}
+            setter={setTextureScaleRatio}
+            step={VERY_SMALL_NUMBER}
+            max={1}
+            min={0.1}
+          />
+          <PanelSlider
+            label="Texture rotation"
+            value={textureRotation}
+            setter={setTextureRotation}
+            step={VERY_SMALL_NUMBER}
+            max={360}
+            min={0}
+          />
+        </div>
+      </Box>
+    </ThemeProvider>
+  );
+};
 export const MoveableTexture = withStyles({
   root: {
     backgroundColor: '#333', display: 'block', width: '100%', height: '100%', position: 'absolute', color: '#fff',
