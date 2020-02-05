@@ -21,21 +21,26 @@ import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 export const theme = createMuiTheme(darkTheme);
 const getFitScale = ({ width: boundsWidth, height: boundsHeight }, { width: imageWidth, height: imageHeight }) => {
   const widthIsClamp = (boundsWidth / boundsHeight) <= (imageWidth / imageHeight);
-  return widthIsClamp ? boundsWidth / imageWidth : boundsHeight / imageHeight;
+  return {
+    widthIsClamp,
+    scale: widthIsClamp ? boundsWidth / imageWidth : boundsHeight / imageHeight,
+  };
 };
 
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
 const MoveableTextureLOC = (props) => {
   const textureRef = createRef();
-  const outerSvgRef = createRef();
 
-  const [screenDimensions, setScreenDimensions] = useState({ width: 1, height: 1 });
+  const [screenDimensions, setScreenDimensions] = useState();
+  // can't use early exit because image must render before it's onload sets imageDimensions
   const [imageDimensions, setImageDimensions] = useState({ width: 1, height: 1 });
 
   const [faceScaleRatio, setFaceScaleRatio] = useState(1);
 
   const [textureScaleRatio, setTextureScaleRatio] = useState(0.5);
+
+  const [offsetRatio, setOffsetRatio] = useState(0);
 
   const [textureRotation, setTextureRotation] = useState(0);
 
@@ -45,7 +50,7 @@ const MoveableTextureLOC = (props) => {
 
   const [textureTranslation, setTextureTranslation] = useState([0, 0]);
 
-  const [boundary, setBoundary] = useState({});
+  const [boundary, setBoundary] = useState();
 
   const setBoundaryWithPoints = (points) => {
     const poly = new Polygon();
@@ -69,27 +74,45 @@ const MoveableTextureLOC = (props) => {
       const { outerWidth: width, outerHeight: height } = window;
       setScreenDimensions({ width, height });
     };
-    window.onresize();
+    setTimeout(() => {
+      window.onresize();
+    });
     ipcRenderer.invoke('list-texture-files').then((list) => {
       setFileIndex(0);
       setFileList(list);
     });
   }, []);
 
-  const { viewBoxAttrs, path } = boundary;
-
-
   const bind = useDrag(({ down, offset }) => {
     if (down) {
-      setTextureTranslation(offset);
+      setTextureTranslation(offset.map((value) => value));
     }
   });
 
-  if (!fileList || !viewBoxAttrs) { return null; }
+  const { viewBoxAttrs, path } = boundary || {};
+  if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
-  const textureFittingScale = getFitScale(viewBoxAttrs, imageDimensions);
+  const { widthIsClamp: faceWidthIsClamp, scale: faceFittingScale } = getFitScale(screenDimensions, viewBoxAttrs);
+  const svgScale = faceScaleRatio * faceFittingScale;
+  const { scale: textureFittingScale } = getFitScale(viewBoxAttrs, imageDimensions);
+  const TEXTURE_RANGE_MULT = 2;
+  const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
+  const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
+  const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatio;
+  const textureCenterVector = [imageDimensions.width / 2, imageDimensions.height / 2];
 
   const getTextureUrl = () => `/images/textures/${fileList[fileIndex]}`;
+  const negateMap = (num) => num * -1;
+  const getTransformMatrix = () => {
+    const matrix = new Matrix();
+    return matrix
+      .translate(...textureTranslation.map((val) => val / svgScale))
+      .scale(textureScaleValue, textureScaleValue)
+      .translate(...textureCenterVector)
+      .rotate(textureRotation)
+      .translate(...textureCenterVector.map(negateMap));
+  };
+  const matrixToTransformString = (m) => `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.tx} ${m.ty})`;
   const getTextureDValue = async () => {
     const { current } = textureRef;
     if (!current) { return null; }
@@ -98,63 +121,53 @@ const MoveableTextureLOC = (props) => {
 
     const svgString = await ipcRenderer.invoke('get-svg-string-by-path', getTextureUrl());
 
-    const { baseVal } = textureRef.current.cloneNode().transform;
-    const consolidatedMatrix = baseVal.consolidate().matrix;
-    const {
-      a, b, c, d, e, f,
-    } = consolidatedMatrix;
     const dee = extractCutHolesFromSvgString(svgString);
     console.log(dee);
-    const path = PathData.fromDValue(dee);
-    return path.transformPoints(new Matrix(a, b, c, d, e, f)).getD();
+    const texPath = PathData.fromDValue(dee);
+    return texPath.transformPoints(getTransformMatrix()).getD();
   };
 
 
   const { classes } = props;
-  const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
+  // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
   const { width: faceWidth, height: faceHeight } = viewBoxAttrs;
 
   const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
-  const TEXTURE_RANGE_MULT = 2;
-  const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
-  const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
-  const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatio;
-  const toSign = (bool) => (bool ? 1 : -1);
-  const getTransformString = (x, y, negate = false) => `translate(${toSign(negate) * x}  ${toSign(negate) * y})`;
-  const centerVector = [imageDimensions.width / 2, imageDimensions.height / 2];
+
+  const offsetMargin = offsetRatio * faceFittingScale * viewBoxAttrs[faceWidthIsClamp ? 'width' : 'height'];
+
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root}>
-        <svg
-          className="root-svg"
-          ref={outerSvgRef}
-          viewBox={viewBoxAttrsToString(viewBoxAttrs)}
-          transform={`scale(${faceScaleRatio})`}
-          {...bind()}
+        <div
+          className="svg-container"
         >
-          <g>
-            <path fill="#FFD900" stroke="#000" d={path.getD()} />
-            <image
-              transform={`
-                scale(${textureScaleValue})
-                ${getTransformString(...textureTranslation, true)} 
-                ${getTransformString(...centerVector, true)} 
-                rotate(${textureRotation}) 
-                ${getTransformString(...centerVector)} 
-              `}
-              onLoad={() => {
-                // eslint-disable-next-line no-shadow
-                const { height, width } = textureRef.current.getBBox();
-                setImageDimensions({ height, width });
-                // the movable attempts to calculate the bounds before the image has loaded, hence below
-                // deferred by a tick so that style changes from above take effect beforehand
-              }}
-              ref={textureRef}
-                // style={{ transformOrigin: `${imageWidth / 2}px ${imageHeight / 2}px` }}
-              xlinkHref={getTextureUrl()}
-            />
-          </g>
-        </svg>
+          <svg
+            className="root-svg"
+            viewBox={viewBoxAttrsToString(viewBoxAttrs)}
+            width={faceWidth}
+            height={faceHeight}
+            transform={`translate(${offsetMargin} ${offsetMargin}) scale(${svgScale})`}
+            transform-origin="0 0"
+            {...bind()}
+          >
+            <g>
+              <path fill="#FFD900" stroke="#000" d={path.getD()} />
+              <image
+                transform={matrixToTransformString(getTransformMatrix())}
+                onLoad={() => {
+                  // eslint-disable-next-line no-shadow
+                  const { height, width } = textureRef.current.getBBox();
+                  setImageDimensions({ height, width });
+                  // the movable attempts to calculate the bounds before the image has loaded, hence below
+                  // deferred by a tick so that style changes from above take effect beforehand
+                }}
+                ref={textureRef}
+                xlinkHref={getTextureUrl()}
+              />
+            </g>
+          </svg>
+        </div>
 
         <div className={classes.select}>
           <FingerprintIcon onClick={async () => {
@@ -183,7 +196,7 @@ const MoveableTextureLOC = (props) => {
             value={textureScaleRatio}
             setter={setTextureScaleRatio}
             step={VERY_SMALL_NUMBER}
-            max={1}
+            max={2}
             min={0.1}
           />
           <PanelSlider
@@ -192,6 +205,14 @@ const MoveableTextureLOC = (props) => {
             setter={setTextureRotation}
             step={VERY_SMALL_NUMBER}
             max={360}
+            min={0}
+          />
+          <PanelSlider
+            label="Offset"
+            value={offsetRatio}
+            setter={setOffsetRatio}
+            step={VERY_SMALL_NUMBER}
+            max={0.5}
             min={0}
           />
         </div>
