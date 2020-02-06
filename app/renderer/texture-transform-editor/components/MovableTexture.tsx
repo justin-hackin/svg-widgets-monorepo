@@ -8,7 +8,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
 import FingerprintIcon from '@material-ui/icons/Fingerprint';
-import { Matrix, Polygon, Point } from '@flatten-js/core';
+import { Matrix, Polygon, point } from '@flatten-js/core';
 
 import { VERY_SMALL_NUMBER } from '../../die-line-viewer/util/geom';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
@@ -20,7 +20,9 @@ import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 
 const degToRad = (deg) => (deg / 360) * Math.PI * 2;
 export const theme = createMuiTheme(darkTheme);
-const getFitScale = ({ width: boundsWidth, height: boundsHeight }, { width: imageWidth, height: imageHeight }) => {
+const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
+  { width: imageWidth, height: imageHeight } = {}) => {
+  if (!boundsWidth || !boundsHeight || !imageWidth || !imageHeight) { return null; }
   const widthIsClamp = (boundsWidth / boundsHeight) <= (imageWidth / imageHeight);
   return {
     widthIsClamp,
@@ -46,7 +48,9 @@ const MoveableTextureLOC = (props) => {
 
   const [fileIndex, setFileIndex] = useState();
 
+  // due to scaling of view in between drags, must maintain active translation and apply when drag released
   const [textureTranslation, setTextureTranslation] = useState([0, 0]);
+  const [textureDragTranslation, setTextureDragTranslation] = useState([0, 0]);
 
   const [boundary, setBoundary] = useState();
 
@@ -64,7 +68,7 @@ const MoveableTextureLOC = (props) => {
 
   useEffect(() => {
     ipcRenderer.on('tex>update-face-outline', (e, points) => {
-      setBoundaryWithPoints(points.map((pt) => new Point(pt[0], pt[1])));
+      setBoundaryWithPoints(points.map((pt) => point(pt[0], pt[1])));
     });
     ipcRenderer.send('die>request-boundary-points');
 
@@ -81,16 +85,28 @@ const MoveableTextureLOC = (props) => {
     });
   }, []);
 
-  const bind = useDrag(({ down, offset }) => {
-    if (down) {
-      setTextureTranslation(offset.map((value) => value));
-    }
-  });
 
   const { viewBoxAttrs, path } = boundary || {};
-  if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
-  const { scale: textureFittingScale } = getFitScale(viewBoxAttrs, imageDimensions);
+  const { scale: textureFittingScale = 1 } = getFitScale(viewBoxAttrs, imageDimensions) || {};
+  const { scale: faceFittingScale = 1 } = getFitScale(screenDimensions, viewBoxAttrs) || {};
+  const absoluteMovementToSvg = (absCoords) => absCoords.map(
+    (coord) => ((coord * 100) / faceScalePercent) / faceFittingScale,
+  );
+  const bind = useDrag(({ down, movement }) => {
+    const relativeMovement = point(absoluteMovementToSvg(movement));
+    if (down) {
+      setTextureDragTranslation(relativeMovement.toArray());
+    } else {
+      setTextureDragTranslation([0, 0]);
+      setTextureTranslation(
+        relativeMovement
+          .add(point(...textureTranslation))
+          .toArray(),
+      );
+    }
+  });
+  if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   const TEXTURE_RANGE_MULT = 2;
   const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
   const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
@@ -102,7 +118,7 @@ const MoveableTextureLOC = (props) => {
   const getTransformMatrix = () => {
     const matrix = new Matrix();
     return matrix
-      .translate(...textureTranslation)
+      .translate(...point(...textureTranslation).add(point(...textureDragTranslation)).toArray())
       .scale(textureScaleValue, textureScaleValue)
       .translate(...textureCenterVector)
       .rotate(degToRad(textureRotation))
