@@ -18,6 +18,7 @@ import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { PathData } from '../../die-line-viewer/util/PathData';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 
+const degToRad = (deg) => (deg / 360) * Math.PI * 2;
 export const theme = createMuiTheme(darkTheme);
 const getFitScale = ({ width: boundsWidth, height: boundsHeight }, { width: imageWidth, height: imageHeight }) => {
   const widthIsClamp = (boundsWidth / boundsHeight) <= (imageWidth / imageHeight);
@@ -26,7 +27,6 @@ const getFitScale = ({ width: boundsWidth, height: boundsHeight }, { width: imag
     scale: widthIsClamp ? boundsWidth / imageWidth : boundsHeight / imageHeight,
   };
 };
-
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
 const MoveableTextureLOC = (props) => {
@@ -36,11 +36,9 @@ const MoveableTextureLOC = (props) => {
   // can't use early exit because image must render before it's onload sets imageDimensions
   const [imageDimensions, setImageDimensions] = useState({ width: 1, height: 1 });
 
-  const [faceScaleRatio, setFaceScaleRatio] = useState(1);
+  const [faceScalePercent, setFaceScalePercent] = useState(80);
 
   const [textureScaleRatio, setTextureScaleRatio] = useState(0.5);
-
-  const [offsetRatio, setOffsetRatio] = useState(0);
 
   const [textureRotation, setTextureRotation] = useState(0);
 
@@ -92,8 +90,6 @@ const MoveableTextureLOC = (props) => {
   const { viewBoxAttrs, path } = boundary || {};
   if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
-  const { widthIsClamp: faceWidthIsClamp, scale: faceFittingScale } = getFitScale(screenDimensions, viewBoxAttrs);
-  const svgScale = faceScaleRatio * faceFittingScale;
   const { scale: textureFittingScale } = getFitScale(viewBoxAttrs, imageDimensions);
   const TEXTURE_RANGE_MULT = 2;
   const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
@@ -106,10 +102,10 @@ const MoveableTextureLOC = (props) => {
   const getTransformMatrix = () => {
     const matrix = new Matrix();
     return matrix
-      .translate(...textureTranslation.map((val) => val / svgScale))
+      .translate(...textureTranslation)
       .scale(textureScaleValue, textureScaleValue)
       .translate(...textureCenterVector)
-      .rotate(textureRotation)
+      .rotate(degToRad(textureRotation))
       .translate(...textureCenterVector.map(negateMap));
   };
   const matrixToTransformString = (m) => `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.tx} ${m.ty})`;
@@ -130,31 +126,40 @@ const MoveableTextureLOC = (props) => {
 
   const { classes } = props;
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
-  const { width: faceWidth, height: faceHeight } = viewBoxAttrs;
+  const { width: faceWidth } = viewBoxAttrs;
 
   const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
-
-  const offsetMargin = offsetRatio * faceFittingScale * viewBoxAttrs[faceWidthIsClamp ? 'width' : 'height'];
-
+  const faceScalePercentStr = `${faceScalePercent}%`;
+  const faceScaleCenterPercentStr = `${(100 - faceScalePercent) / 2}%`;
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root}>
-        <div
+        <svg
           className="svg-container"
+          width="100%"
+          height="100%"
         >
           <svg
+            x={faceScaleCenterPercentStr}
+            y={faceScaleCenterPercentStr}
+            width={faceScalePercentStr}
+            height={faceScalePercentStr}
             className="root-svg"
             viewBox={viewBoxAttrsToString(viewBoxAttrs)}
-            width={faceWidth}
-            height={faceHeight}
-            transform={`translate(${offsetMargin} ${offsetMargin}) scale(${svgScale})`}
-            transform-origin="0 0"
-            {...bind()}
           >
             <g>
-              <path fill="#FFD900" stroke="#000" d={path.getD()} />
+              <path
+                fill="#FFD900"
+                stroke="#000"
+                d={path.getD()}
+              />
               <image
                 transform={matrixToTransformString(getTransformMatrix())}
+                stroke="#f00"
+                {...bind()}
+                x={0}
+                y={0}
+                {...imageDimensions}
                 onLoad={() => {
                   // eslint-disable-next-line no-shadow
                   const { height, width } = textureRef.current.getBBox();
@@ -164,10 +169,11 @@ const MoveableTextureLOC = (props) => {
                 }}
                 ref={textureRef}
                 xlinkHref={getTextureUrl()}
+
               />
             </g>
           </svg>
-        </div>
+        </svg>
 
         <div className={classes.select}>
           <FingerprintIcon onClick={async () => {
@@ -184,15 +190,15 @@ const MoveableTextureLOC = (props) => {
             options={options}
           />
           <PanelSlider
-            label="View scale"
-            value={faceScaleRatio}
-            setter={setFaceScaleRatio}
+            label="Face scale %"
+            value={faceScalePercent}
+            setter={setFaceScalePercent}
             step={VERY_SMALL_NUMBER}
-            max={1}
-            min={0.3}
+            max={100}
+            min={30}
           />
           <PanelSlider
-            label="Texture scale"
+            label="Texture scale ratio"
             value={textureScaleRatio}
             setter={setTextureScaleRatio}
             step={VERY_SMALL_NUMBER}
@@ -200,19 +206,11 @@ const MoveableTextureLOC = (props) => {
             min={0.1}
           />
           <PanelSlider
-            label="Texture rotation"
+            label="Texture rotation °"
             value={textureRotation}
             setter={setTextureRotation}
             step={VERY_SMALL_NUMBER}
             max={360}
-            min={0}
-          />
-          <PanelSlider
-            label="Offset"
-            value={offsetRatio}
-            setter={setOffsetRatio}
-            step={VERY_SMALL_NUMBER}
-            max={0.5}
             min={0}
           />
         </div>
