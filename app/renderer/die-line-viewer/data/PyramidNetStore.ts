@@ -68,7 +68,7 @@ export class PyramidNetStore {
   @action
   setPyramidGeometryId(id) {
     this.activeCutHolePatternD = '';
-    this.textureImportWidth = 0;
+    this.textureTransform = '';
     this.pyramidGeometryId = id;
     this.sendBoundaryPoints();
   }
@@ -103,7 +103,7 @@ export class PyramidNetStore {
   public activeCutHolePatternD: string;
 
   @observable
-  public textureImportWidth: number;
+  public textureTransform: string;
 
   @computed
   get faceInteriorAngles(): number[] {
@@ -176,22 +176,19 @@ export class PyramidNetStore {
 
   @computed
   get borderInsetFaceHoleTransform() {
-    const textureDifferenceScale = this.borderPolygon.box.width / this.textureImportWidth;
-    return `translate(${this.insetPolygon.vertices[0].x}, ${this.insetPolygon.vertices[0].y}) scale(${
-      (textureDifferenceScale * this.insetPolygon.box.width) / this.borderPolygon.box.width
-    })`;
+    return `scale(${(this.insetPolygon.box.width) / this.borderPolygon.box.width})`;
   }
+  //
+  // @action
+  // applyFaceHolePattern(svgString) {
+  //   this.textureTransform = parseFloat(extractViewBoxFromSvg(svgString).split(' ')[2]);
+  //   this.activeCutHolePatternD = extractCutHolesFromSvgString(svgString);
+  // }
 
   @action
-  applyFaceHolePattern(svgString) {
-    this.textureImportWidth = parseFloat(extractViewBoxFromSvg(svgString).split(' ')[2]);
-    this.activeCutHolePatternD = extractCutHolesFromSvgString(svgString);
-  }
-
-  @action
-  setFaceHoleProperties(d, width) {
+  setFaceHoleProperties(d, transform) {
     this.activeCutHolePatternD = d;
-    this.textureImportWidth = width;
+    this.textureTransform = transform;
   }
 
   @action

@@ -59,7 +59,7 @@ export const store = new PyramidNetMakerStore();
 window.store = store;
 
 // @ts-ignore
-ipcRenderer.on('die>set-die-line-cut-holes', (e, d, width) => {
+ipcRenderer.on('die>set-die-line-cut-holes', (e, d, transform) => {
   // @ts-ignore
-  store.pyramidNetSpec.setFaceHoleProperties(d, width);
+  store.pyramidNetSpec.setFaceHoleProperties(d, transform);
 });

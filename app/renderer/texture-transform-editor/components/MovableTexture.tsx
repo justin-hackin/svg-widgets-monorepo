@@ -15,7 +15,6 @@ import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
 import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
 import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
-import { PathData } from '../../die-line-viewer/util/PathData';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 
 const degToRad = (deg) => (deg / 360) * Math.PI * 2;
@@ -36,7 +35,7 @@ const MoveableTextureLOC = (props) => {
 
   const [screenDimensions, setScreenDimensions] = useState();
   // can't use early exit because image must render before it's onload sets imageDimensions
-  const [imageDimensions, setImageDimensions] = useState({ width: 1, height: 1 });
+  const [imageDimensions, setImageDimensions] = useState();
 
   const [faceScalePercent, setFaceScalePercent] = useState(80);
 
@@ -111,7 +110,7 @@ const MoveableTextureLOC = (props) => {
   const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
   const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
   const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatio;
-  const textureCenterVector = [imageDimensions.width / 2, imageDimensions.height / 2];
+  const textureCenterVector = imageDimensions ?  [imageDimensions.width / 2, imageDimensions.height / 2] : [0, 0];
 
   const getTextureUrl = () => `/images/textures/${fileList[fileIndex]}`;
   const negateMap = (num) => num * -1;
@@ -125,6 +124,7 @@ const MoveableTextureLOC = (props) => {
       .translate(...textureCenterVector.map(negateMap));
   };
   const matrixToTransformString = (m) => `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.tx} ${m.ty})`;
+
   const getTextureDValue = async () => {
     const { current } = textureRef;
     if (!current) { return null; }
@@ -133,16 +133,12 @@ const MoveableTextureLOC = (props) => {
 
     const svgString = await ipcRenderer.invoke('get-svg-string-by-path', getTextureUrl());
 
-    const dee = extractCutHolesFromSvgString(svgString);
-    console.log(dee);
-    const texPath = PathData.fromDValue(dee);
-    return texPath.transformPoints(getTransformMatrix()).getD();
+    return extractCutHolesFromSvgString(svgString);
   };
 
 
   const { classes } = props;
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
-  const { width: faceWidth } = viewBoxAttrs;
 
   const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
   const faceScalePercentStr = `${faceScalePercent}%`;
@@ -193,8 +189,8 @@ const MoveableTextureLOC = (props) => {
 
         <div className={classes.select}>
           <FingerprintIcon onClick={async () => {
-            const val = await getTextureDValue();
-            ipcRenderer.send('die>set-die-line-cut-holes', val, faceWidth);
+            const d = await getTextureDValue();
+            ipcRenderer.send('die>set-die-line-cut-holes', d, matrixToTransformString(getTransformMatrix()));
           }}
           />
           <PanelSelect
