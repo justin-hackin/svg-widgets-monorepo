@@ -1,4 +1,6 @@
 const { dialog } = require('electron');
+const { execFile } = require('child_process');
+
 const fsPromises = require('fs').promises;
 // @ts-ignore
 const path = require('path');
@@ -13,7 +15,33 @@ const jsonFilters = [{
   extensions: ['json'],
 }];
 
-export const setupIpc = (ipcMain) => {
+export const setupIpc = (ipcMain, app) => {
+  // unfortunately Inkscape's piping features could not be leveraged so use fs as a buffer
+  const tempInputFilePath = path.join(app.getPath('temp'), '__inkscape-svg-intersection--input__.svg');
+  const tempOutputFilePath = path.join(app.getPath('temp'), '__inkscape-svg-intersection--output__.svg');
+  console.log(tempOutputFilePath, tempInputFilePath);
+  const svgIntersection = async (svgInput) => {
+    await fsPromises.writeFile(tempInputFilePath, svgInput);
+    await new Promise((resolve, reject) => {
+      execFile('/Applications/Inkscape.app/Contents/MacOS/Inkscape', [
+        ' --batch-process',
+        ` --actions="EditSelectAll; SelectionIntersect; export-filename: ${tempOutputFilePath}; export-do;"`,
+        `${tempInputFilePath}`],
+      { shell: true },
+      (e, stdout, stderr) => {
+        if (e instanceof Error) {
+          console.error(e);
+          reject(e);
+        }
+        resolve();
+      });
+    });
+    return fsPromises.readFile(tempOutputFilePath, 'utf8');
+  };
+
+  ipcMain.handle('intersect-svg', (e, svgContent) => svgIntersection(svgContent));
+
+
   ipcMain.handle('save-svg', (e, fileContent, options) => dialog.showSaveDialog({
     ...options,
     filters: svgFilters,

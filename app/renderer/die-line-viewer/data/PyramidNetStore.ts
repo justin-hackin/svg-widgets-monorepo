@@ -176,7 +176,9 @@ export class PyramidNetStore {
 
   @computed
   get borderInsetFaceHoleTransform() {
-    return `scale(${(this.insetPolygon.box.width) / this.borderPolygon.box.width})`;
+    return `translate(${this.insetPolygon.vertices[0].x}, ${this.insetPolygon.vertices[0].y}) scale(${
+      (this.insetPolygon.box.width) / this.borderPolygon.box.width
+    })`;
   }
   //
   // @action

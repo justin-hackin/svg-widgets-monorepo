@@ -162,7 +162,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
           <path
             {...cutProps}
             d={activeCutHolePatternD}
-            transform={`${textureTransform}`}
+            transform={borderInsetFaceHoleTransform}
           />
           )}
         </g>

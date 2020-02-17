@@ -17,9 +17,9 @@ const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/
 // where public folder on the root dir
 
 
-setupIpc(ipcMain);
-
 app.on('ready', async () => {
+  setupIpc(ipcMain, app);
+
   // eslint-disable-next-line max-len
   const reactExtension = '/Library/Application Support/Google/Chrome/'
     + 'Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.4.0_0';

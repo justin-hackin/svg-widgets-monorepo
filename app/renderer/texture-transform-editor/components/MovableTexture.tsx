@@ -3,6 +3,7 @@ import React, {
   createRef, useEffect, useState,
 } from 'react';
 import { useDrag } from 'react-use-gesture';
+import ReactDOMServer from 'react-dom/server';
 
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
@@ -16,6 +17,14 @@ import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
 import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
 import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
+
+
+export const FaceIntersectionSVG = ({ boundaryD, textureD, textureTransform }) => (
+  <svg>
+    <path d={boundaryD} />
+    <path d={textureD} transform={textureTransform} />
+  </svg>
+);
 
 const degToRad = (deg) => (deg / 360) * Math.PI * 2;
 export const theme = createMuiTheme(darkTheme);
@@ -110,7 +119,7 @@ const MoveableTextureLOC = (props) => {
   const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
   const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
   const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatio;
-  const textureCenterVector = imageDimensions ?  [imageDimensions.width / 2, imageDimensions.height / 2] : [0, 0];
+  const textureCenterVector = imageDimensions ? [imageDimensions.width / 2, imageDimensions.height / 2] : [0, 0];
 
   const getTextureUrl = () => `/images/textures/${fileList[fileIndex]}`;
   const negateMap = (num) => num * -1;
@@ -143,6 +152,7 @@ const MoveableTextureLOC = (props) => {
   const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
   const faceScalePercentStr = `${faceScalePercent}%`;
   const faceScaleCenterPercentStr = `${(100 - faceScalePercent) / 2}%`;
+  const imageTransform = matrixToTransformString(getTransformMatrix());
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root}>
@@ -166,7 +176,7 @@ const MoveableTextureLOC = (props) => {
                 d={path.getD()}
               />
               <image
-                transform={matrixToTransformString(getTransformMatrix())}
+                transform={imageTransform}
                 stroke="#f00"
                 {...bind()}
                 x={0}
@@ -190,7 +200,18 @@ const MoveableTextureLOC = (props) => {
         <div className={classes.select}>
           <FingerprintIcon onClick={async () => {
             const d = await getTextureDValue();
-            ipcRenderer.send('die>set-die-line-cut-holes', d, matrixToTransformString(getTransformMatrix()));
+            // return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: this }));
+            const intersectionSvg = (
+              <FaceIntersectionSVG
+                boundaryD={path.getD()}
+                textureD={d}
+                textureTransform={imageTransform}
+              />
+            );
+            const intersectionSvgStr = ReactDOMServer.renderToString(intersectionSvg);
+            const dClipdSVG = await ipcRenderer.invoke('intersect-svg', intersectionSvgStr);
+            const dd = extractCutHolesFromSvgString(dClipdSVG);
+            ipcRenderer.send('die>set-die-line-cut-holes', dd, matrixToTransformString(getTransformMatrix()));
           }}
           />
           <PanelSelect
