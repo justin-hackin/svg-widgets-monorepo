@@ -1,4 +1,5 @@
 // @ts-nocheck
+import Canvg from 'canvg';
 import React, {
   createRef, useEffect, useState,
 } from 'react';
@@ -48,6 +49,8 @@ const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.hei
 
 const MoveableTextureLOC = (props) => {
   const textureRef = createRef();
+  const textureApplicationSvgRef = createRef();
+  const textureApplicationCanvasRef = createRef();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPositive, setIsPositive] = useState(true);
@@ -63,8 +66,9 @@ const MoveableTextureLOC = (props) => {
   const [textureRotation, setTextureRotation] = useState(0);
 
   const [fileList, setFileList] = useState();
-
   const [fileIndex, setFileIndex] = useState();
+  const textureUrl = (fileList && fileIndex != null) ? `/images/textures/${fileList[fileIndex]}` : null;
+  const [texturePathD, setTexturePathD] = useState();
 
   // due to scaling of view in between drags, must maintain active translation and apply when drag released
   const [textureTranslation, setTextureTranslation] = useState([0, 0]);
@@ -124,14 +128,51 @@ const MoveableTextureLOC = (props) => {
       );
     }
   });
+  const setTextureDFromFile = () => {
+    ipcRenderer.invoke('get-svg-string-by-path', textureUrl)
+      .then((svgString) => {
+        setTexturePathD(extractCutHolesFromSvgString(svgString));
+      });
+  };
+
+  useEffect(() => {
+    if (textureRef.current && textureUrl) {
+      setTextureDFromFile();
+    }
+  }, [textureRef.current, textureUrl]);
+
+  useEffect(() => {
+    if (textureRef.current) {
+      const bb = textureRef.current.getBBox();
+      setImageDimensions({ width: bb.width, height: bb.height });
+    }
+  }, [texturePathD]);
+
+  useEffect(() => {
+    if (textureApplicationCanvasRef.current
+      && textureTranslation && textureScaleRatio != null && textureRotation != null) {
+      const ctx = textureApplicationCanvasRef.current.getContext('2d');
+      const svgStr = `<svg viewBox="${
+        viewBoxAttrsToString(viewBoxAttrs)}">${textureApplicationSvgRef.current.outerHTML}</svg>`;
+      Canvg.from(ctx, svgStr, {
+        enableRedraw: false,
+        ignoreAnimation: true,
+        ignoreMouse: true,
+      }).then((v) => {
+        v.start();
+        v.stop();
+      });
+    }
+  }, [textureTranslation, textureScaleRatio, textureRotation]);
+
   if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
+  setTextureDFromFile();
   const TEXTURE_RANGE_MULT = 2;
   const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
   const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
   const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatio;
   const textureCenterVector = imageDimensions ? [imageDimensions.width / 2, imageDimensions.height / 2] : [0, 0];
 
-  const getTextureUrl = () => `/images/textures/${fileList[fileIndex]}`;
   const negateMap = (num) => num * -1;
   const getTransformMatrix = () => {
     const matrix = new Matrix();
@@ -144,18 +185,6 @@ const MoveableTextureLOC = (props) => {
   };
   const matrixToTransformString = (m) => `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.tx} ${m.ty})`;
 
-  const getTextureDValue = async () => {
-    const { current } = textureRef;
-    if (!current) { return null; }
-    const pathFragment = current.getAttribute('xlink:href');
-    if (!pathFragment) { return null; }
-
-    const svgString = await ipcRenderer.invoke('get-svg-string-by-path', getTextureUrl());
-
-    return extractCutHolesFromSvgString(svgString);
-  };
-
-
   const { classes } = props;
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
@@ -164,14 +193,14 @@ const MoveableTextureLOC = (props) => {
   const faceScaleCenterPercentStr = `${(100 - faceScalePercent) / 2}%`;
   const imageTransform = matrixToTransformString(getTransformMatrix());
 
+
   const sendTexture = async () => {
     setIsLoading(true);
-    const d = await getTextureDValue();
     // return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: this }));
     const intersectionSvg = (
       <FaceIntersectionSVG
         boundaryD={path.getD()}
-        textureD={d}
+        textureD={texturePathD}
         textureTransform={imageTransform}
         isPositive
       />
@@ -191,6 +220,12 @@ const MoveableTextureLOC = (props) => {
             <CircularProgress />
           </div>
         )}
+        <canvas
+          width={viewBoxAttrs.width}
+          height={viewBoxAttrs.height}
+          ref={textureApplicationCanvasRef}
+          id="texture-canvas"
+        />
         <svg
           className="svg-container"
           width="100%"
@@ -204,31 +239,24 @@ const MoveableTextureLOC = (props) => {
             className="root-svg"
             viewBox={viewBoxAttrsToString(viewBoxAttrs)}
           >
-            <g>
+            <svg
+              ref={textureApplicationSvgRef}
+              overflow="visible"
+            >
               <path
                 fill="#FFD900"
                 stroke="#000"
                 d={path.getD()}
               />
-              <image
-                transform={imageTransform}
-                stroke="#f00"
-                {...bind()}
-                x={0}
-                y={0}
-                {...imageDimensions}
-                onLoad={() => {
-                  // eslint-disable-next-line no-shadow
-                  const { height, width } = textureRef.current.getBBox();
-                  setImageDimensions({ height, width });
-                  // the movable attempts to calculate the bounds before the image has loaded, hence below
-                  // deferred by a tick so that style changes from above take effect beforehand
-                }}
+              <path
                 ref={textureRef}
-                xlinkHref={getTextureUrl()}
-
+                {...bind()}
+                stroke="#f00"
+                fill="rgba(0,0,0,0.3)"
+                d={texturePathD}
+                transform={imageTransform}
               />
-            </g>
+            </svg>
           </svg>
         </svg>
 
