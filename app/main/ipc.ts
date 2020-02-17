@@ -20,12 +20,18 @@ export const setupIpc = (ipcMain, app) => {
   const tempInputFilePath = path.join(app.getPath('temp'), '__inkscape-svg-intersection--input__.svg');
   const tempOutputFilePath = path.join(app.getPath('temp'), '__inkscape-svg-intersection--output__.svg');
   console.log(tempOutputFilePath, tempInputFilePath);
-  const svgIntersection = async (svgInput) => {
+  const svgIntersection = async (svgInput, isPositive) => {
     await fsPromises.writeFile(tempInputFilePath, svgInput);
     await new Promise((resolve, reject) => {
+      const exportStr = ` export-filename: ${tempOutputFilePath}; export-do;`;
+      const actions = isPositive
+        ? ' --actions="select:texture,texture-bounds; SelectionDiff;'
+          + ` select:texture-bounds,tile; SelectionIntersect;${exportStr}"`
+        : ` --actions="select:texture,tile; SelectionIntersect;${exportStr}"`;
+
       execFile('/Applications/Inkscape.app/Contents/MacOS/Inkscape', [
         ' --batch-process',
-        ` --actions="EditSelectAll; SelectionIntersect; export-filename: ${tempOutputFilePath}; export-do;"`,
+        actions,
         `${tempInputFilePath}`],
       { shell: true },
       (e, stdout, stderr) => {
@@ -39,7 +45,7 @@ export const setupIpc = (ipcMain, app) => {
     return fsPromises.readFile(tempOutputFilePath, 'utf8');
   };
 
-  ipcMain.handle('intersect-svg', (e, svgContent) => svgIntersection(svgContent));
+  ipcMain.handle('intersect-svg', (e, svgContent, isPositive) => svgIntersection(svgContent, isPositive));
 
 
   ipcMain.handle('save-svg', (e, fileContent, options) => dialog.showSaveDialog({

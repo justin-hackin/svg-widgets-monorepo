@@ -7,10 +7,12 @@ import ReactDOMServer from 'react-dom/server';
 
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
-import { Box } from '@material-ui/core';
-import FingerprintIcon from '@material-ui/icons/Fingerprint';
-import { Matrix, Polygon, point } from '@flatten-js/core';
+import {
+  Box, Checkbox, CircularProgress, FormControlLabel, IconButton,
+} from '@material-ui/core';
+import TelegramIcon from '@material-ui/icons/Telegram';
 
+import { Matrix, Polygon, point } from '@flatten-js/core';
 import { VERY_SMALL_NUMBER } from '../../die-line-viewer/util/geom';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
@@ -19,10 +21,15 @@ import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 
 
-export const FaceIntersectionSVG = ({ boundaryD, textureD, textureTransform }) => (
+export const FaceIntersectionSVG = ({
+  boundaryD, textureD, textureTransform, isPositive,
+}) => (
   <svg>
-    <path d={boundaryD} />
-    <path d={textureD} transform={textureTransform} />
+    {isPositive && (
+    <rect fill="yellow" id="texture-bounds" x={0} y={0} width={999999} height={999999} transform={textureTransform} />
+    )}
+    <path fill="purple" id="texture" d={textureD} transform={textureTransform} />
+    <path fill="blue" id="tile" d={boundaryD} />
   </svg>
 );
 
@@ -41,6 +48,9 @@ const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.hei
 
 const MoveableTextureLOC = (props) => {
   const textureRef = createRef();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPositive, setIsPositive] = useState(true);
 
   const [screenDimensions, setScreenDimensions] = useState();
   // can't use early exit because image must render before it's onload sets imageDimensions
@@ -153,9 +163,34 @@ const MoveableTextureLOC = (props) => {
   const faceScalePercentStr = `${faceScalePercent}%`;
   const faceScaleCenterPercentStr = `${(100 - faceScalePercent) / 2}%`;
   const imageTransform = matrixToTransformString(getTransformMatrix());
+
+  const sendTexture = async () => {
+    setIsLoading(true);
+    const d = await getTextureDValue();
+    // return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: this }));
+    const intersectionSvg = (
+      <FaceIntersectionSVG
+        boundaryD={path.getD()}
+        textureD={d}
+        textureTransform={imageTransform}
+        isPositive
+      />
+    );
+    const intersectionSvgStr = ReactDOMServer.renderToString(intersectionSvg);
+    const dClipdSVG = await ipcRenderer.invoke('intersect-svg', intersectionSvgStr, isPositive);
+    const dd = extractCutHolesFromSvgString(dClipdSVG);
+    ipcRenderer.send('die>set-die-line-cut-holes', dd, matrixToTransformString(getTransformMatrix()));
+    setIsLoading(false);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root}>
+        {isLoading && (
+          <div className={classes.loadingContainer}>
+            <CircularProgress />
+          </div>
+        )}
         <svg
           className="svg-container"
           width="100%"
@@ -198,21 +233,18 @@ const MoveableTextureLOC = (props) => {
         </svg>
 
         <div className={classes.select}>
-          <FingerprintIcon onClick={async () => {
-            const d = await getTextureDValue();
-            // return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: this }));
-            const intersectionSvg = (
-              <FaceIntersectionSVG
-                boundaryD={path.getD()}
-                textureD={d}
-                textureTransform={imageTransform}
+          <FormControlLabel
+            className={classes.checkboxControlLabel}
+            control={(
+              <Checkbox
+                checked={isPositive}
+                onChange={(e) => {
+                  setIsPositive(e.target.checked);
+                }}
+                color="primary"
               />
-            );
-            const intersectionSvgStr = ReactDOMServer.renderToString(intersectionSvg);
-            const dClipdSVG = await ipcRenderer.invoke('intersect-svg', intersectionSvgStr);
-            const dd = extractCutHolesFromSvgString(dClipdSVG);
-            ipcRenderer.send('die>set-die-line-cut-holes', dd, matrixToTransformString(getTransformMatrix()));
-          }}
+            )}
+            label="Fill is positive"
           />
           <PanelSelect
             label="Tile"
@@ -246,6 +278,9 @@ const MoveableTextureLOC = (props) => {
             max={360}
             min={0}
           />
+          <IconButton onClick={sendTexture} color="primary" aria-label="send texture" component="span">
+            <TelegramIcon fontSize="large" />
+          </IconButton>
         </div>
       </Box>
     </ThemeProvider>
@@ -257,5 +292,19 @@ export const MoveableTexture = withStyles({
   },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
+  },
+  loadingContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#fff',
+    zIndex: 100,
+  },
+  checkboxControlLabel: {
+    color: '#fff',
   },
 })(MoveableTextureLOC);
