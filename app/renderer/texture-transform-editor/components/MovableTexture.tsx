@@ -221,6 +221,7 @@ const MoveableTextureLOC = (props) => {
           </div>
         )}
         <canvas
+          className={classes.textureCanvas}
           width={viewBoxAttrs.width}
           height={viewBoxAttrs.height}
           ref={textureApplicationCanvasRef}
@@ -320,6 +321,9 @@ export const MoveableTexture = withStyles({
   },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
+  },
+  textureCanvas: {
+    position: 'absolute',
   },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
