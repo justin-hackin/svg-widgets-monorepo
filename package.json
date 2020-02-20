@@ -80,6 +80,8 @@
     "react-svg-pan-zoom": "^3.4.0",
     "react-use-gesture": "^7.0.1",
     "svg-path-parser": "git+https://github.com/justin-hackin/svg-path-parser.git",
+    "three": "^0.113.2",
+    "threejs-orbit-controls": "^1.0.3",
     "use-query-params": "^0.4.3",
     "uuid": "^3.3.3"
   },

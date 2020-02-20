@@ -20,8 +20,10 @@ import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
 import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
 import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
+import { ShapePreview } from './ShapePreview';
 
-
+// TODO: extract this
+// TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 export const FaceIntersectionSVG = ({
   boundaryD, textureD, textureTransform, isPositive,
 }) => (
@@ -212,6 +214,7 @@ const MoveableTextureLOC = (props) => {
     setIsLoading(false);
   };
 
+
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root}>
@@ -227,10 +230,18 @@ const MoveableTextureLOC = (props) => {
           ref={textureApplicationCanvasRef}
           id="texture-canvas"
         />
+        <div style={{ position: 'absolute', left: '50%' }}>
+          <ShapePreview
+            width={screenDimensions.width / 2}
+            height={screenDimensions.height}
+            textureTransform={imageTransform}
+          />
+        </div>
         <svg
           className="svg-container"
-          width="100%"
+          width="50%"
           height="100%"
+          style={{ overflow: 'hidden', width: '50%' }}
         >
           <svg
             x={faceScaleCenterPercentStr}
