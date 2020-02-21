@@ -12,13 +12,12 @@ import {
 } from '../util/geom';
 import { PyramidNetSpec } from '../components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
-import { extractCutHolesFromSvgString, extractViewBoxFromSvg } from '../util/svg';
 import { AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
 import { BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 
 const defaultNet:PyramidNetSpec = {
-  pyramidGeometryId: 'great-stellated-dodecahedron',
+  pyramidGeometryId: 'small-icosacronic-hexecontahedron',
   ascendantEdgeTabsSpec: {
     flapRoundingDistanceRatio: 1,
     holeFlapTaperAngle: Math.PI / 10,

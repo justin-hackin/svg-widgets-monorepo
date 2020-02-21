@@ -50,7 +50,7 @@ export const ShapePreview = ({ width, height, textureTransform }) => {
     let wasSet = false;
     loader.load(
       // resource URL
-      '../models/great-dodecahedron.gltf',
+      '../models/small-icosacronic-hexacontahedron.gltf',
       ({ scene: importScene }) => {
         theScene.add(importScene);
         theCamera.position.set(304, 159 + offsetY, 0);
