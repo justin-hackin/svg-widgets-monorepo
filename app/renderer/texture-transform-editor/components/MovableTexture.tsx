@@ -165,7 +165,7 @@ const MoveableTextureLOC = (props) => {
         v.stop();
       });
     }
-  }, [textureTranslation, textureScaleRatio, textureRotation]);
+  }, [textureTranslation, textureDragTranslation, textureScaleRatio, textureRotation]);
 
   if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   setTextureDFromFile();

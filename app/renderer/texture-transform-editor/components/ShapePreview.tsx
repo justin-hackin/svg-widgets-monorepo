@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import OrbitControls from 'threejs-orbit-controls';
 
 const {
-  Scene, WebGLRenderer, PerspectiveCamera, PointLight, Texture,
+  Scene, WebGLRenderer, PerspectiveCamera, PointLight,
 } = THREE;
 
 const loader = new GLTFLoader();
@@ -50,7 +50,7 @@ export const ShapePreview = ({ width, height, textureTransform }) => {
     let wasSet = false;
     loader.load(
       // resource URL
-      '../models/small-icosacronic-hexacontahedron.gltf',
+      '../models/great-disdyakisdodecahedron.gltf',
       ({ scene: importScene }) => {
         theScene.add(importScene);
         theCamera.position.set(304, 159 + offsetY, 0);
@@ -78,7 +78,7 @@ export const ShapePreview = ({ width, height, textureTransform }) => {
             const { material } = child;
             const textureCanvas:HTMLCanvasElement = document.querySelector('#texture-canvas');
             // eslint-disable-next-line no-param-reassign
-            material.map = new Texture(textureCanvas);
+            material.map.image = textureCanvas;
             material.needsUpdate = true;
             setPolyhedronShape(child);
           }
