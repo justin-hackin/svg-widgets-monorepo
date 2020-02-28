@@ -338,6 +338,8 @@ export const MoveableTexture = withStyles({
   },
   textureCanvas: {
     position: 'absolute',
+    top: '-100%',
+    left: '-100%',
   },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
