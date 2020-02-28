@@ -77,6 +77,7 @@ const MoveableTextureLOC = (props) => {
   const [textureDragTranslation, setTextureDragTranslation] = useState([0, 0]);
 
   const [boundary, setBoundary] = useState();
+  const [shapeId, setShapeId] = useState();
 
   const setBoundaryWithPoints = (points) => {
     const poly = new Polygon();
@@ -91,10 +92,11 @@ const MoveableTextureLOC = (props) => {
   };
 
   useEffect(() => {
-    ipcRenderer.on('tex>update-face-outline', (e, points) => {
-      setBoundaryWithPoints(points.map((pt) => point(pt[0], pt[1])));
+    ipcRenderer.on('tex>shape-update', (e, faceVertices, aShapeId) => {
+      setBoundaryWithPoints(faceVertices.map((vert) => point(...vert)));
+      setShapeId(aShapeId);
     });
-    ipcRenderer.send('die>request-boundary-points');
+    ipcRenderer.send('die>request-shape-update');
 
     window.onresize = () => {
       const { outerWidth: width, outerHeight: height } = window;
@@ -235,6 +237,7 @@ const MoveableTextureLOC = (props) => {
             width={screenDimensions.width / 2}
             height={screenDimensions.height}
             textureTransform={imageTransform}
+            shapeId={shapeId}
           />
         </div>
         <svg

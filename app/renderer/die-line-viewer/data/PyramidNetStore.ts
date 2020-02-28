@@ -55,8 +55,8 @@ const defaultNet:PyramidNetSpec = {
 export class PyramidNetStore {
   constructor(data = defaultNet) {
     // @ts-ignore
-    ipcRenderer.on('die>request-boundary-points', () => {
-      this.sendBoundaryPoints();
+    ipcRenderer.on('die>request-shape-update', () => {
+      this.sendTextureEditorUpdate();
     });
     this.loadSpec(data);
   }
@@ -69,13 +69,13 @@ export class PyramidNetStore {
     this.activeCutHolePatternD = '';
     this.textureTransform = '';
     this.pyramidGeometryId = id;
-    this.sendBoundaryPoints();
+    this.sendTextureEditorUpdate();
   }
 
   @action
-  sendBoundaryPoints() {
+  sendTextureEditorUpdate() {
     // @ts-ignore
-    ipcRenderer.send('tex>update-face-outline', this.boundaryPoints.map((pt) => pt.toArray()));
+    ipcRenderer.send('tex>shape-update', this.boundaryPoints.map((pt) => pt.toArray()), this.pyramidGeometryId);
   }
 
   @computed

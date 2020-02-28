@@ -69,7 +69,7 @@ app.on('ready', async () => {
       webPreferences,
     }, getUrl('texture-transform-editor/indx.html', isDev)),
   ]).then(([dieLineWindow, textureWindow]) => {
-    const forwardingEvents = ['die>set-die-line-cut-holes', 'die>request-boundary-points', 'tex>update-face-outline'];
+    const forwardingEvents = ['die>set-die-line-cut-holes', 'die>request-shape-update', 'tex>shape-update'];
     forwardingEvents.forEach((event) => {
       const getWindow = (eventName) => {
         if (eventName.startsWith('die>')) { return dieLineWindow; }
