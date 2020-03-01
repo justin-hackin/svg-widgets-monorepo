@@ -25,12 +25,6 @@ export const polyhedra:PolyhedraDefs = {
     faceCount: 3,
     copiesNeeded: 8,
   },
-  'earth-grid': {
-    relativeFaceEdgeLengths: [275.38, 446.97, 406.09],
-    diameter: 2000,
-    faceCount: 4,
-    copiesNeeded: 30,
-  },
   'great-dodecahedron': {
     relativeFaceEdgeLengths: [8.62839, 13.961, 8.62839],
     diameter: 26.5555,
