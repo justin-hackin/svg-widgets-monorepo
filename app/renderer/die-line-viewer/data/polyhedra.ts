@@ -104,25 +104,25 @@ export const polyhedra:PolyhedraDefs = {
   //   diameter: 30.8546,
   //   copiesNeeded: 6,
   // },
-  triakisoctahedron: {
+  triakisoctahedron: { // TODO: model
     relativeFaceEdgeLengths: [14.9287, 25.4848, 14.9287],
     diameter: 36.041,
     faceCount: 3,
     copiesNeeded: 8,
   },
-  disdyakisdodecahedron: {
+  disdyakisdodecahedron: { // TODO: model
     relativeFaceEdgeLengths: [11.1129, 8.30741, 13.5461],
     diameter: 30.6552,
     faceCount: 8,
     copiesNeeded: 6,
   },
-  pentakisdodecahedron: {
+  pentakisdodecahedron: { // TODO: model
     relativeFaceEdgeLengths: [8.81261, 9.93465, 8.81261],
     faceCount: 5,
     diameter: 27.842,
     copiesNeeded: 12,
   },
-  disdyakistriacontahedron: {
+  disdyakistriacontahedron: { // TODO: model
     relativeFaceEdgeLengths: [7.64795, 4.86876, 8.99365],
     diameter: 28.8374,
     faceCount: 10,

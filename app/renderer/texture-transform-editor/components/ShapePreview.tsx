@@ -11,12 +11,13 @@ const {
 const loader = new GLTFLoader();
 
 export const ShapePreview = ({
-  width, height, textureTransform, shapeId,
+  width, height, textureTransform, shapeId, textureCanvas,
 }) => {
   const [renderer, setRenderer] = useState();
   const [camera, setCamera] = useState();
   const [scene, setScene] = useState();
-  const [polyhedronShape, setPolyhedronShape] = useState();
+  const [polyhedronMesh, setPolyhedronMesh] = useState();
+  const [polyhedronObject, setPolyhedronObject] = useState();
 
   const [offsetY] = useState(85);
 
@@ -42,14 +43,9 @@ export const ShapePreview = ({
     threeContainerRef.current.appendChild(theRenderer.domElement);
     setRenderer(theRenderer);
 
-    const light = new PointLight(0xffffff);
-    light.position.set(400, 600, 0);
-    light.intensity = 1;
-    theScene.add(light);
-
     const globalLight = new (THREE.AmbientLight)(0xffffff);
     // soft white light
-    globalLight.intensity = 0.1;
+    globalLight.intensity = 1.0;
     theScene.add(globalLight);
 
     const theCamera = new PerspectiveCamera(45, width / height, 0.1, 2000);
@@ -71,12 +67,15 @@ export const ShapePreview = ({
 
   useEffect(() => {
     if (!shapeId || !camera || !scene) { return; }
-
     loader.load(
       // resource URL
       `../models/${shapeId}.gltf`,
       ({ scene: importScene }) => {
+        if (polyhedronObject) {
+          scene.remove(polyhedronObject);
+        }
         scene.add(importScene);
+        setPolyhedronObject(importScene);
 
         // only set the polyhedron once, there should be only one mesh
         scene.traverse((child) => {
@@ -84,15 +83,7 @@ export const ShapePreview = ({
           if (child.isMesh) {
             camera.lookAt(child.position);
             child.scale.fromArray([10, 10, 10]);
-
-            // @ts-ignore
-            const { material } = child;
-            const textureCanvas:HTMLCanvasElement = document.querySelector('#texture-canvas');
-            debugger; // eslint-disable-line no-debugger
-            // eslint-disable-next-line no-param-reassign
-            material.map.image = textureCanvas;
-            material.needsUpdate = true;
-            setPolyhedronShape(child);
+            setPolyhedronMesh(child);
           }
         });
       },
@@ -105,10 +96,14 @@ export const ShapePreview = ({
   }, [shapeId, camera, scene]);
 
   useEffect(() => {
-    if (polyhedronShape) {
-      polyhedronShape.material.map.needsUpdate = true;
+    if (polyhedronMesh && textureCanvas) {
+      // @ts-ignore
+      const { material } = polyhedronMesh;
+      textureCanvas.getContext('2d');
+      material.map.image = textureCanvas.transferToImageBitmap();
+      polyhedronMesh.material.map.needsUpdate = true;
     }
-  }, [textureTransform]);
+  }, [textureTransform, polyhedronMesh, textureCanvas, shapeId]);
 
   return (
     <div ref={threeContainerRef} id="3d-preview-container" />

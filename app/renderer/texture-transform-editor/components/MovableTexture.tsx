@@ -1,5 +1,5 @@
 // @ts-nocheck
-import Canvg from 'canvg';
+import Canvg, { presets } from 'canvg';
 import React, {
   createRef, useEffect, useState,
 } from 'react';
@@ -52,7 +52,7 @@ const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.hei
 const MoveableTextureLOC = (props) => {
   const textureRef = createRef();
   const textureApplicationSvgRef = createRef();
-  const textureApplicationCanvasRef = createRef();
+  const [textureCanvas, setTextureCanvas] = useState();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPositive, setIsPositive] = useState(true);
@@ -74,7 +74,6 @@ const MoveableTextureLOC = (props) => {
 
   // due to scaling of view in between drags, must maintain active translation and apply when drag released
   const [textureTranslation, setTextureTranslation] = useState([0, 0]);
-  const [textureDragTranslation, setTextureDragTranslation] = useState([0, 0]);
 
   const [boundary, setBoundary] = useState();
   const [shapeId, setShapeId] = useState();
@@ -119,18 +118,10 @@ const MoveableTextureLOC = (props) => {
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
     (coord) => ((coord * 100) / faceScalePercent) / faceFittingScale,
   );
-  const bind = useDrag(({ down, movement }) => {
-    const relativeMovement = point(absoluteMovementToSvg(movement));
-    if (down) {
-      setTextureDragTranslation(relativeMovement.toArray());
-    } else {
-      setTextureDragTranslation([0, 0]);
-      setTextureTranslation(
-        relativeMovement
-          .add(point(...textureTranslation))
-          .toArray(),
-      );
-    }
+  const bind = useDrag(({ offset }) => {
+    // accomodates the scale of svg so that the texture stays under the mouse
+    const relativeMovement = point(absoluteMovementToSvg(offset));
+    setTextureTranslation(relativeMovement.toArray());
   });
   const setTextureDFromFile = () => {
     ipcRenderer.invoke('get-svg-string-by-path', textureUrl)
@@ -153,21 +144,22 @@ const MoveableTextureLOC = (props) => {
   }, [texturePathD]);
 
   useEffect(() => {
-    if (textureApplicationCanvasRef.current
-      && textureTranslation && textureScaleRatio != null && textureRotation != null) {
-      const ctx = textureApplicationCanvasRef.current.getContext('2d');
+    if (boundary) {
+      const { height, width } = boundary.viewBoxAttrs;
+      setTextureCanvas(new window.OffscreenCanvas(width, height));
+    }
+  }, [boundary]);
+
+  useEffect(() => {
+    if (textureCanvas && viewBoxAttrs
+      && textureTranslation && textureScaleRatio != null
+      && textureRotation != null && textureApplicationSvgRef.current) {
+      const ctx = textureCanvas.getContext('2d');
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${textureApplicationSvgRef.current.outerHTML}</svg>`;
-      Canvg.from(ctx, svgStr, {
-        enableRedraw: false,
-        ignoreAnimation: true,
-        ignoreMouse: true,
-      }).then((v) => {
-        v.start();
-        v.stop();
-      });
+      Canvg.from(ctx, svgStr, presets.offscreen()).then((v) => v.render());
     }
-  }, [textureTranslation, textureDragTranslation, textureScaleRatio, textureRotation]);
+  }, [textureTranslation, textureScaleRatio, textureRotation, shapeId]);
 
   if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   setTextureDFromFile();
@@ -181,7 +173,7 @@ const MoveableTextureLOC = (props) => {
   const getTransformMatrix = () => {
     const matrix = new Matrix();
     return matrix
-      .translate(...point(...textureTranslation).add(point(...textureDragTranslation)).toArray())
+      .translate(...point(...textureTranslation).toArray())
       .scale(textureScaleValue, textureScaleValue)
       .translate(...textureCenterVector)
       .rotate(degToRad(textureRotation))
@@ -225,18 +217,12 @@ const MoveableTextureLOC = (props) => {
             <CircularProgress />
           </div>
         )}
-        <canvas
-          className={classes.textureCanvas}
-          width={viewBoxAttrs.width}
-          height={viewBoxAttrs.height}
-          ref={textureApplicationCanvasRef}
-          id="texture-canvas"
-        />
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview
             width={screenDimensions.width / 2}
             height={screenDimensions.height}
             textureTransform={imageTransform}
+            textureCanvas={textureCanvas}
             shapeId={shapeId}
           />
         </div>
@@ -264,6 +250,7 @@ const MoveableTextureLOC = (props) => {
                 d={path.getD()}
               />
               <path
+                pointerEvents="bounding-box"
                 ref={textureRef}
                 {...bind()}
                 stroke="#f00"
@@ -335,11 +322,6 @@ export const MoveableTexture = withStyles({
   },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
-  },
-  textureCanvas: {
-    position: 'absolute',
-    top: '-100%',
-    left: '-100%',
   },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
