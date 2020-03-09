@@ -104,29 +104,40 @@ export const polyhedra:PolyhedraDefs = {
   //   diameter: 30.8546,
   //   copiesNeeded: 6,
   // },
-  triakisoctahedron: { // TODO: model
+  triakisoctahedron: { // TODO: more accurate lengths
     relativeFaceEdgeLengths: [14.9287, 25.4848, 14.9287],
     diameter: 36.041,
     faceCount: 3,
     copiesNeeded: 8,
   },
-  disdyakisdodecahedron: { // TODO: model
-    relativeFaceEdgeLengths: [11.1129, 8.30741, 13.5461],
-    diameter: 30.6552,
-    faceCount: 8,
+  disdyakisdodecahedron: { // TODO: more accurate lengths
+    relativeFaceEdgeLengths: [3.13, 5.1, 4.18],
+    diameter: 11.5,
+    faceCount: 4,
     copiesNeeded: 6,
   },
-  pentakisdodecahedron: { // TODO: model
-    relativeFaceEdgeLengths: [8.81261, 9.93465, 8.81261],
+  pentakisdodecahedron: { // TODO: more accurate lengths
+    relativeFaceEdgeLengths: [3.32, 3.74, 3.32],
+    diameter: 9.79,
     faceCount: 5,
-    diameter: 27.842,
     copiesNeeded: 12,
   },
-  disdyakistriacontahedron: { // TODO: model
-    relativeFaceEdgeLengths: [7.64795, 4.86876, 8.99365],
+  disdyakistriacontahedron: { // TODO: more accurate lengths
+    relativeFaceEdgeLengths: [1.83, 3.39, 2.88],
     diameter: 28.8374,
-    faceCount: 10,
-    copiesNeeded: 12,
+    faceCount: 4,
+    copiesNeeded: 30,
   },
-
+  '5-octahedra-compound': { // TODO: more accurate lengths
+    relativeFaceEdgeLengths: [1.95, 2.42, 2.7],
+    diameter: 10,
+    faceCount: 4,
+    copiesNeeded: 30,
+  },
+  // 'strombic-icositetrahedorn': { //TODO: more accurate lengths
+  //   relativeFaceEdgeLengths: [3.87, 2.99, 2.99, 2.87],
+  //   diameter: 10.1,
+  //   faceCount: 1,
+  //   copiesNeeded: 24,
+  // },
 };
