@@ -4,7 +4,6 @@ import { PyramidGeometrySpec } from '../components/PyramidNet';
 interface PolyhedraDefs {
   [propName: string]: PyramidGeometrySpec,
 }
-const SQRT_TWO = Math.sqrt(2);
 
 export const polyhedra:PolyhedraDefs = {
   'great-stellated-dodecahedron': {
@@ -37,18 +36,18 @@ export const polyhedra:PolyhedraDefs = {
     faceCount: 3,
     copiesNeeded: 20,
   },
-  'cube-octahedron-dual-part-1': {
-    relativeFaceEdgeLengths: [1, 1, 1],
-    diameter: 3,
-    faceCount: 4,
-    copiesNeeded: 6,
-  },
-  'cube-octahedron-dual-part-2': {
-    relativeFaceEdgeLengths: [1 / SQRT_TWO, 1, 1 / SQRT_TWO],
-    diameter: 3,
-    faceCount: 3,
-    copiesNeeded: 8,
-  },
+  // 'cube-octahedron-dual-part-1': {
+  //   relativeFaceEdgeLengths: [1, 1, 1],
+  //   diameter: 3,
+  //   faceCount: 4,
+  //   copiesNeeded: 6,
+  // },
+  // 'cube-octahedron-dual-part-2': {
+  //   relativeFaceEdgeLengths: [1 / SQRT_TWO, 1, 1 / SQRT_TWO],
+  //   diameter: 3,
+  //   faceCount: 3,
+  //   copiesNeeded: 8,
+  // },
   'small-rhombihexacron': {
     relativeFaceEdgeLengths: [14.9432, 4.78746, 16.3454],
     diameter: 39.0484,
@@ -67,7 +66,7 @@ export const polyhedra:PolyhedraDefs = {
     faceCount: 10,
     copiesNeeded: 12,
   },
-  'great-disdyakisdodecahedron': {
+  'great-disdyakis-dodecahedron': {
     relativeFaceEdgeLengths: [12.5898, 6.05025, 15.442],
     diameter: 36.8901,
     faceCount: 4,
@@ -91,7 +90,7 @@ export const polyhedra:PolyhedraDefs = {
     faceCount: 6,
     copiesNeeded: 20,
   },
-  'great-stellapentakisdodecahedron': {
+  'great-stellapentakis-dodecahedron': {
     relativeFaceEdgeLengths: [17.5295, 9.29021, 23.3727],
     faceCount: 6,
     diameter: 65.5024,
@@ -104,25 +103,25 @@ export const polyhedra:PolyhedraDefs = {
   //   diameter: 30.8546,
   //   copiesNeeded: 6,
   // },
-  triakisoctahedron: { // TODO: more accurate lengths
+  'triakis-octahedron': { // TODO: more accurate lengths
     relativeFaceEdgeLengths: [14.9287, 25.4848, 14.9287],
     diameter: 36.041,
     faceCount: 3,
     copiesNeeded: 8,
   },
-  disdyakisdodecahedron: { // TODO: more accurate lengths
+  'disdyakis-dodecahedron': { // TODO: more accurate lengths
     relativeFaceEdgeLengths: [3.13, 5.1, 4.18],
     diameter: 11.5,
     faceCount: 4,
     copiesNeeded: 6,
   },
-  pentakisdodecahedron: { // TODO: more accurate lengths
+  'pentakis-dodecahedron': { // TODO: more accurate lengths
     relativeFaceEdgeLengths: [3.32, 3.74, 3.32],
     diameter: 9.79,
     faceCount: 5,
     copiesNeeded: 12,
   },
-  disdyakistriacontahedron: { // TODO: more accurate lengths
+  'disdyakis-triacontahedron': { // TODO: more accurate lengths
     relativeFaceEdgeLengths: [1.83, 3.39, 2.88],
     diameter: 28.8374,
     faceCount: 4,

@@ -17,7 +17,7 @@ import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
 import { BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 
 const defaultNet:PyramidNetSpec = {
-  pyramidGeometryId: 'great-disdyakisdodecahedron',
+  pyramidGeometryId: 'great-disdyakis-dodecahedron',
   ascendantEdgeTabsSpec: {
     flapRoundingDistanceRatio: 1,
     holeFlapTaperAngle: Math.PI / 10,
