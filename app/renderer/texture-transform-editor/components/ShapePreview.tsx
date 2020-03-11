@@ -4,8 +4,10 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import OrbitControls from 'threejs-orbit-controls';
 import '../style.css';
 
+const IDEAL_RADIUS = 60;
+
 const {
-  Scene, WebGLRenderer, PerspectiveCamera, PointLight,
+  Scene, WebGLRenderer, PerspectiveCamera,
 } = THREE;
 
 const loader = new GLTFLoader();
@@ -81,8 +83,9 @@ export const ShapePreview = ({
         scene.traverse((child) => {
           // @ts-ignore
           if (child.isMesh) {
+            const scale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
             camera.lookAt(child.position);
-            child.scale.fromArray([10, 10, 10]);
+            child.scale.fromArray([scale, scale, scale]);
             setPolyhedronMesh(child);
           }
         });
