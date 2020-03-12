@@ -5,28 +5,17 @@ const {
 } = require('electron');
 const { format } = require('url');
 // @ts-ignore
-const path = require('path');
 const isDev = require('electron-is-dev');
 const { resolve } = require('app-root-path');
-const os = require('os');
-
+const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const { setupIpc } = require('./ipc');
 
 // TODO: doesn't seem to work
 const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/256x256.png`);
-// where public folder on the root dir
-
 
 app.on('ready', async () => {
+  installExtension(REACT_DEVELOPER_TOOLS);
   setupIpc(ipcMain, app);
-
-  // eslint-disable-next-line max-len
-  const reactExtension = '/Library/Application Support/Google/Chrome/'
-    + 'Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.4.0_0';
-  BrowserWindow.addDevToolsExtension(
-    path.join(os.homedir(), reactExtension),
-  );
-
 
   const getUrl = (fileName, isDevUrl) => (isDevUrl ? `http://localhost:1124/${fileName}` : format({
     pathname: resolve(`app/renderer/.parcel/production/${fileName}`),
