@@ -1,8 +1,6 @@
 // @ts-nocheck
 import Canvg, { presets } from 'canvg';
-import React, {
-  createRef, useEffect, useState,
-} from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 import { useDrag } from 'react-use-gesture';
 import ReactDOMServer from 'react-dom/server';
 
@@ -13,14 +11,13 @@ import {
 } from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
 
-import { Matrix, Polygon, point } from '@flatten-js/core';
-import { VERY_SMALL_NUMBER } from '../../die-line-viewer/util/geom';
+import { Matrix, point, Polygon } from '@flatten-js/core';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
-import { PanelSlider } from '../../die-line-viewer/components/inputs/PanelSlider';
 import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 import { ShapePreview } from './ShapePreview';
+import { DRAG_MODES, DragModeOptionsGroup } from './DragModeOptionGroup';
 
 // TODO: extract this
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
@@ -36,7 +33,6 @@ export const FaceIntersectionSVG = ({
   </svg>
 );
 
-const degToRad = (deg) => (deg / 360) * Math.PI * 2;
 export const theme = createMuiTheme(darkTheme);
 const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
   { width: imageWidth, height: imageHeight } = {}) => {
@@ -49,7 +45,7 @@ const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
 };
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
-const MoveableTextureLOC = (props) => {
+const MoveableTextureLOC = ({ classes }) => {
   const textureRef = createRef();
   const textureApplicationSvgRef = createRef();
   const [textureCanvas, setTextureCanvas] = useState();
@@ -61,19 +57,26 @@ const MoveableTextureLOC = (props) => {
   // can't use early exit because image must render before it's onload sets imageDimensions
   const [imageDimensions, setImageDimensions] = useState();
 
-  const [faceScalePercent, setFaceScalePercent] = useState(80);
+  const [dragMode, setDragMode] = useState(DRAG_MODES.TRANSLATE);
+
+  const [faceScale, setFaceScale] = useState(0.8);
+  const [faceScaleMux, setFaceScaleMux] = useState(1);
 
   const [textureScaleRatio, setTextureScaleRatio] = useState(0.5);
+  const [textureScaleRatioMux, setTextureScaleRatioMux] = useState(1);
+  const textureScaleRatioMuxed = textureScaleRatioMux * textureScaleRatio;
 
   const [textureRotation, setTextureRotation] = useState(0);
+  const [textureRotationDelta, setTextureRotationDelta] = useState(0);
+
+  const [textureTranslation, setTextureTranslation] = useState([0, 0]);
 
   const [fileList, setFileList] = useState();
   const [fileIndex, setFileIndex] = useState();
   const textureUrl = (fileList && fileIndex != null) ? `/images/textures/${fileList[fileIndex]}` : null;
   const [texturePathD, setTexturePathD] = useState();
 
-  // due to scaling of view in between drags, must maintain active translation and apply when drag released
-  const [textureTranslation, setTextureTranslation] = useState([0, 0]);
+  const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
 
   const [boundary, setBoundary] = useState();
   const [shapeId, setShapeId] = useState();
@@ -116,13 +119,41 @@ const MoveableTextureLOC = (props) => {
   const { scale: textureFittingScale = 1 } = getFitScale(viewBoxAttrs, imageDimensions) || {};
   const { scale: faceFittingScale = 1 } = getFitScale(screenDimensions, viewBoxAttrs) || {};
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
-    (coord) => ((coord * 100) / faceScalePercent) / faceFittingScale,
+    (coord) => (coord / faceScale) / faceFittingScale,
   );
-  const bind = useDrag(({ offset }) => {
+
+  const textureUseDrag = useDrag(({ delta, down, movement }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
-    const relativeMovement = point(absoluteMovementToSvg(offset));
-    setTextureTranslation(relativeMovement.toArray());
+    if (dragMode === DRAG_MODES.TRANSLATE) {
+      setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
+    } else if (dragMode === DRAG_MODES.ROTATE) {
+      if (down) {
+        setTextureRotationDelta(point(...movement).angle);
+      } else {
+        setTextureRotationDelta(0);
+        setTextureRotation(textureRotation + textureRotationDelta);
+      }
+    } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
+      if (down) {
+        setTextureScaleRatioMux((movement[1] / screenDimensions.height) + 1);
+      } else {
+        setTextureScaleRatioMux(1);
+        setTextureScaleRatio(textureScaleRatio * textureScaleRatioMux);
+      }
+    }
   });
+
+  const frameUseDrag = useDrag(({ down, movement }) => {
+    if (dragMode === DRAG_MODES.SCALE_VIEW) {
+      if (down) {
+        setFaceScaleMux((movement[1] / screenDimensions.height) + 1);
+      } else {
+        setFaceScaleMux(1);
+        setFaceScale(faceScaleMux * faceScale);
+      }
+    }
+  });
+
   const setTextureDFromFile = () => {
     ipcRenderer.invoke('get-svg-string-by-path', textureUrl)
       .then((svgString) => {
@@ -152,43 +183,40 @@ const MoveableTextureLOC = (props) => {
 
   useEffect(() => {
     if (textureCanvas && viewBoxAttrs
-      && textureTranslation && textureScaleRatio != null
+      && textureTranslation && textureScaleRatioMuxed != null
       && textureRotation != null && textureApplicationSvgRef.current) {
       const ctx = textureCanvas.getContext('2d');
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${textureApplicationSvgRef.current.outerHTML}</svg>`;
       Canvg.from(ctx, svgStr, presets.offscreen()).then((v) => v.render());
     }
-  }, [textureTranslation, textureScaleRatio, textureRotation, shapeId]);
+  }, [textureTranslation, textureScaleRatioMuxed, textureRotation, textureRotationDelta, shapeId]);
 
   if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   setTextureDFromFile();
   const TEXTURE_RANGE_MULT = 2;
   const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
   const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
-  const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatio;
+  const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatioMuxed;
   const textureCenterVector = imageDimensions ? [imageDimensions.width / 2, imageDimensions.height / 2] : [0, 0];
 
   const negateMap = (num) => num * -1;
-  const getTransformMatrix = () => {
-    const matrix = new Matrix();
-    return matrix
+  const textureTransformMatrixStr = (() => {
+    const m = (new Matrix())
       .translate(...point(...textureTranslation).toArray())
       .scale(textureScaleValue, textureScaleValue)
       .translate(...textureCenterVector)
-      .rotate(degToRad(textureRotation))
+      .rotate(textureRotation + textureRotationDelta)
       .translate(...textureCenterVector.map(negateMap));
-  };
-  const matrixToTransformString = (m) => `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.tx} ${m.ty})`;
+    return `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.tx} ${m.ty})`;
+  })();
 
-  const { classes } = props;
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
-  const faceScalePercentStr = `${faceScalePercent}%`;
-  const faceScaleCenterPercentStr = `${(100 - faceScalePercent) / 2}%`;
-  const imageTransform = matrixToTransformString(getTransformMatrix());
-
+  const faceScaleMuxed = faceScaleMux * faceScale;
+  const faceScalePercentStr = `${faceScaleMuxed * 100}%`;
+  const faceScaleCenterPercentStr = `${((1 - faceScaleMuxed) * 100) / 2}%`;
 
   const sendTexture = async () => {
     setIsLoading(true);
@@ -197,21 +225,21 @@ const MoveableTextureLOC = (props) => {
       <FaceIntersectionSVG
         boundaryD={path.getD()}
         textureD={texturePathD}
-        textureTransform={imageTransform}
+        textureTransform={textureTransformMatrixStr}
         isPositive
       />
     );
     const intersectionSvgStr = ReactDOMServer.renderToString(intersectionSvg);
     const dClipdSVG = await ipcRenderer.invoke('intersect-svg', intersectionSvgStr, isPositive);
     const dd = extractCutHolesFromSvgString(dClipdSVG);
-    ipcRenderer.send('die>set-die-line-cut-holes', dd, matrixToTransformString(getTransformMatrix()));
+    ipcRenderer.send('die>set-die-line-cut-holes', dd, textureTransformMatrixStr);
     setIsLoading(false);
   };
 
 
   return (
     <ThemeProvider theme={theme}>
-      <Box className={classes.root}>
+      <Box className={classes.root} {...frameUseDrag()}>
         {isLoading && (
           <div className={classes.loadingContainer}>
             <CircularProgress />
@@ -221,7 +249,7 @@ const MoveableTextureLOC = (props) => {
           <ShapePreview
             width={screenDimensions.width / 2}
             height={screenDimensions.height}
-            textureTransform={imageTransform}
+            textureTransform={textureTransformMatrixStr}
             textureCanvas={textureCanvas}
             shapeId={shapeId}
           />
@@ -252,11 +280,12 @@ const MoveableTextureLOC = (props) => {
               <path
                 pointerEvents="bounding-box"
                 ref={textureRef}
-                {...bind()}
+                {...textureUseDrag()}
                 stroke="#f00"
-                fill="rgba(0,0,0,0.3)"
+                fill="#000"
+                fillOpacity={0.5}
                 d={texturePathD}
-                transform={imageTransform}
+                transform={textureTransformMatrixStr}
               />
             </svg>
           </svg>
@@ -284,30 +313,7 @@ const MoveableTextureLOC = (props) => {
             }}
             options={options}
           />
-          <PanelSlider
-            label="Face scale %"
-            value={faceScalePercent}
-            setter={setFaceScalePercent}
-            step={VERY_SMALL_NUMBER}
-            max={100}
-            min={30}
-          />
-          <PanelSlider
-            label="Texture scale ratio"
-            value={textureScaleRatio}
-            setter={setTextureScaleRatio}
-            step={VERY_SMALL_NUMBER}
-            max={2}
-            min={0.1}
-          />
-          <PanelSlider
-            label="Texture rotation °"
-            value={textureRotation}
-            setter={setTextureRotation}
-            step={VERY_SMALL_NUMBER}
-            max={360}
-            min={0}
-          />
+          <DragModeOptionsGroup dragMode={dragMode} setDragMode={setDragMode} />
           <IconButton onClick={sendTexture} color="primary" aria-label="send texture" component="span">
             <TelegramIcon fontSize="large" />
           </IconButton>
