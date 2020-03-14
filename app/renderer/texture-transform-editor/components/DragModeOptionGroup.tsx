@@ -1,3 +1,4 @@
+import Tooltip from '@material-ui/core/Tooltip';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup/ToggleButtonGroup';
 import CachedIcon from '@material-ui/icons/Cached';
@@ -31,17 +32,27 @@ export const DragModeOptionsGroup = ({ dragMode, setDragMode }) => {
       }}
       aria-label="drag mode"
     >
+      {/* translate is too technical for end user */}
       <ToggleButton value={DRAG_MODES.TRANSLATE} aria-label={DRAG_MODES.TRANSLATE}>
-        <OpenWithIcon />
+        {/* Tooltips should be around whole button but this breaks the active style */}
+        <Tooltip title="drag (⬆️ + d)">
+          <OpenWithIcon />
+        </Tooltip>
       </ToggleButton>
       <ToggleButton value={DRAG_MODES.ROTATE} aria-label={DRAG_MODES.ROTATE}>
-        <CachedIcon />
+        <Tooltip title="rotate (⬆️ + r)">
+          <CachedIcon />
+        </Tooltip>
       </ToggleButton>
       <ToggleButton value={DRAG_MODES.SCALE_TEXTURE} aria-label={DRAG_MODES.SCALE_TEXTURE}>
-        <ZoomOutMapIcon />
+        <Tooltip title="scale texture (⬆️ + s)">
+          <ZoomOutMapIcon />
+        </Tooltip>
       </ToggleButton>
       <ToggleButton value={DRAG_MODES.SCALE_VIEW} aria-label={DRAG_MODES.SCALE_VIEW}>
-        <AspectRatioIcon />
+        <Tooltip title="scale view (⬆️ + v)">
+          <AspectRatioIcon />
+        </Tooltip>
       </ToggleButton>
     </ToggleButtonGroup>
   );
