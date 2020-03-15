@@ -7,7 +7,7 @@ import ReactDOMServer from 'react-dom/server';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import {
-  Box, Checkbox, CircularProgress, FormControlLabel, IconButton,
+  Box, Checkbox, CircularProgress, FormControlLabel, IconButton, Paper,
 } from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
 
@@ -254,7 +254,10 @@ const MoveableTextureLOC = ({ classes }) => {
             shapeId={shapeId}
           />
         </div>
-        <svg
+        <Paper
+          component="svg"
+          square
+          elevation={5}
           className="svg-container"
           width="50%"
           height="100%"
@@ -289,7 +292,7 @@ const MoveableTextureLOC = ({ classes }) => {
               />
             </svg>
           </svg>
-        </svg>
+        </Paper>
 
         <div className={classes.select}>
           <FormControlLabel
