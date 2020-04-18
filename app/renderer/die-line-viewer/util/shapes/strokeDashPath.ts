@@ -1,4 +1,5 @@
 import sum from 'lodash-es/sum';
+import last from 'lodash-es/last';
 import range from 'lodash-es/range';
 import { lineLerp, PointLike } from '../geom';
 import { PathData } from '../PathData';
@@ -72,22 +73,23 @@ export function strokeDashPathRatios(
         acc.push(startEndLerpNew.map(wrapRatio));
         return acc;
       }
-      // start lies within but end lies without, chop at end, and wrap remainder
+      // start lies within but end lies without, discard
       if (startEndLerpNew[1] > 1) {
-        acc.push([startEndLerpNew[0], 1]);
-        acc.push([0, wrapRatio(startEndLerpNew[1])]);
         return acc;
       }
       acc.push(startEndLerpNew);
       return acc;
     }, [])
     // visually this should not make difference but better for plotters that don't optimize
-    .sort(([start1], [start2]) => (start1 - start2));
+    .sort(([start1], [start2]) => (start1 - start2))
+    // center items so that the start and end points do not touch the cut
+    .map((item, index, array) => item.map((val) => val + (1 - last(array)[1]) / 2));
 }
 
 export function strokeDashPath(
   start: PointLike, end: PointLike, dashSpec: StrokeDashPathSpec,
 ) {
-  return lineSeries(strokeDashPathRatios(start, end, dashSpec)
+  const ratios = strokeDashPathRatios(start, end, dashSpec);
+  return lineSeries(ratios
     .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp))));
 }

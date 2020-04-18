@@ -33,6 +33,8 @@ export interface PyramidNetSpec {
   ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
   baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
   shapeHeightInCm: number,
+  activeCutHolePatternD?: string,
+  textureTransform?: string,
 }
 
 export interface PyramidGeometrySpec {
@@ -153,28 +155,28 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
 
   return (
     <g>
-      <symbol id="face-tile">
-        <g>
-          <FaceBoundary store={store} />
-          {/* eslint-disable-next-line react/no-danger */}
-          { activeCutHolePatternD && textureTransform
-          && (
-          <path
-            {...cutProps}
-            d={activeCutHolePatternD}
-            transform={borderInsetFaceHoleTransform}
-          />
-          )}
-        </g>
-      </symbol>
-
       {range(faceCount).map((index) => {
         const isOdd = !!(index % 2);
         const yScale = isOdd ? -1 : 1;
 
         const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
         const rotation = radToDeg(-1 * yScale * index * faceInteriorAngles[2] + asymetryNudge);
-        return <use key={index} transform={`scale(${yScale} 1) rotate(${rotation}) `} xlinkHref="#face-tile" />;
+
+        return (
+          <g key={index} transform={`scale(${yScale} 1) rotate(${rotation}) `}>
+            {/* TODO: separate visual-only layer for boundary (no good for export) */}
+            {/* <FaceBoundary store={store} /> */}
+            {/* eslint-disable-next-line react/no-danger */}
+            { activeCutHolePatternD && textureTransform
+                && (
+                <path
+                  {...cutProps}
+                  d={activeCutHolePatternD}
+                  transform={borderInsetFaceHoleTransform}
+                />
+                )}
+          </g>
+        );
       })}
 
       <g id="die-lines">
