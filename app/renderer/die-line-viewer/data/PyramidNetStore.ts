@@ -48,7 +48,7 @@ const defaultNet:PyramidNetSpec = {
   interFaceScoreDashSpec: {
     strokeDashPathPatternId: 'base',
     strokeDashLength: 21.26351351,
-    strokeDashOffsetRatio: 0.75,
+    strokeDashOffsetRatio: 0,
   },
   shapeHeightInCm: 40,
   // eslint-disable-next-line max-len

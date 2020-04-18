@@ -37,10 +37,6 @@ export function strokeDashPathRatios(
   const vector = end.subtract(start);
   const vectorLength = vector.length;
   const strokeDashLengthToVectorLength = strokeDashLength / vectorLength;
-  if (strokeDashLengthToVectorLength > 1) {
-    throw new Error('strokeDashLength is greater than length from start to end');
-  }
-
 
   const dashArrayTotalLength = sum(relativeStrokeDasharray);
   const startEndLerps = relativeStrokeDasharray.reduce((acc, intervalLength, index) => {

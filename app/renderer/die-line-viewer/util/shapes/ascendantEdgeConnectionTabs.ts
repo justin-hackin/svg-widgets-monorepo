@@ -11,9 +11,13 @@ import {
   symmetricHingePlot,
   symmetricHingePlotByProjectionDistance,
 } from '../geom';
-import { strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';
+import { strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { roundedEdgePath, connectedLineSegments } from './generic';
+
+// TODO: make this controllable
+const MIRRORED_STROKES = false;
+
 
 export const ascendantEdgeConnectionTabs = (
   start: PointLike, end: PointLike,
@@ -28,23 +32,59 @@ export const ascendantEdgeConnectionTabs = (
     holeFlapTaperAngle,
     tabWideningAngle,
   } = tabSpec;
+
+  const getTabBaseInterval = (tabNum) => [
+    lineLerp(start, end, tabIntervalRatios[tabNum][0]),
+    lineLerp(start, end, tabIntervalRatios[tabNum][1]),
+  ];
+
   const vector = end.subtract(start);
   const tabDepth = tabDepthToTraversalLength * vector.length;
   const maleScoreLineIntervals = [];
+  const getFemaleScorePathData = () => {
+    if (MIRRORED_STROKES) {
+      return new PathData();
+    }
+    return range(tabsCount - 1).reduce((acc, tabIndex) => {
+      const [, previousBaseEnd] = getTabBaseInterval(tabIndex);
+      const [nextBaseStart] = getTabBaseInterval(tabIndex + 1);
+
+      acc.concatPath(strokeDashPath(previousBaseEnd, nextBaseStart, scoreDashSpec));
+      return acc;
+    }, (new PathData()).concatPath(strokeDashPath(
+      start,
+      getTabBaseInterval(0)[0],
+      scoreDashSpec,
+    )))
+      .concatPath(strokeDashPath(getTabBaseInterval(tabsCount - 1)[1], end, scoreDashSpec));
+  };
+
+  const getMaleScorePathData = () => {
+    if (MIRRORED_STROKES) {
+      return new PathData();
+    }
+    return range(tabsCount).reduce((acc, tabIndex) => {
+      const [tabStart, tabEnd] = getTabBaseInterval(tabIndex);
+
+      acc.concatPath(strokeDashPath(tabStart, tabEnd, scoreDashSpec));
+      return acc;
+    }, (new PathData()));
+  };
+
   const commands = {
     female: {
       cut: (new PathData()),
-      score: (new PathData()),
+      score: getFemaleScorePathData(),
     },
     male: {
       cut: (new PathData()).move(start),
-      score: (new PathData()),
+      score: getMaleScorePathData(),
     },
   };
   const ARBITRARY_LENGTH = 10;
   range(0, tabsCount).forEach((tabNum) => {
-    const tabBaseStart = lineLerp(start, end, tabIntervalRatios[tabNum][0]);
-    const tabBaseEnd = lineLerp(start, end, tabIntervalRatios[tabNum][1]);
+    const [tabBaseStart, tabBaseEnd] = getTabBaseInterval(tabNum);
+
     const [tabEdgeStart, tabEdgeEnd] = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
     const midpointDepth = tabDepth * midpointDepthToTabDepth;
     const [tabMidIntersectorStart, tabMidIntersectorEnd] = parallelLinePointsAtDistance(
@@ -83,15 +123,17 @@ export const ascendantEdgeConnectionTabs = (
   });
 
   commands.male.cut.line(end);
-  const dashRatios = strokeDashPathRatios(start, end, scoreDashSpec);
-  const tabDashRatios = subtractRangeSet(dashRatios, tabIntervalRatios);
-  const tabGapDashRatios = subtractRangeSet(dashRatios, tabGapIntervalRatios);
+  if (MIRRORED_STROKES) {
+    const dashRatios = strokeDashPathRatios(start, end, scoreDashSpec);
+    const tabDashRatios = subtractRangeSet(dashRatios, tabIntervalRatios);
+    const tabGapDashRatios = subtractRangeSet(dashRatios, tabGapIntervalRatios);
 
-  for (const [femaleStart, femaleEnd] of tabDashRatios) {
-    commands.female.score.move(lineLerp(start, end, femaleStart)).line(lineLerp(start, end, femaleEnd));
-  }
-  for (const [maleStart, maleEnd] of tabGapDashRatios) {
-    commands.male.score.move(lineLerp(start, end, maleStart)).line(lineLerp(start, end, maleEnd));
+    for (const [femaleStart, femaleEnd] of tabDashRatios) {
+      commands.female.score.move(lineLerp(start, end, femaleStart)).line(lineLerp(start, end, femaleEnd));
+    }
+    for (const [maleStart, maleEnd] of tabGapDashRatios) {
+      commands.male.score.move(lineLerp(start, end, maleStart)).line(lineLerp(start, end, maleEnd));
+    }
   }
   return commands;
 };
