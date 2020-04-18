@@ -30,7 +30,6 @@ export const ascendantEdgeConnectionTabs = (
   } = tabSpec;
   const vector = end.subtract(start);
   const tabDepth = tabDepthToTraversalLength * vector.length;
-  const femaleScoreLineIntervals = [[start]];
   const maleScoreLineIntervals = [];
   const commands = {
     female: {
@@ -81,12 +80,9 @@ export const ascendantEdgeConnectionTabs = (
     commands.female.cut.concatPath(connectedLineSegments(
       [tabBaseStart, holeEdgeStart, holeEdgeEnd, tabBaseEnd],
     ));
-    last(femaleScoreLineIntervals).push(tabBaseStart);
-    femaleScoreLineIntervals.push([tabBaseEnd]);
   });
 
   commands.male.cut.line(end);
-  last(femaleScoreLineIntervals).push(end);
   const dashRatios = strokeDashPathRatios(start, end, scoreDashSpec);
   const tabDashRatios = subtractRangeSet(dashRatios, tabIntervalRatios);
   const tabGapDashRatios = subtractRangeSet(dashRatios, tabGapIntervalRatios);
