@@ -138,10 +138,8 @@ export const ControlPanel = observer(({ store }) => {
       ...ratioSliderProps,
     }, {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finTipDepthToFinDepth',
-      min: 0.9,
-      max: 1.5,
-      step: 0.0001,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finOffsetRatio',
+      ...ratioSliderProps,
     }, {
       component: PanelSlider,
       valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeBreadthToHalfWidth',

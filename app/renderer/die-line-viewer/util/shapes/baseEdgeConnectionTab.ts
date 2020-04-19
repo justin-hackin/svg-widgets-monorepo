@@ -16,7 +16,7 @@ export interface BaseEdgeConnectionTabSpec {
   holeTaper: number,
   holeBreadthToHalfWidth: number,
   finDepthToTabDepth: number,
-  finTipDepthToFinDepth: number,
+  finOffsetRatio: number,
 }
 
 export interface BaseEdgeConnectionTab {
@@ -35,16 +35,19 @@ export function baseEdgeConnectionTab(
     holeTaper,
     holeBreadthToHalfWidth,
     finDepthToTabDepth,
-    finTipDepthToFinDepth,
+    finOffsetRatio,
   } = tabSpec;
   const tabDepth = tabDepthToAscendantEdgeLength * ascendantEdgeTabDepth;
   const cutPath = new PathData();
   const mid = hingedPlotLerp(start, end, 0, 0.5);
-
   const holeHandleThicknessRatio = (1 - holeBreadthToHalfWidth) / 2;
+  const offsetHoleHandle = finOffsetRatio * holeHandleThicknessRatio;
+
+  const outLengthRatio = holeHandleThicknessRatio - offsetHoleHandle;
+  const inLengthRatio = holeHandleThicknessRatio + offsetHoleHandle;
   const holeBases = [
-    hingedPlotLerp(mid, start, 0, holeHandleThicknessRatio),
-    hingedPlotLerp(start, mid, 0, holeHandleThicknessRatio),
+    hingedPlotLerp(mid, start, 0, outLengthRatio),
+    hingedPlotLerp(start, mid, 0, inLengthRatio),
   ];
   const holeTheta = -holeTaper + Math.PI / 2;
   const holeEdges = symmetricHingePlotByProjectionDistance(
@@ -52,17 +55,15 @@ export function baseEdgeConnectionTab(
   );
 
   const finBases = [
-    hingedPlotLerp(end, mid, 0, holeHandleThicknessRatio),
-    hingedPlotLerp(mid, end, 0, holeHandleThicknessRatio),
+    hingedPlotLerp(end, mid, 0, inLengthRatio),
+    hingedPlotLerp(mid, end, 0, outLengthRatio),
   ];
 
   const handleEdges = symmetricHingePlotByProjectionDistance(start, finBases[0], holeTheta, tabDepth);
   const finDepth = finDepthToTabDepth * tabDepth;
   const backFinEdge = hingedPlotByProjectionDistance(finBases[1], finBases[0], holeTheta, -finDepth);
   // const frontFinEdge = hingedPlotByProjectionDistance(finBases[0], finBases[1], Math.PI / 2, finDepth);
-  const finMidTip = hingedPlotByProjectionDistance(
-    finBases[0], finBases[1], holeTheta, finDepth * finTipDepthToFinDepth,
-  );
+  const finMidTip = hingedPlotByProjectionDistance(finBases[0], finBases[1], holeTheta, finDepth);
 
   const roundingEdgeLengths: number[] = [
     [holeBases[0], holeEdges[0]],

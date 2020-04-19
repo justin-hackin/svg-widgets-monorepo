@@ -33,8 +33,8 @@ const defaultNet:PyramidNetSpec = {
   },
   baseEdgeTabSpec: {
     finDepthToTabDepth: 1.1,
-    finTipDepthToFinDepth: 1.1,
-    holeBreadthToHalfWidth: 0.5,
+    finOffsetRatio: 0.75,
+    holeBreadthToHalfWidth: 0.25,
     holeDepthToTabDepth: 0.5,
     holeTaper: 0.6981317007977318,
     roundingDistanceRatio: 1,
