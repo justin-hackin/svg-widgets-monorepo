@@ -51,12 +51,12 @@ export function baseEdgeConnectionTab(
     holeBases[0], holeBases[1], holeTheta, tabDepth * holeDepthToTabDepth,
   );
 
-  const handleEdges = symmetricHingePlotByProjectionDistance(start, mid, holeTheta, tabDepth);
-
   const finBases = [
     hingedPlotLerp(end, mid, 0, holeHandleThicknessRatio),
     hingedPlotLerp(mid, end, 0, holeHandleThicknessRatio),
   ];
+
+  const handleEdges = symmetricHingePlotByProjectionDistance(start, finBases[0], holeTheta, tabDepth);
   const finDepth = finDepthToTabDepth * tabDepth;
   const backFinEdge = hingedPlotByProjectionDistance(finBases[1], finBases[0], holeTheta, -finDepth);
   // const frontFinEdge = hingedPlotByProjectionDistance(finBases[0], finBases[1], Math.PI / 2, finDepth);
@@ -76,7 +76,7 @@ export function baseEdgeConnectionTab(
   cutPath.concatPath(roundedHole);
   cutPath.close();
 
-  cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], mid], roundingDistance));
+  cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], finBases[0]], roundingDistance));
 
   const finPath = roundedEdgePath([finBases[0], backFinEdge, finMidTip, finBases[1]], roundingDistance);
   cutPath.line(finBases[0]).concatPath(finPath.sliceCommandsDangerously(1));
@@ -84,7 +84,6 @@ export function baseEdgeConnectionTab(
   cutPath.line(end);
   const scorePath = new PathData();
   scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
-  scorePath.concatPath(strokeDashPath(holeBases[1], mid, scoreDashSpec));
-  scorePath.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));
+  scorePath.concatPath(strokeDashPath(holeBases[1], finBases[1], scoreDashSpec));
   return { cut: cutPath, score: scorePath };
 }
