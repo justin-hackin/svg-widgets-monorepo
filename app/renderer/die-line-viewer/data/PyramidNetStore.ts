@@ -1,6 +1,6 @@
 import { action, computed, observable } from 'mobx';
 // @ts-ignore
-import { Point, Polygon } from '@flatten-js/core';
+import { Matrix, Point, Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 import { subtract } from '@flatten-js/boolean-op';
 import chunk from 'lodash-es/chunk';
@@ -27,7 +27,7 @@ const defaultNet:PyramidNetSpec = {
     midpointDepthToTabDepth: 0.6,
     tabDepthToTraversalLength: 0.04810606060599847,
     tabRoundingDistanceRatio: 0.75,
-    tabStartGapToTabDepth: 0.5,
+    tabStartGapToTabDepth: 0.7,
     tabWideningAngle: 0.5235987755982988,
     tabsCount: 3,
   },
@@ -42,12 +42,12 @@ const defaultNet:PyramidNetSpec = {
   },
   baseScoreDashSpec: {
     strokeDashPathPatternId: 'base',
-    strokeDashLength: 11.13175676,
+    strokeDashLength: 11,
     strokeDashOffsetRatio: 0,
   },
   interFaceScoreDashSpec: {
     strokeDashPathPatternId: 'base',
-    strokeDashLength: 21.26351351,
+    strokeDashLength: 11,
     strokeDashOffsetRatio: 0,
   },
   shapeHeightInCm: 40,
@@ -176,19 +176,18 @@ export class PyramidNetStore {
     // TODO: can be converted to a path inset using @flatten-js/polygon-offset
     return subtract(this.borderPolygon, this.insetPolygon);
   }
+  // get borderInsetFaceHoleTransform() {
+  //   return `translate(${this.insetPolygon.vertices[0].x}, ${this.insetPolygon.vertices[0].y}) scale(${
+  //     (this.insetPolygon.box.width) / this.borderPolygon.box.width
+  //   })`;
 
   @computed
-  get borderInsetFaceHoleTransform() {
-    return `translate(${this.insetPolygon.vertices[0].x}, ${this.insetPolygon.vertices[0].y}) scale(${
-      (this.insetPolygon.box.width) / this.borderPolygon.box.width
-    })`;
+  get borderInsetFaceHoleTransformMatrix() {
+    const scale = (this.insetPolygon.box.width) / this.borderPolygon.box.width;
+    return (new Matrix())
+      .translate(this.insetPolygon.vertices[0].x, this.insetPolygon.vertices[0].y)
+      .scale(scale, scale);
   }
-  //
-  // @action
-  // applyFaceHolePattern(svgString) {
-  //   this.textureTransform = parseFloat(extractViewBoxFromSvg(svgString).split(' ')[2]);
-  //   this.activeCutHolePatternD = extractCutHolesFromSvgString(svgString);
-  // }
 
   @action
   setFaceHoleProperties(d, transform) {

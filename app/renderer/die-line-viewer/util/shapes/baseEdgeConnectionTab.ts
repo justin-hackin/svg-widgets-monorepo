@@ -7,7 +7,7 @@ import {
   symmetricHingePlotByProjectionDistance,
 } from '../geom';
 import { strokeDashPath, StrokeDashPathSpec } from './strokeDashPath';
-import {roundedEdgePath} from './generic';
+import { roundedEdgePath } from './generic';
 
 export interface BaseEdgeConnectionTabSpec {
   tabDepthToAscendantEdgeLength: number,

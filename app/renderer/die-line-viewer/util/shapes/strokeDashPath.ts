@@ -3,6 +3,7 @@ import last from 'lodash-es/last';
 import range from 'lodash-es/range';
 import { lineLerp, PointLike } from '../geom';
 import { PathData } from '../PathData';
+import { DOTTED_SCORES } from '../../config';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -85,6 +86,9 @@ export function strokeDashPathRatios(
 export function strokeDashPath(
   start: PointLike, end: PointLike, dashSpec: StrokeDashPathSpec,
 ) {
+  if (!DOTTED_SCORES) {
+    return (new PathData()).move(start).line(end);
+  }
   const ratios = strokeDashPathRatios(start, end, dashSpec);
   return lineSeries(ratios
     .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp))));

@@ -5,7 +5,7 @@ import React from 'react';
 import range from 'lodash-es/range';
 import {
   degToRad, hingedPlot,
-  hingedPlotByProjectionDistance, radToDeg,
+  hingedPlotByProjectionDistance,
 } from '../util/geom';
 import { PathData } from '../util/PathData';
 import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
@@ -80,7 +80,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
       interFaceScoreDashSpec, baseScoreDashSpec,
       ascendantEdgeTabsSpec, baseEdgeTabSpec,
       // @ts-ignore
-      tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, textureTransform, borderInsetFaceHoleTransform, // eslint-disable-line
+      tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, textureTransform, borderInsetFaceHoleTransformMatrix, // eslint-disable-line
     },
   } = store;
 
@@ -153,36 +153,23 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
   cutPathAggregate.concatPath(ascendantTabs.female.cut);
   scorePathAggregate.concatPath(ascendantTabs.female.score);
 
+  if (activeCutHolePatternD && textureTransform) {
+    range(faceCount).forEach((index) => {
+      const isOdd = !!(index % 2);
+      const yScale = isOdd ? -1 : 1;
+
+      const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+      const rotationRad = -1 * yScale * index * faceInteriorAngles[2] + asymetryNudge;
+      cutPathAggregate.concatPath(PathData.fromDValue(activeCutHolePatternD)
+        .transformPoints(borderInsetFaceHoleTransformMatrix)
+        .transformPoints((new Matrix()).scale(yScale, 1).rotate(rotationRad)));
+    });
+  }
+
   return (
     <g>
-      {range(faceCount).map((index) => {
-        const isOdd = !!(index % 2);
-        const yScale = isOdd ? -1 : 1;
-
-        const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
-        const rotation = radToDeg(-1 * yScale * index * faceInteriorAngles[2] + asymetryNudge);
-
-        return (
-          <g key={index} transform={`scale(${yScale} 1) rotate(${rotation}) `}>
-            {/* TODO: separate visual-only layer for boundary (no good for export) */}
-            {/* <FaceBoundary store={store} /> */}
-            {/* eslint-disable-next-line react/no-danger */}
-            { activeCutHolePatternD && textureTransform
-                && (
-                <path
-                  {...cutProps}
-                  d={activeCutHolePatternD}
-                  transform={borderInsetFaceHoleTransform}
-                />
-                )}
-          </g>
-        );
-      })}
-
-      <g id="die-lines">
-        <path {...scoreProps} d={scorePathAggregate.getD()} />
-        <path {...cutProps} d={cutPathAggregate.getD()} />
-      </g>
+      <path className="score" {...scoreProps} d={scorePathAggregate.getD()} />
+      <path className="cut" {...cutProps} d={cutPathAggregate.getD()} />
     </g>
   );
 });

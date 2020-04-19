@@ -23,6 +23,7 @@ import { ControlsExpansionPanel } from './ControlsExpansionPanel';
 import { PanelColorPicker } from './inputs/PanelColorPicker';
 import { dashPatterns } from '../data/dash-patterns';
 import { VERY_SMALL_NUMBER } from '../util/geom';
+import { MIRRORED_STROKES } from '../config';
 
 
 export const ControlPanel = observer(({ store }) => {
@@ -37,8 +38,9 @@ export const ControlPanel = observer(({ store }) => {
   const [open, setOpen] = React.useState(false);
 
   const mapControlsSpecToComponents = ({
-    component, valuePath, label, ...props
+    component, valuePath, label, disabled, ...props
   }) => {
+    if (disabled) { return null; }
     const extraProps = {
       setter: (value) => { store.setValueAtPath(valuePath, value); },
       value: get(store, valuePath),
@@ -88,6 +90,7 @@ export const ControlPanel = observer(({ store }) => {
     component: PanelSlider,
     valuePath: 'pyramidNetSpec.interFaceScoreDashSpec.strokeDashOffsetRatio',
     label: 'Inter-face Stroke Dash Offset Ratio',
+    disabled: !MIRRORED_STROKES,
     ...ratioSliderProps,
   }, {
     component: PanelSelect,
@@ -103,6 +106,7 @@ export const ControlPanel = observer(({ store }) => {
     component: PanelSlider,
     valuePath: 'pyramidNetSpec.baseScoreDashSpec.strokeDashOffsetRatio',
     label: 'Base Stroke Dash Offset Ratio',
+    disabled: !MIRRORED_STROKES,
     ...ratioSliderProps,
   }]
   // @ts-ignore
@@ -217,8 +221,8 @@ export const ControlPanel = observer(({ store }) => {
     }, {
       component: PanelSlider,
       valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabWideningAngle',
-      min: Math.PI / 8,
-      max: Math.PI / 4,
+      min: Math.PI / 12,
+      max: Math.PI / 8,
       step: VERY_SMALL_NUMBER,
     },
     // @ts-ignore

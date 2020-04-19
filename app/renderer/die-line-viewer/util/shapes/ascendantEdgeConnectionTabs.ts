@@ -13,10 +13,8 @@ import {
 } from '../geom';
 import { strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
-import { roundedEdgePath, connectedLineSegments } from './generic';
-
-// TODO: make this controllable
-const MIRRORED_STROKES = false;
+import { connectedLineSegments, roundedEdgePath } from './generic';
+import { DOTTED_SCORES, MIRRORED_STROKES } from '../../config';
 
 
 export const ascendantEdgeConnectionTabs = (
@@ -42,7 +40,7 @@ export const ascendantEdgeConnectionTabs = (
   const tabDepth = tabDepthToTraversalLength * vector.length;
   const maleScoreLineIntervals = [];
   const getFemaleScorePathData = () => {
-    if (MIRRORED_STROKES) {
+    if (MIRRORED_STROKES && DOTTED_SCORES) {
       return new PathData();
     }
     return range(tabsCount - 1).reduce((acc, tabIndex) => {
@@ -60,7 +58,7 @@ export const ascendantEdgeConnectionTabs = (
   };
 
   const getMaleScorePathData = () => {
-    if (MIRRORED_STROKES) {
+    if (MIRRORED_STROKES && DOTTED_SCORES) {
       return new PathData();
     }
     return range(tabsCount).reduce((acc, tabIndex) => {
@@ -123,7 +121,7 @@ export const ascendantEdgeConnectionTabs = (
   });
 
   commands.male.cut.line(end);
-  if (MIRRORED_STROKES) {
+  if (DOTTED_SCORES && MIRRORED_STROKES) {
     const dashRatios = strokeDashPathRatios(start, end, scoreDashSpec);
     const tabDashRatios = subtractRangeSet(dashRatios, tabIntervalRatios);
     const tabGapDashRatios = subtractRangeSet(dashRatios, tabGapIntervalRatios);
