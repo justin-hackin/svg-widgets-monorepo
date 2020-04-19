@@ -1,33 +1,27 @@
 import range from 'lodash-es/range';
 // @ts-ignore
-import { Point } from '@flatten-js/core';
+import {Point} from '@flatten-js/core';
 import last from 'lodash-es/last';
-import { PathData } from '../PathData';
-import {
-  intersectLineLine,
-  lineLerp,
-  parallelLinePointsAtDistance,
-  PointLike,
-  symmetricHingePlot,
-  symmetricHingePlotByProjectionDistance,
-} from '../geom';
-import { strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';
-import { subtractRangeSet } from '../../data/range';
-import { connectedLineSegments, roundedEdgePath } from './generic';
-import { DOTTED_SCORES, MIRRORED_STROKES } from '../../config';
-
+import {PathData} from '../PathData';
+import {lineLerp, PointLike, symmetricHingePlotByProjectionDistance,} from '../geom';
+import {strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec} from './strokeDashPath';
+import {subtractRangeSet} from '../../data/range';
+import {connectedLineSegments} from './generic';
+import {DOTTED_SCORES, MIRRORED_STROKES} from '../../config';
+import {symmetricRoundedTab} from './symmetricRoundedTab';
 
 export const ascendantEdgeConnectionTabs = (
   start: PointLike, end: PointLike,
   tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec, tabIntervalRatios, tabGapIntervalRatios,
 ): AscendantEdgeConnectionPaths => {
   const {
+    holeFlapTaperAngle,
+    holeReachToTabDepth,
+    holeWidthRatio,
+    midpointDepthToTabDepth,
     tabDepthToTraversalLength,
     tabRoundingDistanceRatio,
     tabsCount,
-    midpointDepthToTabDepth,
-    holeReachToTabDepth,
-    holeFlapTaperAngle,
     tabWideningAngle,
   } = tabSpec;
 
@@ -36,8 +30,6 @@ export const ascendantEdgeConnectionTabs = (
     lineLerp(start, end, tabIntervalRatios[tabNum][1]),
   ];
 
-  const vector = end.subtract(start);
-  const tabDepth = tabDepthToTraversalLength * vector.length;
   const maleScoreLineIntervals = [];
   const getFemaleScorePathData = () => {
     if (MIRRORED_STROKES && DOTTED_SCORES) {
@@ -79,38 +71,23 @@ export const ascendantEdgeConnectionTabs = (
       score: getMaleScorePathData(),
     },
   };
-  const ARBITRARY_LENGTH = 10;
+  const vector = end.subtract(start);
+  const tabDepth = tabDepthToTraversalLength * vector.length;
+  const tabLength = (vector.length * holeWidthRatio) / tabsCount;
+  const tabDepthToBaseLength = tabDepth / tabLength;
   range(0, tabsCount).forEach((tabNum) => {
     const [tabBaseStart, tabBaseEnd] = getTabBaseInterval(tabNum);
-
-    const [tabEdgeStart, tabEdgeEnd] = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
-    const midpointDepth = tabDepth * midpointDepthToTabDepth;
-    const [tabMidIntersectorStart, tabMidIntersectorEnd] = parallelLinePointsAtDistance(
-      tabBaseStart, tabBaseEnd, midpointDepth,
-    );
-    const [tabStartDeparture, tabEndDeparture] = symmetricHingePlot(
-      tabBaseStart, tabBaseEnd, Math.PI / 2 + tabWideningAngle, ARBITRARY_LENGTH,
-    );
-    const tabMidpointStart = intersectLineLine(
-      tabMidIntersectorStart, tabMidIntersectorEnd, tabBaseStart, tabStartDeparture,
-    );
-    const tabMidpointEnd = intersectLineLine(
-      tabMidIntersectorStart, tabMidIntersectorEnd, tabBaseEnd, tabEndDeparture,
-    );
-
     const [holeEdgeStart, holeEdgeEnd] = symmetricHingePlotByProjectionDistance(
       tabBaseStart, tabBaseEnd, -Math.PI / 2 + holeFlapTaperAngle, holeReachToTabDepth * -tabDepth,
     );
-    // don't let the retraction happen any more than half the length of shortest the non-rounded edge
-    // otherwise the control points may criss-cross causing odd loops
-    const tabRoundingDistance = tabRoundingDistanceRatio * 0.5 * Math.min(
-      tabBaseStart.subtract(tabMidpointStart).length,
-      tabMidpointStart.subtract(tabEdgeStart).length,
-    );
+
     commands.male.cut.line(tabBaseStart);
-    const tabPath = roundedEdgePath(
-      [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], tabRoundingDistance,
+
+    const tabPath = symmetricRoundedTab(
+      tabBaseStart, tabBaseEnd,
+      midpointDepthToTabDepth, tabDepthToBaseLength, tabRoundingDistanceRatio, tabWideningAngle,
     );
+
     maleScoreLineIntervals.push([new Point(...tabPath.commands[0].to), new Point(...last(tabPath.commands).to)]);
     tabPath.sliceCommandsDangerously(1);
     // roundedEdgePath assumes first point is move command but we needed and applied line
