@@ -219,7 +219,7 @@ export const ControlPanel = observer(({ store }) => {
     }, {
       component: PanelSlider,
       valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabWideningAngle',
-      min: Math.PI / 16,
+      min: Math.PI / 20,
       max: Math.PI / 8,
       step: VERY_SMALL_NUMBER,
     },

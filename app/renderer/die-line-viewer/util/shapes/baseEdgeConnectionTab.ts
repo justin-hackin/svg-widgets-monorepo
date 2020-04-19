@@ -2,7 +2,7 @@ import { PathData } from '../PathData';
 import {
   distanceBetweenPoints,
   hingedPlotByProjectionDistance,
-  hingedPlotLerp,
+  hingedPlotLerp, intersectLineLine,
   PointLike,
   symmetricHingePlotByProjectionDistance,
 } from '../geom';
@@ -59,7 +59,6 @@ export function baseEdgeConnectionTab(
     hingedPlotLerp(mid, end, 0, outLengthRatio),
   ];
 
-  const handleEdges = symmetricHingePlotByProjectionDistance(start, finBases[0], holeTheta, tabDepth);
   const finDepth = finDepthToTabDepth * tabDepth;
   const backFinEdge = hingedPlotByProjectionDistance(finBases[1], finBases[0], holeTheta, -finDepth);
   // const frontFinEdge = hingedPlotByProjectionDistance(finBases[0], finBases[1], Math.PI / 2, finDepth);
@@ -77,6 +76,7 @@ export function baseEdgeConnectionTab(
   cutPath.concatPath(roundedHole);
   cutPath.close();
 
+  const handleEdges = symmetricHingePlotByProjectionDistance(start, finBases[0], holeTheta, tabDepth);
   cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], finBases[0]], roundingDistance));
 
   const finPath = roundedEdgePath([finBases[0], backFinEdge, finMidTip, finBases[1]], roundingDistance);
@@ -86,5 +86,15 @@ export function baseEdgeConnectionTab(
   const scorePath = new PathData();
   scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
   scorePath.concatPath(strokeDashPath(holeBases[1], finBases[1], scoreDashSpec));
+  const midpoint = (p1, p2) => hingedPlotLerp(p1, p2, 0, 0.5);
+  const east = midpoint(finBases[1], finMidTip);
+  const west = midpoint(finBases[0], backFinEdge);
+  const south = intersectLineLine(
+    finBases[1], hingedPlotLerp(finBases[0], finBases[1], Math.PI / 2, 1),
+    backFinEdge, finMidTip,
+  );
+  const north = finBases[1];
+  scorePath.concatPath(strokeDashPath(north, south, scoreDashSpec));
+  scorePath.concatPath(strokeDashPath(east, west, scoreDashSpec));
   return { cut: cutPath, score: scorePath };
 }
