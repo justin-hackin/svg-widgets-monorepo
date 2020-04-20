@@ -1,14 +1,14 @@
 import range from 'lodash-es/range';
 // @ts-ignore
-import {Point} from '@flatten-js/core';
+import { Point } from '@flatten-js/core';
 import last from 'lodash-es/last';
-import {PathData} from '../PathData';
-import {lineLerp, PointLike, symmetricHingePlotByProjectionDistance,} from '../geom';
-import {strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec} from './strokeDashPath';
-import {subtractRangeSet} from '../../data/range';
-import {connectedLineSegments} from './generic';
-import {DOTTED_SCORES, MIRRORED_STROKES} from '../../config';
-import {symmetricRoundedTab} from './symmetricRoundedTab';
+import { PathData } from '../PathData';
+import { lineLerp, PointLike, symmetricHingePlotByProjectionDistance } from '../geom';
+import { strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';
+import { subtractRangeSet } from '../../data/range';
+import { connectedLineSegments } from './generic';
+import { DOTTED_SCORES, MIRRORED_STROKES } from '../../config';
+import { symmetricRoundedTab } from './symmetricRoundedTab';
 
 export const ascendantEdgeConnectionTabs = (
   start: PointLike, end: PointLike,
@@ -83,7 +83,7 @@ export const ascendantEdgeConnectionTabs = (
 
     commands.male.cut.line(tabBaseStart);
 
-    const tabPath = symmetricRoundedTab(
+    const { path: tabPath } = symmetricRoundedTab(
       tabBaseStart, tabBaseEnd,
       midpointDepthToTabDepth, tabDepthToBaseLength, tabRoundingDistanceRatio, tabWideningAngle,
     );

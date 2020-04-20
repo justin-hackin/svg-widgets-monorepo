@@ -1,11 +1,13 @@
-import {intersectLineLine, parallelLinePointsAtDistance, symmetricHingePlot} from '../geom';
-import {roundedEdgePath} from './generic';
+import { intersectLineLine, parallelLinePointsAtDistance, symmetricHingePlot } from '../geom';
+import { roundedEdgePath } from './generic';
 
 const ARBITRARY_LENGTH = 10;
-export const symmetricRoundedTab = (tabBaseStart, tabBaseEnd, midpointDepthToTabDepth, tabDepthToBaseLength, tabRoundingDistanceRatio, tabWideningAngle) => {
+export const symmetricRoundedTab = (
+  tabBaseStart, tabBaseEnd, midpointDepthToTabDepth, tabDepthToBaseLength, tabRoundingDistanceRatio, tabWideningAngle,
+) => {
   const vector = tabBaseEnd.subtract(tabBaseStart);
   const tabDepth = tabDepthToBaseLength * vector.length;
-  const [tabEdgeStart, tabEdgeEnd] = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
+  const [tabApexStart, tabApexEnd] = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
   const midpointDepth = tabDepth * midpointDepthToTabDepth;
   const [tabMidIntersectorStart, tabMidIntersectorEnd] = parallelLinePointsAtDistance(
     tabBaseStart, tabBaseEnd, midpointDepth,
@@ -24,9 +26,17 @@ export const symmetricRoundedTab = (tabBaseStart, tabBaseEnd, midpointDepthToTab
   // otherwise the control points may criss-cross causing odd loops
   const tabRoundingDistance = tabRoundingDistanceRatio * 0.5 * Math.min(
     tabBaseStart.subtract(tabMidpointStart).length,
-    tabMidpointStart.subtract(tabEdgeStart).length,
+    tabMidpointStart.subtract(tabApexStart).length,
   );
-  return roundedEdgePath(
-    [tabBaseStart, tabMidpointStart, tabEdgeStart, tabEdgeEnd, tabMidpointEnd, tabBaseEnd], tabRoundingDistance,
-  );
+  return {
+    points: {
+      center: [tabMidpointStart, tabMidpointEnd],
+      apex: [tabApexStart, tabApexEnd],
+    },
+    tabRoundingDistance,
+    path: roundedEdgePath(
+      [tabBaseStart, tabMidpointStart, tabApexStart, tabApexEnd, tabMidpointEnd, tabBaseEnd],
+      tabRoundingDistance,
+    ),
+  };
 };
