@@ -4,6 +4,7 @@ import {
   hingedPlotByProjectionDistance,
   hingedPlotLerp,
   PointLike,
+  symmetricHingePlotByProjectionDistance,
 } from '../geom';
 import { strokeDashPath, StrokeDashPathSpec } from './strokeDashPath';
 import { roundedEdgePath } from './generic';
@@ -80,11 +81,7 @@ export function baseEdgeConnectionTab(
   ].map(([pt1, pt2]) => distanceBetweenPoints(pt1, pt2));
   const roundingDistance = roundingDistanceRatio * Math.min(...roundingEdgeLengths);
   const roundedHole = roundedEdgePath([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]], roundingDistance);
-  // TODO: only taper as much as needed for clearance
-  const handleEdges = [
-    hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
-    hingedPlotByProjectionDistance(start, finBases[0], Math.PI * (1 - 1 / 10), tabDepth),
-  ];
+  const handleEdges = symmetricHingePlotByProjectionDistance(start, finBases[0], holeTheta, tabDepth);
 
   cutPath.concatPath(roundedHole);
   cutPath.close();
