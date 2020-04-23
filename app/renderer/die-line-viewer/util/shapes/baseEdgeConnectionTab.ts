@@ -97,7 +97,7 @@ export function baseEdgeConnectionTab(
   scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
   scorePath.concatPath(strokeDashPath(holeBases[1], finBases[1], scoreDashSpec));
   // vertical fin score
-  scorePath.concatPath(strokeDashPath(finBases[0], finApexes[0], scoreDashSpec));
+  scorePath.concatPath(strokeDashPath(finBases[1], finApexes[1], scoreDashSpec));
 
   // horizontal fin scores
   scorePath.concatPath(strokeDashPath(finCenters[0], finCenters[1], scoreDashSpec));
