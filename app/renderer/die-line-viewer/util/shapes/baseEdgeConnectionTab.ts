@@ -7,7 +7,7 @@ import {
 } from '../geom';
 import { strokeDashPath, StrokeDashPathSpec } from './strokeDashPath';
 import { roundedEdgePath } from './generic';
-import { arrowTab } from './symmetricRoundedTab';
+import { symmetricRoundedTab } from './symmetricRoundedTab';
 
 export interface BaseEdgeConnectionTabSpec {
   tabDepthToAscendantEdgeLength: number,
@@ -68,8 +68,9 @@ export function baseEdgeConnectionTab(
   const finTraversal = distanceBetweenPoints(finBases[0], finBases[1]);
   // for plotting points only, need rounding clamp based on all roundings
   // TODO: pull plotting into it's own function
-  const { points: { center: finCenters }, path: finPath } = arrowTab(
-    finBases[0], finBases[1], 0.5, finDepth / finTraversal, holeTheta,
+  const { points: { center: finCenters, apex: finApexes }, path: finPath } = symmetricRoundedTab(
+    finBases[0], finBases[1], 0.5, finDepth / finTraversal,
+    0, holeTheta,
   );
 
 
@@ -95,6 +96,8 @@ export function baseEdgeConnectionTab(
   const scorePath = new PathData();
   scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
   scorePath.concatPath(strokeDashPath(holeBases[1], finBases[1], scoreDashSpec));
+  // vertical fin score
+  scorePath.concatPath(strokeDashPath(finBases[0], finApexes[0], scoreDashSpec));
 
   // horizontal fin scores
   scorePath.concatPath(strokeDashPath(finCenters[0], finCenters[1], scoreDashSpec));

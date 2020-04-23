@@ -1,10 +1,5 @@
-import {
-  hingedPlotByProjectionDistance,
-  intersectLineLine,
-  parallelLinePointsAtDistance,
-  symmetricHingePlot,
-} from '../geom';
-import { connectedLineSegments, roundedEdgePath } from './generic';
+import { intersectLineLine, parallelLinePointsAtDistance, symmetricHingePlot } from '../geom';
+import { roundedEdgePath } from './generic';
 
 const ARBITRARY_LENGTH = 10;
 export const symmetricRoundedTab = (
@@ -42,30 +37,6 @@ export const symmetricRoundedTab = (
     path: roundedEdgePath(
       [tabBaseStart, tabMidpointStart, tabApexStart, tabApexEnd, tabMidpointEnd, tabBaseEnd],
       tabRoundingDistance,
-    ),
-  };
-};
-
-export const arrowTab = (
-  tabBaseStart, tabBaseEnd, midpointDepthToTabDepth, tabDepthToBaseLength, tabWideningAngle,
-) => {
-  const vector = tabBaseEnd.subtract(tabBaseStart);
-  const tabDepth = tabDepthToBaseLength * vector.length;
-  const tabApexes = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
-  const midpointDepth = tabDepth * midpointDepthToTabDepth;
-
-  const tabMidpoints = [
-    hingedPlotByProjectionDistance(
-      tabBaseEnd, tabBaseStart, tabWideningAngle, -midpointDepth,
-    ),
-    hingedPlotByProjectionDistance(
-      tabBaseStart, tabBaseEnd, tabWideningAngle, midpointDepth,
-    ),
-  ];
-  return {
-    points: { center: tabMidpoints, apex: tabApexes },
-    path: connectedLineSegments(
-      [tabBaseStart, tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], tabBaseEnd],
     ),
   };
 };
