@@ -8,7 +8,7 @@
     "release": "run-s parcel:build \"electron:build {@}\" --",
     "watch": "run-p -r parcel:watch electron:start",
     "electron:start": "electron .",
-    "electron:build": "build --x64 --publish=never", 
+    "electron:build": "build --x64 --publish=never",
     "parcel:watch": "run-p -r main:watch renderer:watch",
     "main:watch": "parcel watch app/main/main.ts --out-dir app/main/.parcel --out-file main --target electron",
     "main:build": "parcel build app/main/main.ts --out-dir app/main/.parcel --out-file main --target electron",
@@ -91,7 +91,7 @@
   "devDependencies": {
     "@babel/core": "^7.8.7",
     "@babel/plugin-transform-destructuring": "^7.8.8",
-    "@babel/preset-env": "^7.8.7",
+    "@babel/preset-env": "^7.10.4",
     "@babel/preset-react": "^7.8.3",
     "@types/node": "^13.13.0",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
