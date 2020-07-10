@@ -18,7 +18,7 @@ app.on('ready', async () => {
   setupIpc(ipcMain, app);
 
   const getUrl = (fileName, isDevUrl) => (isDevUrl ? `http://localhost:1124/${fileName}` : format({
-    pathname: resolve(`app/renderer/.parcel/production/${fileName}`),
+    pathname: resolve(`/dist/production/${fileName}`),
     protocol: 'file:',
     slashes: true,
   }));
@@ -48,14 +48,14 @@ app.on('ready', async () => {
       show: false,
       icon,
       webPreferences,
-    }, getUrl('die-line-viewer/indx.html', isDev)),
+    }, getUrl('die-line-viewer/app.html', isDev)),
     promisifyWindow({
       width: 800,
       height: 600,
       show: false,
       icon,
       webPreferences,
-    }, getUrl('texture-transform-editor/indx.html', isDev)),
+    }, getUrl('texture-transform-editor/app.html', isDev)),
   ]).then(([dieLineWindow, textureWindow]) => {
     const forwardingEvents = ['die>set-die-line-cut-holes', 'die>request-shape-update', 'tex>shape-update'];
     forwardingEvents.forEach((event) => {

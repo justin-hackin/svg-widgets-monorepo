@@ -6,5 +6,4 @@ dist/
 node_modules/
 **/.DS_Store
 build/
-app/renderer/.parcel/
-app/main/.parcel/
+.fusebox/
