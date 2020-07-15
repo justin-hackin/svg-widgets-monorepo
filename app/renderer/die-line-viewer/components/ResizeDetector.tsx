@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import ReactResizeDetector from 'react-resize-detector';
 import { isValidNumber } from '../util/geom';
 

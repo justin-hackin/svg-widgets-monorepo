@@ -1,11 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import { render } from 'react-dom';
 
 import '../common/style/index.css';
 import { MoveableTexture } from './components/MovableTexture';
 
 
-ReactDOM.render(
+render(
   <MoveableTexture />,
   document.getElementById('root'),
 );

@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
 import { ResizeDetector } from './ResizeDetector';
+
+const { useState } = React;
+
 
 export const ResizableZoomPan = ({ children, onChange = null, ...props }) => {
   const [viewValue, setValue] = useState(INITIAL_VALUE);

@@ -1,6 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import * as React from 'react';
 import { createPortal } from 'react-dom';
 import ReactMoveable from 'react-moveable';
+
+const { useState, useRef, useEffect } = React;
 
 const PortalizedReactMoveable = React.forwardRef(
   // @ts-ignore

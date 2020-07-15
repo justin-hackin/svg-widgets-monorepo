@@ -1,8 +1,8 @@
 /* eslint-disable max-classes-per-file */
-import set from 'lodash-es/set';
+import { set } from 'lodash';
 import { action, observable } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
-import React from 'react';
+import * as React from 'react';
 // @ts-ignore
 import {
   FaceBoundarySVG, PyramidNet, PyramidNetSpec, StoreSpec, StyleSpec,

@@ -2,7 +2,7 @@
 
 const {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  FuseBox, Sparky, CSSPlugin, CSSResourcePlugin, WebIndexPlugin, RawPlugin, CopyPlugin,
+  FuseBox, Sparky, SassPlugin, CSSPlugin, CSSResourcePlugin, CopyPlugin, JSONPlugin,
 // eslint-disable-next-line import/no-extraneous-dependencies
 } = require('fuse-box');
 // const { spawn } = require('child_process');
@@ -14,41 +14,41 @@ const isDev = process.env.NODE_ENV !== 'production';
 const ASSETS = ['*.jpg', '*.png', '*.jpeg', '*.gif', '*.svg', '*.gltf'];
 
 
-Sparky.task('copy-html', () => Sparky.src('./**/*.html', { base: './src/app/renderer' }).dest('./dist/renderer/'));
+Sparky.task('copy-html', () => Sparky.src('./**/*.html', { base: './app/renderer' }).dest('./dist/renderer/'));
 
 Sparky.task('default', ['copy-html'], () => {
   const fuse = FuseBox.init({
-    homeDir: 'src/app',
+    homeDir: 'app',
     automaticAlias: true,
     sourcemaps: true,
     useTypescriptCompiler: true,
     allowSyntheticDefaultImports: true,
     output: 'dist/$name.js',
     plugins: [
-      [CSSResourcePlugin(), CSSPlugin()], CSSPlugin()],
-    alias: {
-      '@coglite': '~/packages',
-    },
+      CopyPlugin({
+        useDefault: false, files: ASSETS, dest: 'static', resolve: 'static/',
+      }),
+      JSONPlugin(),
+      [SassPlugin({ import: true }), CSSResourcePlugin(), CSSPlugin()],
+      CSSPlugin(),
+    ],
   });
 
   if (isDev) {
-    fuse.dev({ port: 8085, httpServer: false });
+    fuse.dev({ port: 8080, httpServer: false });
 
-    fuse.bundle('main')
+    fuse.bundle('main/main')
       .target('electron')
       .instructions(' > [main/main.ts]')
       .watch();
 
-    fuse.bundle('renderer/die-line-viewer')
+    fuse.bundle('renderer/die-line-viewer/app')
       .target('electron')
-      .instructions(' > [app/renderer/die-line-viewer/app.tsx] +fuse-box-css')
+      .instructions(' > [renderer/die-line-viewer/app.tsx] +fuse-box-css')
       .watch()
-      .hmr()
-      .plugin(CopyPlugin({
-        useDefault: false, files: ASSETS, dest: 'app/static', resolve: '/',
-      }));
+      .hmr();
 
-    fuse.bundle('renderer/texture-transform-editor')
+    fuse.bundle('renderer/texture-transform-editor/app')
       .target('electron')
       .instructions(' > [renderer/texture-transform-editor/app.tsx] +fuse-box-css')
       .watch()
@@ -66,13 +66,13 @@ Sparky.task('default', ['copy-html'], () => {
 
   // ------------------prod config here..needs some work but doesnt matter atm-----------------------//
 
-  fuse.bundle('app/main')
-    .target('electron')
-    .instructions(' > [desktop/main.ts]');
+  // fuse.bundle('app/main')
+  //   .target('electron')
+  //   .instructions(' > [desktop/main.ts]');
 
-  fuse.bundle('app/renderer')
-    .target('electron')
-    .instructions(' > app/index.tsx');
+  // fuse.bundle('app/renderer')
+  //   .target('electron')
+  //   .instructions(' > app/index.tsx');
 
   return fuse.run();
 });

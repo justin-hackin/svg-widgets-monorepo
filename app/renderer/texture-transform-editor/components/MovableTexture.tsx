@@ -1,6 +1,6 @@
 // @ts-nocheck
 import Canvg, { presets } from 'canvg';
-import React, { createRef, useEffect, useState } from 'react';
+import * as React from 'react';
 import { useDrag } from 'react-use-gesture';
 import ReactDOMServer from 'react-dom/server';
 
@@ -18,6 +18,8 @@ import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 import { ShapePreview } from './ShapePreview';
 import { DRAG_MODES, DragModeOptionsGroup } from './DragModeOptionGroup';
+
+const { createRef, useEffect, useState } = React;
 
 // TODO: extract this
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin

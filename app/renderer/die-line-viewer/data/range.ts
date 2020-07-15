@@ -1,7 +1,6 @@
-import sortedIndex from 'lodash-es/sortedIndex';
-import flatten from 'lodash-es/flatten';
-import last from 'lodash-es/last';
-import cloneDeep from 'lodash-es/cloneDeep';
+import {
+  cloneDeep, flatten, last, sortedIndex,
+} from 'lodash';
 
 const validateRange = (rangeSeries) => {
   const errorMsg = (index, item) => `Invalid range set, index: ${index}, value: ${item}`;

@@ -1,4 +1,4 @@
-import last from 'lodash-es/last';
+import { last } from 'lodash';
 import { hingedPlot, PointLike } from '../geom';
 import { PathData } from '../PathData';
 

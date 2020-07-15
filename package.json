@@ -2,10 +2,9 @@
   "name": "spacecraft-net-factory",
   "version": "1.0.0",
   "description": "A toolkit for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra, something playfully referred to as SpaceCrafts",
-  "main": "dist/main.js",
-  "scripts": { 
-    "build": "node fuse",
-    "start": "npm run build && npm run electron:start",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "start": "node fuse",
     "release": "run-s parcel:build \"electron:build {@}\" --",
     "watch": "run-p -r parcel:watch electron:start",
     "electron:start": "electron .",
@@ -63,7 +62,7 @@
     "@material-ui/styles": "^4.10.0",
     "canvg": "^3.0.6",
     "clsx": "^1.1.1",
-    "lodash-es": "^4.17.15",
+    "lodash": "^4.17.19",
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
     "react": "^16.13.1",
@@ -76,6 +75,7 @@
     "react-use-gesture": "^7.0.15",
     "svg-path-parser": "git+https://github.com/justin-hackin/svg-path-parser.git",
     "three": "^0.113.2",
+    "three-gltf-loader": "^1.111.0",
     "threejs-orbit-controls": "^1.0.3",
     "use-query-params": "^0.4.6",
     "uuid": "^3.4.0"

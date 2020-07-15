@@ -7,7 +7,7 @@ import AspectRatioIcon from '@material-ui/icons/AspectRatio';
 import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import React from 'react';
+import * as React from 'react';
 
 export const DRAG_MODES = {
   ROTATE: 'rotate',

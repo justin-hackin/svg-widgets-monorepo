@@ -3,12 +3,15 @@
 const {
   app, BrowserWindow, nativeImage, ipcMain,
 } = require('electron');
+const path = require('path');
 const { format } = require('url');
-// @ts-ignore
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isDev = require('electron-is-dev');
 const { resolve } = require('app-root-path');
 const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const { setupIpc } = require('./ipc');
+
 
 // TODO: doesn't seem to work
 const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/256x256.png`);
@@ -17,17 +20,17 @@ app.on('ready', async () => {
   installExtension(REACT_DEVELOPER_TOOLS);
   setupIpc(ipcMain, app);
 
-  const getUrl = (fileName, isDevUrl) => (isDevUrl ? `http://localhost:1124/${fileName}` : format({
-    pathname: resolve(`/dist/production/${fileName}`),
+  const getUrl = (fileName) => format({
+    pathname: path.join(app.getAppPath(), `dist/renderer/${fileName}`),
     protocol: 'file:',
     slashes: true,
-  }));
+  });
 
   const promisifyWindow = (config, url) => new Promise((resolveFn) => {
     const mainWindow = new BrowserWindow(config);
 
     mainWindow.once('ready-to-show', () => {
-      //mainWindow.toggleDevTools();
+      mainWindow.toggleDevTools();
       mainWindow.show();
       resolveFn(mainWindow);
     });
@@ -37,6 +40,7 @@ app.on('ready', async () => {
   });
 
   const webPreferences = {
+    webSecurity: false,
     nodeIntegration: true,
     preload: resolve('app/main/preload.js'),
   };
@@ -48,14 +52,14 @@ app.on('ready', async () => {
       show: false,
       icon,
       webPreferences,
-    }, getUrl('die-line-viewer/app.html', isDev)),
+    }, getUrl('die-line-viewer/app.html')),
     promisifyWindow({
       width: 800,
       height: 600,
       show: false,
       icon,
       webPreferences,
-    }, getUrl('texture-transform-editor/app.html', isDev)),
+    }, getUrl('texture-transform-editor/app.html')),
   ]).then(([dieLineWindow, textureWindow]) => {
     const forwardingEvents = ['die>set-die-line-cut-holes', 'die>request-shape-update', 'tex>shape-update'];
     forwardingEvents.forEach((event) => {

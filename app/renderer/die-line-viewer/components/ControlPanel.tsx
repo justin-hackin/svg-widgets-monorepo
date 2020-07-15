@@ -1,9 +1,7 @@
-import React from 'react';
+import * as React from 'react';
 import { observer } from 'mobx-react';
-import startCase from 'lodash-es/startCase';
-import last from 'lodash-es/last';
+import { get, last, startCase } from 'lodash';
 
-import get from 'lodash-es/get';
 import clsx from 'clsx';
 import { useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -19,7 +17,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import { PanelSelect } from './inputs/PanelSelect';
 import { PanelSlider } from './inputs/PanelSlider';
 import { useStyles } from './style';
-import { ControlsExpansionPanel } from './ControlsExpansionPanel';
+import { ControlsAccordion } from './ControlsAccordion';
 import { PanelColorPicker } from './inputs/PanelColorPicker';
 import { dashPatterns } from '../data/dash-patterns';
 import { VERY_SMALL_NUMBER } from '../util/geom';
@@ -309,23 +307,23 @@ export const ControlPanel = observer(({ store }) => {
         </div>
         <Divider />
 
-        <ControlsExpansionPanel summary="Path Styles">
+        <ControlsAccordion summary="Path Styles">
           {styleControls}
-        </ControlsExpansionPanel>
+        </ControlsAccordion>
 
         {topLevelControls}
 
-        <ControlsExpansionPanel summary="Stroke">
+        <ControlsAccordion summary="Stroke">
           {strokeControls}
-        </ControlsExpansionPanel>
+        </ControlsAccordion>
 
-        <ControlsExpansionPanel summary="Ascendant Edge Tabs">
+        <ControlsAccordion summary="Ascendant Edge Tabs">
           {ascendantEdgeTabsControl}
-        </ControlsExpansionPanel>
+        </ControlsAccordion>
 
-        <ControlsExpansionPanel summary="Base Edge Tab">
+        <ControlsAccordion summary="Base Edge Tab">
           {baseEdgeTabControl}
-        </ControlsExpansionPanel>
+        </ControlsAccordion>
       </Drawer>
     </div>
   );

@@ -1,7 +1,6 @@
-import range from 'lodash-es/range';
 // @ts-ignore
 import { Point } from '@flatten-js/core';
-import last from 'lodash-es/last';
+import { last, range } from 'lodash';
 import { PathData } from '../PathData';
 import { lineLerp, PointLike, symmetricHingePlotByProjectionDistance } from '../geom';
 import { strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';

@@ -3,7 +3,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import uuid from 'uuid/v1';
 import FormControl from '@material-ui/core/FormControl';
-import React from 'react';
+import * as React from 'react';
 import { useStyles } from '../style';
 
 export const PanelSelect = ({

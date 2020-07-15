@@ -1,6 +1,4 @@
-import sum from 'lodash-es/sum';
-import last from 'lodash-es/last';
-import range from 'lodash-es/range';
+import { last, range, sum } from 'lodash';
 import { lineLerp, PointLike } from '../geom';
 import { PathData } from '../PathData';
 import { DOTTED_SCORES } from '../../config';

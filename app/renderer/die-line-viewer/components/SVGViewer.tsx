@@ -1,5 +1,5 @@
 // import { useQueryParam, StringParam, JsonParam } from 'use-query-params';
-import React from 'react';
+import * as React from 'react';
 import { observer } from 'mobx-react';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';

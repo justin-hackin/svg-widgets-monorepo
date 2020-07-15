@@ -3,9 +3,7 @@ import { action, computed, observable } from 'mobx';
 import { Matrix, Point, Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 import { subtract } from '@flatten-js/boolean-op';
-import chunk from 'lodash-es/chunk';
-import flatten from 'lodash-es/flatten';
-import range from 'lodash-es/range';
+import { chunk, flatten, range } from 'lodash';
 import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, hingedPlot, triangleAnglesGivenSides,

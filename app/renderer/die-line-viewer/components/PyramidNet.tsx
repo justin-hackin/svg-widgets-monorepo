@@ -1,8 +1,8 @@
 // @ts-ignore
 import { Matrix } from '@flatten-js/core';
 import { observer } from 'mobx-react';
-import React from 'react';
-import range from 'lodash-es/range';
+import * as React from 'react';
+import { range } from 'lodash';
 import {
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
@@ -12,6 +12,7 @@ import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPat
 import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs, AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { roundedEdgePath } from '../util/shapes/generic';
+
 
 export interface StyleSpec {
   dieLineProps: object,

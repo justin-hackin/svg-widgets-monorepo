@@ -1,21 +1,36 @@
 {
   "compilerOptions": {
-    "lib": [
-      "es2015",
-      "dom"
-    ],
+    "alwaysStrict": true,
+    "importHelpers": true,
+    "sourceMap": true,
+    "inlineSourceMap": true,
+    "preserveConstEnums": true,
+    "target": "es2016",
+    "module": "commonjs",
+    "outDir": "dist",
     "jsx": "react",
-    "allowUmdGlobalAccess": true,
+    "moduleResolution": "node",
+
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "allowJs": true,
+
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": false,
+    "skipLibCheck": true,
+    "baseUrl": ".",
     "paths": {
-      "~*": ["./app/*"]
-    },
-    "target": "es2015",
-    "module": "esnext",
-    "moduleResolution": "node"
-  }
+      "*": ["*","src/*","src/app/*"],
+      // "@coglite/*": ["src/packages/*"]
+     },
+    "lib": ["es6","es2015", "es2016", "es2017", "dom"]
+    
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

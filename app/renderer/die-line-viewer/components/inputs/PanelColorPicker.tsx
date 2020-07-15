@@ -1,5 +1,5 @@
 import uuid from 'uuid/v1';
-import React, { useState } from 'react';
+import * as React from 'react';
 import FormControl from '@material-ui/core/FormControl';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -7,6 +7,8 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { ChromePicker } from 'react-color';
 import { useStyles } from '../style';
+
+const { useState } = React;
 
 export const PanelColorPicker = ({
   label, setter, value, valuePath, ...rest

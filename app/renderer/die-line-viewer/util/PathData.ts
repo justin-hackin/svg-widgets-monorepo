@@ -1,13 +1,11 @@
-import cloneDeep from 'lodash-es/cloneDeep';
-import includes from 'lodash-es/includes';
-import intersection from 'lodash-es/intersection';
+import {
+  cloneDeep, intersection, isNumber, isNaN,
+} from 'lodash';
 // @ts-ignore
 import { Matrix, Point } from '@flatten-js/core';
-import isNaN from 'lodash-es/isNaN';
 import {
   composeSVG, parseSVG,
 } from 'svg-path-parser';
-import isNumber from 'lodash-es/isNumber';
 
 import { PointTuple, Coord } from './geom';
 

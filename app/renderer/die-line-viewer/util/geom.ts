@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Line, Point } from '@flatten-js/core';
-import isNaN from 'lodash-es/isNaN';
+import { isNaN } from 'lodash';
 
 import { circularSlice } from './data';
 
