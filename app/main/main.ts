@@ -9,7 +9,7 @@ const { format } = require('url');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isDev = require('electron-is-dev');
 const { resolve } = require('app-root-path');
-const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
+// const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const { setupIpc } = require('./ipc');
 
 
@@ -17,7 +17,9 @@ const { setupIpc } = require('./ipc');
 const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/256x256.png`);
 
 app.on('ready', async () => {
-  installExtension(REACT_DEVELOPER_TOOLS);
+  // TODO: monitor status of bug breaking extension installs
+  // https://github.com/electron/electron/issues/23662
+  // installExtension(REACT_DEVELOPER_TOOLS);
   setupIpc(ipcMain, app);
 
   const getUrl = (fileName) => format({
