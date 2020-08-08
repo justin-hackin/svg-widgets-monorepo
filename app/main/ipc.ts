@@ -24,10 +24,10 @@ export const setupIpc = (ipcMain, app) => {
     if (isPositive) {
       const punchoutPath = new PathData();
       punchoutPath
-        .move([0, 0])
-        .line([VERY_LARGE_NUMBER, 0])
+        .move([-VERY_LARGE_NUMBER, -VERY_LARGE_NUMBER])
+        .line([VERY_LARGE_NUMBER, -VERY_LARGE_NUMBER])
         .line([VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
-        .line([0, VERY_LARGE_NUMBER])
+        .line([-VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
         .close();
       const punchoutPathTransformedD = svgpath.from(
         punchoutPath.getD(),
