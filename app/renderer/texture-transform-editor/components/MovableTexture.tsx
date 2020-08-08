@@ -206,7 +206,7 @@ const MoveableTextureLOC = ({ classes }) => {
   const faceScaleCenterPercentStr = `${((1 - faceScaleMuxed) * 100) / 2}%`;
   const sendTexture = async () => {
     const boundaryPathD = path.getD();
-    const dd = ipcRenderer.invoke(
+    const dd = await ipcRenderer.invoke(
       'intersect-svg', boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
     );
     ipcRenderer.send('die>set-die-line-cut-holes', dd, textureTransformMatrixStr);
