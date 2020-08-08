@@ -1,11 +1,12 @@
 import {
-  cloneDeep, intersection, isNumber, isNaN,
+  cloneDeep, isNaN,
 } from 'lodash';
 // @ts-ignore
 import { Matrix, Point } from '@flatten-js/core';
 import {
   composeSVG, parseSVG,
 } from 'svg-path-parser';
+import svgpath from 'svgpath';
 
 import { PointTuple, Coord } from './geom';
 
@@ -199,22 +200,7 @@ export class PathData {
   }
 
   transformPoints(matrix:Matrix) {
-    // this.makePathAbsolute();
-    this.commands.forEach((command) => {
-      const propsToTransform = intersection(Object.keys(command), TRANSFORMABLE_COMMAND_PROPS);
-      propsToTransform.forEach((prop) => {
-        command[prop] = matrix.transform(command[prop]);
-      });
-      const rotDelta = Math.atan(matrix.c / matrix.d);
-      if (command.code === 'A') {
-        if (isNumber(rotDelta) && !isNaN(rotDelta)) {
-          command.xAxisRotation += (360 * rotDelta) / (2 * Math.PI);
-          if (command.xAxisRotation > 360) {
-            command.xAxisRotation -= 360;
-          }
-        }
-      }
-    });
+    this.commands = parseSVG(svgpath(this.getD()).transform(matrix).toString());
     return this;
   }
 

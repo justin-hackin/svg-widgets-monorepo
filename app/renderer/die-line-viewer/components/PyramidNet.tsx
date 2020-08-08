@@ -6,6 +6,7 @@ import { range } from 'lodash';
 import {
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
+  radToDeg,
 } from '../util/geom';
 import { PathData } from '../util/PathData';
 import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
@@ -144,7 +145,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
     boundaryPoints[1], boundaryPoints[0],
     ascendantEdgeTabsSpec, interFaceScoreDashSpec, tabIntervalRatios, tabGapIntervalRatios,
   );
-  const rotationMatrix = (new Matrix()).rotate(-faceCount * faceInteriorAngles[2]);
+  const rotationMatrix = `rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`;
   ascendantTabs.male.cut.transformPoints(rotationMatrix);
   ascendantTabs.male.score.transformPoints(rotationMatrix);
   cutPathAggregate.concatPath(ascendantTabs.male.cut);
@@ -163,7 +164,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
       const rotationRad = -1 * yScale * index * faceInteriorAngles[2] + asymetryNudge;
       cutPathAggregate.concatPath(PathData.fromDValue(activeCutHolePatternD)
         .transformPoints(borderInsetFaceHoleTransformMatrix)
-        .transformPoints((new Matrix()).scale(yScale, 1).rotate(rotationRad)));
+        .transformPoints(`scale(${yScale}, 1) rotate(${radToDeg(rotationRad)})`));
     });
   }
 
