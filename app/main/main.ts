@@ -5,6 +5,7 @@ const {
 } = require('electron');
 const path = require('path');
 const { format } = require('url');
+const debug = require('electron-debug');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isDev = require('electron-is-dev');
@@ -12,6 +13,7 @@ const { resolve } = require('app-root-path');
 // const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const { setupIpc } = require('./ipc');
 
+debug();
 
 // TODO: doesn't seem to work
 const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/256x256.png`);
