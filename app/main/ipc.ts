@@ -1,9 +1,12 @@
-const { dialog } = require('electron');
-const { execFile } = require('child_process');
 
+const { dialog } = require('electron');
+const svgpath = require('svgpath');
 const fsPromises = require('fs').promises;
 // @ts-ignore
 const path = require('path');
+const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean-addon');
+const { VERY_LARGE_NUMBER } = require('../renderer/die-line-viewer/util/geom');
+const { PathData } = require('../renderer/die-line-viewer/util/PathData');
 
 const svgFilters = [{
   name: 'SVG - Scalable Vector Graphics',
@@ -16,36 +19,24 @@ const jsonFilters = [{
 }];
 
 export const setupIpc = (ipcMain, app) => {
-  // unfortunately Inkscape's piping features could not be leveraged so use fs as a buffer
-  const tempInputFilePath = path.join(app.getPath('temp'), '__inkscape-svg-intersection--input__.svg');
-  const tempOutputFilePath = path.join(app.getPath('temp'), '__inkscape-svg-intersection--output__.svg');
-  console.log(tempOutputFilePath, tempInputFilePath);
-  const svgIntersection = async (svgInput, isPositive) => {
-    await fsPromises.writeFile(tempInputFilePath, svgInput);
-    await new Promise((resolve, reject) => {
-      const exportStr = ` export-filename: ${tempOutputFilePath}; export-do;`;
-      const actions = isPositive
-        ? ' --actions="select:texture,texture-bounds; SelectionDiff;'
-          + ` select:texture-bounds,tile; SelectionIntersect;${exportStr}"`
-        : ` --actions="select:texture,tile; SelectionIntersect;${exportStr}"`;
-
-      execFile('/Applications/Inkscape.app/Contents/MacOS/Inkscape', [
-        ' --batch-process',
-        actions,
-        `${tempInputFilePath}`],
-      { shell: true },
-      (e, stdout, stderr) => {
-        if (e instanceof Error) {
-          console.error(e);
-          reject(e);
-        }
-        resolve();
-      });
-    });
-    return fsPromises.readFile(tempOutputFilePath, 'utf8');
-  };
-
-  ipcMain.handle('intersect-svg', (e, svgContent, isPositive) => svgIntersection(svgContent, isPositive));
+  ipcMain.handle('intersect-svg', (e, boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive) => {
+    const texturePathTransformedD = svgpath.from(texturePathD).transform(textureTransformMatrixStr).toString();
+    if (isPositive) {
+      const punchoutPath = new PathData();
+      punchoutPath
+        .move([0, 0])
+        .line([VERY_LARGE_NUMBER, 0])
+        .line([VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
+        .line([0, VERY_LARGE_NUMBER])
+        .close();
+      const punchoutPathTransformedD = svgpath.from(
+        punchoutPath.getD(),
+      ).transform(textureTransformMatrixStr).toString();
+      const punchedPathD = subtractPathData(punchoutPathTransformedD, texturePathTransformedD);
+      return intersectPathData(punchedPathD, boundaryPathD);
+    }
+    return intersectPathData(texturePathTransformedD, boundaryPathD);
+  });
 
 
   ipcMain.handle('save-svg', (e, fileContent, options) => dialog.showSaveDialog({

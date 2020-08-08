@@ -2,38 +2,23 @@
 import Canvg, { presets } from 'canvg';
 import * as React from 'react';
 import { useDrag } from 'react-use-gesture';
-import ReactDOMServer from 'react-dom/server';
 
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import {
-  Box, Checkbox, CircularProgress, FormControlLabel, IconButton, Paper,
+  Box, Checkbox, FormControlLabel, IconButton, Paper,
 } from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
 
 import { Matrix, point, Polygon } from '@flatten-js/core';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
-import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 import { ShapePreview } from './ShapePreview';
 import { DRAG_MODES, DragModeOptionsGroup } from './DragModeOptionGroup';
 
 const { createRef, useEffect, useState } = React;
-
-// TODO: extract this
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
-export const FaceIntersectionSVG = ({
-  boundaryD, textureD, textureTransform, isPositive,
-}) => (
-  <svg>
-    {isPositive && (
-    <rect fill="yellow" id="texture-bounds" x={0} y={0} width={999999} height={999999} transform={textureTransform} />
-    )}
-    <path fill="purple" id="texture" d={textureD} transform={textureTransform} />
-    <path fill="blue" id="tile" d={boundaryD} />
-  </svg>
-);
 
 export const theme = createMuiTheme(darkTheme);
 const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
@@ -52,7 +37,6 @@ const MoveableTextureLOC = ({ classes }) => {
   const textureApplicationSvgRef = createRef();
   const [textureCanvas, setTextureCanvas] = useState();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [isPositive, setIsPositive] = useState(true);
 
   const [screenDimensions, setScreenDimensions] = useState();
@@ -219,34 +203,18 @@ const MoveableTextureLOC = ({ classes }) => {
   const faceScaleMuxed = faceScaleMux * faceScale;
   const faceScalePercentStr = `${faceScaleMuxed * 100}%`;
   const faceScaleCenterPercentStr = `${((1 - faceScaleMuxed) * 100) / 2}%`;
-
   const sendTexture = async () => {
-    setIsLoading(true);
-    // return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: this }));
-    const intersectionSvg = (
-      <FaceIntersectionSVG
-        boundaryD={path.getD()}
-        textureD={texturePathD}
-        textureTransform={textureTransformMatrixStr}
-        isPositive
-      />
+    const boundaryPathD = path.getD();
+    const dd = ipcRenderer.invoke(
+      'intersect-svg', boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
     );
-    const intersectionSvgStr = ReactDOMServer.renderToString(intersectionSvg);
-    const dClipdSVG = await ipcRenderer.invoke('intersect-svg', intersectionSvgStr, isPositive);
-    const dd = extractCutHolesFromSvgString(dClipdSVG);
     ipcRenderer.send('die>set-die-line-cut-holes', dd, textureTransformMatrixStr);
-    setIsLoading(false);
   };
 
 
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root} {...frameUseDrag()}>
-        {isLoading && (
-          <div className={classes.loadingContainer}>
-            <CircularProgress />
-          </div>
-        )}
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview
             width={screenDimensions.width / 2}
