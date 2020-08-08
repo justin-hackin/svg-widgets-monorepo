@@ -12,10 +12,7 @@ const {
   Scene, WebGLRenderer, PerspectiveCamera,
 } = THREE;
 
-const manager = new THREE.LoadingManager();
-manager.setURLModifier((file) => URL.createObjectURL(file));
-const loader = new GLTFLoader(manager);
-
+const loader = new GLTFLoader();
 
 export const ShapePreview = ({
   width, height, textureTransform, shapeId, textureCanvas,
@@ -74,35 +71,33 @@ export const ShapePreview = ({
 
   useEffect(() => {
     if (!shapeId || !camera || !scene) { return; }
-    import(`../../static/models/${shapeId}.gltf`).then((gltfFile) => {
-      loader.load(
-        // resource URL
-        gltfFile,
-        ({ scene: importScene }) => {
-          if (polyhedronObject) {
-            scene.remove(polyhedronObject);
-          }
-          scene.add(importScene);
-          setPolyhedronObject(importScene);
+    loader.load(
+      // resource URL
+      `../../static/models/${shapeId}.gltf`,
+      ({ scene: importScene }) => {
+        if (polyhedronObject) {
+          scene.remove(polyhedronObject);
+        }
+        scene.add(importScene);
+        setPolyhedronObject(importScene);
 
-          // only set the polyhedron once, there should be only one mesh
-          scene.traverse((child) => {
-            // @ts-ignore
-            if (child.isMesh) {
-              const scale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
-              camera.lookAt(child.position);
-              child.scale.fromArray([scale, scale, scale]);
-              setPolyhedronMesh(child);
-            }
-          });
-        },
-        null,
-        // called when loading has errors
-        (error) => {
-          console.log(error);
-        },
-      );
-    });
+        // only set the polyhedron once, there should be only one mesh
+        scene.traverse((child) => {
+          // @ts-ignore
+          if (child.isMesh) {
+            const scale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
+            camera.lookAt(child.position);
+            child.scale.fromArray([scale, scale, scale]);
+            setPolyhedronMesh(child);
+          }
+        });
+      },
+      null,
+      // called when loading has errors
+      (error) => {
+        console.log(error);
+      },
+    );
   }, [shapeId, camera, scene]);
 
   useEffect(() => {

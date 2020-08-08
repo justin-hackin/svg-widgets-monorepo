@@ -14,9 +14,18 @@ const isDev = process.env.NODE_ENV !== 'production';
 const ASSETS = ['*.jpg', '*.png', '*.jpeg', '*.gif', '*.svg', '*.gltf'];
 
 
-Sparky.task('copy-html', () => Sparky.src('./**/*.html', { base: './app/renderer' }).dest('./dist/renderer/'));
+Sparky.task('copy-html', () => Sparky.src(
+  './**/*.html',
+  { base: './app/renderer' },
+).dest('./dist/renderer/'));
 
-Sparky.task('default', ['copy-html'], () => {
+Sparky.task('copy-static', async () => {
+  await Sparky.src('static/**/*', { base: './app' })
+    .dest('dist/')
+    .exec();
+});
+
+Sparky.task('default', ['copy-html', 'copy-static'], () => {
   const fuse = FuseBox.init({
     homeDir: 'app',
     automaticAlias: true,
@@ -25,9 +34,6 @@ Sparky.task('default', ['copy-html'], () => {
     allowSyntheticDefaultImports: true,
     output: 'dist/$name.js',
     plugins: [
-      CopyPlugin({
-        useDefault: false, files: ASSETS, dest: 'static', resolve: 'static/',
-      }),
       JSONPlugin(),
       [SassPlugin({ import: true }), CSSResourcePlugin(), CSSPlugin()],
       CSSPlugin(),
