@@ -16,6 +16,7 @@ import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
 import { ShapePreview } from './ShapePreview';
 import { DRAG_MODES, DragModeOptionsGroup } from './DragModeOptionGroup';
+import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 
 const { createRef, useEffect, useState } = React;
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
