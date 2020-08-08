@@ -34,7 +34,6 @@ app.on('ready', async () => {
     const mainWindow = new BrowserWindow(config);
 
     mainWindow.once('ready-to-show', () => {
-      mainWindow.toggleDevTools();
       mainWindow.show();
       resolveFn(mainWindow);
     });
