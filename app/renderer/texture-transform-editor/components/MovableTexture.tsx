@@ -85,7 +85,6 @@ const MoveableTextureLOC = ({ classes }) => {
       setBoundaryWithPoints(faceVertices.map((vert) => point(...vert)));
       setShapeId(aShapeId);
     });
-    ipcRenderer.send('die>request-shape-update');
 
     window.onresize = () => {
       const { outerWidth: width, outerHeight: height } = window;
