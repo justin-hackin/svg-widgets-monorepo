@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
 
-import { Matrix, point, Polygon } from '@flatten-js/core';
+import { point, Polygon } from '@flatten-js/core';
 import { PanelSelect } from '../../die-line-viewer/components/inputs/PanelSelect';
 import darkTheme from '../../die-line-viewer/data/material-ui-dark-theme.json';
 import { closedPolygonPath } from '../../die-line-viewer/util/shapes/generic';
@@ -97,7 +97,7 @@ const MoveableTextureLOC = ({ classes }) => {
       setFileIndex(0);
       setFileList(list);
     });
-    // needed for the case in which the texture fitting window is reloaded 
+    // needed for the case in which the texture fitting window is reloaded
     // (no-op on initial launch, main calls this when events wired)
     ipcRenderer.send('die>request-shape-update');
   }, []);
@@ -194,15 +194,9 @@ const MoveableTextureLOC = ({ classes }) => {
 
   if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   setTextureDFromFile();
-  
-  const negateMap = (num) => num * -1;
-  const textureTransformMatrixStr = (() => {
-    const m = (new Matrix())
-      .translate(...point(...textureTranslation).toArray())
-      .scale(textureScaleValue, textureScaleValue)
-      .rotate(textureRotation + textureRotationDelta)
-    return `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.tx} ${m.ty})`;
-  })();
+
+  const textureTransformMatrixStr = `translate(${textureTranslation.join(',')}) scale(${textureScaleValue}) rotate(${
+    textureRotation + textureRotationDelta})`;
 
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
