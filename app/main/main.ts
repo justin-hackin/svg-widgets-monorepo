@@ -1,7 +1,7 @@
 // Basic init from https://github.com/aimerib/electron-react-parcel/
 // eslint-disable-next-line import/no-extraneous-dependencies
 const {
-  app, BrowserWindow, nativeImage, ipcMain,
+  app, BrowserWindow, nativeImage, ipcMain, screen: electronScreen,
 } = require('electron');
 const path = require('path');
 const { format } = require('url');
@@ -13,7 +13,7 @@ const { resolve } = require('app-root-path');
 // const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const { setupIpc } = require('./ipc');
 
-debug();
+debug({ showDevTools: false });
 
 // TODO: doesn't seem to work
 const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/256x256.png`);
@@ -23,6 +23,8 @@ app.on('ready', async () => {
   // https://github.com/electron/electron/issues/23662
   // installExtension(REACT_DEVELOPER_TOOLS);
   setupIpc(ipcMain, app);
+  const { width, height } = electronScreen.getPrimaryDisplay().workAreaSize;
+
 
   const getUrl = (fileName) => format({
     pathname: path.join(app.getAppPath(), `dist/renderer/${fileName}`),
@@ -50,16 +52,22 @@ app.on('ready', async () => {
 
   Promise.all([
     promisifyWindow({
-      width: 800,
-      height: 600,
+      width: width / 2,
+      x: 0,
+      y: 0,
+      height,
       show: false,
+      title: 'SpaceCraft Net Factory - Dieline Viewer',
       icon,
       webPreferences,
     }, getUrl('die-line-viewer/app.html')),
     promisifyWindow({
-      width: 800,
-      height: 600,
+      width: width / 2,
+      x: width / 2,
+      y: 0,
+      height,
       show: false,
+      title: 'SpaceCraft Net Factory - Texture Fitting',
       icon,
       webPreferences,
     }, getUrl('texture-transform-editor/app.html')),
