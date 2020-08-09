@@ -2,7 +2,7 @@ import {
   cloneDeep, isNaN,
 } from 'lodash';
 // @ts-ignore
-import { Matrix, Point } from '@flatten-js/core';
+import { Point } from '@flatten-js/core';
 import {
   composeSVG, parseSVG,
 } from 'svg-path-parser';
@@ -199,7 +199,7 @@ export class PathData {
     return this;
   }
 
-  transformPoints(matrix:Matrix) {
+  transform(matrix:string) {
     this.commands = parseSVG(svgpath(this.getD()).transform(matrix).toString());
     return this;
   }

@@ -1,5 +1,4 @@
 // @ts-ignore
-import { Matrix } from '@flatten-js/core';
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import { range } from 'lodash';
@@ -146,8 +145,8 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
     ascendantEdgeTabsSpec, interFaceScoreDashSpec, tabIntervalRatios, tabGapIntervalRatios,
   );
   const rotationMatrix = `rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`;
-  ascendantTabs.male.cut.transformPoints(rotationMatrix);
-  ascendantTabs.male.score.transformPoints(rotationMatrix);
+  ascendantTabs.male.cut.transform(rotationMatrix);
+  ascendantTabs.male.score.transform(rotationMatrix);
   cutPathAggregate.concatPath(ascendantTabs.male.cut);
   scorePathAggregate.concatPath(ascendantTabs.male.score);
 
@@ -163,8 +162,8 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
       const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
       const rotationRad = -1 * yScale * index * faceInteriorAngles[2] + asymetryNudge;
       cutPathAggregate.concatPath(PathData.fromDValue(activeCutHolePatternD)
-        .transformPoints(borderInsetFaceHoleTransformMatrix)
-        .transformPoints(`scale(${yScale}, 1) rotate(${radToDeg(rotationRad)})`));
+        .transform(borderInsetFaceHoleTransformMatrix)
+        .transform(`scale(${yScale}, 1) rotate(${radToDeg(rotationRad)})`));
     });
   }
 

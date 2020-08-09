@@ -1,6 +1,6 @@
 import { action, computed, observable } from 'mobx';
 // @ts-ignore
-import { Matrix, Point, Polygon } from '@flatten-js/core';
+import { Point, Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 import { subtract } from '@flatten-js/boolean-op';
 import { chunk, flatten, range } from 'lodash';
