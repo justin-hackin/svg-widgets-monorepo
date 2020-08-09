@@ -40,18 +40,18 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const [isPositive, setIsPositive] = useState(true);
 
-  const [screenDimensions, setScreenDimensions] = useState();
+  const [placementAreaDimensions, setPlacementAreaDimensions] = useState();
   // can't use early exit because image must render before it's onload sets imageDimensions
   const [imageDimensions, setImageDimensions] = useState();
 
   const [dragMode, setDragMode] = useState(DRAG_MODES.TRANSLATE);
 
-  const [faceScale, setFaceScale] = useState(0.8);
+  const [faceScale, setFaceScale] = useState(1);
   const [faceScaleMux, setFaceScaleMux] = useState(1);
 
-  const [textureScaleRatio, setTextureScaleRatio] = useState(0.5);
-  const [textureScaleRatioMux, setTextureScaleRatioMux] = useState(1);
-  const textureScaleRatioMuxed = textureScaleRatioMux * textureScaleRatio;
+  const [textureScale, setTextureScale] = useState(1);
+  const [textureScaleMux, setTextureScaleMux] = useState(1);
+  const textureScaleValue = textureScaleMux * textureScale;
 
   const [textureRotation, setTextureRotation] = useState(0);
   const [textureRotationDelta, setTextureRotationDelta] = useState(0);
@@ -88,7 +88,7 @@ const MoveableTextureLOC = ({ classes }) => {
 
     window.onresize = () => {
       const { outerWidth: width, outerHeight: height } = window;
-      setScreenDimensions({ width, height });
+      setPlacementAreaDimensions({ width: width / 2, height });
     };
     setTimeout(() => {
       window.onresize();
@@ -104,15 +104,10 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const { viewBoxAttrs, path } = boundary || {};
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
-  const { scale: textureFittingScale = 1 } = getFitScale(viewBoxAttrs, imageDimensions) || {};
-  const { scale: faceFittingScale = 1 } = getFitScale(screenDimensions, viewBoxAttrs) || {};
-  const TEXTURE_RANGE_MULT = 6;
-  const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
-  const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
-  const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatioMuxed;
+  const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
 
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
-    (coord) => (coord / faceScale) / faceFittingScale,
+    (coord) => coord / (faceFittingScale * faceScale),
   );
 
   const textureUseDrag = useDrag(({ delta, down, movement }) => {
@@ -128,10 +123,10 @@ const MoveableTextureLOC = ({ classes }) => {
       }
     } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
       if (down) {
-        setTextureScaleRatioMux((movement[1] / screenDimensions.height) + 1);
+        setTextureScaleMux((movement[1] / placementAreaDimensions.height) + 1);
       } else {
-        setTextureScaleRatioMux(1);
-        setTextureScaleRatio(textureScaleRatio * textureScaleRatioMux);
+        setTextureScaleMux(1);
+        setTextureScale(textureScale * textureScaleMux);
       }
     }
   });
@@ -139,7 +134,7 @@ const MoveableTextureLOC = ({ classes }) => {
   const frameUseDrag = useDrag(({ down, movement }) => {
     if (dragMode === DRAG_MODES.SCALE_VIEW) {
       if (down) {
-        setFaceScaleMux((movement[1] / screenDimensions.height) + 1);
+        setFaceScaleMux((movement[1] / placementAreaDimensions.height) + 1);
       } else {
         setFaceScaleMux(1);
         setFaceScale(faceScaleMux * faceScale);
@@ -175,24 +170,17 @@ const MoveableTextureLOC = ({ classes }) => {
   }, [boundary]);
 
   useEffect(() => {
-    if (boundary && imageDimensions) {
-      const textureCenterVector = [viewBoxAttrs.xmin, viewBoxAttrs.ymin];
-      setTextureTranslation(textureCenterVector);
-    }
-  }, [boundary, imageDimensions]);
-
-  useEffect(() => {
     if (textureCanvas && viewBoxAttrs
-      && textureTranslation && textureScaleRatioMuxed != null
+      && textureTranslation && textureScaleValue != null
       && textureRotation != null && textureApplicationSvgRef.current) {
       const ctx = textureCanvas.getContext('2d');
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${textureApplicationSvgRef.current.outerHTML}</svg>`;
       Canvg.from(ctx, svgStr, presets.offscreen()).then((v) => v.render());
     }
-  }, [textureTranslation, textureScaleRatioMuxed, textureRotation, textureRotationDelta, shapeId]);
+  }, [textureTranslation, textureScaleValue, textureRotation, textureRotationDelta, shapeId]);
 
-  if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
+  if (!fileList || !placementAreaDimensions || !viewBoxAttrs) { return null; }
   setTextureDFromFile();
 
   const textureTransformMatrixStr = `translate(${textureTranslation.join(',')}) scale(${textureScaleValue}) rotate(${
@@ -218,8 +206,8 @@ const MoveableTextureLOC = ({ classes }) => {
       <Box className={classes.root} {...frameUseDrag()}>
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview
-            width={screenDimensions.width / 2}
-            height={screenDimensions.height}
+            width={placementAreaDimensions.width}
+            height={placementAreaDimensions.height}
             textureTransform={textureTransformMatrixStr}
             textureCanvas={textureCanvas}
             shapeId={shapeId}
