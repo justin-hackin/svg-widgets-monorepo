@@ -97,8 +97,10 @@ const MoveableTextureLOC = ({ classes }) => {
       setFileIndex(0);
       setFileList(list);
     });
+    // needed for the case in which the texture fitting window is reloaded 
+    // (no-op on initial launch, main calls this when events wired)
+    ipcRenderer.send('die>request-shape-update');
   }, []);
-
 
   const { viewBoxAttrs, path } = boundary || {};
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
