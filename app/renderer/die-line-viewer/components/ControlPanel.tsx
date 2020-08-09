@@ -132,7 +132,17 @@ export const ControlPanel = observer(({ store }) => {
   const baseEdgeTabControl = [
     {
       component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.tabDepthToAscendantEdgeLength',
+      min: 0.6,
+      max: 2,
+      step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
       valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finDepthToTabDepth',
+      ...ratioSliderProps,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeDepthToTabDepth',
       ...ratioSliderProps,
     }, {
       component: PanelSlider,
@@ -144,10 +154,6 @@ export const ControlPanel = observer(({ store }) => {
       ...ratioSliderProps,
     }, {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeDepthToTabDepth',
-      ...ratioSliderProps,
-    }, {
-      component: PanelSlider,
       valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeTaper',
       min: Math.PI / 8,
       max: Math.PI / 3,
@@ -156,42 +162,16 @@ export const ControlPanel = observer(({ store }) => {
       component: PanelSlider,
       valuePath: 'pyramidNetSpec.baseEdgeTabSpec.roundingDistanceRatio',
       ...ratioSliderProps,
-    }, {
-      component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.tabDepthToAscendantEdgeLength',
-      min: 0.6,
-      max: 2,
-      step: VERY_SMALL_NUMBER,
     },
     // @ts-ignore
   ].map(mapControlsSpecToComponents);
   const ascendantEdgeTabsControl = [
     {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.flapRoundingDistanceRatio',
-      ...ratioSliderProps,
-    }, {
-      component: PanelSlider,
-      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeFlapTaperAngle',
-      min: Math.PI / 12,
-      max: Math.PI / 8,
-      step: 0.00000001,
-    }, {
-      component: PanelSlider,
-      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeReachToTabDepth',
-      min: 0.05,
-      max: 0.2,
-      step: VERY_SMALL_NUMBER,
-    }, {
-      component: PanelSlider,
-      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeWidthRatio',
-      min: 0.1,
-      max: 0.9,
-      step: VERY_SMALL_NUMBER,
-    }, {
-      component: PanelSlider,
-      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.midpointDepthToTabDepth',
-      ...ratioSliderProps,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabsCount',
+      min: 2,
+      max: 5,
+      step: 1,
     }, {
       component: PanelSlider,
       valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabDepthToTraversalLength',
@@ -200,14 +180,18 @@ export const ControlPanel = observer(({ store }) => {
       step: VERY_SMALL_NUMBER,
     }, {
       component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeReachToTabDepth',
+      min: 0.05,
+      max: 0.2,
+      step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
       valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabRoundingDistanceRatio',
       ...ratioSliderProps,
     }, {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabsCount',
-      min: 2,
-      max: 5,
-      step: 1,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.midpointDepthToTabDepth',
+      ...ratioSliderProps,
     }, {
       component: PanelSlider,
       valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.tabStartGapToTabDepth',
@@ -220,6 +204,22 @@ export const ControlPanel = observer(({ store }) => {
       min: Math.PI / 20,
       max: Math.PI / 8,
       step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeWidthRatio',
+      min: 0.1,
+      max: 0.9,
+      step: VERY_SMALL_NUMBER,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.holeFlapTaperAngle',
+      min: Math.PI / 12,
+      max: Math.PI / 8,
+      step: 0.00000001,
+    }, {
+      component: PanelSlider,
+      valuePath: 'pyramidNetSpec.ascendantEdgeTabsSpec.flapRoundingDistanceRatio',
+      ...ratioSliderProps,
     },
     // @ts-ignore
   ].map(mapControlsSpecToComponents);
@@ -307,15 +307,8 @@ export const ControlPanel = observer(({ store }) => {
         </div>
         <Divider />
 
-        <ControlsAccordion summary="Path Styles">
-          {styleControls}
-        </ControlsAccordion>
 
         {topLevelControls}
-
-        <ControlsAccordion summary="Stroke">
-          {strokeControls}
-        </ControlsAccordion>
 
         <ControlsAccordion summary="Ascendant Edge Tabs">
           {ascendantEdgeTabsControl}
@@ -323,6 +316,14 @@ export const ControlPanel = observer(({ store }) => {
 
         <ControlsAccordion summary="Base Edge Tab">
           {baseEdgeTabControl}
+        </ControlsAccordion>
+
+        <ControlsAccordion summary="Stroke">
+          {strokeControls}
+        </ControlsAccordion>
+
+        <ControlsAccordion summary="Path Styles">
+          {styleControls}
         </ControlsAccordion>
       </Drawer>
     </div>
