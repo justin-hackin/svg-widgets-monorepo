@@ -105,6 +105,11 @@ const MoveableTextureLOC = ({ classes }) => {
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: textureFittingScale = 1 } = getFitScale(viewBoxAttrs, imageDimensions) || {};
   const { scale: faceFittingScale = 1 } = getFitScale(screenDimensions, viewBoxAttrs) || {};
+  const TEXTURE_RANGE_MULT = 6;
+  const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
+  const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
+  const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatioMuxed;
+
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
     (coord) => (coord / faceScale) / faceFittingScale,
   );
@@ -169,6 +174,13 @@ const MoveableTextureLOC = ({ classes }) => {
   }, [boundary]);
 
   useEffect(() => {
+    if (boundary && imageDimensions) {
+      const textureCenterVector = [viewBoxAttrs.xmin, viewBoxAttrs.ymin];
+      setTextureTranslation(textureCenterVector);
+    }
+  }, [boundary, imageDimensions]);
+
+  useEffect(() => {
     if (textureCanvas && viewBoxAttrs
       && textureTranslation && textureScaleRatioMuxed != null
       && textureRotation != null && textureApplicationSvgRef.current) {
@@ -181,20 +193,13 @@ const MoveableTextureLOC = ({ classes }) => {
 
   if (!fileList || !screenDimensions || !viewBoxAttrs) { return null; }
   setTextureDFromFile();
-  const TEXTURE_RANGE_MULT = 2;
-  const textureScaleMax = textureFittingScale * TEXTURE_RANGE_MULT;
-  const textureScaleMin = textureFittingScale / TEXTURE_RANGE_MULT;
-  const textureScaleValue = textureScaleMin + (textureScaleMax - textureScaleMin) * textureScaleRatioMuxed;
-  const textureCenterVector = imageDimensions ? [imageDimensions.width / 2, imageDimensions.height / 2] : [0, 0];
-
+  
   const negateMap = (num) => num * -1;
   const textureTransformMatrixStr = (() => {
     const m = (new Matrix())
       .translate(...point(...textureTranslation).toArray())
       .scale(textureScaleValue, textureScaleValue)
-      .translate(...textureCenterVector)
       .rotate(textureRotation + textureRotationDelta)
-      .translate(...textureCenterVector.map(negateMap));
     return `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.tx} ${m.ty})`;
   })();
 
