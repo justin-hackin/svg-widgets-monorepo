@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Canvg, { presets } from 'canvg';
 import * as React from 'react';
-import { useDrag } from 'react-use-gesture';
+import { useDrag, useWheel } from 'react-use-gesture';
 
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
@@ -87,6 +87,8 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const [faceScale, setFaceScale] = useState(1);
   const [faceScaleMux, setFaceScaleMux] = useState(1);
+  const faceScaleMuxed = faceScaleMux * faceScale;
+
 
   const [textureScale, setTextureScale] = useState(1);
   const [textureScaleMux, setTextureScaleMux] = useState(1);
@@ -150,36 +152,41 @@ const MoveableTextureLOC = ({ classes }) => {
     (coord) => coord / (faceFittingScale * faceScale),
   );
 
-  const textureUseDrag = useDrag(({ delta, down, movement }) => {
+  const textureTranslationUseDrag = useDrag(({ delta, down, movement }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
     if (dragMode === DRAG_MODES.TRANSLATE) {
       setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
-    } else if (dragMode === DRAG_MODES.ROTATE) {
-      if (down) {
-        setTextureRotationDelta(point(...movement).angle);
-      } else {
-        setTextureRotationDelta(0);
-        setTextureRotation(textureRotation + textureRotationDelta);
-      }
-    } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
-      if (down) {
-        setTextureScaleMux((movement[1] / placementAreaDimensions.height) + 1);
-      } else {
-        setTextureScaleMux(1);
-        setTextureScale(textureScale * textureScaleMux);
-      }
     }
   });
 
-  const frameUseDrag = useDrag(({ down, movement }) => {
+  const scaleUseWheel = useWheel(({ movement: [, y] }) => {
     if (dragMode === DRAG_MODES.SCALE_VIEW) {
-      if (down) {
-        setFaceScaleMux((movement[1] / placementAreaDimensions.height) + 1);
-      } else {
-        setFaceScaleMux(1);
-        setFaceScale(faceScaleMux * faceScale);
-      }
+      setFaceScaleMux(((y / placementAreaDimensions.height) + 1) * faceScaleMux);
     }
+  }, {
+    bounds: {
+      // TODO: this should be based on current window height but no way to dynamically set bounds
+      // see
+      top: -0.9 * window.outerHeight,
+      bottom: window.outerHeight * 3,
+      rubberband: true,
+    },
+    onWheelEnd: () => {
+      setFaceScale(faceScale * faceScaleMux);
+      setFaceScaleMux(1);
+    },
+  });
+
+  const rotateSpeed = 8;
+  const rotateUseWheel = useWheel(({ delta: [, y] }) => {
+    if (dragMode === DRAG_MODES.ROTATE) {
+      setTextureRotationDelta(textureRotationDelta + (2 * Math.PI * y * rotateSpeed) / placementAreaDimensions.height);
+    }
+  }, {
+    onWheelEnd: () => {
+      setTextureRotationDelta(0);
+      setTextureRotation(textureRotation + textureRotationDelta);
+    },
   });
 
   const setTextureDFromFile = () => {
@@ -229,7 +236,6 @@ const MoveableTextureLOC = ({ classes }) => {
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
-  const faceScaleMuxed = faceScaleMux * faceScale;
   const faceScalePercentStr = `${faceScaleMuxed * 100}%`;
   const faceScaleCenterPercentStr = `${((1 - faceScaleMuxed) * 100) / 2}%`;
   const sendTexture = async () => {
@@ -243,7 +249,7 @@ const MoveableTextureLOC = ({ classes }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box className={classes.root} {...frameUseDrag()}>
+      <Box className={classes.root} {...rotateUseWheel()}>
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview
             width={placementAreaDimensions.width}
@@ -261,6 +267,7 @@ const MoveableTextureLOC = ({ classes }) => {
           width="50%"
           height="100%"
           style={{ overflow: 'hidden', width: '50%' }}
+          {...scaleUseWheel()}
         >
           <svg
             x={faceScaleCenterPercentStr}
@@ -282,7 +289,7 @@ const MoveableTextureLOC = ({ classes }) => {
               <path
                 pointerEvents="bounding-box"
                 ref={textureRef}
-                {...textureUseDrag()}
+                {...textureTranslationUseDrag()}
                 stroke="#f00"
                 fill="#000"
                 fillOpacity={0.5}
