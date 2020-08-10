@@ -21,6 +21,44 @@ import { extractCutHolesFromSvgString } from '../../die-line-viewer/util/svg';
 const { createRef, useEffect, useState } = React;
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 
+
+function useDragMode() {
+  const [pressed, setPressed] = useState({ Shift: false, Alt: false, Control: false });
+
+  useEffect(() => {
+    const createHandler = (keyName, value:boolean) => (e) => {
+      if (e.key === keyName) {
+        setPressed((oldPressed) => ({
+          ...oldPressed,
+          ...{ [keyName]: value },
+        }));
+      }
+    };
+
+    const createHandlers = (keyName) => [
+      window.addEventListener('keydown', createHandler(keyName, true)),
+      window.addEventListener('keyup', createHandler(keyName, false)),
+    ];
+
+    const shiftHandlers = createHandlers('Shift');
+    const altHandlers = createHandlers('Alt');
+    const controlHandlers = createHandlers('Control');
+
+
+    return () => {
+      [shiftHandlers, altHandlers, controlHandlers].forEach(([keydown, keyup]) => {
+        window.removeEventListener('keydown', keydown);
+        window.removeEventListener('keyup', keyup);
+      });
+    };
+  }, []);
+
+  if (pressed.Alt) { return DRAG_MODES.SCALE_VIEW; }
+  if (pressed.Control) { return DRAG_MODES.SCALE_TEXTURE; }
+  if (pressed.Shift) { return DRAG_MODES.ROTATE; }
+  return DRAG_MODES.TRANSLATE;
+}
+
 export const theme = createMuiTheme(darkTheme);
 const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
   { width: imageWidth, height: imageHeight } = {}) => {
@@ -34,6 +72,8 @@ const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
 const MoveableTextureLOC = ({ classes }) => {
+  const dragMode = useDragMode();
+
   const textureRef = createRef();
   const textureApplicationSvgRef = createRef();
   const [textureCanvas, setTextureCanvas] = useState();
@@ -44,7 +84,6 @@ const MoveableTextureLOC = ({ classes }) => {
   // can't use early exit because image must render before it's onload sets imageDimensions
   const [imageDimensions, setImageDimensions] = useState();
 
-  const [dragMode, setDragMode] = useState(DRAG_MODES.TRANSLATE);
 
   const [faceScale, setFaceScale] = useState(1);
   const [faceScaleMux, setFaceScaleMux] = useState(1);
@@ -80,6 +119,7 @@ const MoveableTextureLOC = ({ classes }) => {
     setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) });
   };
 
+  // Init
   useEffect(() => {
     ipcRenderer.on('tex>shape-update', (e, faceVertices, aShapeId) => {
       setBoundaryWithPoints(faceVertices.map((vert) => point(...vert)));
@@ -275,7 +315,7 @@ const MoveableTextureLOC = ({ classes }) => {
             }}
             options={options}
           />
-          <DragModeOptionsGroup dragMode={dragMode} setDragMode={setDragMode} />
+          <DragModeOptionsGroup dragMode={dragMode} />
           <IconButton onClick={sendTexture} color="primary" aria-label="send texture" component="span">
             <TelegramIcon fontSize="large" />
           </IconButton>

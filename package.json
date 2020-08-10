@@ -70,7 +70,6 @@
     "react": "^16.13.1",
     "react-color": "^2.18.1",
     "react-dom": "^16.13.1",
-    "react-hotkeys-hook": "^1.6.1",
     "react-moveable": "^0.16.6",
     "react-resize-detector": "^4.2.3",
     "react-svg-pan-zoom": "^3.8.0",
