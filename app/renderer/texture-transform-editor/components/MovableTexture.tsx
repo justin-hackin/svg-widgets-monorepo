@@ -2,6 +2,7 @@
 import Canvg, { presets } from 'canvg';
 import * as React from 'react';
 import { useDrag, useWheel } from 'react-use-gesture';
+import { inRange } from 'lodash';
 
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
@@ -149,7 +150,7 @@ const MoveableTextureLOC = ({ classes }) => {
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
 
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
-    (coord) => coord / (faceFittingScale * faceScale),
+    (coord) => coord / (faceFittingScale * faceScaleMuxed),
   );
 
   const textureTranslationUseDrag = useDrag(({ delta, down, movement }) => {
@@ -159,20 +160,19 @@ const MoveableTextureLOC = ({ classes }) => {
     }
   });
 
-  const scaleUseWheel = useWheel(({ movement: [, y] }) => {
-    if (dragMode === DRAG_MODES.SCALE_VIEW) {
-      setFaceScaleMux(((y / placementAreaDimensions.height) + 1) * faceScaleMux);
+  const MIN_SCALE = 0.3;
+  const MAX_SCALE = 3;
+  const scaleViewUseWheel = useWheel(({ movement: [, y] }) => {
+    const newMux = ((y / placementAreaDimensions.height) + 1) * faceScaleMux;
+    if (
+      dragMode === DRAG_MODES.SCALE_VIEW && 
+      inRange(newMux * faceScale, MIN_SCALE, MAX_SCALE)
+    ) {
+      setFaceScaleMux(newMux);
     }
   }, {
-    bounds: {
-      // TODO: this should be based on current window height but no way to dynamically set bounds
-      // see
-      top: -0.9 * window.outerHeight,
-      bottom: window.outerHeight * 3,
-      rubberband: true,
-    },
     onWheelEnd: () => {
-      setFaceScale(faceScale * faceScaleMux);
+      setFaceScale(faceScaleMux * faceScale);
       setFaceScaleMux(1);
     },
   });
@@ -249,7 +249,7 @@ const MoveableTextureLOC = ({ classes }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box className={classes.root} {...rotateUseWheel()}>
+      <Box className={classes.root} {...scaleViewUseWheel()}>
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview
             width={placementAreaDimensions.width}
@@ -267,7 +267,7 @@ const MoveableTextureLOC = ({ classes }) => {
           width="50%"
           height="100%"
           style={{ overflow: 'hidden', width: '50%' }}
-          {...scaleUseWheel()}
+          {...rotateUseWheel()}
         >
           <svg
             x={faceScaleCenterPercentStr}
