@@ -93,7 +93,6 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const [textureScale, setTextureScale] = useState(1);
   const [textureScaleMux, setTextureScaleMux] = useState(1);
-  const textureScaleValue = textureScaleMux * textureScale;
 
   const [textureRotation, setTextureRotation] = useState(0);
   const [textureRotationDelta, setTextureRotationDelta] = useState(0);
@@ -105,10 +104,18 @@ const MoveableTextureLOC = ({ classes }) => {
   const textureUrl = (fileList && fileIndex != null) ? `/images/textures/${fileList[fileIndex]}` : null;
   const [texturePathD, setTexturePathD] = useState();
 
+  const [boundary, setBoundary] = useState();
+  const { viewBoxAttrs, path } = boundary || {};
+
+  const [shapeId, setShapeId] = useState();
+  // slider component should enforce range and prevent tile from going outside bounds on change of window size
+  const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
+  const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
+
+  const textureScaleValue = textureScaleMux * textureScale * imageFittingScale / faceFittingScale;
+
   const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
 
-  const [boundary, setBoundary] = useState();
-  const [shapeId, setShapeId] = useState();
 
   const setBoundaryWithPoints = (points) => {
     const poly = new Polygon();
@@ -140,52 +147,51 @@ const MoveableTextureLOC = ({ classes }) => {
       setFileIndex(0);
       setFileList(list);
     });
+
     // needed for the case in which the texture fitting window is reloaded
     // (no-op on initial launch, main calls this when events wired)
     ipcRenderer.send('die>request-shape-update');
   }, []);
 
-  const { viewBoxAttrs, path } = boundary || {};
-  // slider component should enforce range and prevent tile from going outside bounds on change of window size
-  const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
-
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
     (coord) => coord / (faceFittingScale * faceScaleMuxed),
   );
 
-  const textureTranslationUseDrag = useDrag(({ delta, down, movement }) => {
+  const textureTranslationUseDrag = useDrag(({ delta }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
     if (dragMode === DRAG_MODES.TRANSLATE) {
       setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
     }
   });
 
-  const MIN_SCALE = 0.3;
-  const MAX_SCALE = 3;
-  const scaleViewUseWheel = useWheel(({ movement: [, y] }) => {
-    const newMux = ((y / placementAreaDimensions.height) + 1) * faceScaleMux;
-    if (
-      dragMode === DRAG_MODES.SCALE_VIEW && 
-      inRange(newMux * faceScale, MIN_SCALE, MAX_SCALE)
-    ) {
-      setFaceScaleMux(newMux);
-    }
-  }, {
-    onWheelEnd: () => {
-      setFaceScale(faceScaleMux * faceScale);
-      setFaceScaleMux(1);
-    },
-  });
-
+  const MIN_VIEW_SCALE = 0.3;
+  const MAX_VIEW_SCALE = 3;
   const rotateSpeed = 8;
-  const rotateUseWheel = useWheel(({ delta: [, y] }) => {
-    if (dragMode === DRAG_MODES.ROTATE) {
-      setTextureRotationDelta(textureRotationDelta + (2 * Math.PI * y * rotateSpeed) / placementAreaDimensions.height);
+  const viewUseWheel = useWheel(({ movement: [, y] }) => {
+    const percentHeightDelta = (y / placementAreaDimensions.height);
+    const newScaleViewMux = (percentHeightDelta + 1) * faceScaleMux;
+    if (
+      dragMode === DRAG_MODES.SCALE_VIEW
+      && inRange(newScaleViewMux * faceScale, MIN_VIEW_SCALE, MAX_VIEW_SCALE)
+    ) {
+      setFaceScaleMux(newScaleViewMux);
+    } else if (dragMode === DRAG_MODES.ROTATE) {
+      setTextureRotationDelta(textureRotationDelta + (percentHeightDelta * Math.PI * rotateSpeed));
+    } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
+      setTextureScaleMux((percentHeightDelta + 1) * textureScaleMux);
     }
   }, {
     onWheelEnd: () => {
-      setTextureRotationDelta(0);
-      setTextureRotation(textureRotation + textureRotationDelta);
+      if (dragMode === DRAG_MODES.SCALE_VIEW) {
+        setFaceScale(faceScaleMux * faceScale);
+        setFaceScaleMux(1);
+      } else if (dragMode === DRAG_MODES.ROTATE) {
+        setTextureRotationDelta(0);
+        setTextureRotation(textureRotation + textureRotationDelta);
+      } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
+        setTextureScale(textureScaleMux * textureScale);
+        setTextureScaleMux(1);
+      }
     },
   });
 
@@ -249,7 +255,7 @@ const MoveableTextureLOC = ({ classes }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box className={classes.root} {...scaleViewUseWheel()}>
+      <Box className={classes.root} {...viewUseWheel()}>
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview
             width={placementAreaDimensions.width}
@@ -267,7 +273,6 @@ const MoveableTextureLOC = ({ classes }) => {
           width="50%"
           height="100%"
           style={{ overflow: 'hidden', width: '50%' }}
-          {...rotateUseWheel()}
         >
           <svg
             x={faceScaleCenterPercentStr}
