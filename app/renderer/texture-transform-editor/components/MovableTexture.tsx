@@ -99,6 +99,9 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const [textureTranslation, setTextureTranslation] = useState([0, 0]);
 
+  const [transformOrigin, setTransformOrigin] = useState([400, 400]);
+
+
   const [fileList, setFileList] = useState();
   const [fileIndex, setFileIndex] = useState();
   const textureUrl = (fileList && fileIndex != null) ? `/images/textures/${fileList[fileIndex]}` : null;
@@ -236,8 +239,13 @@ const MoveableTextureLOC = ({ classes }) => {
   if (!fileList || !placementAreaDimensions || !viewBoxAttrs) { return null; }
   setTextureDFromFile();
 
-  const textureTransformMatrixStr = `translate(${textureTranslation.join(',')}) scale(${textureScaleValue}) rotate(${
-    textureRotation + textureRotationDelta})`;
+  const textureTransformMatrixStr = `\
+  translate(${textureTranslation.join(', ')}) \
+  translate(${transformOrigin.join(', ')}) \
+  rotate(${textureRotation + textureRotationDelta}) \
+  scale(${textureScaleValue}) \
+  translate(${transformOrigin.map((val) => val * -1).join(',')}) \
+  `;
 
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
@@ -253,6 +261,8 @@ const MoveableTextureLOC = ({ classes }) => {
   };
 
 
+  const CENTER_MARKER_RADIUS = 45;
+  const CENTER_MARKER_STROKE = 2;
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root} {...viewUseWheel()}>
@@ -291,16 +301,37 @@ const MoveableTextureLOC = ({ classes }) => {
                 stroke="#000"
                 d={path.getD()}
               />
-              <path
-                pointerEvents="bounding-box"
-                ref={textureRef}
-                {...textureTranslationUseDrag()}
-                stroke="#f00"
-                fill="#000"
-                fillOpacity={0.5}
-                d={texturePathD}
-                transform={textureTransformMatrixStr}
-              />
+              <g transform={textureTransformMatrixStr}>
+                <path
+                  pointerEvents="bounding-box"
+                  ref={textureRef}
+                  {...textureTranslationUseDrag()}
+                  stroke="#f00"
+                  fill="#000"
+                  fillOpacity={0.5}
+                  d={texturePathD}
+                />
+                <g>
+                  <circle
+                    r={CENTER_MARKER_RADIUS / textureScaleValue}
+                    fill="rgba(255, 0, 0, 0.3)"
+                    stroke="rgba(255, 0, 0, 0.7)"
+                    strokeWidth={CENTER_MARKER_STROKE / textureScaleValue}
+                    cx={transformOrigin[0]}
+                    cy={transformOrigin[1]}
+                  />
+                  <circle
+                    r={(0.15 * CENTER_MARKER_RADIUS) / textureScaleValue}
+                    fill="rgba(255, 0, 0, 0.7)"
+                    stroke="black"
+                    strokeWidth={(CENTER_MARKER_STROKE) / textureScaleValue}
+
+                    cx={transformOrigin[0]}
+                    cy={transformOrigin[1]}
+                  />
+
+                </g>
+              </g>
             </svg>
           </svg>
         </Paper>
