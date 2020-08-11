@@ -117,6 +117,17 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const textureScaleValue = textureScaleMux * textureScale * imageFittingScale / faceFittingScale;
 
+
+  const negateMap = (num) => num * -1;
+  const m = (new DOMMatrixReadOnly())
+    .translate(...textureTranslation)
+    .translate(...transformOrigin)
+    .scale(textureScaleValue, textureScaleValue)
+    .rotate(textureRotation + textureRotationDelta)
+    .translate(...transformOrigin.map(negateMap));
+  const mInverse = m.inverse();
+  const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
+
   const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
 
 
@@ -160,11 +171,19 @@ const MoveableTextureLOC = ({ classes }) => {
     (coord) => coord / (faceFittingScale * faceScaleMuxed),
   );
 
+  const absoluteMovementToTextureGroup = (absCoords) => {
+    const domPoint = mInverse.transformPoint(new DOMPoint(...absCoords.map((coord) => coord * faceFittingScale)));
+    return [domPoint.x, domPoint.y];
+  };
+
   const textureTranslationUseDrag = useDrag(({ delta }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
-    if (dragMode === DRAG_MODES.TRANSLATE) {
-      setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
-    }
+    setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
+  });
+
+  const transformOriginUseDrag = useDrag(({ delta }) => {
+    // accomodates the scale of svg so that the texture stays under the mouse
+    setTransformOrigin(addTuple(absoluteMovementToTextureGroup(delta), transformOrigin));
   });
 
   const MIN_VIEW_SCALE = 0.3;
@@ -239,14 +258,6 @@ const MoveableTextureLOC = ({ classes }) => {
   if (!fileList || !placementAreaDimensions || !viewBoxAttrs) { return null; }
   setTextureDFromFile();
 
-  const textureTransformMatrixStr = `\
-  translate(${textureTranslation.join(', ')}) \
-  translate(${transformOrigin.join(', ')}) \
-  rotate(${textureRotation + textureRotationDelta}) \
-  scale(${textureScaleValue}) \
-  translate(${transformOrigin.map((val) => val * -1).join(',')}) \
-  `;
-
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
@@ -311,7 +322,7 @@ const MoveableTextureLOC = ({ classes }) => {
                   fillOpacity={0.5}
                   d={texturePathD}
                 />
-                <g>
+                <g {...transformOriginUseDrag()}>
                   <circle
                     r={CENTER_MARKER_RADIUS / textureScaleValue}
                     fill="rgba(255, 0, 0, 0.3)"
