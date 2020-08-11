@@ -129,6 +129,7 @@ const MoveableTextureLOC = ({ classes }) => {
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
   const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
+  const subtractTuple = ([ax, ay], [bx, by]) => [ax - bx, ay - by];
 
 
   const setBoundaryWithPoints = (points) => {
@@ -167,23 +168,29 @@ const MoveableTextureLOC = ({ classes }) => {
     ipcRenderer.send('die>request-shape-update');
   }, []);
 
+
+  const matrixTupleTransformPoint = (matrix, tuple) => {
+    const domPoint = matrix.transformPoint(new DOMPoint(...tuple));
+    return [domPoint.x, domPoint.y];
+  };
+
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
     (coord) => coord / (faceFittingScale * faceScaleMuxed),
   );
 
-  const absoluteMovementToTextureGroup = (absCoords) => {
-    const domPoint = mInverse.transformPoint(new DOMPoint(...absCoords.map((coord) => coord * faceFittingScale)));
-    return [domPoint.x, domPoint.y];
-  };
+  const absoluteMovementToTextureGroup = (absCoords) => matrixTupleTransformPoint(m, absCoords.map((coord) => coord * faceFittingScale));
 
   const textureTranslationUseDrag = useDrag(({ delta }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
     setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
   });
 
+  // ORIGIN
   const transformOriginUseDrag = useDrag(({ delta }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
-    setTransformOrigin(addTuple(absoluteMovementToTextureGroup(delta), transformOrigin));
+    const relDelta = absoluteMovementToTextureGroup(delta);
+    setTransformOrigin(addTuple(relDelta, transformOrigin));
+    setTextureTranslation(addTuple(textureTranslation, matrixTupleTransformPoint(mInverse, relDelta.map(negateMap))));
   });
 
   const MIN_VIEW_SCALE = 0.3;
