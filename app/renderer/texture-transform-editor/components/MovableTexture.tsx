@@ -72,6 +72,9 @@ const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
 };
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
+const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
+const subtractTuple = ([ax, ay], [bx, by]) => [ax - bx, ay - by];
+
 const MoveableTextureLOC = ({ classes }) => {
   const dragMode = useDragMode();
 
@@ -99,8 +102,9 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const [textureTranslation, setTextureTranslation] = useState([0, 0]);
 
-  const [transformOrigin, setTransformOrigin] = useState([400, 400]);
-
+  const [transformOrigin, setTransformOrigin] = useState([0, 0]);
+  const [transformOriginDelta, setTransformOriginDelta] = useState([0, 0]);
+  const transformOriginMarkerPos = addTuple(transformOrigin, transformOriginDelta);
 
   const [fileList, setFileList] = useState();
   const [fileIndex, setFileIndex] = useState();
@@ -127,9 +131,6 @@ const MoveableTextureLOC = ({ classes }) => {
     .translate(...transformOrigin.map(negateMap));
   const mInverse = m.inverse();
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
-
-  const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
-  const subtractTuple = ([ax, ay], [bx, by]) => [ax - bx, ay - by];
 
 
   const setBoundaryWithPoints = (points) => {
@@ -186,11 +187,16 @@ const MoveableTextureLOC = ({ classes }) => {
   });
 
   // ORIGIN
-  const transformOriginUseDrag = useDrag(({ delta }) => {
+  const transformOriginUseDrag = useDrag(({ movement, down }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
-    const relDelta = absoluteMovementToTextureGroup(delta);
-    setTransformOrigin(addTuple(relDelta, transformOrigin));
-    setTextureTranslation(addTuple(textureTranslation, matrixTupleTransformPoint(mInverse, relDelta.map(negateMap))));
+    const relDelta = absoluteMovementToTextureGroup(movement);
+    if (down) {
+      setTransformOriginDelta(relDelta);
+    } else {
+      setTransformOrigin(transformOriginMarkerPos);
+      setTransformOriginDelta([0, 0]);
+      setTextureTranslation(addTuple(textureTranslation, matrixTupleTransformPoint(mInverse, relDelta.map(negateMap))));
+    }
   });
 
   const MIN_VIEW_SCALE = 0.3;
@@ -335,8 +341,8 @@ const MoveableTextureLOC = ({ classes }) => {
                     fill="rgba(255, 0, 0, 0.3)"
                     stroke="rgba(255, 0, 0, 0.7)"
                     strokeWidth={CENTER_MARKER_STROKE / textureScaleValue}
-                    cx={transformOrigin[0]}
-                    cy={transformOrigin[1]}
+                    cx={transformOriginMarkerPos[0]}
+                    cy={transformOriginMarkerPos[1]}
                   />
                   <circle
                     r={(0.15 * CENTER_MARKER_RADIUS) / textureScaleValue}
@@ -344,8 +350,8 @@ const MoveableTextureLOC = ({ classes }) => {
                     stroke="black"
                     strokeWidth={(CENTER_MARKER_STROKE) / textureScaleValue}
 
-                    cx={transformOrigin[0]}
-                    cy={transformOrigin[1]}
+                    cx={transformOriginMarkerPos[0]}
+                    cy={transformOriginMarkerPos[1]}
                   />
 
                 </g>
