@@ -73,7 +73,6 @@ const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
 const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
-const subtractTuple = ([ax, ay], [bx, by]) => [ax - bx, ay - by];
 
 const MoveableTextureLOC = ({ classes }) => {
   const dragMode = useDragMode();
@@ -119,7 +118,7 @@ const MoveableTextureLOC = ({ classes }) => {
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
   const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
 
-  const textureScaleValue = textureScaleMux * textureScale * imageFittingScale / faceFittingScale;
+  const textureScaleValue = (textureScaleMux * textureScale * imageFittingScale) / faceFittingScale;
 
 
   const negateMap = (num) => num * -1;
@@ -129,9 +128,7 @@ const MoveableTextureLOC = ({ classes }) => {
     .scale(textureScaleValue, textureScaleValue)
     .rotate(textureRotation + textureRotationDelta)
     .translate(...transformOrigin.map(negateMap));
-  const mInverse = m.inverse();
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
-
 
   const setBoundaryWithPoints = (points) => {
     const poly = new Polygon();
@@ -139,6 +136,7 @@ const MoveableTextureLOC = ({ classes }) => {
     const {
       xmin, ymin, xmax, ymax,
     } = poly.box;
+    // eslint-disable-next-line no-shadow
     const viewBoxAttrs = {
       xmin, ymin, width: xmax - xmin, height: ymax - ymin,
     };
@@ -179,7 +177,15 @@ const MoveableTextureLOC = ({ classes }) => {
     (coord) => coord / (faceFittingScale * faceScaleMuxed),
   );
 
-  const absoluteMovementToTextureGroup = (absCoords) => matrixTupleTransformPoint(m, absCoords.map((coord) => coord * faceFittingScale));
+  // eslint-disable-next-line max-len
+  const absoluteToRelativeCoords = (absCoords) => matrixTupleTransformPoint(
+    ((new DOMMatrixReadOnly())
+      .scale(textureScaleValue, textureScaleValue)
+      .rotate(textureRotation + textureRotationDelta)
+      .inverse()),
+    absoluteMovementToSvg(absCoords),
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
   const textureTranslationUseDrag = useDrag(({ delta }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
@@ -187,15 +193,16 @@ const MoveableTextureLOC = ({ classes }) => {
   });
 
   // ORIGIN
-  const transformOriginUseDrag = useDrag(({ movement, down }) => {
+  const transformOriginUseDrag = useDrag(({ initial, movement, down }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
-    const relDelta = absoluteMovementToTextureGroup(movement);
+    const relDelta = absoluteToRelativeCoords(movement);
     if (down) {
       setTransformOriginDelta(relDelta);
     } else {
-      setTransformOrigin(transformOriginMarkerPos);
+      setTransformOrigin(addTuple(transformOrigin, transformOriginDelta));
       setTransformOriginDelta([0, 0]);
-      setTextureTranslation(addTuple(textureTranslation, matrixTupleTransformPoint(mInverse, relDelta.map(negateMap))));
+      const offset = absoluteMovementToSvg(movement);
+      setTextureTranslation(addTuple(textureTranslation, offset));
     }
   });
 
