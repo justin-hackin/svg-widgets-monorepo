@@ -116,8 +116,8 @@ const MoveableTextureLOC = ({ classes }) => {
   const [shapeId, setShapeId] = useState();
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
-  const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
-
+  // const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
+  const imageFittingScale = 1;
   const textureScaleValue = (textureScaleMux * textureScale * imageFittingScale) / faceFittingScale;
 
 
@@ -185,6 +185,23 @@ const MoveableTextureLOC = ({ classes }) => {
       .inverse()),
     absoluteMovementToSvg(absCoords),
   );
+
+  const matrixWithTransformCenter = (transformOrigin) => (new DOMMatrixReadOnly())
+    .translate(...transformOrigin)
+    .scale(textureScaleValue, textureScaleValue)
+    .rotate(textureRotation + textureRotationDelta)
+    .translate(...transformOrigin.map(negateMap));
+
+
+  // eslint-disable-next-line max-len
+  const originChangeOffset = (relScaledRotatedCoords) => matrixTupleTransformPoint(
+    ((new DOMMatrixReadOnly())
+      .scale(textureScaleValue, textureScaleValue)
+      .rotate(textureRotation + textureRotationDelta)
+      .inverse()
+    ),
+    relScaledRotatedCoords,
+  );
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
   const textureTranslationUseDrag = useDrag(({ delta }) => {
@@ -199,10 +216,15 @@ const MoveableTextureLOC = ({ classes }) => {
     if (down) {
       setTransformOriginDelta(relDelta);
     } else {
-      setTransformOrigin(addTuple(transformOrigin, transformOriginDelta));
+      const newMatrix = matrixWithTransformCenter(transformOriginMarkerPos);
+      const oldMatrix = matrixWithTransformCenter(transformOrigin);
+      const relativeDifference = addTuple(
+        matrixTupleTransformPoint(newMatrix, textureTranslation),
+        matrixTupleTransformPoint(oldMatrix, textureTranslation).map(negateMap),
+      );
+      setTransformOrigin(transformOriginMarkerPos);
       setTransformOriginDelta([0, 0]);
-      const offset = absoluteMovementToSvg(movement);
-      setTextureTranslation(addTuple(textureTranslation, offset));
+      setTextureTranslation(addTuple(textureTranslation, relativeDifference.map(negateMap)));
     }
   });
 
