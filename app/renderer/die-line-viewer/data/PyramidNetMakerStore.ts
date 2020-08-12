@@ -6,10 +6,10 @@ import * as React from 'react';
 // @ts-ignore
 import {
   FaceBoundarySVG, PyramidNet, PyramidNetSpec, StoreSpec, StyleSpec,
-} from '../components/PyramidNet';
+} from '../components/SVGViewer/components/PyramidNet';
 import { CM_TO_PIXELS_RATIO } from '../util/geom';
 import { polyhedra } from './polyhedra';
-import { SVGWrapper } from '../components/SVGWrapper';
+import { SVGWrapper } from './SVGWrapper';
 import { PyramidNetStore } from './PyramidNetStore';
 
 export class PyramidNetMakerStore implements StoreSpec {

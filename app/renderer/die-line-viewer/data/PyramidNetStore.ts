@@ -8,7 +8,7 @@ import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, hingedPlot, triangleAnglesGivenSides,
 } from '../util/geom';
-import { PyramidNetSpec } from '../components/PyramidNet';
+import { PyramidNetSpec } from '../components/SVGViewer/components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
 import { AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';

@@ -5,7 +5,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-import { useStyles } from './style';
+import { useStyles } from '../../../style';
 
 export const ControlsAccordion = ({ summary, children }) => {
   // @ts-ignore

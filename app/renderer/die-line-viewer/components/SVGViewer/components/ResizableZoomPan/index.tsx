@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
-import { ResizeDetector } from './ResizeDetector';
+import { ResizeDetector } from './components/ResizeDetector';
 
 const { useState } = React;
 

@@ -1,5 +1,5 @@
 import { PHI } from '../util/geom';
-import { PyramidGeometrySpec } from '../components/PyramidNet';
+import { PyramidGeometrySpec } from '../components/SVGViewer/components/PyramidNet';
 
 interface PolyhedraDefs {
   [propName: string]: PyramidGeometrySpec,

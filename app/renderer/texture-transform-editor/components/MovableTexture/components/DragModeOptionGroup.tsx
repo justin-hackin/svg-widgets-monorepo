@@ -6,13 +6,7 @@ import AspectRatioIcon from '@material-ui/icons/AspectRatio';
 import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 
 import * as React from 'react';
-
-export const DRAG_MODES = {
-  ROTATE: 'rotate',
-  TRANSLATE: 'translate',
-  SCALE_TEXTURE: 'scale texture',
-  SCALE_VIEW: 'scale view',
-};
+import {DRAG_MODES} from '../dragMode';
 
 export const DragModeOptionsGroup = ({ dragMode }) => {
   return (

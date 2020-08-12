@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { ChromePicker } from 'react-color';
-import { useStyles } from '../style';
+import { useStyles } from '../../../style';
 
 const { useState } = React;
 

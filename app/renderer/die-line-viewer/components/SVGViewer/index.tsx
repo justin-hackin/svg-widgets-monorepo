@@ -4,13 +4,13 @@ import { observer } from 'mobx-react';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
 
-import darkTheme from '../data/material-ui-dark-theme.json';
-import { store } from '../data/PyramidNetMakerStore';
-import { PyramidNet } from './PyramidNet';
+import darkTheme from '../../data/material-ui-dark-theme.json';
+import { store } from '../../data/PyramidNetMakerStore';
+import { PyramidNet } from './components/PyramidNet';
 // eslint-disable-next-line import/no-cycle
-import { ControlPanel } from './ControlPanel';
-import { GridPattern } from './GridPattern';
-import { ResizableZoomPan } from './ResizableZoomPan';
+import { ControlPanel } from './components/ControlPanel';
+import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';
+import { ResizableZoomPan } from './components/ResizableZoomPan';
 
 const patternId = 'grid-pattern';
 // @ts-ignore

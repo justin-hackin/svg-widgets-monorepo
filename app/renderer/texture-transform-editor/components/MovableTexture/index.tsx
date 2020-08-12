@@ -12,53 +12,16 @@ import {
 import TelegramIcon from '@material-ui/icons/Telegram';
 
 import { point, Polygon } from '@flatten-js/core';
-import { PanelSelect } from '../../../die-line-viewer/components/inputs/PanelSelect';
+import { PanelSelect } from '../../../die-line-viewer/components/SVGViewer/components/ControlPanel/components/PanelSelect';
 import darkTheme from '../../../die-line-viewer/data/material-ui-dark-theme.json';
 import { closedPolygonPath } from '../../../die-line-viewer/util/shapes/generic';
 import { ShapePreview } from './components/ShapePreview';
-import { DRAG_MODES, DragModeOptionsGroup } from './components/DragModeOptionGroup';
+import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
+import { DRAG_MODES, useDragMode } from './dragMode';
 import { extractCutHolesFromSvgString } from '../../../die-line-viewer/util/svg';
 
 const { createRef, useEffect, useState } = React;
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
-
-
-function useDragMode() {
-  const [pressed, setPressed] = useState({ Shift: false, Alt: false, Control: false });
-
-  useEffect(() => {
-    const createHandler = (keyName, value:boolean) => (e) => {
-      if (e.key === keyName) {
-        setPressed((oldPressed) => ({
-          ...oldPressed,
-          ...{ [keyName]: value },
-        }));
-      }
-    };
-
-    const createHandlers = (keyName) => [
-      window.addEventListener('keydown', createHandler(keyName, true)),
-      window.addEventListener('keyup', createHandler(keyName, false)),
-    ];
-
-    const shiftHandlers = createHandlers('Shift');
-    const altHandlers = createHandlers('Alt');
-    const controlHandlers = createHandlers('Control');
-
-
-    return () => {
-      [shiftHandlers, altHandlers, controlHandlers].forEach(([keydown, keyup]) => {
-        window.removeEventListener('keydown', keydown);
-        window.removeEventListener('keyup', keyup);
-      });
-    };
-  }, []);
-
-  if (pressed.Alt) { return DRAG_MODES.SCALE_VIEW; }
-  if (pressed.Control) { return DRAG_MODES.SCALE_TEXTURE; }
-  if (pressed.Shift) { return DRAG_MODES.ROTATE; }
-  return DRAG_MODES.TRANSLATE;
-}
 
 export const theme = createMuiTheme(darkTheme);
 const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},

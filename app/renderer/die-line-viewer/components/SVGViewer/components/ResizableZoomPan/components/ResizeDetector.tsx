@@ -1,6 +1,6 @@
 import * as React from 'react';
 import ReactResizeDetector from 'react-resize-detector';
-import { isValidNumber } from '../util/geom';
+import { isValidNumber } from '../../../../../util/geom';
 
 export const ResizeDetector = (props) => (
   <ReactResizeDetector handleWidth handleHeight>

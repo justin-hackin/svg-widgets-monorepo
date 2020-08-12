@@ -1,4 +1,4 @@
-import { PyramidNetSpec } from '../components/PyramidNet';
+import { PyramidNetSpec } from '../components/SVGViewer/components/PyramidNet';
 
 
 interface PyramidNetStore {

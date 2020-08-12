@@ -14,14 +14,14 @@ import SaveIcon from '@material-ui/icons/Save';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import BlurOnIcon from '@material-ui/icons/BlurOn';
 import DescriptionIcon from '@material-ui/icons/Description';
-import { PanelSelect } from './inputs/PanelSelect';
-import { PanelSlider } from './inputs/PanelSlider';
-import { useStyles } from './style';
-import { ControlsAccordion } from './ControlsAccordion';
-import { PanelColorPicker } from './inputs/PanelColorPicker';
-import { dashPatterns } from '../data/dash-patterns';
-import { VERY_SMALL_NUMBER } from '../util/geom';
-import { MIRRORED_STROKES } from '../config';
+import { PanelSelect } from './components/PanelSelect';
+import { PanelSlider } from './components/PanelSlider';
+import { useStyles } from '../../style';
+import { ControlsAccordion } from './components/ControlsAccordion';
+import { PanelColorPicker } from './components/PanelColorPicker';
+import { dashPatterns } from '../../../../data/dash-patterns';
+import { VERY_SMALL_NUMBER } from '../../../../util/geom';
+import { MIRRORED_STROKES } from '../../../../config';
 
 
 export const ControlPanel = observer(({ store }) => {

@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as THREE from 'three';
 import GLTFLoader from 'three-gltf-loader';
 import OrbitControls from 'threejs-orbit-controls';
-import '../style.css';
+import '../../../style.css';
 
 const { useEffect, useRef, useState } = React;
 
