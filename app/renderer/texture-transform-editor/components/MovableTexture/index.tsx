@@ -12,7 +12,7 @@ import {
 import TelegramIcon from '@material-ui/icons/Telegram';
 
 import { point, Polygon } from '@flatten-js/core';
-import { PanelSelect } from '../../../die-line-viewer/components/SVGViewer/components/ControlPanel/components/PanelSelect';
+import { PanelSelect } from '../../../common/components/PanelSelect';
 import darkTheme from '../../../die-line-viewer/data/material-ui-dark-theme.json';
 import { closedPolygonPath } from '../../../die-line-viewer/util/shapes/generic';
 import { ShapePreview } from './components/ShapePreview';

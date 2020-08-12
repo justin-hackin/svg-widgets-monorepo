@@ -4,7 +4,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import uuid from 'uuid/v1';
 import FormControl from '@material-ui/core/FormControl';
 import * as React from 'react';
-import { useStyles } from '../../../style';
+import { useStyles } from '../../die-line-viewer/components/SVGViewer/style';
 
 export const PanelSelect = ({
   label, options, setter, value, className,
