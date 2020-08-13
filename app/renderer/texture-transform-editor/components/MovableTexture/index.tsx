@@ -40,8 +40,8 @@ const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
 
 const CENTER_MARKER_RADIUS = 45;
 const CENTER_MARKER_STROKE = 2;
-const HOLES_COLOR = '#FFD900';
-const MATERIAL_COLOR = '#fff';
+const HOLES_COLOR = '#fff';
+const MATERIAL_COLOR = '#FFD900';
 const TextureSvg = ({
   showCenterMarker,
   transformOriginMarkerPos,
