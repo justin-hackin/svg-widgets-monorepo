@@ -15,7 +15,7 @@ const {
 const loader = new GLTFLoader();
 
 export const ShapePreview = ({
-  width, height, textureTransform, shapeId, textureCanvas,
+  width, height, changeRenderFlag, shapeId, textureCanvas,
 }) => {
   const [renderer, setRenderer] = useState();
   const [camera, setCamera] = useState();
@@ -108,7 +108,7 @@ export const ShapePreview = ({
       material.map.image = textureCanvas.transferToImageBitmap();
       polyhedronMesh.material.map.needsUpdate = true;
     }
-  }, [textureTransform, polyhedronMesh, textureCanvas, shapeId]);
+  }, [changeRenderFlag, polyhedronMesh, textureCanvas, shapeId]);
 
   return (
     <div ref={threeContainerRef} id="3d-preview-container" />

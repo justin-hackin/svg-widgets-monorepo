@@ -40,21 +40,28 @@ const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
 
 const CENTER_MARKER_RADIUS = 45;
 const CENTER_MARKER_STROKE = 2;
+const HOLES_COLOR = '#FFD900';
+const MATERIAL_COLOR = '#fff';
 const TextureSvg = ({
-  showCenterMarker, boundaryPathD, textureTransformMatrixStr, texturePathD,
-  textureRef, textureTranslationUseDrag, transformOriginUseDrag, textureScaleValue,
+  showCenterMarker,
   transformOriginMarkerPos,
+  boundaryPathD,
+  texturePathD,
+  textureTransformMatrixStr,
+  textureScaleValue,
+  textureRef,
+  textureTranslationUseDrag,
+  transformOriginUseDrag,
+  isPositive,
 }) => (
   <svg overflow="visible">
-    <path fill="#FFD900" stroke="#000" d={boundaryPathD} />
+    <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
     <g transform={textureTransformMatrixStr}>
       <path
         pointerEvents="bounding-box"
         ref={textureRef}
         {...(showCenterMarker && textureTranslationUseDrag())}
-        stroke="#f00"
-        fill="#000"
-        fillOpacity={0.5}
+        fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
         d={texturePathD}
       />
       {showCenterMarker && (
@@ -123,6 +130,8 @@ const MoveableTextureLOC = ({ classes }) => {
   const boundaryPathD = path ? path.getD() : null;
 
   const [shapeId, setShapeId] = useState();
+  const [changeRenderFlag, setChangeRenderFlag] = useState(0);
+
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
   const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
@@ -200,25 +209,13 @@ const MoveableTextureLOC = ({ classes }) => {
     .rotate(textureRotation + textureRotationDelta)
     .translate(...transformOrigin.map(negateMap));
 
-
-  // eslint-disable-next-line max-len
-  const originChangeOffset = (relScaledRotatedCoords) => matrixTupleTransformPoint(
-    ((new DOMMatrixReadOnly())
-      .scale(textureScaleValue, textureScaleValue)
-      .rotate(textureRotation + textureRotationDelta)
-      .inverse()
-    ),
-    relScaledRotatedCoords,
-  );
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
   const textureTranslationUseDrag = useDrag(({ delta }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
     setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
   });
 
   // ORIGIN
-  const transformOriginUseDrag = useDrag(({ initial, movement, down }) => {
+  const transformOriginUseDrag = useDrag(({ movement, down }) => {
     // accomodates the scale of svg so that the texture stays under the mouse
     const relDelta = absoluteToRelativeCoords(movement);
     if (down) {
@@ -274,12 +271,14 @@ const MoveableTextureLOC = ({ classes }) => {
       });
   };
 
+  // update texture path d-value when textureUrl changes
   useEffect(() => {
     if (textureRef.current && textureUrl) {
       setTextureDFromFile();
     }
   }, [textureRef.current, textureUrl]);
 
+  // update image dimensions when the image changes
   useEffect(() => {
     if (textureRef.current) {
       const bb = textureRef.current.getBBox();
@@ -287,6 +286,8 @@ const MoveableTextureLOC = ({ classes }) => {
     }
   }, [texturePathD]);
 
+  // when texture boundary or texture changes, recenter texture and
+  // update offscreen canvas to match aspect of boundary
   useEffect(() => {
     if (boundary && imageDimensions) {
       const {
@@ -298,21 +299,18 @@ const MoveableTextureLOC = ({ classes }) => {
   }, [boundary, imageDimensions]);
 
 
-  const updateTextureCanvas = () => {
+  useEffect(() => {
     if (textureCanvas && viewBoxAttrs && textureTransformMatrixStr && texturePathD) {
       const ctx = textureCanvas.getContext('2d');
       const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, {
-        texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginMarkerPos,
+        texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginMarkerPos, isPositive,
       }));
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
       Canvg.from(ctx, svgStr, presets.offscreen()).then((v) => v.render());
+      setTimeout(() => { setChangeRenderFlag(changeRenderFlag + 1); });
     }
-  };
-
-  useEffect(() => {
-    updateTextureCanvas();
-  }, [textureCanvas, viewBoxAttrs, textureTransformMatrixStr, texturePathD, shapeId]);
+  }, [!!textureCanvas, viewBoxAttrs, textureTransformMatrixStr, texturePathD, isPositive]);
 
   if (!fileList || !placementAreaDimensions || !viewBoxAttrs || !textureTransformMatrixStr) { return null; }
   setTextureDFromFile();
@@ -337,7 +335,7 @@ const MoveableTextureLOC = ({ classes }) => {
           <ShapePreview
             width={placementAreaDimensions.width}
             height={placementAreaDimensions.height}
-            textureTransform={textureTransformMatrixStr}
+            changeRenderFlag={changeRenderFlag}
             textureCanvas={textureCanvas}
             shapeId={shapeId}
           />
@@ -361,15 +359,18 @@ const MoveableTextureLOC = ({ classes }) => {
           >
             <TextureSvg
               showCenterMarker
-              boundaryPathD={boundaryPathD}
-              textureRef={textureRef}
-              textureScaleValue={textureScaleValue}
-              textureApplicationSvgRef={textureApplicationSvgRef}
-              transformOriginMarkerPos={transformOriginMarkerPos}
-              texturePathD={texturePathD}
-              textureTransformMatrixStr={textureTransformMatrixStr}
-              textureTranslationUseDrag={textureTranslationUseDrag}
-              transformOriginUseDrag={transformOriginUseDrag}
+              {...{
+                boundaryPathD,
+                textureRef,
+                textureScaleValue,
+                textureApplicationSvgRef,
+                transformOriginMarkerPos,
+                texturePathD,
+                textureTransformMatrixStr,
+                textureTranslationUseDrag,
+                transformOriginUseDrag,
+                isPositive,
+              }}
             />
           </svg>
         </Paper>
