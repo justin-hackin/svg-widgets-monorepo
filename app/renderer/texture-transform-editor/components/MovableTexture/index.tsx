@@ -1,6 +1,7 @@
 // @ts-nocheck
 import Canvg, { presets } from 'canvg';
 import * as React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import { useDrag, useWheel } from 'react-use-gesture';
 import { inRange } from 'lodash';
 
@@ -36,6 +37,50 @@ const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
 const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
+
+const CENTER_MARKER_RADIUS = 45;
+const CENTER_MARKER_STROKE = 2;
+const TextureSvg = ({
+  showCenterMarker, boundaryPathD, textureTransformMatrixStr, texturePathD,
+  textureRef, textureTranslationUseDrag, transformOriginUseDrag, textureScaleValue,
+  transformOriginMarkerPos,
+}) => (
+  <svg overflow="visible">
+    <path fill="#FFD900" stroke="#000" d={boundaryPathD} />
+    <g transform={textureTransformMatrixStr}>
+      <path
+        pointerEvents="bounding-box"
+        ref={textureRef}
+        {...(showCenterMarker && textureTranslationUseDrag())}
+        stroke="#f00"
+        fill="#000"
+        fillOpacity={0.5}
+        d={texturePathD}
+      />
+      {showCenterMarker && (
+      <g {...transformOriginUseDrag()}>
+        <circle
+          r={CENTER_MARKER_RADIUS / textureScaleValue}
+          fill="rgba(255, 0, 0, 0.3)"
+          stroke="rgba(255, 0, 0, 0.7)"
+          strokeWidth={CENTER_MARKER_STROKE / textureScaleValue}
+          cx={transformOriginMarkerPos[0]}
+          cy={transformOriginMarkerPos[1]}
+        />
+        <circle
+          r={(0.15 * CENTER_MARKER_RADIUS) / textureScaleValue}
+          fill="rgba(255, 0, 0, 0.7)"
+          stroke="black"
+          strokeWidth={CENTER_MARKER_STROKE / textureScaleValue}
+          cx={transformOriginMarkerPos[0]}
+          cy={transformOriginMarkerPos[1]}
+        />
+      </g>
+      )}
+    </g>
+  </svg>
+);
+
 
 const MoveableTextureLOC = ({ classes }) => {
   const dragMode = useDragMode();
@@ -75,12 +120,12 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const [boundary, setBoundary] = useState();
   const { viewBoxAttrs, path } = boundary || {};
+  const boundaryPathD = path ? path.getD() : null;
 
   const [shapeId, setShapeId] = useState();
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
-  // const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
-  const imageFittingScale = 1;
+  const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
   const textureScaleValue = (textureScaleMux * textureScale * imageFittingScale) / faceFittingScale;
 
 
@@ -243,24 +288,33 @@ const MoveableTextureLOC = ({ classes }) => {
   }, [texturePathD]);
 
   useEffect(() => {
-    if (boundary) {
-      const { height, width } = boundary.viewBoxAttrs;
+    if (boundary && imageDimensions) {
+      const {
+        height, width, xmin,
+      } = boundary.viewBoxAttrs;
       setTextureCanvas(new window.OffscreenCanvas(width, height));
+      setTextureTranslation([xmin, (height - imageDimensions.height / textureScale)]);
     }
-  }, [boundary]);
+  }, [boundary, imageDimensions]);
 
-  useEffect(() => {
-    if (textureCanvas && viewBoxAttrs
-      && textureTranslation && textureScaleValue != null
-      && textureRotation != null && textureApplicationSvgRef.current) {
+
+  const updateTextureCanvas = () => {
+    if (textureCanvas && viewBoxAttrs && textureTransformMatrixStr && texturePathD) {
       const ctx = textureCanvas.getContext('2d');
+      const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, {
+        texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginMarkerPos,
+      }));
       const svgStr = `<svg viewBox="${
-        viewBoxAttrsToString(viewBoxAttrs)}">${textureApplicationSvgRef.current.outerHTML}</svg>`;
+        viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
       Canvg.from(ctx, svgStr, presets.offscreen()).then((v) => v.render());
     }
-  }, [textureTranslation, textureScaleValue, textureRotation, textureRotationDelta, shapeId]);
+  };
 
-  if (!fileList || !placementAreaDimensions || !viewBoxAttrs) { return null; }
+  useEffect(() => {
+    updateTextureCanvas();
+  }, [textureCanvas, viewBoxAttrs, textureTransformMatrixStr, texturePathD, shapeId]);
+
+  if (!fileList || !placementAreaDimensions || !viewBoxAttrs || !textureTransformMatrixStr) { return null; }
   setTextureDFromFile();
 
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
@@ -269,7 +323,6 @@ const MoveableTextureLOC = ({ classes }) => {
   const faceScalePercentStr = `${faceScaleMuxed * 100}%`;
   const faceScaleCenterPercentStr = `${((1 - faceScaleMuxed) * 100) / 2}%`;
   const sendTexture = async () => {
-    const boundaryPathD = path.getD();
     const dd = await ipcRenderer.invoke(
       'intersect-svg', boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
     );
@@ -277,8 +330,6 @@ const MoveableTextureLOC = ({ classes }) => {
   };
 
 
-  const CENTER_MARKER_RADIUS = 45;
-  const CENTER_MARKER_STROKE = 2;
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root} {...viewUseWheel()}>
@@ -308,47 +359,18 @@ const MoveableTextureLOC = ({ classes }) => {
             className="root-svg"
             viewBox={viewBoxAttrsToString(viewBoxAttrs)}
           >
-            <svg
-              ref={textureApplicationSvgRef}
-              overflow="visible"
-            >
-              <path
-                fill="#FFD900"
-                stroke="#000"
-                d={path.getD()}
-              />
-              <g transform={textureTransformMatrixStr}>
-                <path
-                  pointerEvents="bounding-box"
-                  ref={textureRef}
-                  {...textureTranslationUseDrag()}
-                  stroke="#f00"
-                  fill="#000"
-                  fillOpacity={0.5}
-                  d={texturePathD}
-                />
-                <g {...transformOriginUseDrag()}>
-                  <circle
-                    r={CENTER_MARKER_RADIUS / textureScaleValue}
-                    fill="rgba(255, 0, 0, 0.3)"
-                    stroke="rgba(255, 0, 0, 0.7)"
-                    strokeWidth={CENTER_MARKER_STROKE / textureScaleValue}
-                    cx={transformOriginMarkerPos[0]}
-                    cy={transformOriginMarkerPos[1]}
-                  />
-                  <circle
-                    r={(0.15 * CENTER_MARKER_RADIUS) / textureScaleValue}
-                    fill="rgba(255, 0, 0, 0.7)"
-                    stroke="black"
-                    strokeWidth={(CENTER_MARKER_STROKE) / textureScaleValue}
-
-                    cx={transformOriginMarkerPos[0]}
-                    cy={transformOriginMarkerPos[1]}
-                  />
-
-                </g>
-              </g>
-            </svg>
+            <TextureSvg
+              showCenterMarker
+              boundaryPathD={boundaryPathD}
+              textureRef={textureRef}
+              textureScaleValue={textureScaleValue}
+              textureApplicationSvgRef={textureApplicationSvgRef}
+              transformOriginMarkerPos={transformOriginMarkerPos}
+              texturePathD={texturePathD}
+              textureTransformMatrixStr={textureTransformMatrixStr}
+              textureTranslationUseDrag={textureTranslationUseDrag}
+              transformOriginUseDrag={transformOriginUseDrag}
+            />
           </svg>
         </Paper>
 
