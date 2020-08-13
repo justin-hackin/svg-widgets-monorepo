@@ -26,6 +26,8 @@ export const ShapePreview = ({
   const [offsetY] = useState(85);
 
   const threeContainerRef = useRef();
+  const requestRef = React.useRef();
+
 
   useEffect(() => {
     if (!threeContainerRef.current || !camera || !renderer) { return; }
@@ -66,8 +68,12 @@ export const ShapePreview = ({
       theControls.update();
       theRenderer.render(theScene, theCamera);
     }
-    animate();
+    requestRef.current = requestAnimationFrame(animate);
+
+    // eslint-disable-next-line consistent-return
+    return () => cancelAnimationFrame(requestRef.current);
   }, [threeContainerRef]);
+
 
   useEffect(() => {
     if (!shapeId || !camera || !scene) { return; }
