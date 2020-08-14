@@ -11,6 +11,7 @@ import {
   Box, Checkbox, FormControlLabel, IconButton, Paper,
 } from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
+import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
 import { point, Polygon } from '@flatten-js/core';
 import { PanelSelect } from '../../../common/components/PanelSelect';
@@ -96,6 +97,8 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const textureRef = createRef();
   const textureApplicationSvgRef = createRef();
+  const textureSvgRef = createRef();
+
   const textureCanvas = useRef();
 
   const [isPositive, setIsPositive] = useState(true);
@@ -124,7 +127,7 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const [fileList, setFileList] = useState();
   const [fileIndex, setFileIndex] = useState();
-  const textureUrl = (fileList && fileIndex != null) ? `/images/textures/${fileList[fileIndex]}` : null;
+  const [textureUrl, setTextureUrl] = useState();
   const [texturePathD, setTexturePathD] = useState();
 
   const [boundary, setBoundary] = useState();
@@ -133,6 +136,7 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const [shapeId, setShapeId] = useState();
   const [changeRenderFlag, setChangeRenderFlag] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
@@ -149,6 +153,12 @@ const MoveableTextureLOC = ({ classes }) => {
     .translate(...transformOrigin.map(negateMap));
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
+  const setTextureDFromFile = (url) => {
+    ipcRenderer.invoke('get-svg-string-by-path', url)
+      .then((svgString) => {
+        setTexturePathD(extractCutHolesFromSvgString(svgString));
+      });
+  };
 
   // Init
   useEffect(() => {
@@ -176,13 +186,16 @@ const MoveableTextureLOC = ({ classes }) => {
       const { outerWidth: width, outerHeight: height } = window;
       setPlacementAreaDimensions({ width: width / 2, height });
     };
+
     setTimeout(() => {
       window.onresize();
     });
+
     ipcRenderer.invoke('list-texture-files').then((list) => {
       setFileIndex(0);
       setFileList(list);
     });
+
 
     // needed for the case in which the texture fitting window is reloaded
     // (no-op on initial launch, main calls this when events wired)
@@ -200,6 +213,55 @@ const MoveableTextureLOC = ({ classes }) => {
       }, 100);
     }
   }, [viewBoxAttrs, imageDimensions]);
+
+  useEffect(() => {
+    const dragOver: any = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const dragEnter = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragOver(true);
+    };
+
+    const dragLeave = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragOver(false);
+    };
+
+    const drop: any = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setIsDragOver(false);
+      const { dataTransfer: { files } = {} } = event;
+
+      if (files.length > 1) {
+        alert('Whoa there, only one file at a time in the Texture Fitting zone please');
+      } else {
+        setTextureDFromFile(files[0].path);
+        setFileIndex(null);
+      }
+    };
+
+    if (textureSvgRef.current) {
+      textureSvgRef.current.addEventListener('drop', drop, false);
+      textureSvgRef.current.addEventListener('dragover', dragOver, false);
+      textureSvgRef.current.addEventListener('dragenter', dragEnter, false);
+      textureSvgRef.current.addEventListener('dragleave', dragLeave, false);
+    }
+
+    return () => {
+      if (textureSvgRef.current) {
+        textureSvgRef.current.removeEventListener('drop', drop);
+        textureSvgRef.current.removeEventListener('dragover', dragOver);
+        textureSvgRef.current.removeEventListener('dragenter', dragEnter);
+        textureSvgRef.current.removeEventListener('dragleave', dragLeave);
+      }
+    };
+  }, [textureSvgRef]);
 
 
   const matrixTupleTransformPoint = (matrix, tuple) => {
@@ -281,19 +343,19 @@ const MoveableTextureLOC = ({ classes }) => {
     },
   });
 
-  const setTextureDFromFile = () => {
-    ipcRenderer.invoke('get-svg-string-by-path', textureUrl)
-      .then((svgString) => {
-        setTexturePathD(extractCutHolesFromSvgString(svgString));
-      });
-  };
-
   // update texture path d-value when textureUrl changes
   useEffect(() => {
-    if (textureRef.current && textureUrl) {
-      setTextureDFromFile();
+    if (textureUrl) {
+      setTextureDFromFile(textureUrl);
     }
-  }, [textureRef.current, textureUrl]);
+  }, [textureUrl]);
+
+  useEffect(() => {
+    // eslint-disable-next-line eqeqeq
+    if (textureRef.current && fileIndex != undefined && fileList) {
+      setTextureUrl(`app/static/images/textures/${fileList[fileIndex]}`);
+    }
+  }, [textureRef.current, fileIndex, fileList]);
 
   // update image dimensions when the image changes
   useEffect(() => {
@@ -321,7 +383,7 @@ const MoveableTextureLOC = ({ classes }) => {
   }, [textureCanvas.current, viewBoxAttrs, textureTransformMatrixStr, imageDimensions, isPositive]);
 
   if (!fileList || !placementAreaDimensions || !viewBoxAttrs || !textureTransformMatrixStr) { return null; }
-  setTextureDFromFile();
+
 
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
@@ -339,6 +401,11 @@ const MoveableTextureLOC = ({ classes }) => {
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root} {...viewUseWheel()}>
+        {isDragOver && (
+          <div className={classes.loadingContainer}>
+            <SystemUpdateIcon />
+          </div>
+        )}
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview
             width={placementAreaDimensions.width}
@@ -358,6 +425,7 @@ const MoveableTextureLOC = ({ classes }) => {
           style={{ overflow: 'hidden', width: '50%' }}
         >
           <svg
+            ref={textureSvgRef}
             x={faceScaleCenterPercentStr}
             y={faceScaleCenterPercentStr}
             width={faceScalePercentStr}
@@ -400,6 +468,7 @@ const MoveableTextureLOC = ({ classes }) => {
           <PanelSelect
             label="Tile"
             value={fileIndex}
+            displayEmpty
             setter={(val) => {
               setFileIndex(parseInt(val, 10));
             }}
@@ -414,9 +483,16 @@ const MoveableTextureLOC = ({ classes }) => {
     </ThemeProvider>
   );
 };
+
 export const MoveableTexture = withStyles({
   root: {
-    backgroundColor: '#333', display: 'block', width: '100%', height: '100%', position: 'absolute', color: '#fff',
+    backgroundColor:
+     '#333',
+    display: 'block',
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    color: '#fff',
   },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
@@ -427,6 +503,7 @@ export const MoveableTexture = withStyles({
     width: '100%',
     height: '100%',
     position: 'absolute',
+    pointerEvents: 'none',
     alignItems: 'center',
     justifyContent: 'center',
     color: '#fff',

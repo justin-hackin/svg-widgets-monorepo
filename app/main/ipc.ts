@@ -76,7 +76,7 @@ export const setupIpc = (ipcMain, app) => {
     filters: svgFilters,
   }));
 
-  ipcMain.handle('get-svg-string-by-path', (e, pathRelativeStatic) => fsPromises.readFile(
-    `app/static/${pathRelativeStatic}`, 'utf8',
+  ipcMain.handle('get-svg-string-by-path', (e, absolutePath) => fsPromises.readFile(
+    absolutePath, 'utf8',
   ));
 };
