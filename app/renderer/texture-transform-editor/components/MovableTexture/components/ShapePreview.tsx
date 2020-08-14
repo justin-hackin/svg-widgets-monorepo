@@ -114,7 +114,7 @@ export const ShapePreview = ({
       material.map.image = textureCanvas.transferToImageBitmap();
       polyhedronMesh.material.map.needsUpdate = true;
     }
-  }, [changeRenderFlag, polyhedronMesh, textureCanvas, shapeId]);
+  }, [changeRenderFlag]);
 
   return (
     <div ref={threeContainerRef} id="3d-preview-container" />

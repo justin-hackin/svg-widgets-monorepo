@@ -84,9 +84,10 @@ app.on('ready', async () => {
         getWindow(event).webContents.send(event, ...params);
       });
     });
-  // no initial shape update sent from die line viewer (texture fitting window would not be ready)
-  // @ts-ignore
-  dieLineWindow.webContents.send('die>request-shape-update');
+    // no initial shape update sent from die line viewer (texture fitting window would not be ready)
+    // @ts-ignore
+    dieLineWindow.webContents.send('die>request-shape-update');
+  });
 });
 
 app.on('window-all-closed', app.quit);

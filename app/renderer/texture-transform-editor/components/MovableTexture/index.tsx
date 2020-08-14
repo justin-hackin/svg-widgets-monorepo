@@ -21,7 +21,9 @@ import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 import { DRAG_MODES, useDragMode } from './dragMode';
 import { extractCutHolesFromSvgString } from '../../../die-line-viewer/util/svg';
 
-const { createRef, useEffect, useState } = React;
+const {
+  createRef, useRef, useEffect, useState,
+} = React;
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 
 export const theme = createMuiTheme(darkTheme);
@@ -40,7 +42,7 @@ const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
 
 const CENTER_MARKER_RADIUS = 45;
 const CENTER_MARKER_STROKE = 2;
-const HOLES_COLOR = '#fff';
+const HOLES_COLOR = '#000';
 const MATERIAL_COLOR = '#FFD900';
 const TextureSvg = ({
   showCenterMarker,
@@ -94,7 +96,7 @@ const MoveableTextureLOC = ({ classes }) => {
 
   const textureRef = createRef();
   const textureApplicationSvgRef = createRef();
-  const [textureCanvas, setTextureCanvas] = useState();
+  const textureCanvas = useRef();
 
   const [isPositive, setIsPositive] = useState(true);
 
@@ -130,7 +132,7 @@ const MoveableTextureLOC = ({ classes }) => {
   const boundaryPathD = path ? path.getD() : null;
 
   const [shapeId, setShapeId] = useState();
-  const [changeRenderFlag, setChangeRenderFlag] = useState(0);
+  const [changeRenderFlag, setChangeRenderFlag] = useState(false);
 
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
@@ -147,25 +149,31 @@ const MoveableTextureLOC = ({ classes }) => {
     .translate(...transformOrigin.map(negateMap));
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
-  const setBoundaryWithPoints = (points) => {
-    const poly = new Polygon();
-    poly.addFace(points);
-    const {
-      xmin, ymin, xmax, ymax,
-    } = poly.box;
-    // eslint-disable-next-line no-shadow
-    const viewBoxAttrs = {
-      xmin, ymin, width: xmax - xmin, height: ymax - ymin,
-    };
-    setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) });
-  };
 
   // Init
   useEffect(() => {
     ipcRenderer.on('tex>shape-update', (e, faceVertices, aShapeId) => {
-      setBoundaryWithPoints(faceVertices.map((vert) => point(...vert)));
       setShapeId(aShapeId);
+      const points = faceVertices.map((vert) => point(...vert));
+      const poly = new Polygon();
+      poly.addFace(points);
+      const {
+        xmin, ymin, xmax, ymax,
+      } = poly.box;
+      // eslint-disable-next-line no-shadow
+      const width = xmax - xmin;
+      const height = ymax - ymin;
+      // eslint-disable-next-line no-shadow
+      const viewBoxAttrs = {
+        xmin, ymin, width, height,
+      };
+      textureCanvas.current = new window.OffscreenCanvas(width, height);
+      setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) });
+      // the boundary update will trigger the offscreen canvas which will flip the changeRenderFlag
+      // that happens too early so here we toggle back to the old value to cause another render later
+      setTimeout(() => setChangeRenderFlag(changeRenderFlag), 500);
     });
+
 
     window.onresize = () => {
       const { outerWidth: width, outerHeight: height } = window;
@@ -183,6 +191,13 @@ const MoveableTextureLOC = ({ classes }) => {
     // (no-op on initial launch, main calls this when events wired)
     ipcRenderer.send('die>request-shape-update');
   }, []);
+
+  useEffect(() => {
+    if (imageDimensions && viewBoxAttrs) {
+      const { height, xmin } = viewBoxAttrs;
+      setTextureTranslation([xmin, (height - imageDimensions.height / textureScale)]);
+    }
+  }, [viewBoxAttrs, imageDimensions]);
 
 
   const matrixTupleTransformPoint = (matrix, tuple) => {
@@ -203,6 +218,7 @@ const MoveableTextureLOC = ({ classes }) => {
     absoluteMovementToSvg(absCoords),
   );
 
+  // eslint-disable-next-line no-shadow
   const matrixWithTransformCenter = (transformOrigin) => (new DOMMatrixReadOnly())
     .translate(...transformOrigin)
     .scale(textureScaleValue, textureScaleValue)
@@ -289,28 +305,19 @@ const MoveableTextureLOC = ({ classes }) => {
   // when texture boundary or texture changes, recenter texture and
   // update offscreen canvas to match aspect of boundary
   useEffect(() => {
-    if (boundary && imageDimensions) {
-      const {
-        height, width, xmin,
-      } = boundary.viewBoxAttrs;
-      setTextureCanvas(new window.OffscreenCanvas(width, height));
-      setTextureTranslation([xmin, (height - imageDimensions.height / textureScale)]);
-    }
-  }, [boundary, imageDimensions]);
-
-
-  useEffect(() => {
-    if (textureCanvas && viewBoxAttrs && textureTransformMatrixStr && texturePathD) {
-      const ctx = textureCanvas.getContext('2d');
+    if (textureCanvas.current && viewBoxAttrs && textureTransformMatrixStr && imageDimensions) {
+      const ctx = textureCanvas.current.getContext('2d');
       const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, {
         texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginMarkerPos, isPositive,
       }));
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
-      Canvg.from(ctx, svgStr, presets.offscreen()).then((v) => v.render());
-      setTimeout(() => { setChangeRenderFlag(changeRenderFlag + 1); });
+      Canvg.from(ctx, svgStr, presets.offscreen()).then((v) => {
+        v.render();
+        setChangeRenderFlag(!changeRenderFlag);
+      });
     }
-  }, [!!textureCanvas, viewBoxAttrs, textureTransformMatrixStr, texturePathD, isPositive]);
+  }, [textureCanvas.current, viewBoxAttrs, textureTransformMatrixStr, imageDimensions, isPositive]);
 
   if (!fileList || !placementAreaDimensions || !viewBoxAttrs || !textureTransformMatrixStr) { return null; }
   setTextureDFromFile();
@@ -336,7 +343,7 @@ const MoveableTextureLOC = ({ classes }) => {
             width={placementAreaDimensions.width}
             height={placementAreaDimensions.height}
             changeRenderFlag={changeRenderFlag}
-            textureCanvas={textureCanvas}
+            textureCanvas={textureCanvas.current}
             shapeId={shapeId}
           />
         </div>
