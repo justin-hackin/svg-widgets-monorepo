@@ -169,9 +169,6 @@ const MoveableTextureLOC = ({ classes }) => {
       };
       textureCanvas.current = new window.OffscreenCanvas(width, height);
       setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) });
-      // the boundary update will trigger the offscreen canvas which will flip the changeRenderFlag
-      // that happens too early so here we toggle back to the old value to cause another render later
-      setTimeout(() => setChangeRenderFlag(changeRenderFlag), 500);
     });
 
 
@@ -195,7 +192,12 @@ const MoveableTextureLOC = ({ classes }) => {
   useEffect(() => {
     if (imageDimensions && viewBoxAttrs) {
       const { height, xmin } = viewBoxAttrs;
-      setTextureTranslation([xmin, (height - imageDimensions.height / textureScale)]);
+      // the boundary update will trigger the offscreen canvas which will flip the changeRenderFlag
+      // that happens too early on first render
+      // TODO: make shape preview request canvas update when ready instead
+      setTimeout(() => {
+        setTextureTranslation([xmin, (height - (imageDimensions.height * textureScaleValue)) / 2]);
+      }, 100);
     }
   }, [viewBoxAttrs, imageDimensions]);
 
@@ -218,7 +220,6 @@ const MoveableTextureLOC = ({ classes }) => {
     absoluteMovementToSvg(absCoords),
   );
 
-  // eslint-disable-next-line no-shadow
   const matrixWithTransformCenter = (transformOrigin) => (new DOMMatrixReadOnly())
     .translate(...transformOrigin)
     .scale(textureScaleValue, textureScaleValue)
