@@ -205,7 +205,7 @@ const MoveableTextureLOC = ({ classes }) => {
         xmin, ymin, width, height,
       };
       textureCanvas.current = new window.OffscreenCanvas(width, height);
-      setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) });
+      setTimeout(() => { setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) }); });
     });
 
 
@@ -219,8 +219,8 @@ const MoveableTextureLOC = ({ classes }) => {
     });
 
     ipcRenderer.invoke('list-texture-files').then((list) => {
-      setFileIndex(0);
       setFileList(list);
+      setTimeout(() => { setFileIndex(0); });
     });
 
 
