@@ -1,25 +1,27 @@
 // @ts-nocheck
-import Canvg, {presets} from 'canvg';
+import Canvg, { presets } from 'canvg';
 import * as React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import {useDrag, useWheel} from 'react-use-gesture';
-import {inRange} from 'lodash';
+import { useDrag, useWheel } from 'react-use-gesture';
+import { inRange } from 'lodash';
 
-import {ThemeProvider} from '@material-ui/styles';
-import {createMuiTheme, withStyles} from '@material-ui/core/styles';
-import {Box, Checkbox, FormControlLabel, IconButton, Paper,} from '@material-ui/core';
+import { ThemeProvider } from '@material-ui/styles';
+import { createMuiTheme, withStyles } from '@material-ui/core/styles';
+import {
+  Box, Checkbox, FormControlLabel, IconButton, Paper,
+} from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
-import {point, Polygon} from '@flatten-js/core';
-import {PanelSelect} from '../../../common/components/PanelSelect';
+import { point, Polygon } from '@flatten-js/core';
+import { PanelSelect } from '../../../common/components/PanelSelect';
 import darkTheme from '../../../die-line-viewer/data/material-ui-dark-theme.json';
-import {closedPolygonPath} from '../../../die-line-viewer/util/shapes/generic';
-import {ShapePreview} from './components/ShapePreview';
-import {DragModeOptionsGroup} from './components/DragModeOptionGroup';
-import {DRAG_MODES, useDragMode} from './dragMode';
-import {extractCutHolesFromSvgString} from '../../../die-line-viewer/util/svg';
-import {TextureSvg} from './components/TextureSvg';
+import { closedPolygonPath } from '../../../die-line-viewer/util/shapes/generic';
+import { ShapePreview } from './components/ShapePreview';
+import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
+import { DRAG_MODES, useDragMode } from './dragMode';
+import { extractCutHolesFromSvgString } from '../../../die-line-viewer/util/svg';
+import { TextureSvg } from './components/TextureSvg';
 
 const {
   createRef, useRef, useEffect, useState,
@@ -153,11 +155,12 @@ const MoveableTextureLOC = ({ classes }) => {
 
   useEffect(() => {
     if (imageDimensions && viewBoxAttrs) {
-      const { height, xmin } = viewBoxAttrs;
+      const { height, width, xmin } = viewBoxAttrs;
       // the boundary update will trigger the offscreen canvas which will flip the changeRenderFlag
       // that happens too early on first render
       // TODO: make shape preview request canvas update when ready instead
       setTimeout(() => {
+        setTransformOrigin([imageDimensions.width / 2, imageDimensions.height / 2]);
         setTextureTranslation([xmin, (height - (imageDimensions.height * textureScaleValue)) / 2]);
       }, 100);
     }
