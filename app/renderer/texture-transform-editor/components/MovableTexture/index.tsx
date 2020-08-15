@@ -1,26 +1,25 @@
 // @ts-nocheck
-import Canvg, { presets } from 'canvg';
+import Canvg, {presets} from 'canvg';
 import * as React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { useDrag, useWheel } from 'react-use-gesture';
-import { inRange } from 'lodash';
+import {useDrag, useWheel} from 'react-use-gesture';
+import {inRange} from 'lodash';
 
-import { ThemeProvider } from '@material-ui/styles';
-import { createMuiTheme, withStyles } from '@material-ui/core/styles';
-import {
-  Box, Checkbox, FormControlLabel, IconButton, Paper,
-} from '@material-ui/core';
+import {ThemeProvider} from '@material-ui/styles';
+import {createMuiTheme, withStyles} from '@material-ui/core/styles';
+import {Box, Checkbox, FormControlLabel, IconButton, Paper,} from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
-import { point, Polygon } from '@flatten-js/core';
-import { PanelSelect } from '../../../common/components/PanelSelect';
+import {point, Polygon} from '@flatten-js/core';
+import {PanelSelect} from '../../../common/components/PanelSelect';
 import darkTheme from '../../../die-line-viewer/data/material-ui-dark-theme.json';
-import { closedPolygonPath } from '../../../die-line-viewer/util/shapes/generic';
-import { ShapePreview } from './components/ShapePreview';
-import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
-import { DRAG_MODES, useDragMode } from './dragMode';
-import { extractCutHolesFromSvgString } from '../../../die-line-viewer/util/svg';
+import {closedPolygonPath} from '../../../die-line-viewer/util/shapes/generic';
+import {ShapePreview} from './components/ShapePreview';
+import {DragModeOptionsGroup} from './components/DragModeOptionGroup';
+import {DRAG_MODES, useDragMode} from './dragMode';
+import {extractCutHolesFromSvgString} from '../../../die-line-viewer/util/svg';
+import {TextureSvg} from './components/TextureSvg';
 
 const {
   createRef, useRef, useEffect, useState,
@@ -40,83 +39,6 @@ const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
 const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
-
-
-const HOLES_COLOR = '#000';
-const MATERIAL_COLOR = '#ffaa00';
-const TextureSvg = ({
-  showCenterMarker,
-  faceFittingScale,
-  transformOriginMarkerPos,
-  boundaryPathD,
-  texturePathD,
-  textureTransformMatrixStr,
-  textureScaleValue,
-  textureRef,
-  textureTranslationUseDrag,
-  transformOriginUseDrag,
-  isPositive,
-}) => {
-  const scaleAdjust = (textureScaleValue * faceFittingScale);
-  const CENTER_MARKER_RADIUS = 30 / scaleAdjust;
-  const CENTER_MARKER_STROKE = 2 / scaleAdjust;
-  const OPACITY = 0.3;
-  const CROSSHAIR_START_RATIO = 0.2;
-  const DOT_RADIUS_TO_WHOLE = 0.05;
-  return (
-    <svg overflow="visible">
-      <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
-      <g transform={textureTransformMatrixStr}>
-        <path
-          pointerEvents="bounding-box"
-          ref={textureRef}
-          {...(showCenterMarker && textureTranslationUseDrag())}
-          fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
-          d={texturePathD}
-        />
-        {showCenterMarker && (
-        <g
-          {...transformOriginUseDrag()}
-          transform={`translate(${transformOriginMarkerPos[0]}, ${transformOriginMarkerPos[1]})`}
-        >
-          <circle
-            r={CENTER_MARKER_RADIUS}
-            fill="red"
-            fillOpacity={OPACITY}
-            stroke="red"
-            strokeOpacity={1 - OPACITY}
-            strokeWidth={CENTER_MARKER_STROKE}
-            cx={0}
-            cy={0}
-          />
-          {[[0, 1], [1, 0], [0, -1], [-1, 0]].map((coords) => {
-            const lineProps = ([[x1, y1], [x2, y2]]) => ({
-              x1, y1, x2, y2,
-            });
-            const end = coords.map((coord) => coord * CENTER_MARKER_RADIUS);
-            const start = coords.map((coord) => coord * CENTER_MARKER_RADIUS * CROSSHAIR_START_RATIO);
-            return (
-              <line
-                {...lineProps([start, end])}
-                stroke="#000"
-                opacity={OPACITY}
-                strokeWidth={CENTER_MARKER_STROKE}
-              />
-            );
-          })}
-          <circle
-            r={(DOT_RADIUS_TO_WHOLE * CENTER_MARKER_RADIUS)}
-            fill="black"
-            cx={0}
-            cy={0}
-            opacity={OPACITY}
-          />
-        </g>
-        )}
-      </g>
-    </svg>
-  );
-};
 
 
 const MoveableTextureLOC = ({ classes }) => {
