@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as THREE from 'three';
 import GLTFLoader from 'three-gltf-loader';
+// @ts-ignore
 import OrbitControls from 'threejs-orbit-controls';
 import '../../../style.css';
 
@@ -15,6 +16,7 @@ const {
 const loader = new GLTFLoader();
 
 export const ShapePreview = ({
+  // @ts-ignore
   width, height, changeRenderFlag, shapeId, textureCanvas,
 }) => {
   const [renderer, setRenderer] = useState();
@@ -51,7 +53,7 @@ export const ShapePreview = ({
 
     const globalLight = new (THREE.AmbientLight)(0xffffff);
     // soft white light
-    globalLight.intensity = 1.0;
+    globalLight.intensity = 2.0;
     theScene.add(globalLight);
 
     const theCamera = new PerspectiveCamera(45, width / height, 0.1, 2000);
