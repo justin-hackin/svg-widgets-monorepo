@@ -3,18 +3,18 @@ import * as React from 'react';
 const HOLES_COLOR = '#101010';
 const MATERIAL_COLOR = '#ffaa00';
 export const TextureSvg = ({
-   showCenterMarker,
-   faceFittingScale,
-   transformOriginMarkerPos,
-   boundaryPathD,
-   texturePathD,
-   textureTransformMatrixStr,
-   textureScaleValue,
-   textureRef,
-   textureTranslationUseDrag,
-   transformOriginUseDrag,
-   isPositive,
- }) => {
+  showCenterMarker,
+  faceFittingScale,
+  transformOriginMarkerPos,
+  boundaryPathD,
+  texturePathD,
+  textureTransformMatrixStr,
+  textureScaleValue,
+  textureRef,
+  textureTranslationUseDrag,
+  transformOriginUseDrag,
+  isPositive,
+}) => {
   const scaleAdjust = (textureScaleValue * faceFittingScale);
   const CENTER_MARKER_RADIUS = 30 / scaleAdjust;
   const CENTER_MARKER_STROKE = 2 / scaleAdjust;
@@ -23,7 +23,7 @@ export const TextureSvg = ({
   const DOT_RADIUS_TO_WHOLE = 0.05;
   return (
     <svg overflow="visible">
-      <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD}/>
+      <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
       <g transform={textureTransformMatrixStr}>
         <path
           pointerEvents="bounding-box"
