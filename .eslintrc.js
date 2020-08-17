@@ -38,5 +38,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 11,
     allowImportExportEverywhere: true
+  },
+  globals: {
+    '__static': true,
   }
 };

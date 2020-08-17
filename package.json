@@ -2,14 +2,10 @@
   "name": "spacecraft-net-factory",
   "version": "1.0.0",
   "description": "A toolkit for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra, something playfully referred to as SpaceCrafts",
-  "main": "dist/main/main.js",
   "scripts": {
-    "start": "node fuse",
-    "release": "run-s parcel:build \"electron:build {@}\" --",
-    "watch": "run-p -r parcel:watch electron:start",
-    "electron:start": "electron .",
+    "dev": "electron-webpack dev",
     "electron:build": "build --x64 --publish=never",
-    "lint": "eslint app/**/*.ts{,x}"
+    "lint": "eslint src/**/*.ts{,x}"
   },
   "build": {
     "appId": "com.playful.geometer.spacecraft-net-factory",
@@ -29,8 +25,7 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb"
+        "snap"
       ]
     },
     "win": {
@@ -38,16 +33,10 @@
       "icon": "build/logo.ico"
     },
     "files": [
-      "main.js",
-      "build/*",
-      "build-resources/*"
-    ],
-    "directories": {
-      "buildResources": "build-resources"
-    }
+      "dist/**/*"
+    ]
   },
   "keywords": [
-    "parcel",
     "react"
   ],
   "author": "“Robin <“wrobin@gmx.net”> (https://www.robinwieruch.de)",
@@ -63,6 +52,7 @@
     "canvg": "^3.0.6",
     "clsx": "^1.1.1",
     "electron-debug": "^3.1.0",
+    "electron-webpack": "^2.8.2",
     "lib2geom-path-boolean-addon": "git+https://github.com/justin-hackin/lib2geom-path-boolean-addon.git",
     "lodash": "^4.17.19",
     "mobx": "^5.15.4",
@@ -70,8 +60,10 @@
     "react": "^16.13.1",
     "react-color": "^2.18.1",
     "react-dom": "^16.13.1",
+    "react-hot-loader": "^4.12.21",
     "react-moveable": "^0.16.6",
     "react-resize-detector": "^4.2.3",
+    "react-router-static": "^1.0.0",
     "react-svg-pan-zoom": "^3.8.0",
     "react-use-gesture": "^7.0.15",
     "svg-path-parser": "git+https://github.com/justin-hackin/svg-path-parser.git",
@@ -79,8 +71,8 @@
     "three": "^0.113.2",
     "three-gltf-loader": "^1.111.0",
     "threejs-orbit-controls": "^1.0.3",
-    "use-query-params": "^0.4.6",
-    "uuid": "^3.4.0"
+    "uuid": "^3.4.0",
+    "webpack": "^4.44.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
@@ -99,6 +91,7 @@
     "electron-devtools-installer": "^3.1.1",
     "electron-is-dev": "^1.2.0",
     "electron-reload": "^1.5.0",
+    "electron-webpack-ts": "^4.0.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-typescript": "^6.3.2",
     "eslint-import-resolver-typescript": "^2.0.0",
@@ -107,9 +100,12 @@
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^1.7.0",
     "execa": "^4.0.3",
-    "fuse-box": "^3.7.1",
+    "node-sass": "^4.14.1",
     "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
-    "typescript": "^3.9.6"
+    "sass-loader": "^9.0.3",
+    "source-map-support": "^0.5.19",
+    "typescript": "^3.9.7",
+    "webpack-merge": "^5.1.1"
   }
 }

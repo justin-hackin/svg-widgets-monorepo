@@ -1,0 +1,11 @@
+{
+  "whiteListedModules": [
+    "react-hot-loader",
+    "react-dom",
+    "@material-ui/core", "@material-ui/styles" , "@material-ui/lab", "@material-ui/icons",
+    "react-moveable", "react-use-gesture", "react-router-static", "mobx-react"
+  ],
+  "renderer": {
+    "webpackConfig": "webpack.renderer.js"
+  }
+}

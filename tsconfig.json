@@ -1,28 +1,8 @@
 {
+  "extends": "./node_modules/electron-webpack/tsconfig-base.json",
   "compilerOptions": {
-    "alwaysStrict": true,
-    "importHelpers": true,
-    "sourceMap": true,
-    "inlineSourceMap": true,
-    "preserveConstEnums": true,
-    "target": "es2016",
-    "module": "commonjs",
-    "outDir": "dist",
     "jsx": "react",
-    "moduleResolution": "node",
-    "allowJs": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "allowSyntheticDefaultImports": false,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": ["*","src/*","src/app/*"],
-      // "@coglite/*": ["src/packages/*"]
-     },
-    "lib": ["es6","es2015", "es2016", "es2017", "dom"]
-
+    "resolveJsonModule": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

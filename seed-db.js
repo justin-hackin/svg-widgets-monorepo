@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { Photon } = require('@generated/photon');
 const { entries, startCase } = require('lodash');
-const polyhedra = require('./app/renderer/die-line-viewer/data/polyhedra.json');
+const polyhedra = require('./src/renderer/die-line-viewer/data/polyhedra.json');
 
 const photon = new Photon();
 
