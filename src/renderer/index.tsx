@@ -6,6 +6,7 @@ import { hot } from 'react-hot-loader/root';
 import { TextureTransformEditor } from './TextureTransformEditor';
 import { DielineViewer } from './DielineViewer';
 import './common/style/index.css';
+import './globalThis';
 
 const routes = { // A map of "route" => "component"
   default: DielineViewer,

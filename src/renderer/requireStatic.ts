@@ -1,4 +1,3 @@
-
 import path from 'path';
 import * as url from 'url';
 
@@ -11,7 +10,8 @@ import * as url from 'url';
  */
 export default function requireStatic(resourcePath) {
   if (process.env.NODE_ENV === 'production') {
-    return path.resolve(__static, resourcePath);
+    // eslint-disable-next-line no-underscore-dangle
+    return path.resolve(globalThis.__static, resourcePath);
   }
   return url.resolve(window.location.origin, resourcePath);
 }

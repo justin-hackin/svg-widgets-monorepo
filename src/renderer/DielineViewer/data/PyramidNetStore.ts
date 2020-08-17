@@ -56,8 +56,7 @@ const defaultNet:PyramidNetSpec = {
 
 export class PyramidNetStore {
   constructor(data = defaultNet) {
-    // @ts-ignore
-    ipcRenderer.on('die>request-shape-update', () => {
+    globalThis.ipcRenderer.on('die>request-shape-update', () => {
       this.sendTextureEditorUpdate();
     });
     this.loadSpec(data);
@@ -78,8 +77,8 @@ export class PyramidNetStore {
 
   @action
   sendTextureEditorUpdate() {
-    // @ts-ignore
-    ipcRenderer.send('tex>shape-update', this.boundaryPoints.map((pt) => pt.toArray()), this.pyramidGeometryId);
+    globalThis.ipcRenderer.send('tex>shape-update',
+      this.boundaryPoints.map((pt) => pt.toArray()), this.pyramidGeometryId);
   }
 
   @computed

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Canvg, { presets } from 'canvg';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
@@ -13,6 +12,7 @@ import {
 import TelegramIcon from '@material-ui/icons/Telegram';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
+// @ts-ignore
 import { point, Polygon } from '@flatten-js/core';
 import { PanelSelect } from '../common/components/PanelSelect';
 import darkTheme from '../DielineViewer/data/material-ui-dark-theme.json';
@@ -22,41 +22,59 @@ import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 import { DRAG_MODES, useDragMode } from './dragMode';
 import { extractCutHolesFromSvgString } from '../DielineViewer/util/svg';
 import { TextureSvg } from './components/TextureSvg';
+import { PointTuple } from '../DielineViewer/util/geom';
+import { PathData } from '../DielineViewer/util/PathData';
+
+interface DimensionsObject {
+  width: number,
+  height: number,
+}
+
+interface ViewBoxAttrs extends DimensionsObject {
+  xmin: number,
+  ymin:number
+}
+
+interface Boundary {
+  viewBoxAttrs?: ViewBoxAttrs,
+  path?: PathData
+}
 
 const {
   createRef, useRef, useEffect, useState,
 } = React;
-// TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 
+// TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
+// TODO: make router wrap with styles
+// @ts-ignore
 export const theme = createMuiTheme(darkTheme);
-const getFitScale = ({ width: boundsWidth, height: boundsHeight } = {},
-  { width: imageWidth, height: imageHeight } = {}) => {
-  if (!boundsWidth || !boundsHeight || !imageWidth || !imageHeight) { return null; }
-  const widthIsClamp = (boundsWidth / boundsHeight) <= (imageWidth / imageHeight);
+const getFitScale = (bounds: DimensionsObject, image: DimensionsObject) => {
+  if (!bounds || !image) { return null; }
+  const widthIsClamp = (bounds.width / bounds.height) <= (image.width / image.height);
   return {
     widthIsClamp,
-    scale: widthIsClamp ? boundsWidth / imageWidth : boundsHeight / imageHeight,
+    scale: widthIsClamp ? bounds.width / image.width : bounds.height / image.height,
   };
 };
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
-const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
+const addTuple = ([ax, ay]: PointTuple, [bx, by]:PointTuple):PointTuple => [ax + bx, ay + by];
 
 
 const TextureTransformEditorLOC = ({ classes }) => {
   const dragMode = useDragMode();
 
-  const textureRef = createRef();
-  const textureApplicationSvgRef = createRef();
-  const textureSvgRef = createRef();
+  const textureRef = createRef<SVGGraphicsElement>();
+  const textureApplicationSvgRef = createRef<SVGElement>();
+  const textureSvgRef = createRef<SVGSVGElement>();
 
-  const textureCanvas = useRef();
+  const textureCanvas = useRef<OffscreenCanvas>();
 
   const [isPositive, setIsPositive] = useState(true);
 
-  const [placementAreaDimensions, setPlacementAreaDimensions] = useState();
+  const [placementAreaDimensions, setPlacementAreaDimensions] = useState<DimensionsObject>();
   // can't use early exit because image must render before it's onload sets imageDimensions
-  const [imageDimensions, setImageDimensions] = useState();
+  const [imageDimensions, setImageDimensions] = useState<DimensionsObject>();
 
 
   const [faceScale, setFaceScale] = useState(1);
@@ -64,24 +82,26 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const faceScaleMuxed = faceScaleMux * faceScale;
 
 
-  const [textureScale, setTextureScale] = useState(1);
-  const [textureScaleMux, setTextureScaleMux] = useState(1);
+  const [textureScale, setTextureScale] = useState<number>(1);
+  const [textureScaleMux, setTextureScaleMux] = useState<number>(1);
 
-  const [textureRotation, setTextureRotation] = useState(0);
-  const [textureRotationDelta, setTextureRotationDelta] = useState(0);
+  const [textureRotation, setTextureRotation] = useState<number>(0);
+  const [textureRotationDelta, setTextureRotationDelta] = useState<number>(0);
 
-  const [textureTranslation, setTextureTranslation] = useState([0, 0]);
+  const [textureTranslation, setTextureTranslation] = useState<PointTuple>([0, 0]);
 
-  const [transformOrigin, setTransformOrigin] = useState([0, 0]);
-  const [transformOriginDelta, setTransformOriginDelta] = useState([0, 0]);
+  const [transformOrigin, setTransformOrigin] = useState<PointTuple>([0, 0]);
+  const [transformOriginDelta, setTransformOriginDelta] = useState<PointTuple>([0, 0]);
   const transformOriginMarkerPos = addTuple(transformOrigin, transformOriginDelta);
 
-  const [fileList, setFileList] = useState();
-  const [fileIndex, setFileIndex] = useState();
-  const [textureUrl, setTextureUrl] = useState();
-  const [texturePathD, setTexturePathD] = useState();
+  const FILE_UNSELECTED_VALUE = '';
+  const [fileList, setFileList] = useState<string[]>();
+  const [fileIndex, setFileIndex] = useState<string>(FILE_UNSELECTED_VALUE);
+  const [textureUrl, setTextureUrl] = useState<string>();
+  const [texturePathD, setTexturePathD] = useState<string>();
 
-  const [boundary, setBoundary] = useState();
+  const [boundary, setBoundary] = useState<Boundary>();
+
   const { viewBoxAttrs, path } = boundary || {};
   const boundaryPathD = path ? path.getD() : null;
 
@@ -105,7 +125,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
   const setTextureDFromFile = (url) => {
-    ipcRenderer.invoke('get-svg-string-by-path', url)
+    globalThis.ipcRenderer.invoke('get-svg-string-by-path', url)
       .then((svgString) => {
         setTexturePathD(extractCutHolesFromSvgString(svgString));
       });
@@ -113,7 +133,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   // Init
   useEffect(() => {
-    ipcRenderer.on('tex>shape-update', (e, faceVertices, aShapeId) => {
+    globalThis.ipcRenderer.on('tex>shape-update', (e, faceVertices, aShapeId) => {
       setShapeId(aShapeId);
       const points = faceVertices.map((vert) => point(...vert));
       const poly = new Polygon();
@@ -133,24 +153,30 @@ const TextureTransformEditorLOC = ({ classes }) => {
     });
 
 
-    window.onresize = () => {
+    const resizeHandler = () => {
       const { outerWidth: width, outerHeight: height } = window;
       setPlacementAreaDimensions({ width: width / 2, height });
     };
 
+    window.addEventListener('resize', resizeHandler);
+
     setTimeout(() => {
-      window.onresize();
+      resizeHandler();
     });
 
-    ipcRenderer.invoke('list-texture-files').then((list) => {
+    globalThis.ipcRenderer.invoke('list-texture-files').then((list:string[]) => {
       setFileList(list);
-      setTimeout(() => { setFileIndex(0); });
+      setTimeout(() => { setFileIndex('0'); }, 1000);
     });
 
 
     // needed for the case in which the texture fitting window is reloaded
     // (no-op on initial launch, main calls this when events wired)
-    ipcRenderer.send('die>request-shape-update');
+    globalThis.ipcRenderer.send('die>request-shape-update');
+
+    return () => {
+      window.removeEventListener('resize', resizeHandler);
+    };
   }, []);
 
   useEffect(() => {
@@ -184,17 +210,18 @@ const TextureTransformEditorLOC = ({ classes }) => {
       setIsDragOver(false);
     };
 
-    const drop: any = (event) => {
+    const drop: EventListener = (event:DragEvent) => {
       event.preventDefault();
       event.stopPropagation();
       setIsDragOver(false);
       const { dataTransfer: { files } = {} } = event;
 
       if (files.length > 1) {
+        // eslint-disable-next-line no-alert
         alert('Whoa there, only one file at a time in the Texture Fitting zone please');
       } else {
         setTextureDFromFile(files[0].path);
-        setFileIndex(null);
+        setFileIndex(FILE_UNSELECTED_VALUE);
       }
     };
 
@@ -216,7 +243,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   }, [textureSvgRef]);
 
 
-  const matrixTupleTransformPoint = (matrix, tuple) => {
+  const matrixTupleTransformPoint = (matrix: DOMMatrixReadOnly, tuple: PointTuple): PointTuple => {
     const domPoint = matrix.transformPoint(new DOMPoint(...tuple));
     return [domPoint.x, domPoint.y];
   };
@@ -226,7 +253,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   );
 
   // eslint-disable-next-line max-len
-  const absoluteToRelativeCoords = (absCoords) => matrixTupleTransformPoint(
+  const absoluteToRelativeCoords = (absCoords: PointTuple):PointTuple => matrixTupleTransformPoint(
     ((new DOMMatrixReadOnly())
       .scale(textureScaleValue, textureScaleValue)
       .rotate(textureRotation + textureRotationDelta)
@@ -234,20 +261,20 @@ const TextureTransformEditorLOC = ({ classes }) => {
     absoluteMovementToSvg(absCoords),
   );
 
-  const matrixWithTransformCenter = (transformOrigin) => (new DOMMatrixReadOnly())
-    .translate(...transformOrigin)
+  const matrixWithTransformCenter = (origin) => (new DOMMatrixReadOnly())
+    .translate(...origin)
     .scale(textureScaleValue, textureScaleValue)
     .rotate(textureRotation + textureRotationDelta)
-    .translate(...transformOrigin.map(negateMap));
+    .translate(...origin.map(negateMap));
 
   const textureTranslationUseDrag = useDrag(({ delta }) => {
-    // accomodates the scale of svg so that the texture stays under the mouse
+    // accommodates the scale of svg so that the texture stays under the mouse
     setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
   });
 
   // ORIGIN
   const transformOriginUseDrag = useDrag(({ movement, down }) => {
-    // accomodates the scale of svg so that the texture stays under the mouse
+    // accommodates the scale of svg so that the texture stays under the mouse
     const relDelta = absoluteToRelativeCoords(movement);
     if (down) {
       setTransformOriginDelta(relDelta);
@@ -304,7 +331,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   useEffect(() => {
     // eslint-disable-next-line eqeqeq
-    if (textureRef.current && fileIndex != undefined && fileList) {
+    if (textureRef.current && fileIndex !== null && fileList) {
       setTextureUrl(`static/images/textures/${fileList[fileIndex]}`);
     }
   }, [textureRef.current, fileIndex, fileList]);
@@ -322,13 +349,14 @@ const TextureTransformEditorLOC = ({ classes }) => {
   useEffect(() => {
     if (textureCanvas.current && viewBoxAttrs && textureTransformMatrixStr && imageDimensions) {
       const ctx = textureCanvas.current.getContext('2d');
+      // @ts-ignore
       const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, {
         texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginMarkerPos, isPositive,
       }));
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
-      Canvg.from(ctx, svgStr, presets.offscreen()).then((v) => {
-        v.render();
+      Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
+        await v.render();
         setChangeRenderFlag(!changeRenderFlag);
       });
     }
@@ -343,13 +371,14 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const faceScalePercentStr = `${faceScaleMuxed * 100}%`;
   const faceScaleCenterPercentStr = `${((1 - faceScaleMuxed) * 100) / 2}%`;
   const sendTexture = async () => {
-    const dd = await ipcRenderer.invoke(
+    const dd = await globalThis.ipcRenderer.invoke(
       'intersect-svg', boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
     );
-    ipcRenderer.send('die>set-die-line-cut-holes', dd, textureTransformMatrixStr);
+    globalThis.ipcRenderer.send('die>set-die-line-cut-holes', dd, textureTransformMatrixStr);
   };
 
 
+  // @ts-ignore
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root} {...viewUseWheel()}>
@@ -368,13 +397,10 @@ const TextureTransformEditorLOC = ({ classes }) => {
           />
         </div>
         <Paper
-          component="svg"
           square
           elevation={5}
           className="svg-container"
-          width="50%"
-          height="100%"
-          style={{ overflow: 'hidden', width: '50%' }}
+          style={{ overflow: 'hidden', width: '50%', height: '100%' }}
         >
           <svg
             ref={textureSvgRef}
@@ -420,11 +446,10 @@ const TextureTransformEditorLOC = ({ classes }) => {
           />
           <PanelSelect
             label="Tile"
+            className="select-texture"
             value={fileIndex}
             displayEmpty
-            setter={(val) => {
-              setFileIndex(parseInt(val, 10));
-            }}
+            setter={setFileIndex}
             options={options}
           />
           <DragModeOptionsGroup dragMode={dragMode} />

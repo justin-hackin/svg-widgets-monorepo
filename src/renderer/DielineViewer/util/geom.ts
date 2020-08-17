@@ -11,7 +11,8 @@ export interface PointLike {
   [x: string]: any,
 }
 
-export type PointTuple = [number, number];
+// TODO: too a loose definition but [number, number] causes issues with mapping coords
+export type PointTuple = Array<number>;
 export type Coord = PointTuple | PointLike;
 
 export const PHI = (1 + Math.sqrt(5)) / 2;

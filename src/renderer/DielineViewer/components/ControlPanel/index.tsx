@@ -254,8 +254,7 @@ export const ControlPanel = observer(({ store }) => {
           <IconButton
             aria-label="save"
             onClick={() => {
-              // @ts-ignore
-              ipcRenderer.invoke('load-net-spec').then((netSpecData) => {
+              globalThis.ipcRenderer.invoke('load-net-spec').then((netSpecData) => {
                 store.pyramidNetSpec.loadSpec(netSpecData);
               });
             }}
@@ -266,8 +265,7 @@ export const ControlPanel = observer(({ store }) => {
           <IconButton
             aria-label="save"
             onClick={() => {
-              // @ts-ignore
-              ipcRenderer.invoke(
+              globalThis.ipcRenderer.invoke(
                 'save-net-with-data',
                 store.renderPyramidNetToString(),
                 store.pyramidNetSpec.exportToJSONString(),
@@ -280,8 +278,7 @@ export const ControlPanel = observer(({ store }) => {
           <IconButton
             aria-label="save"
             onClick={() => {
-              // @ts-ignore
-              ipcRenderer.invoke('save-svg', store.renderFaceBoundaryToString(), {
+              globalThis.ipcRenderer.invoke('save-svg', store.renderFaceBoundaryToString(), {
                 message: 'Save face template',
                 defaultPath: `${store.pyramidNetSpec.pyramidGeometryId}__template.svg`,
               });
@@ -292,8 +289,7 @@ export const ControlPanel = observer(({ store }) => {
           <IconButton
             aria-label="save"
             onClick={() => {
-              // @ts-ignore
-              ipcRenderer.invoke('open-svg', 'Upload face cut pattern')
+              globalThis.ipcRenderer.invoke('open-svg', 'Upload face cut pattern')
                 .then((svgString) => {
                   store.pyramidNetSpec.applyFaceHolePattern(svgString);
                 });

@@ -1,7 +1,9 @@
 import React from 'react';
+import {
+  Mesh, MeshPhongMaterial, Object3D, PerspectiveCamera, Renderer, Scene, WebGLRenderer,
+} from 'three';
 import * as THREE from 'three';
 import GLTFLoader from 'three-gltf-loader';
-// @ts-ignore
 import OrbitControls from 'threejs-orbit-controls';
 import '../style.css';
 import requireStatic from '../../requireStatic';
@@ -10,26 +12,22 @@ const { useEffect, useRef, useState } = React;
 
 const IDEAL_RADIUS = 60;
 
-const {
-  Scene, WebGLRenderer, PerspectiveCamera,
-} = THREE;
-
 const loader = new GLTFLoader();
 
 export const ShapePreview = ({
   // @ts-ignore
   width, height, changeRenderFlag, shapeId, textureCanvas,
 }) => {
-  const [renderer, setRenderer] = useState();
-  const [camera, setCamera] = useState();
-  const [scene, setScene] = useState();
-  const [polyhedronMesh, setPolyhedronMesh] = useState();
-  const [polyhedronObject, setPolyhedronObject] = useState();
+  const [renderer, setRenderer] = useState<Renderer>();
+  const [camera, setCamera] = useState<PerspectiveCamera>();
+  const [scene, setScene] = useState<Scene>();
+  const [polyhedronMesh, setPolyhedronMesh] = useState<Mesh>();
+  const [polyhedronObject, setPolyhedronObject] = useState<Object3D>();
 
   const [offsetY] = useState(85);
 
   const threeContainerRef = useRef();
-  const requestRef = React.useRef();
+  const requestRef = React.useRef<number>();
 
 
   useEffect(() => {
@@ -40,40 +38,40 @@ export const ShapePreview = ({
   }, [width, height, threeContainerRef, camera, renderer]);
 
   useEffect(() => {
-    if (!threeContainerRef.current) { return; }
-    const theScene = new Scene();
-    const theRenderer = new WebGLRenderer({
-      alpha: true,
-      antialias: true,
-      preserveDrawingBuffer: true,
-    });
-    theRenderer.setPixelRatio(window.devicePixelRatio);
-    // @ts-ignore
-    threeContainerRef.current.appendChild(theRenderer.domElement);
-    setRenderer(theRenderer);
+    if (threeContainerRef.current) {
+      const theScene = new Scene();
+      const theRenderer = new WebGLRenderer({
+        alpha: true,
+        antialias: true,
+        preserveDrawingBuffer: true,
+      });
+      theRenderer.setPixelRatio(window.devicePixelRatio);
+      // @ts-ignore
+      threeContainerRef.current.appendChild(theRenderer.domElement);
+      setRenderer(theRenderer);
 
-    const globalLight = new (THREE.AmbientLight)(0xffffff);
-    // soft white light
-    globalLight.intensity = 2.0;
-    theScene.add(globalLight);
+      const globalLight = new (THREE.AmbientLight)(0xffffff);
+      // soft white light
+      globalLight.intensity = 2.0;
+      theScene.add(globalLight);
 
-    const theCamera = new PerspectiveCamera(45, width / height, 0.1, 2000);
-    theCamera.position.set(304, 159 + offsetY, 0);
-    setCamera(theCamera);
+      const theCamera = new PerspectiveCamera(45, width / height, 0.1, 2000);
+      theCamera.position.set(304, 159 + offsetY, 0);
+      setCamera(theCamera);
 
-    const theControls = new OrbitControls(theCamera, theRenderer.domElement);
-    theControls.autoRotate = true;
-    theScene.add(theCamera);
-    setScene(theScene);
+      const theControls = new OrbitControls(theCamera, theRenderer.domElement);
+      theControls.autoRotate = true;
+      theScene.add(theCamera);
+      setScene(theScene);
 
-    function animate() {
-      window.requestAnimationFrame(animate);
-      theControls.update();
-      theRenderer.render(theScene, theCamera);
+      const animate = () => {
+        window.requestAnimationFrame(animate);
+        theControls.update();
+        theRenderer.render(theScene, theCamera);
+      };
+      requestRef.current = requestAnimationFrame(animate);
     }
-    requestRef.current = requestAnimationFrame(animate);
 
-    // eslint-disable-next-line consistent-return
     return () => cancelAnimationFrame(requestRef.current);
   }, [threeContainerRef]);
 
@@ -91,8 +89,7 @@ export const ShapePreview = ({
         setPolyhedronObject(importScene);
 
         // only set the polyhedron once, there should be only one mesh
-        scene.traverse((child) => {
-          // @ts-ignore
+        scene.traverse((child: Mesh) => {
           if (child.isMesh) {
             const scale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
             camera.lookAt(child.position);
@@ -104,6 +101,8 @@ export const ShapePreview = ({
       null,
       // called when loading has errors
       (error) => {
+        // TODO: handle error
+        // eslint-disable-next-line no-console
         console.log(error);
       },
     );
@@ -111,11 +110,12 @@ export const ShapePreview = ({
 
   useEffect(() => {
     if (polyhedronMesh && textureCanvas) {
+      // TODO: throw if material not MeshPhong
       // @ts-ignore
-      const { material } = polyhedronMesh;
+      const { material }: {material: MeshPhongMaterial} = polyhedronMesh;
       textureCanvas.getContext('2d');
       material.map.image = textureCanvas.transferToImageBitmap();
-      polyhedronMesh.material.map.needsUpdate = true;
+      material.map.needsUpdate = true;
     }
   }, [changeRenderFlag]);
 

@@ -1,7 +1,10 @@
 import React from 'react';
+import { PointTuple } from '../../DielineViewer/util/geom';
 
+const normalizedBoxCoords:PointTuple[] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const HOLES_COLOR = '#101010';
 const MATERIAL_COLOR = '#ffaa00';
+
 export const TextureSvg = ({
   showCenterMarker,
   faceFittingScale,
@@ -47,15 +50,17 @@ export const TextureSvg = ({
               cx={0}
               cy={0}
             />
-            {[[0, 1], [1, 0], [0, -1], [-1, 0]].map((coords) => {
-              const lineProps = ([[x1, y1], [x2, y2]]) => ({
-                x1, y1, x2, y2,
-              });
+            {normalizedBoxCoords.map((coords, index) => {
               const end = coords.map((coord) => coord * CENTER_MARKER_RADIUS);
               const start = coords.map((coord) => coord * CENTER_MARKER_RADIUS * CROSSHAIR_START_RATIO);
+              const lineProps = (([x1, y1]: PointTuple, [x2, y2]:PointTuple) => ({
+                x1, y1, x2, y2,
+              // @ts-ignore
+              }))(start, end);
               return (
                 <line
-                  {...lineProps([start, end])}
+                  {...lineProps}
+                  key={index}
                   stroke="#000"
                   opacity={OPACITY}
                   strokeWidth={CENTER_MARKER_STROKE}

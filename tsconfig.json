@@ -3,7 +3,13 @@
   "compilerOptions": {
     "jsx": "react",
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strict": false,
+    "incremental": true,
+    "noUnusedLocals": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noStrictGenericChecks": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
