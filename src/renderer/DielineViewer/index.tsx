@@ -4,8 +4,8 @@ import { observer } from 'mobx-react';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
 
-import darkTheme from '../../data/material-ui-dark-theme.json';
-import { store } from '../../data/PyramidNetMakerStore';
+import darkTheme from './data/material-ui-dark-theme.json';
+import { store } from './data/PyramidNetMakerStore';
 import { PyramidNet } from './components/PyramidNet';
 // eslint-disable-next-line import/no-cycle
 import { ControlPanel } from './components/ControlPanel';
@@ -15,7 +15,7 @@ import { ResizableZoomPan } from './components/ResizableZoomPan';
 const patternId = 'grid-pattern';
 // @ts-ignore
 const theme = createMuiTheme(darkTheme);
-export const SVGViewer = observer(() => (
+export const DielineViewer = observer(() => (
   <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
     <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
       <svg {...store.svgDimensions}>

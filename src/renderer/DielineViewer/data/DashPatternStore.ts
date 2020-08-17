@@ -1,10 +1,6 @@
 import { computed, observable } from 'mobx';
 import { dashPatterns } from './dash-patterns';
-import {StrokeDashPathSpec} from '../util/shapes/strokeDashPath';
-
-interface DashPatternDefs {
-  [propName: string]: StrokeDashPathSpec,
-}
+import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
 
 export class DashPatternStore implements StrokeDashPathSpec {
   @observable

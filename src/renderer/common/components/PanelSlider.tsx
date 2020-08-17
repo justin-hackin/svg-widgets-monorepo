@@ -3,7 +3,7 @@ import FormControl from '@material-ui/core/FormControl';
 import React from 'react';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
-import { useStyles } from '../../die-line-viewer/components/SVGViewer/style';
+import { useStyles } from '../../DielineViewer/style';
 
 export const PanelSlider = ({
   label, setter, value, valuePath, ...rest

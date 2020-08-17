@@ -4,8 +4,8 @@ const fsPromises = require('fs').promises;
 // @ts-ignore
 const path = require('path');
 const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean-addon');
-const { VERY_LARGE_NUMBER } = require('../renderer/die-line-viewer/util/geom');
-const { PathData } = require('../renderer/die-line-viewer/util/PathData');
+const { VERY_LARGE_NUMBER } = require('../renderer/DielineViewer/util/geom');
+const { PathData } = require('../renderer/DielineViewer/util/PathData');
 
 const svgFilters = [{
   name: 'SVG - Scalable Vector Graphics',
@@ -17,7 +17,7 @@ const jsonFilters = [{
   extensions: ['json'],
 }];
 
-export const setupIpc = (ipcMain, app) => {
+export const setupIpc = (ipcMain) => {
   ipcMain.handle('intersect-svg', (e, boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive) => {
     const texturePathTransformedD = svgpath.from(texturePathD).transform(textureTransformMatrixStr).toString();
     if (isPositive) {

@@ -6,7 +6,7 @@ import React from 'react';
 // @ts-ignore
 import {
   FaceBoundarySVG, PyramidNet, PyramidNetSpec, StoreSpec, StyleSpec,
-} from '../components/SVGViewer/components/PyramidNet';
+} from '../components/PyramidNet';
 import { CM_TO_PIXELS_RATIO } from '../util/geom';
 import { polyhedra } from './polyhedra';
 import { SVGWrapper } from './SVGWrapper';

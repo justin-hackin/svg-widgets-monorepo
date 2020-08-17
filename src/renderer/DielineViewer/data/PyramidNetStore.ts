@@ -8,7 +8,7 @@ import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, hingedPlot, triangleAnglesGivenSides,
 } from '../util/geom';
-import { PyramidNetSpec } from '../components/SVGViewer/components/PyramidNet';
+import { PyramidNetSpec } from '../components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
 import { AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
@@ -184,7 +184,7 @@ export class PyramidNetStore {
   @computed
   get borderInsetFaceHoleTransformMatrix() {
     const scale = (this.insetPolygon.box.width) / this.borderPolygon.box.width;
-    return `translate(${this.insetPolygon.vertices[0].x}, ${this.insetPolygon.vertices[0].y}) scale(${scale}, ${scale})`
+    return `translate(${this.insetPolygon.vertices[0].x}, ${this.insetPolygon.vertices[0].y}) scale(${scale}, ${scale})`;
   }
 
   @action

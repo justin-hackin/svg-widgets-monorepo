@@ -6,12 +6,12 @@ import {
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
   radToDeg,
-} from '../../../util/geom';
-import { PathData } from '../../../util/PathData';
-import { strokeDashPath, StrokeDashPathSpec } from '../../../util/shapes/strokeDashPath';
-import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../../../util/shapes/baseEdgeConnectionTab';
-import { ascendantEdgeConnectionTabs, AscendantEdgeTabsSpec } from '../../../util/shapes/ascendantEdgeConnectionTabs';
-import { roundedEdgePath } from '../../../util/shapes/generic';
+} from '../util/geom';
+import { PathData } from '../util/PathData';
+import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
+import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
+import { ascendantEdgeConnectionTabs, AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
+import { roundedEdgePath } from '../util/shapes/generic';
 
 
 export interface StyleSpec {

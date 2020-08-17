@@ -14,15 +14,14 @@ import TelegramIcon from '@material-ui/icons/Telegram';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
 import { point, Polygon } from '@flatten-js/core';
-import { PanelSelect } from '../../../common/components/PanelSelect';
-import darkTheme from '../../../die-line-viewer/data/material-ui-dark-theme.json';
-import { closedPolygonPath } from '../../../die-line-viewer/util/shapes/generic';
+import { PanelSelect } from '../common/components/PanelSelect';
+import darkTheme from '../DielineViewer/data/material-ui-dark-theme.json';
+import { closedPolygonPath } from '../DielineViewer/util/shapes/generic';
 import { ShapePreview } from './components/ShapePreview';
 import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 import { DRAG_MODES, useDragMode } from './dragMode';
-import { extractCutHolesFromSvgString } from '../../../die-line-viewer/util/svg';
+import { extractCutHolesFromSvgString } from '../DielineViewer/util/svg';
 import { TextureSvg } from './components/TextureSvg';
-import requireStatic from '../../../requireStatic';
 
 const {
   createRef, useRef, useEffect, useState,
@@ -44,7 +43,7 @@ const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.hei
 const addTuple = ([ax, ay], [bx, by]) => [ax + bx, ay + by];
 
 
-const MoveableTextureLOC = ({ classes }) => {
+const TextureTransformEditorLOC = ({ classes }) => {
   const dragMode = useDragMode();
 
   const textureRef = createRef();
@@ -156,7 +155,7 @@ const MoveableTextureLOC = ({ classes }) => {
 
   useEffect(() => {
     if (imageDimensions && viewBoxAttrs) {
-      const { height, width, xmin } = viewBoxAttrs;
+      const { height, xmin } = viewBoxAttrs;
       // the boundary update will trigger the offscreen canvas which will flip the changeRenderFlag
       // that happens too early on first render
       // TODO: make shape preview request canvas update when ready instead
@@ -438,7 +437,7 @@ const MoveableTextureLOC = ({ classes }) => {
   );
 };
 
-export const MoveableTexture = withStyles({
+export const TextureTransformEditor = withStyles({
   root: {
     backgroundColor:
      '#333',
@@ -466,4 +465,4 @@ export const MoveableTexture = withStyles({
   checkboxControlLabel: {
     color: '#fff',
   },
-})(MoveableTextureLOC);
+})(TextureTransformEditorLOC);
