@@ -79,20 +79,24 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   const [faceScale, setFaceScale] = useState(1);
   const [faceScaleMux, setFaceScaleMux] = useState(1);
-  const faceScaleMuxed = faceScaleMux * faceScale;
+  const faceScaleDragged = faceScaleMux * faceScale;
 
 
   const [textureScale, setTextureScale] = useState<number>(1);
   const [textureScaleMux, setTextureScaleMux] = useState<number>(1);
+  const textureScaleDragged = textureScale * textureScaleMux;
 
   const [textureRotation, setTextureRotation] = useState<number>(0);
   const [textureRotationDelta, setTextureRotationDelta] = useState<number>(0);
+  const textureRotationDragged = textureRotation + textureRotationDelta;
 
   const [textureTranslation, setTextureTranslation] = useState<PointTuple>([0, 0]);
+  const [textureTranslationDelta, setTextureTranslationDelta] = useState<PointTuple>([0, 0]);
+  const textureTranslationDragged = addTuple(textureTranslation, textureTranslationDelta);
 
   const [transformOrigin, setTransformOrigin] = useState<PointTuple>([0, 0]);
   const [transformOriginDelta, setTransformOriginDelta] = useState<PointTuple>([0, 0]);
-  const transformOriginMarkerPos = addTuple(transformOrigin, transformOriginDelta);
+  const transformOriginDragged = addTuple(transformOrigin, transformOriginDelta);
 
   const FILE_UNSELECTED_VALUE = '';
   const [fileList, setFileList] = useState<string[]>();
@@ -112,15 +116,15 @@ const TextureTransformEditorLOC = ({ classes }) => {
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
   const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
-  const textureScaleValue = (textureScaleMux * textureScale * imageFittingScale) / faceFittingScale;
+  const textureScaleValue = (textureScaleDragged * imageFittingScale) / faceFittingScale;
 
 
   const negateMap = (num) => num * -1;
   const m = (new DOMMatrixReadOnly())
-    .translate(...textureTranslation)
+    .translate(...textureTranslationDragged)
     .translate(...transformOrigin)
     .scale(textureScaleValue, textureScaleValue)
-    .rotate(textureRotation + textureRotationDelta)
+    .rotate((textureRotationDragged * 360) / (Math.PI * 2))
     .translate(...transformOrigin.map(negateMap));
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
@@ -249,14 +253,19 @@ const TextureTransformEditorLOC = ({ classes }) => {
   };
 
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
-    (coord) => coord / (faceFittingScale * faceScaleMuxed),
+    (coord) => coord / (faceFittingScale * faceScaleDragged),
   );
+
+  const svgToAbsoluteMovement = (absCoords) => absCoords.map(
+    (coord) => coord * faceFittingScale * faceScaleDragged,
+  );
+
 
   // eslint-disable-next-line max-len
   const absoluteToRelativeCoords = (absCoords: PointTuple):PointTuple => matrixTupleTransformPoint(
     ((new DOMMatrixReadOnly())
       .scale(textureScaleValue, textureScaleValue)
-      .rotate(textureRotation + textureRotationDelta)
+      .rotate(textureRotationDragged)
       .inverse()),
     absoluteMovementToSvg(absCoords),
   );
@@ -264,12 +273,37 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const matrixWithTransformCenter = (origin) => (new DOMMatrixReadOnly())
     .translate(...origin)
     .scale(textureScaleValue, textureScaleValue)
-    .rotate(textureRotation + textureRotationDelta)
+    .rotate(textureRotationDragged)
     .translate(...origin.map(negateMap));
 
-  const textureTranslationUseDrag = useDrag(({ delta }) => {
+
+  const relativeToDomCoords = (relCoords) => {
+    const matrix = matrixWithTransformCenter(transformOrigin).inverse();
+    return svgToAbsoluteMovement(matrixTupleTransformPoint(matrix, relCoords));
+  };
+
+  const textureTranslationUseDrag = useDrag(({ movement, xy, down }) => {
     // accommodates the scale of svg so that the texture stays under the mouse
-    setTextureTranslation(addTuple(absoluteMovementToSvg(delta), textureTranslation));
+    if (dragMode === DRAG_MODES.TRANSLATE) {
+      if (down) {
+        setTextureTranslationDelta(absoluteMovementToSvg(movement));
+      } else {
+        setTextureTranslation(textureTranslationDragged);
+        setTextureTranslationDelta([0, 0]);
+      }
+    } else if (dragMode === DRAG_MODES.ROTATE) {
+      setTextureRotationDelta(point(...addTuple(
+        absoluteMovementToSvg(xy),
+        relativeToDomCoords(transformOrigin).map(negateMap),
+      )).angle);
+    } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
+      if (down) {
+        setTextureScaleMux((movement[1] / placementAreaDimensions.height) + 1);
+      } else {
+        setTextureScaleMux(1);
+        setTextureScale(textureScaleDragged);
+      }
+    }
   });
 
   // ORIGIN
@@ -279,13 +313,13 @@ const TextureTransformEditorLOC = ({ classes }) => {
     if (down) {
       setTransformOriginDelta(relDelta);
     } else {
-      const newMatrix = matrixWithTransformCenter(transformOriginMarkerPos);
+      const newMatrix = matrixWithTransformCenter(transformOriginDragged);
       const oldMatrix = matrixWithTransformCenter(transformOrigin);
       const relativeDifference = addTuple(
         matrixTupleTransformPoint(newMatrix, textureTranslation),
         matrixTupleTransformPoint(oldMatrix, textureTranslation).map(negateMap),
       );
-      setTransformOrigin(transformOriginMarkerPos);
+      setTransformOrigin(transformOriginDragged);
       setTransformOriginDelta([0, 0]);
       setTextureTranslation(addTuple(textureTranslation, relativeDifference.map(negateMap)));
     }
@@ -293,7 +327,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   const MIN_VIEW_SCALE = 0.3;
   const MAX_VIEW_SCALE = 3;
-  const rotateSpeed = 8;
   const viewUseWheel = useWheel(({ movement: [, y] }) => {
     const percentHeightDelta = (y / placementAreaDimensions.height);
     const newScaleViewMux = (percentHeightDelta + 1) * faceScaleMux;
@@ -303,20 +336,20 @@ const TextureTransformEditorLOC = ({ classes }) => {
     ) {
       setFaceScaleMux(newScaleViewMux);
     } else if (dragMode === DRAG_MODES.ROTATE) {
-      setTextureRotationDelta(textureRotationDelta + (percentHeightDelta * Math.PI * rotateSpeed));
+      setTextureRotationDelta(textureRotationDelta + percentHeightDelta);
     } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
       setTextureScaleMux((percentHeightDelta + 1) * textureScaleMux);
     }
   }, {
     onWheelEnd: () => {
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
-        setFaceScale(faceScaleMux * faceScale);
+        setFaceScale(faceScaleDragged);
         setFaceScaleMux(1);
       } else if (dragMode === DRAG_MODES.ROTATE) {
+        setTextureRotation(textureRotationDragged);
         setTextureRotationDelta(0);
-        setTextureRotation(textureRotation + textureRotationDelta);
       } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
-        setTextureScale(textureScaleMux * textureScale);
+        setTextureScale(textureScaleDragged);
         setTextureScaleMux(1);
       }
     },
@@ -351,7 +384,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
       const ctx = textureCanvas.current.getContext('2d');
       // @ts-ignore
       const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, {
-        texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginMarkerPos, isPositive,
+        texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginDragged, isPositive,
       }));
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
@@ -368,8 +401,8 @@ const TextureTransformEditorLOC = ({ classes }) => {
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
-  const faceScalePercentStr = `${faceScaleMuxed * 100}%`;
-  const faceScaleCenterPercentStr = `${((1 - faceScaleMuxed) * 100) / 2}%`;
+  const faceScalePercentStr = `${faceScaleDragged * 100}%`;
+  const faceScaleCenterPercentStr = `${((1 - faceScaleDragged) * 100) / 2}%`;
   const sendTexture = async () => {
     const dd = await globalThis.ipcRenderer.invoke(
       'intersect-svg', boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
@@ -396,10 +429,14 @@ const TextureTransformEditorLOC = ({ classes }) => {
           />
         </div>
         <Paper
+          // @ts-ignore
+          component="svg"
           square
           elevation={5}
           className="svg-container"
-          style={{ overflow: 'hidden', width: '50%', height: '100%' }}
+          width="50%"
+          height="100%"
+          style={{ overflow: 'hidden', width: '50%' }}
         >
           <svg
             ref={textureSvgRef}
@@ -417,7 +454,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
                 textureRef,
                 textureScaleValue,
                 textureApplicationSvgRef,
-                transformOriginMarkerPos,
+                transformOriginDragged,
                 texturePathD,
                 textureTransformMatrixStr,
                 textureTranslationUseDrag,

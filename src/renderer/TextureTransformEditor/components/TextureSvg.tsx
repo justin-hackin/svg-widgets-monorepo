@@ -8,7 +8,7 @@ const MATERIAL_COLOR = '#ffaa00';
 export const TextureSvg = ({
   showCenterMarker,
   faceFittingScale,
-  transformOriginMarkerPos,
+  transformOriginDragged,
   boundaryPathD,
   texturePathD,
   textureTransformMatrixStr,
@@ -38,7 +38,7 @@ export const TextureSvg = ({
         {showCenterMarker && (
           <g
             {...transformOriginUseDrag()}
-            transform={`translate(${transformOriginMarkerPos[0]}, ${transformOriginMarkerPos[1]})`}
+            transform={`translate(${transformOriginDragged[0]}, ${transformOriginDragged[1]})`}
           >
             <circle
               r={CENTER_MARKER_RADIUS}
