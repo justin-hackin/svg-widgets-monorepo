@@ -378,7 +378,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   };
 
 
-  // @ts-ignore
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root} {...viewUseWheel()}>

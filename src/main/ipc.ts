@@ -1,7 +1,6 @@
 const { dialog } = require('electron');
 const svgpath = require('svgpath');
 const fsPromises = require('fs').promises;
-// @ts-ignore
 const path = require('path');
 const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean-addon');
 const { VERY_LARGE_NUMBER } = require('../renderer/DielineViewer/util/geom');

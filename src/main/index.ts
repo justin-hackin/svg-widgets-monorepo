@@ -1,7 +1,8 @@
 // Basic init from https://github.com/aimerib/electron-react-parcel/
 // eslint-disable-next-line import/no-extraneous-dependencies
+
 const {
-  app, BrowserWindow, nativeImage, ipcMain, screen: electronScreen,
+  app, BrowserWindow, BrowserWindowConstructorOptions, nativeImage, ipcMain, screen: electronScreen,
 } = require('electron');
 const path = require('path');
 const { format } = require('url');
@@ -9,14 +10,13 @@ const debug = require('electron-debug');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isDev = require('electron-is-dev');
-const { resolve } = require('app-root-path');
 // const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const { setupIpc } = require('./ipc');
 
-debug({ showDevTools: false });
+// TODO: remove isEnabled once builder works
+debug({ showDevTools: false, isEnabled: true });
 
 // TODO: doesn't seem to work
 const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/256x256.png`);
@@ -28,8 +28,9 @@ app.on('ready', async () => {
   setupIpc(ipcMain, app);
   const { width, height } = electronScreen.getPrimaryDisplay().workAreaSize;
 
-
-  const promisifyWindow = (config, route) => new Promise((resolveFn) => {
+  const promisifyWindow = (
+    config: typeof BrowserWindowConstructorOptions, route: string,
+  ): Promise<typeof BrowserWindow> => new Promise((resolveFn) => {
     console.log('Loading: ', route);
     const mainWindow = new BrowserWindow(config);
 
@@ -40,20 +41,21 @@ app.on('ready', async () => {
 
     mainWindow.setMenu(null);
 
-    const url = isDevelopment ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}?route=${route}` : format({
-      pathname: path.join(__dirname, 'index.html'),
-      query: { route },
-      protocol: 'file',
-      slashes: true,
-    });
-
-    mainWindow.loadURL(url);
+    const hashFragment = `#/${route}`;
+    mainWindow.loadURL(isDevelopment
+      ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}${hashFragment}`
+      : `${format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file',
+        slashes: true,
+      })}${hashFragment}`);
   });
 
   const webPreferences = {
     webSecurity: false,
     nodeIntegration: true,
-    preload: resolve('src/main/preload.js'),
+    // @ts-ignore
+    preload: path.resolve(__static, 'preload.js'),
   };
 
   Promise.all([
@@ -77,7 +79,7 @@ app.on('ready', async () => {
       icon,
       webPreferences,
     }, 'texture-transform-editor'),
-  ]).then(([dieLineWindow, textureWindow]) => {
+  ]).then(([dieLineWindow, textureWindow]:[typeof BrowserWindow, typeof BrowserWindow]) => {
     const forwardingEvents = ['die>set-die-line-cut-holes', 'die>request-shape-update', 'tex>shape-update'];
     forwardingEvents.forEach((event) => {
       const getWindow = (eventName) => {
@@ -86,12 +88,10 @@ app.on('ready', async () => {
         throw new Error('forwardingEvents items must start with \'die\'> or \'tex\'>');
       };
       ipcMain.on(event, (e, ...params) => {
-        // @ts-ignore
         getWindow(event).webContents.send(event, ...params);
       });
     });
     // no initial shape update sent from die line viewer (texture fitting window would not be ready)
-    // @ts-ignore
     dieLineWindow.webContents.send('die>request-shape-update');
   });
 });

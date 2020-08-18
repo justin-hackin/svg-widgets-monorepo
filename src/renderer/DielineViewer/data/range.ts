@@ -11,14 +11,13 @@ const validateRange = (rangeSeries) => {
       console.dir(rangeSeries);
       throw new Error(errorMsg(index, range));
     }
-    // @ts-ignore
+
     if (index && range[0] <= rangeSeries[index - 1][1]) {
       // eslint-disable-next-line no-console
       console.dir(rangeSeries);
       throw new Error(errorMsg(index, range));
     }
 
-    // @ts-ignore
     if (index !== rangeSeries.length - 1 && range[1] >= rangeSeries[index + 1]) {
       // eslint-disable-next-line no-console
       console.dir(rangeSeries);

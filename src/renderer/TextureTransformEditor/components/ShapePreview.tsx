@@ -15,7 +15,6 @@ const IDEAL_RADIUS = 60;
 const loader = new GLTFLoader();
 
 export const ShapePreview = ({
-  // @ts-ignore
   width, height, changeRenderFlag, shapeId, textureCanvas,
 }) => {
   const [renderer, setRenderer] = useState<Renderer>();
@@ -26,7 +25,7 @@ export const ShapePreview = ({
 
   const [offsetY] = useState(85);
 
-  const threeContainerRef = useRef();
+  const threeContainerRef = useRef<HTMLDivElement>();
   const requestRef = React.useRef<number>();
 
 
@@ -46,7 +45,6 @@ export const ShapePreview = ({
         preserveDrawingBuffer: true,
       });
       theRenderer.setPixelRatio(window.devicePixelRatio);
-      // @ts-ignore
       threeContainerRef.current.appendChild(theRenderer.domElement);
       setRenderer(theRenderer);
 

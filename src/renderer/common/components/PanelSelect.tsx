@@ -9,7 +9,6 @@ import { useStyles } from '../../DielineViewer/style';
 export const PanelSelect = ({
   label, options, displayEmpty, setter, value, className,
 }) => {
-  // @ts-ignore
   const classes = useStyles();
   const labelId = `${label}__${uuid()}`;
   const selectProps = {

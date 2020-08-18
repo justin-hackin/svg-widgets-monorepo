@@ -55,7 +55,6 @@ export const TextureSvg = ({
               const start = coords.map((coord) => coord * CENTER_MARKER_RADIUS * CROSSHAIR_START_RATIO);
               const lineProps = (([x1, y1]: PointTuple, [x2, y2]:PointTuple) => ({
                 x1, y1, x2, y2,
-              // @ts-ignore
               }))(start, end);
               return (
                 <line

@@ -8,7 +8,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useStyles } from '../../../style';
 
 export const ControlsAccordion = ({ summary, children }) => {
-  // @ts-ignore
   const classes = useStyles();
   return (
     <Accordion defaultExpanded>

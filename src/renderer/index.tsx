@@ -1,12 +1,9 @@
 import React from 'react';
-// @ts-ignore
 import { render } from 'react-dom';
-import { Router } from 'react-router-static';
 import { hot } from 'react-hot-loader/root';
 import { TextureTransformEditor } from './TextureTransformEditor';
 import { DielineViewer } from './DielineViewer';
 import './common/style/index.css';
-import './globalThis';
 
 const routes = { // A map of "route" => "component"
   default: DielineViewer,
@@ -14,9 +11,8 @@ const routes = { // A map of "route" => "component"
   'die-line-viewer': DielineViewer,
 };
 
-const HotRouter = hot(Router);
-
+const route = window.location.hash.split('#/')[1];
 render(
-  <HotRouter routes={routes} />,
+  React.createElement(routes[route]),
   document.getElementById('app'),
 );

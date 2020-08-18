@@ -8,7 +8,6 @@ import { useStyles } from '../../DielineViewer/style';
 export const PanelSlider = ({
   label, setter, value, valuePath, ...rest
 }) => {
-  // @ts-ignore
   const classes = useStyles();
   const labelId = uuid();
   return (
@@ -16,7 +15,6 @@ export const PanelSlider = ({
       <Typography id={labelId} gutterBottom>
         {label}
       </Typography>
-      {/* @ts-ignore */}
       <Slider
         name={valuePath}
         value={value}

@@ -13,7 +13,6 @@ const { useState } = React;
 export const PanelColorPicker = ({
   label, setter, value, valuePath, ...rest
 }) => {
-  // @ts-ignore
   const classes = useStyles();
   const labelId = uuid();
   const [isPickerShown, setPickerShown] = useState(false);

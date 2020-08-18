@@ -3,7 +3,6 @@ import { set } from 'lodash';
 import { action, observable } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
-// @ts-ignore
 import {
   FaceBoundarySVG, PyramidNet, PyramidNetSpec, StoreSpec, StyleSpec,
 } from '../components/PyramidNet';
@@ -55,8 +54,6 @@ export class PyramidNetMakerStore implements StoreSpec {
 }
 
 export const store = new PyramidNetMakerStore();
-// @ts-ignore
-window.store = store;
 
 globalThis.ipcRenderer.on('die>set-die-line-cut-holes', (e, d, transform) => {
   // @ts-ignore
