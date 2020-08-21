@@ -26,6 +26,29 @@ export const TextureSvg = ({
   const DOT_RADIUS_TO_WHOLE = 0.05;
   return (
     <svg overflow="visible">
+      <defs>
+        <marker
+          style={{ overflow: 'visible' }}
+          id="Arrow1Lend"
+          refX="0"
+          refY="0"
+          orient="auto"
+        >
+          <path
+            transform="translate(-4, 0) scale(-0.3, 0.3)"
+            style={{
+              fill: '#000000',
+              fillOpacity: 1,
+              fillRule: 'evenodd',
+              stroke: '#000000',
+              strokeWidth: '1pt',
+              strokeOpacity: 1,
+            }}
+            d="M 0,0 5,-5 -12.5,0 5,5 Z"
+            id="path838"
+          />
+        </marker>
+      </defs>
       <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
       <g transform={textureTransformMatrixStr}>
         <path
@@ -61,17 +84,18 @@ export const TextureSvg = ({
                   {...lineProps}
                   key={index}
                   stroke="#000"
-                  opacity={OPACITY}
+                  opacity={OPACITY + 0.4}
+                  markerEnd={index === 2 ? 'url(#Arrow1Lend)' : null}
                   strokeWidth={CENTER_MARKER_STROKE}
                 />
               );
             })}
             <circle
-              r={(DOT_RADIUS_TO_WHOLE * CENTER_MARKER_RADIUS)}
+              r={DOT_RADIUS_TO_WHOLE * CENTER_MARKER_RADIUS}
               fill="black"
               cx={0}
               cy={0}
-              opacity={OPACITY}
+              opacity={OPACITY + 0.4}
             />
           </g>
         )}
