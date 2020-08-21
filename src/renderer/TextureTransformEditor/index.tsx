@@ -22,9 +22,8 @@ import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 import { DRAG_MODES, useDragMode } from './dragMode';
 import { extractCutHolesFromSvgString } from '../DielineViewer/util/svg';
 import { TextureSvg } from './components/TextureSvg';
-import { PointTuple } from '../DielineViewer/util/geom';
+import { PointTuple, radToDeg } from '../DielineViewer/util/geom';
 import { PathData } from '../DielineViewer/util/PathData';
-import requireStatic from '../requireStatic';
 
 interface DimensionsObject {
   width: number,
@@ -125,7 +124,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
     .translate(...textureTranslationDragged)
     .translate(...transformOrigin)
     .scale(textureScaleValue, textureScaleValue)
-    .rotate((textureRotationDragged * 360) / (Math.PI * 2))
+    .rotate(radToDeg(textureRotationDragged))
     .translate(...transformOrigin.map(negateMap));
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
@@ -266,7 +265,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const absoluteToRelativeCoords = (absCoords: PointTuple):PointTuple => matrixTupleTransformPoint(
     ((new DOMMatrixReadOnly())
       .scale(textureScaleValue, textureScaleValue)
-      .rotate(textureRotationDragged)
+      .rotate(radToDeg(textureRotationDragged))
       .inverse()),
     absoluteMovementToSvg(absCoords),
   );
@@ -274,7 +273,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const matrixWithTransformCenter = (origin) => (new DOMMatrixReadOnly())
     .translate(...origin)
     .scale(textureScaleValue, textureScaleValue)
-    .rotate(textureRotationDragged)
+    .rotate(radToDeg(textureRotationDragged))
     .translate(...origin.map(negateMap));
 
 
