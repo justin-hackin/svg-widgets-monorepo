@@ -292,10 +292,12 @@ const TextureTransformEditorLOC = ({ classes }) => {
         setTextureTranslationDelta([0, 0]);
       }
     } else if (dragMode === DRAG_MODES.ROTATE) {
-      setTextureRotationDelta(point(...addTuple(
-        absoluteMovementToSvg(xy),
-        relativeToDomCoords(transformOrigin).map(negateMap),
-      )).angle);
+      if (down) {
+        setTextureRotationDelta((movement[1] / placementAreaDimensions.height) * 2 * Math.PI);
+      } else {
+        setTextureRotation(textureRotationDragged);
+        setTextureRotationDelta(0);
+      }
     } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
       if (down) {
         setTextureScaleMux((movement[1] / placementAreaDimensions.height) + 1);
