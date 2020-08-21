@@ -314,9 +314,10 @@ export const ControlPanel = observer(({ store }) => {
           {baseEdgeTabControl}
         </ControlsAccordion>
 
-        <ControlsAccordion summary="Stroke">
-          {strokeControls}
-        </ControlsAccordion>
+        {/* TODO: re-add stroke controls when refined */}
+        {/* <ControlsAccordion summary="Stroke"> */}
+        {/*  {strokeControls} */}
+        {/* </ControlsAccordion> */}
 
         <ControlsAccordion summary="Path Styles">
           {styleControls}
