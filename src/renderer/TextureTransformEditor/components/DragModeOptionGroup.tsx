@@ -8,6 +8,13 @@ import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 import React from 'react';
 import { DRAG_MODES } from '../dragMode';
 
+// TODO: remove hover effects
+const extraButtonProps = {
+  disableFocusRipple: true,
+  disableRipple: true,
+  style: { cursor: 'default' },
+};
+
 export const DragModeOptionsGroup = ({ dragMode }) => (
   <ToggleButtonGroup
     value={dragMode}
@@ -16,16 +23,36 @@ export const DragModeOptionsGroup = ({ dragMode }) => (
     aria-label="drag mode"
   >
     {/* translate is too technical for end user */}
-    <ToggleButton disabled value={DRAG_MODES.TRANSLATE} aria-label={DRAG_MODES.TRANSLATE}>
+    <ToggleButton
+      title="drag"
+      value={DRAG_MODES.TRANSLATE}
+      aria-label={DRAG_MODES.TRANSLATE}
+      {...extraButtonProps}
+    >
       <OpenWithIcon />
     </ToggleButton>
-    <ToggleButton disabled value={DRAG_MODES.ROTATE} aria-label={DRAG_MODES.ROTATE}>
+    <ToggleButton
+      title="shift + drag/wheel"
+      value={DRAG_MODES.ROTATE}
+      aria-label={DRAG_MODES.ROTATE}
+      {...extraButtonProps}
+    >
       <CachedIcon />
     </ToggleButton>
-    <ToggleButton disabled value={DRAG_MODES.SCALE_TEXTURE} aria-label={DRAG_MODES.SCALE_TEXTURE}>
+    <ToggleButton
+      title="ctrl + drag/wheel"
+      value={DRAG_MODES.SCALE_TEXTURE}
+      aria-label={DRAG_MODES.SCALE_TEXTURE}
+      {...extraButtonProps}
+    >
       <ZoomOutMapIcon />
     </ToggleButton>
-    <ToggleButton disabled value={DRAG_MODES.SCALE_VIEW} aria-label={DRAG_MODES.SCALE_VIEW}>
+    <ToggleButton
+      title="alt + drag/wheel"
+      value={DRAG_MODES.SCALE_VIEW}
+      aria-label={DRAG_MODES.SCALE_VIEW}
+      {...extraButtonProps}
+    >
       <AspectRatioIcon />
     </ToggleButton>
   </ToggleButtonGroup>
