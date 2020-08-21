@@ -1,0 +1,12 @@
+---
+appId: com.playful.geometer.spacecraft-net-factory
+linux:
+  icon: icons/256x256.png
+  target:
+    - deb
+snap:
+  stagePackages:
+    - default
+files:
+  - dist/**/*
+  - build/icons/*

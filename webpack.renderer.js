@@ -1,8 +1,10 @@
+/* eslint-env node */
+
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { merge } = require('webpack-merge');
 
 module.exports = function (config) {
-  config = merge(config, {
+  return merge(config, {
     module: {
       rules: [
         {
@@ -13,6 +15,4 @@ module.exports = function (config) {
       ],
     },
   });
-
-  return config;
 };

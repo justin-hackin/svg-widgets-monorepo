@@ -1,6 +1,3 @@
-// Basic init from https://github.com/aimerib/electron-react-parcel/
-// eslint-disable-next-line import/no-extraneous-dependencies
-
 const {
   app, BrowserWindow, BrowserWindowConstructorOptions, nativeImage, ipcMain, screen: electronScreen,
 } = require('electron');
@@ -19,7 +16,8 @@ const { setupIpc } = require('./ipc');
 debug({ showDevTools: false, isEnabled: true });
 
 // TODO: doesn't seem to work
-const icon = nativeImage.createFromPath(`${__dirname}/build-resources/icons/png/256x256.png`);
+// @ts-ignore
+const icon = nativeImage.createFromPath(`${path.resolve(__static, '..')}/build/icons/png/256x256.png`);
 
 app.on('ready', async () => {
   // TODO: monitor status of bug breaking extension installs

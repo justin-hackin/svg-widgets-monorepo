@@ -24,6 +24,7 @@ import { extractCutHolesFromSvgString } from '../DielineViewer/util/svg';
 import { TextureSvg } from './components/TextureSvg';
 import { PointTuple } from '../DielineViewer/util/geom';
 import { PathData } from '../DielineViewer/util/PathData';
+import requireStatic from '../requireStatic';
 
 interface DimensionsObject {
   width: number,
@@ -365,7 +366,8 @@ const TextureTransformEditorLOC = ({ classes }) => {
   useEffect(() => {
     // eslint-disable-next-line eqeqeq
     if (textureRef.current && fileIndex !== null && fileList) {
-      setTextureUrl(`static/images/textures/${fileList[fileIndex]}`);
+      // @ts-ignore
+      setTextureUrl(`${__static}/images/textures/${fileList[fileIndex]}`);
     }
   }, [textureRef.current, fileIndex, fileList]);
 

@@ -2,6 +2,7 @@
   "name": "spacecraft-net-factory",
   "version": "1.0.0",
   "description": "A toolkit for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra, something playfully referred to as SpaceCrafts",
+  "homepage": "http://example.com",
   "main": "dist/main/main.js",
   "scripts": {
     "dev": "electron-webpack dev",
@@ -9,35 +10,6 @@
     "electron": "node node_modules/electron/cli.js .",
     "dist": "npm run compile && electron-builder",
     "lint": "eslint src/**/*.ts{,x}"
-  },
-  "build": {
-    "appId": "com.playful.geometer.spacecraft-net-factory",
-    "dmg": {
-      "contents": [
-        {
-          "x": 110,
-          "y": 150
-        },
-        {
-          "x": 240,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "linux": {
-      "target": [
-        "snap"
-      ]
-    },
-    "win": {
-      "target": "msi",
-      "icon": "build/logo.ico"
-    },
-    "files": [
-      "dist/**/*"
-    ]
   },
   "keywords": [
     "react"
@@ -86,6 +58,7 @@
     "@typescript-eslint/parser": "^2.34.0",
     "babel-eslint": "^10.1.0",
     "babel-preset-env": "^1.7.0",
+    "copy-webpack-plugin": "^6.0.3",
     "cpx2": "^2.0.0",
     "electron": "^9.1.1",
     "electron-builder": "^22.8.0",

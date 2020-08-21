@@ -61,7 +61,8 @@ export const setupIpc = (ipcMain) => {
       fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, jsonContent)]);
   }));
 
-  ipcMain.handle('list-texture-files', () => fsPromises.readdir('static/images/textures')
+  // @ts-ignore
+  ipcMain.handle('list-texture-files', () => fsPromises.readdir(path.resolve(__static, 'images/textures'))
     .then((filesList) => filesList.filter((fileName) => path.extname(fileName) === '.svg')));
 
   ipcMain.handle('load-net-spec', () => resolveStringDataFromDialog(
