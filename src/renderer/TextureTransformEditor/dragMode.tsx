@@ -8,9 +8,15 @@ export const DRAG_MODES = {
 };
 
 export function useDragMode() {
-  const [pressed, setPressed] = useState({ Shift: false, Alt: false, Control: false });
+  const INITIAL_PRESSED_STATE = { Shift: false, Alt: false, Control: false };
+  const [pressed, setPressed] = useState(INITIAL_PRESSED_STATE);
 
   useEffect(() => {
+    const resetDragMode = () => {
+      setPressed(INITIAL_PRESSED_STATE);
+    };
+    globalThis.ipcRenderer.on('reset-drag-mode', resetDragMode);
+
     const createHandler = (keyName: string, value: boolean): EventHandler<any> => (e:KeyboardEvent) => {
       if (e.key === keyName) {
         setPressed((oldPressed) => ({
@@ -38,6 +44,7 @@ export function useDragMode() {
         window.removeEventListener('keydown', keydown);
         window.removeEventListener('keyup', keyup);
       });
+      globalThis.ipcRenderer.removeEventListener('reset-drag-mode', resetDragMode);
     };
   }, []);
 

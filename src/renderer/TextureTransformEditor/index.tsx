@@ -156,7 +156,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
       setTimeout(() => { setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) }); });
     });
 
-
     const resizeHandler = () => {
       const { outerWidth: width, outerHeight: height } = window;
       setPlacementAreaDimensions({ width: width / 2, height });

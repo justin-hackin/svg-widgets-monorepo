@@ -91,6 +91,12 @@ app.on('ready', async () => {
     });
     // no initial shape update sent from die line viewer (texture fitting window would not be ready)
     dieLineWindow.webContents.send('die>request-shape-update');
+    const sendResetDragMode = () => {
+      textureWindow.webContents.send('reset-drag-mode');
+    };
+    textureWindow.on('blur', sendResetDragMode);
+    textureWindow.on('minimize', sendResetDragMode);
+    textureWindow.on('hide', sendResetDragMode);
   });
 });
 
