@@ -98,10 +98,8 @@ export const ShapePreview = ({
       },
       null,
       // called when loading has errors
-      (error) => {
+      () => {
         // TODO: handle error
-        // eslint-disable-next-line no-console
-        console.log(error);
       },
     );
   }, [shapeId, camera, scene]);

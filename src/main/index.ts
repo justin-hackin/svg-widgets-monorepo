@@ -29,7 +29,6 @@ app.on('ready', async () => {
   const promisifyWindow = (
     config: typeof BrowserWindowConstructorOptions, route: string,
   ): Promise<typeof BrowserWindow> => new Promise((resolveFn) => {
-    console.log('Loading: ', route);
     const mainWindow = new BrowserWindow(config);
 
     mainWindow.once('ready-to-show', () => {

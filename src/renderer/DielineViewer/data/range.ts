@@ -7,20 +7,14 @@ const validateRange = (rangeSeries) => {
   for (let index = 0; index < rangeSeries.length; index += 1) {
     const range = rangeSeries[index];
     if (range[0] >= range[1]) {
-      // eslint-disable-next-line no-console
-      console.dir(rangeSeries);
       throw new Error(errorMsg(index, range));
     }
 
     if (index && range[0] <= rangeSeries[index - 1][1]) {
-      // eslint-disable-next-line no-console
-      console.dir(rangeSeries);
       throw new Error(errorMsg(index, range));
     }
 
     if (index !== rangeSeries.length - 1 && range[1] >= rangeSeries[index + 1]) {
-      // eslint-disable-next-line no-console
-      console.dir(rangeSeries);
       throw new Error(errorMsg(index, range));
     }
   }
