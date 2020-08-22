@@ -2,6 +2,8 @@ import {
   intersectLineLine, parallelLinePointsAtDistance, symmetricHingePlot, hingedPlotByProjectionDistance,
 } from '../geom';
 import { connectedLineSegments, roundedEdgePath } from './generic';
+import { PathData } from '../PathData';
+import { strokeDashPath } from './strokeDashPath';
 
 const ARBITRARY_LENGTH = 10;
 export const symmetricRoundedTab = (
@@ -44,7 +46,7 @@ export const symmetricRoundedTab = (
 };
 
 export const arrowTab = (
-  tabBaseStart, tabBaseEnd, midpointDepthToTabDepth, tabDepthToBaseLength, tabWideningAngle,
+  tabBaseStart, tabBaseEnd, midpointDepthToTabDepth, tabDepthToBaseLength, tabWideningAngle, scoreDashSpec,
 ) => {
   const vector = tabBaseEnd.subtract(tabBaseStart);
   const tabDepth = tabDepthToBaseLength * vector.length;
@@ -59,10 +61,15 @@ export const arrowTab = (
       tabBaseStart, tabBaseEnd, tabWideningAngle, midpointDepth,
     ),
   ];
+
+  const scorePath = new PathData();
+  scorePath.concatPath(strokeDashPath(tabBaseStart, tabBaseEnd, scoreDashSpec));
+  scorePath.concatPath(strokeDashPath(tabMidpoints[0], tabMidpoints[1], scoreDashSpec));
+
   return {
-    points: { center: tabMidpoints, apex: tabApexes },
-    path: connectedLineSegments(
+    cutPath: connectedLineSegments(
       [tabBaseStart, tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], tabBaseEnd],
     ),
+    scorePath,
   };
 };

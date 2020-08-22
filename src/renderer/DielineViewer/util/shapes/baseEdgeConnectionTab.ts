@@ -67,8 +67,9 @@ export function baseEdgeConnectionTab(
   const finDepth = finDepthToTabDepth * tabDepth;
   const finTraversal = distanceBetweenPoints(finBases[0], finBases[1]);
   // for plotting points only, need rounding clamp based on all roundings
-  const { points: { center: finCenters }, path: finPath } = arrowTab(
-    finBases[0], finBases[1], 0.5, finDepth / finTraversal, holeTheta,
+  const { cutPath: finCutPath, scorePath: finScorePath } = arrowTab(
+    finBases[0], finBases[1], 0.5,
+    finDepth / finTraversal, holeTheta, scoreDashSpec,
   );
 
 
@@ -88,15 +89,13 @@ export function baseEdgeConnectionTab(
   cutPath.concatPath(roundedHole);
   cutPath.close();
   cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], finBases[0]], roundingDistance));
-  cutPath.line(finBases[0]).concatPath(finPath.sliceCommandsDangerously(1));
+  cutPath.line(finBases[0]).concatPath(finCutPath.sliceCommandsDangerously(1));
   cutPath.line(finBases[1]);
   cutPath.line(end);
   const scorePath = new PathData();
   scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
   scorePath.concatPath(strokeDashPath(holeBases[1], finBases[1], scoreDashSpec));
-
-  // horizontal fin scores
-  scorePath.concatPath(strokeDashPath(finCenters[0], finCenters[1], scoreDashSpec));
+  scorePath.concatPath(finScorePath);
 
   return { cut: cutPath, score: scorePath };
 }
