@@ -1,7 +1,7 @@
 import Canvg, { presets } from 'canvg';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { useDrag, useWheel } from 'react-use-gesture';
+import { useDrag, useGesture } from 'react-use-gesture';
 import { inRange } from 'lodash';
 
 import { ThemeProvider } from '@material-ui/styles';
@@ -281,7 +281,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
     return svgToAbsoluteMovement(matrixTupleTransformPoint(matrix, relCoords));
   };
 
-  const textureTranslationUseDrag = useDrag(({ movement, xy, down }) => {
+  const textureTranslationUseDrag = useDrag(({ movement, down }) => {
     // accommodates the scale of svg so that the texture stays under the mouse
     if (dragMode === DRAG_MODES.TRANSLATE) {
       if (down) {
@@ -328,20 +328,21 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   const MIN_VIEW_SCALE = 0.3;
   const MAX_VIEW_SCALE = 3;
-  const viewUseWheel = useWheel(({ movement: [, y] }) => {
-    const percentHeightDelta = (y / placementAreaDimensions.height);
-    const newScaleViewMux = (percentHeightDelta + 1) * faceScaleMux;
-    if (
-      dragMode === DRAG_MODES.SCALE_VIEW
-      && inRange(newScaleViewMux * faceScale, MIN_VIEW_SCALE, MAX_VIEW_SCALE)
-    ) {
-      setFaceScaleMux(newScaleViewMux);
-    } else if (dragMode === DRAG_MODES.ROTATE) {
-      setTextureRotationDelta(textureRotationDelta + percentHeightDelta);
-    } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
-      setTextureScaleMux((percentHeightDelta + 1) * textureScaleMux);
-    }
-  }, {
+  const viewUseWheel = useGesture({
+    onWheel: ({ movement: [, y] }) => {
+      const percentHeightDelta = (y / placementAreaDimensions.height);
+      const newScaleViewMux = (percentHeightDelta + 1) * faceScaleMux;
+      if (
+        dragMode === DRAG_MODES.SCALE_VIEW
+        && inRange(newScaleViewMux * faceScale, MIN_VIEW_SCALE, MAX_VIEW_SCALE)
+      ) {
+        setFaceScaleMux(newScaleViewMux);
+      } else if (dragMode === DRAG_MODES.ROTATE) {
+        setTextureRotationDelta(textureRotationDelta + percentHeightDelta);
+      } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
+        setTextureScaleMux((percentHeightDelta + 1) * textureScaleMux);
+      }
+    },
     onWheelEnd: () => {
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
         setFaceScale(faceScaleDragged);
