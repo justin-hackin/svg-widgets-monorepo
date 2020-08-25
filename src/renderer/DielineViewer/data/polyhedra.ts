@@ -121,12 +121,13 @@ export const polyhedra:PolyhedraDefs = {
     faceCount: 5,
     copiesNeeded: 12,
   },
-  'disdyakis-triacontahedron': { // TODO: more accurate lengths
-    relativeFaceEdgeLengths: [1.83, 3.39, 2.88],
-    diameter: 28.8374,
-    faceCount: 4,
-    copiesNeeded: 30,
-  },
+  // too tight
+  // 'disdyakis-triacontahedron': { // TODO: more accurate lengths
+  //   relativeFaceEdgeLengths: [1.83, 3.39, 2.88],
+  //   diameter: 28.8374,
+  //   faceCount: 4,
+  //   copiesNeeded: 30,
+  // },
   '5-octahedra-compound': { // TODO: more accurate lengths
     relativeFaceEdgeLengths: [1.95, 2.42, 2.7],
     diameter: 10,
