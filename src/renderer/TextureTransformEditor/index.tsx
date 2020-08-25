@@ -2,33 +2,25 @@ import Canvg, { presets } from 'canvg';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { useDrag, useGesture } from 'react-use-gesture';
-import { inRange, range } from 'lodash';
+import { inRange } from 'lodash';
 
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
-import {
-  Box, Checkbox, FormControlLabel, IconButton, Paper,
-} from '@material-ui/core';
-import TelegramIcon from '@material-ui/icons/Telegram';
+import { Box, Paper } from '@material-ui/core';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
-import TrackChangesIcon from '@material-ui/icons/TrackChanges';
-import Button from '@material-ui/core/Button';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 
 
 // @ts-ignore
 import { point, Polygon } from '@flatten-js/core';
-import { PanelSelect } from '../common/components/PanelSelect';
 import darkTheme from '../DielineViewer/data/material-ui-dark-theme.json';
 import { closedPolygonPath } from '../DielineViewer/util/shapes/generic';
 import { ShapePreview } from './components/ShapePreview';
-import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 import { DRAG_MODES, useDragMode } from './dragMode';
 import { extractCutHolesFromSvgString } from '../DielineViewer/util/svg';
 import { TextureSvg } from './components/TextureSvg';
 import { PointTuple, radToDeg } from '../DielineViewer/util/geom';
 import { PathData } from '../DielineViewer/util/PathData';
+import { TextureControls } from './components/TextureControls';
 
 interface DimensionsObject {
   width: number,
@@ -126,20 +118,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const [shapeId, setShapeId] = useState();
   const [changeRenderFlag, setChangeRenderFlag] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-
-  const [cornerSnapMenuAnchorEl, setCornerSnapMenuAnchorEl] = React.useState(null);
-
-  const handleCornerSnapMenuClick = (event) => {
-    setCornerSnapMenuAnchorEl(event.currentTarget);
-  };
-
-
-  const handleCornerSnapMenuClose = (index) => {
-    if (index !== undefined) {
-      repositionOverCorner(index);
-    }
-    setCornerSnapMenuAnchorEl(null);
-  };
 
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
@@ -433,7 +411,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
-  const options = fileList.map((item, index) => ({ label: item, value: `${index}` }));
+  const textureOptions = fileList.map((item, index) => ({ label: item, value: `${index}` }));
   const faceScalePercentStr = `${faceScaleDragged * 100}%`;
   const faceScaleCenterPercentStr = `${((1 - faceScaleDragged) * 100) / 2}%`;
   const sendTexture = async () => {
@@ -499,59 +477,18 @@ const TextureTransformEditorLOC = ({ classes }) => {
           </svg>
         </Paper>
 
-        <div className={classes.select}>
-          <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleCornerSnapMenuClick}>
-            <TrackChangesIcon />
-            {' '}
-            Snap Origin
-          </Button>
-          <Menu
-            id="simple-menu"
-            anchorEl={cornerSnapMenuAnchorEl}
-            keepMounted
-            variant="menu"
-            open={Boolean(cornerSnapMenuAnchorEl)}
-            onClose={handleCornerSnapMenuClose}
-          >
-            { range(3).map((index) => (
-              <MenuItem
-                key={index}
-                onClick={() => {
-                  handleCornerSnapMenuClose(index);
-                }}
-              >
-                Corner
-                {index + 1}
-              </MenuItem>
-            ))}
-          </Menu>
-
-          <FormControlLabel
-            className={classes.checkboxControlLabel}
-            control={(
-              <Checkbox
-                checked={isPositive}
-                onChange={(e) => {
-                  setIsPositive(e.target.checked);
-                }}
-                color="primary"
-              />
-            )}
-            label="Fill is positive"
-          />
-          <PanelSelect
-            label="Tile"
-            className="select-texture"
-            value={fileIndex}
-            displayEmpty
-            setter={setFileIndex}
-            options={options}
-          />
-          <DragModeOptionsGroup dragMode={dragMode} />
-          <IconButton onClick={sendTexture} color="primary" aria-label="send texture" component="span">
-            <TelegramIcon fontSize="large" />
-          </IconButton>
-        </div>
+        <TextureControls {...{
+          classes,
+          textureOptions,
+          sendTexture,
+          repositionOverCorner,
+          isPositive,
+          setIsPositive,
+          fileIndex,
+          setFileIndex,
+          dragMode,
+        }}
+        />
       </Box>
     </ThemeProvider>
   );
