@@ -83,7 +83,7 @@ export function baseEdgeConnectionTab(
   // TODO: only taper as much as needed for clearance
   const handleEdges = [
     hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
-    hingedPlotByProjectionDistance(start, finBases[0], Math.PI * (1 - 1 / 10), tabDepth),
+    hingedPlotByProjectionDistance(start, finBases[0], Math.PI * 0.6, tabDepth),
   ];
 
   cutPath.concatPath(roundedHole);
