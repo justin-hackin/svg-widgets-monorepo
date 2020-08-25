@@ -2,7 +2,7 @@ import Canvg, { presets } from 'canvg';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { useDrag, useGesture } from 'react-use-gesture';
-import { inRange } from 'lodash';
+import { inRange, range } from 'lodash';
 
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
@@ -11,6 +11,11 @@ import {
 } from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
+import TrackChangesIcon from '@material-ui/icons/TrackChanges';
+import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+
 
 // @ts-ignore
 import { point, Polygon } from '@flatten-js/core';
@@ -56,9 +61,17 @@ const getFitScale = (bounds: DimensionsObject, image: DimensionsObject) => {
     scale: widthIsClamp ? bounds.width / image.width : bounds.height / image.height,
   };
 };
+
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
+const matrixTupleTransformPoint = (matrix: DOMMatrixReadOnly, tuple: PointTuple): PointTuple => {
+  const domPoint = matrix.transformPoint(new DOMPoint(...tuple));
+  return [domPoint.x, domPoint.y];
+};
+
 const addTuple = ([ax, ay]: PointTuple, [bx, by]:PointTuple):PointTuple => [ax + bx, ay + by];
+
+const negateMap = (num) => num * -1;
 
 
 const TextureTransformEditorLOC = ({ classes }) => {
@@ -113,19 +126,60 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const [changeRenderFlag, setChangeRenderFlag] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
+  const [cornerSnapMenuAnchorEl, setCornerSnapMenuAnchorEl] = React.useState(null);
+
+  const handleCornerSnapMenuClick = (event) => {
+    setCornerSnapMenuAnchorEl(event.currentTarget);
+  };
+
+  const repositionOverCorner = (cornerIndex) => {};
+
+  const handleCornerSnapMenuClose = (index) => {
+    if (index !== undefined) {
+      repositionOverCorner(index);
+    }
+    setCornerSnapMenuAnchorEl(null);
+  };
+
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
   const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
   const textureScaleValue = (textureScaleDragged * imageFittingScale) / faceFittingScale;
 
 
-  const negateMap = (num) => num * -1;
-  const m = (new DOMMatrixReadOnly())
-    .translate(...textureTranslationDragged)
-    .translate(...transformOrigin)
+  const absoluteMovementToSvg = (absCoords) => absCoords.map(
+    (coord) => coord / (faceFittingScale * faceScaleDragged),
+  );
+
+  const svgToAbsoluteMovement = (absCoords) => absCoords.map(
+    (coord) => coord * faceFittingScale * faceScaleDragged,
+  );
+
+
+  // eslint-disable-next-line max-len
+  const absoluteToRelativeCoords = (absCoords: PointTuple):PointTuple => matrixTupleTransformPoint(
+    ((new DOMMatrixReadOnly())
+      .scale(textureScaleValue, textureScaleValue)
+      .rotate(radToDeg(textureRotationDragged))
+      .inverse()),
+    absoluteMovementToSvg(absCoords),
+  );
+
+  const matrixWithTransformCenter = (origin) => (new DOMMatrixReadOnly())
+    .translate(...origin)
     .scale(textureScaleValue, textureScaleValue)
     .rotate(radToDeg(textureRotationDragged))
-    .translate(...transformOrigin.map(negateMap));
+    .translate(...origin.map(negateMap));
+
+
+  const relativeToAbsCoords = (relCoords) => matrixTupleTransformPoint(
+    matrixWithTransformCenter(transformOrigin).inverse(), relCoords,
+  );
+
+  const m = (new DOMMatrixReadOnly())
+    .translate(...textureTranslationDragged)
+    .multiply(matrixWithTransformCenter(transformOrigin));
+
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
   const setTextureDFromFile = (url) => {
@@ -245,41 +299,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
     };
   }, [textureSvgRef]);
 
-
-  const matrixTupleTransformPoint = (matrix: DOMMatrixReadOnly, tuple: PointTuple): PointTuple => {
-    const domPoint = matrix.transformPoint(new DOMPoint(...tuple));
-    return [domPoint.x, domPoint.y];
-  };
-
-  const absoluteMovementToSvg = (absCoords) => absCoords.map(
-    (coord) => coord / (faceFittingScale * faceScaleDragged),
-  );
-
-  const svgToAbsoluteMovement = (absCoords) => absCoords.map(
-    (coord) => coord * faceFittingScale * faceScaleDragged,
-  );
-
-
-  // eslint-disable-next-line max-len
-  const absoluteToRelativeCoords = (absCoords: PointTuple):PointTuple => matrixTupleTransformPoint(
-    ((new DOMMatrixReadOnly())
-      .scale(textureScaleValue, textureScaleValue)
-      .rotate(radToDeg(textureRotationDragged))
-      .inverse()),
-    absoluteMovementToSvg(absCoords),
-  );
-
-  const matrixWithTransformCenter = (origin) => (new DOMMatrixReadOnly())
-    .translate(...origin)
-    .scale(textureScaleValue, textureScaleValue)
-    .rotate(radToDeg(textureRotationDragged))
-    .translate(...origin.map(negateMap));
-
-
-  const relativeToDomCoords = (relCoords) => {
-    const matrix = matrixWithTransformCenter(transformOrigin).inverse();
-    return svgToAbsoluteMovement(matrixTupleTransformPoint(matrix, relCoords));
-  };
 
   const textureTranslationUseDrag = useDrag(({ movement, down }) => {
     // accommodates the scale of svg so that the texture stays under the mouse
@@ -470,6 +489,32 @@ const TextureTransformEditorLOC = ({ classes }) => {
         </Paper>
 
         <div className={classes.select}>
+          <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleCornerSnapMenuClick}>
+            <TrackChangesIcon />
+            {' '}
+            Snap Origin
+          </Button>
+          <Menu
+            id="simple-menu"
+            anchorEl={cornerSnapMenuAnchorEl}
+            keepMounted
+            variant="menu"
+            open={Boolean(cornerSnapMenuAnchorEl)}
+            onClose={handleCornerSnapMenuClose}
+          >
+            { range(3).map((index) => (
+              <MenuItem
+                key={index}
+                onClick={() => {
+                  handleCornerSnapMenuClose(index);
+                }}
+              >
+                Corner
+                {index + 1}
+              </MenuItem>
+            ))}
+          </Menu>
+
           <FormControlLabel
             className={classes.checkboxControlLabel}
             control={(
