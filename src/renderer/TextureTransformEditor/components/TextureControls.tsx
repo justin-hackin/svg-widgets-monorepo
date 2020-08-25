@@ -31,10 +31,13 @@ export const TextureControls = ({
 
   return (
     <div className={classes.select}>
-      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleCornerSnapMenuClick}>
-        <TrackChangesIcon />
-        {' '}
-        Snap Origin
+      <Button
+        startIcon={<TrackChangesIcon />}
+        aria-controls="simple-menu"
+        aria-haspopup="true"
+        onClick={handleCornerSnapMenuClick}
+      >
+        Snap
       </Button>
       <Menu
         id="simple-menu"
@@ -52,6 +55,7 @@ export const TextureControls = ({
             }}
           >
             Corner
+            {' '}
             {index + 1}
           </MenuItem>
         ))}
