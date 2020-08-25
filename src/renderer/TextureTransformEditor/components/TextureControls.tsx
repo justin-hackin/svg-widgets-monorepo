@@ -4,7 +4,7 @@ import TelegramIcon from '@material-ui/icons/Telegram';
 import { range } from 'lodash';
 
 import {
-  Button, Checkbox, FormControlLabel, IconButton, Menu, MenuItem,
+  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem,
 } from '@material-ui/core';
 
 import { PanelSelect } from '../../common/components/PanelSelect';
@@ -64,7 +64,7 @@ export const TextureControls = ({
       <FormControlLabel
         className={classes.checkboxControlLabel}
         control={(
-          <Checkbox
+          <Switch
             checked={isPositive}
             onChange={(e) => {
               setIsPositive(e.target.checked);
