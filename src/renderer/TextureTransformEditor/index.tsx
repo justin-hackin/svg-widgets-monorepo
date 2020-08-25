@@ -41,8 +41,9 @@ interface ViewBoxAttrs extends DimensionsObject {
 }
 
 interface Boundary {
-  viewBoxAttrs?: ViewBoxAttrs,
-  path?: PathData
+  viewBoxAttrs: ViewBoxAttrs,
+  path: PathData,
+  vertices: PointTuple[]
 }
 
 const {
@@ -119,7 +120,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   const [boundary, setBoundary] = useState<Boundary>();
 
-  const { viewBoxAttrs, path } = boundary || {};
+  const { viewBoxAttrs, path, vertices } = boundary || {};
   const boundaryPathD = path ? path.getD() : null;
 
   const [shapeId, setShapeId] = useState();
@@ -132,7 +133,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
     setCornerSnapMenuAnchorEl(event.currentTarget);
   };
 
-  const repositionOverCorner = (cornerIndex) => {};
 
   const handleCornerSnapMenuClose = (index) => {
     if (index !== undefined) {
@@ -182,6 +182,15 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
+
+  const repositionOverCorner = (vertexIndex) => {
+    const originAbsolute = matrixTupleTransformPoint(
+      m, transformOrigin,
+    );
+    const delta = addTuple(originAbsolute, vertices[vertexIndex].map(negateMap)).map(negateMap);
+    setTextureTranslation(addTuple(delta, textureTranslation));
+  };
+
   const setTextureDFromFile = (url) => {
     globalThis.ipcRenderer.invoke('get-svg-string-by-path', url)
       .then((svgString) => {
@@ -207,7 +216,9 @@ const TextureTransformEditorLOC = ({ classes }) => {
         xmin, ymin, width, height,
       };
       textureCanvas.current = new window.OffscreenCanvas(width, height);
-      setTimeout(() => { setBoundary({ viewBoxAttrs, path: closedPolygonPath(points) }); });
+      setTimeout(() => {
+        setBoundary({ viewBoxAttrs, path: closedPolygonPath(points), vertices: faceVertices });
+      });
     });
 
     const resizeHandler = () => {
