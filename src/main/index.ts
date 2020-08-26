@@ -17,7 +17,7 @@ debug({ showDevTools: false, isEnabled: true });
 
 // TODO: doesn't seem to work
 // @ts-ignore
-const icon = nativeImage.createFromPath(`${path.resolve(__static, '..')}/build/icons/png/256x256.png`);
+const icon = nativeImage.createFromPath(`${path.resolve(__static, '..')}/build/icons/256x256.png`);
 
 app.on('ready', async () => {
   // TODO: monitor status of bug breaking extension installs
