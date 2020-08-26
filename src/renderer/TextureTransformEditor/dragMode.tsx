@@ -44,7 +44,7 @@ export function useDragMode() {
         window.removeEventListener('keydown', keydown);
         window.removeEventListener('keyup', keyup);
       });
-      globalThis.ipcRenderer.removeEventListener('reset-drag-mode', resetDragMode);
+      globalThis.ipcRenderer.removeListener('reset-drag-mode', resetDragMode);
     };
   }, []);
 

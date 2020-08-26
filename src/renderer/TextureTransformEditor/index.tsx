@@ -18,7 +18,7 @@ import { ShapePreview } from './components/ShapePreview';
 import { DRAG_MODES, useDragMode } from './dragMode';
 import { extractCutHolesFromSvgString } from '../DielineViewer/util/svg';
 import { TextureSvg } from './components/TextureSvg';
-import { PointTuple, radToDeg } from '../DielineViewer/util/geom';
+import { PointTuple } from '../DielineViewer/util/geom';
 import { PathData } from '../DielineViewer/util/PathData';
 import { TextureControls } from './components/TextureControls';
 
@@ -92,9 +92,17 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const [textureScaleMux, setTextureScaleMux] = useState<number>(1);
   const textureScaleDragged = textureScale * textureScaleMux;
 
-  const [textureRotation, setTextureRotation] = useState<number>(0);
-  const [textureRotationDelta, setTextureRotationDelta] = useState<number>(0);
+  // since both controls and matrix function require degrees, use degrees as unit instead of radians
+  const [textureRotation, setTextureRotationRaw] = useState<number>(0);
+  const negativeMod = (n, m) => ((n % m) + m) % m;
+  const wrapDegrees = (deg) => negativeMod(deg, 360);
+  const setTextureRotation = (val) => {
+    setTextureRotationRaw(wrapDegrees(val));
+  };
+
+  const [textureRotationDelta, setTextureRotationDeltaRaw] = useState<number>(0);
   const textureRotationDragged = textureRotation + textureRotationDelta;
+  const setTextureRotationDelta = (val) => { setTextureRotationDeltaRaw(wrapDegrees(val)); };
 
   const [textureTranslation, setTextureTranslation] = useState<PointTuple>([0, 0]);
   const [textureTranslationDelta, setTextureTranslationDelta] = useState<PointTuple>([0, 0]);
@@ -138,7 +146,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const absoluteToRelativeCoords = (absCoords: PointTuple):PointTuple => matrixTupleTransformPoint(
     ((new DOMMatrixReadOnly())
       .scale(textureScaleValue, textureScaleValue)
-      .rotate(radToDeg(textureRotationDragged))
+      .rotate(textureRotationDragged)
       .inverse()),
     absoluteMovementToSvg(absCoords),
   );
@@ -146,7 +154,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const matrixWithTransformCenter = (origin) => (new DOMMatrixReadOnly())
     .translate(...origin)
     .scale(textureScaleValue, textureScaleValue)
-    .rotate(radToDeg(textureRotationDragged))
+    .rotate(textureRotationDragged)
     .translate(...origin.map(negateMap));
 
 
@@ -300,7 +308,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
       }
     } else if (dragMode === DRAG_MODES.ROTATE) {
       if (down) {
-        setTextureRotationDelta((movement[1] / placementAreaDimensions.height) * 2 * Math.PI);
+        setTextureRotationDelta((movement[1] / placementAreaDimensions.height) * 360);
       } else {
         setTextureRotation(textureRotationDragged);
         setTextureRotationDelta(0);
@@ -346,7 +354,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
       ) {
         setFaceScaleMux(newScaleViewMux);
       } else if (dragMode === DRAG_MODES.ROTATE) {
-        setTextureRotationDelta(textureRotationDelta + percentHeightDelta);
+        setTextureRotationDelta(textureRotationDelta + percentHeightDelta * 90);
       } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
         setTextureScaleMux((percentHeightDelta + 1) * textureScaleMux);
       }
@@ -480,6 +488,8 @@ const TextureTransformEditorLOC = ({ classes }) => {
         <TextureControls {...{
           classes,
           textureOptions,
+          textureRotation,
+          setTextureRotation,
           sendTexture,
           repositionOverCorner,
           isPositive,
@@ -506,6 +516,9 @@ export const TextureTransformEditor = withStyles({
   },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
+  },
+  rotationInput: {
+    width: '6.5em',
   },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

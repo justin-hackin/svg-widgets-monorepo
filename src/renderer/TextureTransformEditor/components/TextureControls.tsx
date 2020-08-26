@@ -1,18 +1,39 @@
 import React from 'react';
-import TrackChangesIcon from '@material-ui/icons/TrackChanges';
-import TelegramIcon from '@material-ui/icons/Telegram';
-import { range } from 'lodash';
-
 import {
+  TextField, InputAdornment,
   Button, Switch, FormControlLabel, IconButton, Menu, MenuItem,
 } from '@material-ui/core';
+import TrackChangesIcon from '@material-ui/icons/TrackChanges';
+import CachedIcon from '@material-ui/icons/Cached';
+import TelegramIcon from '@material-ui/icons/Telegram';
+import { range, isNumber, isNaN } from 'lodash';
+import NumberFormat from 'react-number-format';
 
 import { PanelSelect } from '../../common/components/PanelSelect';
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
 
+const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
+  <NumberFormat
+    {...other}
+    getInputRef={inputRef}
+    onValueChange={(values) => {
+
+      onChange({
+        target: {
+          name: other.name,
+          floatValue: values.floatValue,
+          value: values.value,
+        },
+      });
+    }}
+    decimalScale={1}
+    suffix="°"
+  />
+);
+
 
 export const TextureControls = ({
-  classes, textureOptions,
+  classes, textureOptions, textureRotation, setTextureRotation,
   sendTexture, repositionOverCorner,
   isPositive, setIsPositive, fileIndex, setFileIndex, dragMode,
 }) => {
@@ -31,6 +52,27 @@ export const TextureControls = ({
 
   return (
     <div className={classes.select}>
+      <TextField
+        className={classes.rotationInput}
+        label="Rotation"
+        value={textureRotation}
+        onChange={({ target: { value } = {} }) => {
+          // TODO: this should not run when value changes via props
+          // TODO: once above is fixed, use textureRotationDragged
+          if (isNumber(value) && !isNaN(value)) {
+            setTextureRotation(value);
+          }
+        }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <CachedIcon />
+            </InputAdornment>
+          ),
+          inputComponent: NumberFormatDecimalDegrees,
+        }}
+        variant="filled"
+      />
       <Button
         startIcon={<TrackChangesIcon />}
         aria-controls="simple-menu"

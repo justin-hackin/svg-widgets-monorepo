@@ -36,6 +36,7 @@
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.21",
     "react-moveable": "^0.16.6",
+    "react-number-format": "^4.4.1",
     "react-resize-detector": "^4.2.3",
     "react-svg-pan-zoom": "^3.8.0",
     "react-use-gesture": "^7.0.15",
