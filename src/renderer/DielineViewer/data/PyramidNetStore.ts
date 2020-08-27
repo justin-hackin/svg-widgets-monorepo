@@ -13,6 +13,7 @@ import { DashPatternStore } from './DashPatternStore';
 import { AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
 import { BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
+import { EVENTS } from '../../../main/ipc';
 
 
 const defaultNet:PyramidNetSpec = {
@@ -71,7 +72,7 @@ export class PyramidNetStore {
 
   @action
   sendTextureEditorUpdate() {
-    globalThis.ipcRenderer.send('tex>shape-update',
+    globalThis.ipcRenderer.send(EVENTS.SHAPE_UPDATE,
       this.boundaryPoints.map((pt) => pt.toArray()), this.pyramidGeometryId);
   }
 

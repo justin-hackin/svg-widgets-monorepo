@@ -10,7 +10,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isDev = require('electron-is-dev');
 // const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
-const { setupIpc } = require('./ipc');
+const { setupIpc, EVENTS, EVENT_TARGET_DELIMITER } = require('./ipc');
 
 // TODO: remove isEnabled once builder works
 debug({ showDevTools: false, isEnabled: true });
@@ -77,21 +77,21 @@ app.on('ready', async () => {
       webPreferences,
     }, 'texture-transform-editor'),
   ]).then(([dieLineWindow, textureWindow]:[typeof BrowserWindow, typeof BrowserWindow]) => {
-    const forwardingEvents = ['die>set-die-line-cut-holes', 'die>request-shape-update', 'tex>shape-update'];
-    forwardingEvents.forEach((event) => {
-      const getWindow = (eventName) => {
-        if (eventName.startsWith('die>')) { return dieLineWindow; }
-        if (eventName.startsWith('tex>')) { return textureWindow; }
-        throw new Error('forwardingEvents items must start with \'die\'> or \'tex\'>');
-      };
-      ipcMain.on(event, (e, ...params) => {
-        getWindow(event).webContents.send(event, ...params);
+    const eventPrefixMap = {
+      tex: textureWindow,
+      die: dieLineWindow,
+    };
+    Object.values(EVENTS).filter((eventName:string) => eventName.includes(EVENT_TARGET_DELIMITER))
+      .forEach((eventName:string) => {
+        ipcMain.on(eventName, (e, ...params) => {
+          const targetWindowKey = eventName.split(EVENT_TARGET_DELIMITER)[0];
+          eventPrefixMap[targetWindowKey].webContents.send(eventName, ...params);
+        });
       });
-    });
     // no initial shape update sent from die line viewer (texture fitting window would not be ready)
-    dieLineWindow.webContents.send('die>request-shape-update');
+    dieLineWindow.webContents.send(EVENTS.REQUEST_SHAPE_UPDATE);
     const sendResetDragMode = () => {
-      textureWindow.webContents.send('reset-drag-mode');
+      textureWindow.webContents.send(EVENTS.RESET_DRAG_MODE);
     };
     textureWindow.on('blur', sendResetDragMode);
     textureWindow.on('minimize', sendResetDragMode);

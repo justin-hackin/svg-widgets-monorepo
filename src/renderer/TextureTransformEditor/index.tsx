@@ -21,6 +21,7 @@ import { TextureSvg } from './components/TextureSvg';
 import { PointTuple } from '../DielineViewer/util/geom';
 import { PathData } from '../DielineViewer/util/PathData';
 import { TextureControls } from './components/TextureControls';
+import { EVENTS } from '../../main/ipc';
 
 interface DimensionsObject {
   width: number,
@@ -178,7 +179,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   };
 
   const setTextureDFromFile = (url) => {
-    globalThis.ipcRenderer.invoke('get-svg-string-by-path', url)
+    globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_STRING_BY_PATH, url)
       .then((svgString) => {
         setTexturePathD(extractCutHolesFromSvgString(svgString));
       });
@@ -186,7 +187,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   // Init
   useEffect(() => {
-    globalThis.ipcRenderer.on('tex>shape-update', (e, faceVertices, aShapeId) => {
+    globalThis.ipcRenderer.on(EVENTS.SHAPE_UPDATE, (e, faceVertices, aShapeId) => {
       setShapeId(aShapeId);
       const points = faceVertices.map((vert) => point(...vert));
       const poly = new Polygon();
@@ -218,7 +219,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
       resizeHandler();
     });
 
-    globalThis.ipcRenderer.invoke('list-texture-files').then((list:string[]) => {
+    globalThis.ipcRenderer.invoke(EVENTS.LIST_TEXTURE_FILES).then((list:string[]) => {
       setFileList(list);
       setTimeout(() => { setFileIndex('0'); }, 1000);
     });
@@ -226,7 +227,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
     // needed for the case in which the texture fitting window is reloaded
     // (no-op on initial launch, main calls this when events wired)
-    globalThis.ipcRenderer.send('die>request-shape-update');
+    globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_UPDATE);
 
     return () => {
       window.removeEventListener('resize', resizeHandler);
@@ -424,9 +425,9 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const faceScaleCenterPercentStr = `${((1 - faceScaleDragged) * 100) / 2}%`;
   const sendTexture = async () => {
     const dd = await globalThis.ipcRenderer.invoke(
-      'intersect-svg', boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
+      EVENTS.INTERSECT_SVG, boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
     );
-    globalThis.ipcRenderer.send('die>set-die-line-cut-holes', dd, textureTransformMatrixStr);
+    globalThis.ipcRenderer.send(EVENTS.SET_DIELINE_CUT_HOLES, dd, textureTransformMatrixStr);
   };
 
 

@@ -13,6 +13,7 @@ import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../util/shapes
 import { ascendantEdgeConnectionTabs, AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { roundedEdgePath } from '../util/shapes/generic';
 import { PyramidGeometrySpec } from '../data/polyhedra';
+import { EVENTS } from '../../../main/ipc';
 
 
 export interface StyleSpec {
@@ -86,11 +87,11 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
     // @ts-ignore
     const sendShapeUpdateHandler = () => { store.pyramidNetSpec.sendTextureEditorUpdate(); };
     sendShapeUpdateHandler();
-    globalThis.ipcRenderer.on('die>set-die-line-cut-holes', setCutHoleHandler);
-    globalThis.ipcRenderer.on('die>request-shape-update', sendShapeUpdateHandler);
+    globalThis.ipcRenderer.on(EVENTS.SET_DIELINE_CUT_HOLES, setCutHoleHandler);
+    globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
 
     return () => {
-      globalThis.ipcRenderer.removeListener('die>set-die-line-cut-holes', setCutHoleHandler);
+      globalThis.ipcRenderer.removeListener(EVENTS.SET_DIELINE_CUT_HOLES, setCutHoleHandler);
       globalThis.ipcRenderer.removeListener('die>request-shape-update', sendShapeUpdateHandler);
     };
   }, []);

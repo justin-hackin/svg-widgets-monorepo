@@ -22,6 +22,7 @@ import { PanelColorPicker } from '../../../common/components/PanelColorPicker';
 import { dashPatterns } from '../../data/dash-patterns';
 import { VERY_SMALL_NUMBER } from '../../util/geom';
 import { MIRRORED_STROKES } from '../../config';
+import { EVENTS } from '../../../../main/ipc';
 
 
 export const ControlPanel = observer(({ store }) => {
@@ -254,7 +255,7 @@ export const ControlPanel = observer(({ store }) => {
           <IconButton
             aria-label="save"
             onClick={() => {
-              globalThis.ipcRenderer.invoke('load-net-spec').then((netSpecData) => {
+              globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((netSpecData) => {
                 store.pyramidNetSpec.loadSpec(netSpecData);
               });
             }}
@@ -266,7 +267,7 @@ export const ControlPanel = observer(({ store }) => {
             aria-label="save"
             onClick={() => {
               globalThis.ipcRenderer.invoke(
-                'save-net-with-data',
+                EVENTS.SAVE_NET_SVG_AND_SPEC,
                 store.renderPyramidNetToString(),
                 store.pyramidNetSpec.exportToJSONString(),
                 'Save pyramid net dielines and model',
@@ -278,7 +279,7 @@ export const ControlPanel = observer(({ store }) => {
           <IconButton
             aria-label="save"
             onClick={() => {
-              globalThis.ipcRenderer.invoke('save-svg', store.renderFaceBoundaryToString(), {
+              globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderFaceBoundaryToString(), {
                 message: 'Save face template',
                 defaultPath: `${store.pyramidNetSpec.pyramidGeometryId}__template.svg`,
               });
@@ -289,7 +290,7 @@ export const ControlPanel = observer(({ store }) => {
           <IconButton
             aria-label="save"
             onClick={() => {
-              globalThis.ipcRenderer.invoke('open-svg', 'Upload face cut pattern')
+              globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, 'Upload face cut pattern')
                 .then((svgString) => {
                   store.pyramidNetSpec.applyFaceHolePattern(svgString);
                 });

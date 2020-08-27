@@ -1,5 +1,5 @@
 import { EventHandler, useEffect, useState } from 'react';
-import { ipcRenderer } from 'electron';
+import { EVENTS } from '../../main/ipc';
 
 export const DRAG_MODES = {
   ROTATE: 'rotate',
@@ -16,7 +16,7 @@ export function useDragMode() {
     const resetDragMode = () => {
       setPressed(INITIAL_PRESSED_STATE);
     };
-    globalThis.ipcRenderer.on('reset-drag-mode', resetDragMode);
+    globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, resetDragMode);
 
     const createHandler = (keyName: string, value: boolean): EventHandler<any> => (e:KeyboardEvent) => {
       if (e.key === keyName) {
@@ -45,7 +45,7 @@ export function useDragMode() {
         window.removeEventListener('keydown', keydown);
         window.removeEventListener('keyup', keyup);
       });
-      ipcRenderer.removeListener('reset-drag-mode', resetDragMode);
+      globalThis.ipcRenderer.removeListener(EVENTS.RESET_DRAG_MODE, resetDragMode);
     };
   }, []);
 
