@@ -17,12 +17,10 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
     {...other}
     getInputRef={inputRef}
     onValueChange={(values) => {
-
       onChange({
         target: {
           name: other.name,
-          floatValue: values.floatValue,
-          value: values.value,
+          value: values.floatValue,
         },
       });
     }}
