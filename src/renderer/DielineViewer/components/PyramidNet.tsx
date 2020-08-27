@@ -87,14 +87,17 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
   } = store;
 
   useEffect(() => {
-    const setCutHoleHandler = (e, d, transform) => {
-      // @ts-ignore
-      store.pyramidNetSpec.setFaceHoleProperties(d, transform);
-    };
+    // @ts-ignore
+    const setCutHoleHandler = (e, d, transform) => { store.pyramidNetSpec.setFaceHoleProperties(d, transform); };
+    // @ts-ignore
+    const sendShapeUpdateHandler = () => { store.pyramidNetSpec.sendTextureEditorUpdate(); };
+    sendShapeUpdateHandler();
     globalThis.ipcRenderer.on('die>set-die-line-cut-holes', setCutHoleHandler);
+    globalThis.ipcRenderer.on('die>request-shape-update', sendShapeUpdateHandler);
 
     return () => {
       globalThis.ipcRenderer.removeListener('die>set-die-line-cut-holes', setCutHoleHandler);
+      globalThis.ipcRenderer.removeListener('die>request-shape-update', sendShapeUpdateHandler);
     };
   }, []);
 

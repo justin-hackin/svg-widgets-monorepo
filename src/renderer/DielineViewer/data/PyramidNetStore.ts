@@ -56,9 +56,6 @@ const defaultNet:PyramidNetSpec = {
 
 export class PyramidNetStore {
   constructor(data = defaultNet) {
-    globalThis.ipcRenderer.on('die>request-shape-update', () => {
-      this.sendTextureEditorUpdate();
-    });
     this.loadSpec(data);
     // no-op on initial BrowserWindow instantiation, ensures texture fitting is updated upon dieline viewer reload
     this.sendTextureEditorUpdate();
