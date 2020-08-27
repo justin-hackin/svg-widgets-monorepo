@@ -54,8 +54,3 @@ export class PyramidNetMakerStore implements StoreSpec {
 }
 
 export const store = new PyramidNetMakerStore();
-
-globalThis.ipcRenderer.on('die>set-die-line-cut-holes', (e, d, transform) => {
-  // @ts-ignore
-  store.pyramidNetSpec.setFaceHoleProperties(d, transform);
-});

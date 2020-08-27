@@ -1,6 +1,6 @@
 // @ts-ignore
 import { observer } from 'mobx-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { range } from 'lodash';
 import {
   degToRad, hingedPlot,
@@ -12,6 +12,7 @@ import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPat
 import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs, AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { roundedEdgePath } from '../util/shapes/generic';
+import { store } from '../data/PyramidNetMakerStore';
 
 
 export interface StyleSpec {
@@ -84,6 +85,19 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
       tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, textureTransform, borderInsetFaceHoleTransformMatrix, // eslint-disable-line
     },
   } = store;
+
+  useEffect(() => {
+    const setCutHoleHandler = (e, d, transform) => {
+      // @ts-ignore
+      store.pyramidNetSpec.setFaceHoleProperties(d, transform);
+    };
+    globalThis.ipcRenderer.on('die>set-die-line-cut-holes', setCutHoleHandler);
+
+    return () => {
+      globalThis.ipcRenderer.removeListener('die>set-die-line-cut-holes', setCutHoleHandler);
+    };
+  }, []);
+
 
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
 

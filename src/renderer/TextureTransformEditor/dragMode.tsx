@@ -1,4 +1,5 @@
 import { EventHandler, useEffect, useState } from 'react';
+import { ipcRenderer } from 'electron';
 
 export const DRAG_MODES = {
   ROTATE: 'rotate',
@@ -44,7 +45,7 @@ export function useDragMode() {
         window.removeEventListener('keydown', keydown);
         window.removeEventListener('keyup', keyup);
       });
-      globalThis.ipcRenderer.removeListener('reset-drag-mode', resetDragMode);
+      ipcRenderer.removeListener('reset-drag-mode', resetDragMode);
     };
   }, []);
 
