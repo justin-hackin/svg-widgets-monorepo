@@ -12,7 +12,7 @@ import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPat
 import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs, AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { roundedEdgePath } from '../util/shapes/generic';
-import { store } from '../data/PyramidNetMakerStore';
+import { PyramidGeometrySpec } from '../data/polyhedra';
 
 
 export interface StyleSpec {
@@ -39,12 +39,6 @@ export interface PyramidNetSpec {
   textureTransform?: string,
 }
 
-export interface PyramidGeometrySpec {
-  relativeFaceEdgeLengths: [number, number, number],
-  diameter: number,
-  faceCount: number,
-  copiesNeeded: number,
-}
 
 export const FaceBoundary = observer(({ store }:{store: StoreSpec}) => {
   const {

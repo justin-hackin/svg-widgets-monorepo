@@ -1,5 +1,11 @@
 import { PHI } from '../util/geom';
-import { PyramidGeometrySpec } from '../components/PyramidNet';
+
+export interface PyramidGeometrySpec {
+  relativeFaceEdgeLengths: [number, number, number],
+  diameter: number,
+  faceCount: number,
+  copiesNeeded: number,
+}
 
 interface PolyhedraDefs {
   [propName: string]: PyramidGeometrySpec,
