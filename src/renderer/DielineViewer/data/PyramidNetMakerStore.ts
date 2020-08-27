@@ -18,7 +18,7 @@ export class PyramidNetMakerStore implements StoreSpec {
   @observable
   public styleSpec:StyleSpec = {
     dieLineProps: { fill: 'none', strokeWidth: 1 },
-    cutLineProps: { stroke: '#FF244D' },
+    cutLineProps: { stroke: '#FF3A5E' },
     scoreLineProps: { stroke: '#BDFF48' },
     designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
   };
