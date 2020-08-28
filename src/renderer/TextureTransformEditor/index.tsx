@@ -158,6 +158,15 @@ const TextureTransformEditorLOC = ({ classes }) => {
     .rotate(textureRotationDragged)
     .translate(...origin.map(negateMap));
 
+  const calculateTransformOriginChangeOffset = (newTransformOrigin) => {
+    const newMatrix = matrixWithTransformCenter(newTransformOrigin);
+    const oldMatrix = matrixWithTransformCenter(transformOrigin);
+    return addTuple(
+      matrixTupleTransformPoint(newMatrix, textureTranslation),
+      matrixTupleTransformPoint(oldMatrix, textureTranslation).map(negateMap),
+    );
+  };
+
 
   const relativeToAbsCoords = (relCoords) => matrixTupleTransformPoint(
     matrixWithTransformCenter(transformOrigin).inverse(), relCoords,
@@ -170,12 +179,25 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
 
 
-  const repositionOverCorner = (vertexIndex) => {
+  const repositionTextureWithOriginOverCorner = (vertexIndex) => {
     const originAbsolute = matrixTupleTransformPoint(
       m, transformOrigin,
     );
     const delta = addTuple(originAbsolute, vertices[vertexIndex].map(negateMap)).map(negateMap);
     setTextureTranslation(addTuple(delta, textureTranslation));
+  };
+
+  const repositionOriginOverCorner = (vertexIndex) => {
+    const relVertex = matrixTupleTransformPoint(
+      m.inverse(), vertices[vertexIndex],
+    );
+    const delta = addTuple(relVertex.map(negateMap), transformOrigin).map(negateMap);
+    const newTransformOrigin = addTuple(delta, transformOrigin);
+    setTransformOrigin(newTransformOrigin);
+    setTextureTranslation(addTuple(
+      textureTranslation,
+      calculateTransformOriginChangeOffset(newTransformOrigin).map(negateMap),
+    ));
   };
 
   const setTextureDFromFile = (url) => {
@@ -331,12 +353,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
     if (down) {
       setTransformOriginDelta(relDelta);
     } else {
-      const newMatrix = matrixWithTransformCenter(transformOriginDragged);
-      const oldMatrix = matrixWithTransformCenter(transformOrigin);
-      const relativeDifference = addTuple(
-        matrixTupleTransformPoint(newMatrix, textureTranslation),
-        matrixTupleTransformPoint(oldMatrix, textureTranslation).map(negateMap),
-      );
+      const relativeDifference = calculateTransformOriginChangeOffset(transformOriginDragged);
       setTransformOrigin(transformOriginDragged);
       setTransformOriginDelta([0, 0]);
       setTextureTranslation(addTuple(textureTranslation, relativeDifference.map(negateMap)));
@@ -492,7 +509,8 @@ const TextureTransformEditorLOC = ({ classes }) => {
           textureRotation,
           setTextureRotation,
           sendTexture,
-          repositionOverCorner,
+          repositionTextureWithOriginOverCorner,
+          repositionOriginOverCorner,
           isPositive,
           setIsPositive,
           fileIndex,

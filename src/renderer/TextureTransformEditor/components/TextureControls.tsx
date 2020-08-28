@@ -32,7 +32,7 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 
 export const TextureControls = ({
   classes, textureOptions, textureRotation, setTextureRotation,
-  sendTexture, repositionOverCorner,
+  sendTexture, repositionTextureWithOriginOverCorner, repositionOriginOverCorner,
   isPositive, setIsPositive, fileIndex, setFileIndex, dragMode,
 }) => {
   const [cornerSnapMenuAnchorEl, setCornerSnapMenuAnchorEl] = React.useState(null);
@@ -41,9 +41,13 @@ export const TextureControls = ({
   };
 
 
-  const handleCornerSnapMenuClose = (index) => {
+  const handleCornerSnapMenuClose = (index:number = undefined, isOriginOnly: boolean = false) => {
     if (index !== undefined) {
-      repositionOverCorner(index);
+      if (isOriginOnly) {
+        repositionOriginOverCorner(index);
+      } else {
+        repositionTextureWithOriginOverCorner(index);
+      }
     }
     setCornerSnapMenuAnchorEl(null);
   };
@@ -85,7 +89,7 @@ export const TextureControls = ({
         keepMounted
         variant="menu"
         open={Boolean(cornerSnapMenuAnchorEl)}
-        onClose={handleCornerSnapMenuClose}
+        onClose={() => { handleCornerSnapMenuClose(); }}
       >
         {range(3).map((index) => (
           <MenuItem
@@ -94,7 +98,19 @@ export const TextureControls = ({
               handleCornerSnapMenuClose(index);
             }}
           >
-            Corner
+            Texture and origin to corner
+            {' '}
+            {index + 1}
+          </MenuItem>
+        ))}
+        {range(3).map((index) => (
+          <MenuItem
+            key={index}
+            onClick={() => {
+              handleCornerSnapMenuClose(index, true);
+            }}
+          >
+            Origin to corner
             {' '}
             {index + 1}
           </MenuItem>
