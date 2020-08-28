@@ -391,7 +391,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   useEffect(() => {
     // eslint-disable-next-line eqeqeq
-    if (textureRef.current && fileIndex !== null && fileList) {
+    if (textureRef.current && fileIndex !== null && fileList && fileList[fileIndex]) {
       // @ts-ignore
       setTextureUrl(`${__static}/images/textures/${fileList[fileIndex]}`);
     }
