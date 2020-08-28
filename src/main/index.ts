@@ -55,48 +55,49 @@ app.on('ready', async () => {
     preload: path.resolve(__static, 'preload.js'),
   };
 
-  Promise.all([
-    promisifyWindow({
-      width: width / 2,
-      x: 0,
-      y: 0,
-      height,
-      show: false,
-      title: 'SpaceCraft Net Factory - Dieline Viewer',
-      icon,
-      webPreferences,
-    }, 'die-line-viewer'),
-    promisifyWindow({
-      width: width / 2,
-      x: width / 2,
-      y: 0,
-      height,
-      show: false,
-      title: 'SpaceCraft Net Factory - Texture Fitting',
-      icon,
-      webPreferences,
-    }, 'texture-transform-editor'),
-  ]).then(([dieLineWindow, textureWindow]:[typeof BrowserWindow, typeof BrowserWindow]) => {
-    const eventPrefixMap = {
-      tex: textureWindow,
-      die: dieLineWindow,
-    };
-    Object.values(EVENTS).filter((eventName:string) => eventName.includes(EVENT_TARGET_DELIMITER))
-      .forEach((eventName:string) => {
-        ipcMain.on(eventName, (e, ...params) => {
-          const targetWindowKey = eventName.split(EVENT_TARGET_DELIMITER)[0];
-          eventPrefixMap[targetWindowKey].webContents.send(eventName, ...params);
-        });
+  const dieLineWindow:(typeof BrowserWindow) = await promisifyWindow({
+    width: width / 2,
+    x: 0,
+    y: 0,
+    height,
+    show: false,
+    title: 'SpaceCraft Net Factory - Dieline Viewer',
+    icon,
+    webPreferences,
+  }, 'die-line-viewer');
+
+  const textureWindow:(typeof BrowserWindow) = await promisifyWindow({
+    width: width / 2,
+    x: width / 2,
+    y: 0,
+    height,
+    show: false,
+    title: 'SpaceCraft Net Factory - Texture Fitting',
+    icon,
+    webPreferences,
+    parent: dieLineWindow,
+  }, 'texture-transform-editor');
+
+  const eventPrefixMap = {
+    tex: textureWindow,
+    die: dieLineWindow,
+  };
+
+  Object.values(EVENTS).filter((eventName:string) => eventName.includes(EVENT_TARGET_DELIMITER))
+    .forEach((eventName:string) => {
+      ipcMain.on(eventName, (e, ...params) => {
+        const targetWindowKey = eventName.split(EVENT_TARGET_DELIMITER)[0];
+        eventPrefixMap[targetWindowKey].webContents.send(eventName, ...params);
       });
-    // no initial shape update sent from die line viewer (texture fitting window would not be ready)
-    dieLineWindow.webContents.send(EVENTS.REQUEST_SHAPE_UPDATE);
-    const sendResetDragMode = () => {
-      textureWindow.webContents.send(EVENTS.RESET_DRAG_MODE);
-    };
-    textureWindow.on('blur', sendResetDragMode);
-    textureWindow.on('minimize', sendResetDragMode);
-    textureWindow.on('hide', sendResetDragMode);
-  });
+    });
+  // no initial shape update sent from die line viewer (texture fitting window would not be ready)
+  dieLineWindow.webContents.send(EVENTS.REQUEST_SHAPE_UPDATE);
+  const sendResetDragMode = () => {
+    textureWindow.webContents.send(EVENTS.RESET_DRAG_MODE);
+  };
+  textureWindow.on('blur', sendResetDragMode);
+  textureWindow.on('minimize', sendResetDragMode);
+  textureWindow.on('hide', sendResetDragMode);
 });
 
 app.on('window-all-closed', app.quit);

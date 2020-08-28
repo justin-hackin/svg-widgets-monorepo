@@ -98,7 +98,7 @@ export const TextureControls = ({
               handleCornerSnapMenuClose(index);
             }}
           >
-            Texture and origin to corner
+            Texture & origin to corner
             {' '}
             {index + 1}
           </MenuItem>
