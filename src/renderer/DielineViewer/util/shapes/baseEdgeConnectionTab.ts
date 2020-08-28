@@ -1,12 +1,12 @@
 import { PathData } from '../PathData';
 import {
-  distanceBetweenPoints,
+  distanceBetweenPoints, hingedPlot,
   hingedPlotByProjectionDistance,
-  hingedPlotLerp,
-  PointLike,
+  hingedPlotLerp, intersectLineLine,
+  PointLike, VERY_LARGE_NUMBER,
 } from '../geom';
 import { strokeDashPath, StrokeDashPathSpec } from './strokeDashPath';
-import { roundedEdgePath } from './generic';
+import { connectedLineSegments, roundedEdgePath } from './generic';
 import { arrowTab } from './symmetricRoundedTab';
 
 export interface BaseEdgeConnectionTabSpec {
@@ -85,10 +85,23 @@ export function baseEdgeConnectionTab(
     hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
     hingedPlotByProjectionDistance(start, finBases[0], Math.PI * 0.6, tabDepth),
   ];
-
+  const valleyDepthRatio = 0.3;
+  const valleyTheta = Math.PI / 4;
+  const handleValleyDip = hingedPlot(end, mid, Math.PI / 2, valleyDepthRatio * tabDepth);
+  const handleValleyEdgeCasters = [
+    hingedPlot(mid, handleValleyDip, Math.PI + valleyTheta, VERY_LARGE_NUMBER),
+    hingedPlot(mid, handleValleyDip, Math.PI - valleyTheta, VERY_LARGE_NUMBER),
+  ];
+  const handleValleyEdges = handleValleyEdgeCasters.map(
+    (castPt) => intersectLineLine(handleEdges[0], handleEdges[1], handleValleyDip, castPt),
+  );
   cutPath.concatPath(roundedHole);
   cutPath.close();
-  cutPath.concatPath(roundedEdgePath([start, handleEdges[0], handleEdges[1], finBases[0]], roundingDistance));
+  const handleCornerPoints = [start, handleEdges[0],
+    handleValleyEdges[0], handleValleyDip, handleValleyEdges[1],
+    handleEdges[1], finBases[0]];
+  // cutPath.concatPath(roundedEdgePath(handleCornerPoints, roundingDistance));
+  cutPath.concatPath(connectedLineSegments(handleCornerPoints));
   cutPath.line(finBases[0]).concatPath(finCutPath.sliceCommandsDangerously(1));
   cutPath.line(finBases[1]);
   cutPath.line(end);
