@@ -14,11 +14,12 @@ export const EVENTS = {
   LIST_TEXTURE_FILES: 'list-texture-files',
   LOAD_NET_SPEC: 'load-net-spec',
   OPEN_SVG: 'open-svg',
+  OPEN_TEXTURE_WINDOW: 'open-texture-window',
   RESET_DRAG_MODE: 'reset-drag-mode',
   GET_SVG_STRING_BY_PATH: 'get-svg-string-by-path',
+  REQUEST_SHAPE_UPDATE: 'request-shape-update',
   SHAPE_UPDATE: `tex${EVENT_TARGET_DELIMITER}shape-update`,
   SET_DIELINE_CUT_HOLES: `die${EVENT_TARGET_DELIMITER}set-dieline-cut-holes`,
-  REQUEST_SHAPE_UPDATE: `die${EVENT_TARGET_DELIMITER}request-shape-update`,
 };
 
 const svgFilters = [{

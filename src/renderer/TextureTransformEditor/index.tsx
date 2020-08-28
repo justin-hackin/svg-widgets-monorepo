@@ -236,11 +236,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
       setTimeout(() => { setFileIndex('0'); }, 1000);
     });
 
-
-    // needed for the case in which the texture fitting window is reloaded
-    // (no-op on initial launch, main calls this when events wired)
-    globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_UPDATE);
-
     return () => {
       window.removeEventListener('resize', resizeHandler);
     };

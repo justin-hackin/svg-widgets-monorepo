@@ -14,6 +14,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import BlurOnIcon from '@material-ui/icons/BlurOn';
 import DescriptionIcon from '@material-ui/icons/Description';
+import ControlCameraIcon from '@material-ui/icons/ControlCamera';
 import { PanelSelect } from '../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../common/components/PanelSlider';
 import { useStyles } from '../../style';
@@ -225,13 +226,12 @@ export const ControlPanel = observer(({ store }) => {
     // @ts-ignore
   ].map(mapControlsSpecToComponents);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const handleDrawerOpen = () => { setOpen(true); };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const handleDrawerClose = () => { setOpen(false); };
+
+  const handleOpenTextureEditor = () => { globalThis.ipcRenderer.send(EVENTS.OPEN_TEXTURE_WINDOW); };
+
   return (
     <div className={classes.root}>
       <Fab
@@ -324,6 +324,14 @@ export const ControlPanel = observer(({ store }) => {
           {styleControls}
         </ControlsAccordion>
       </Drawer>
+      <Fab
+        color="inherit"
+        aria-label="open texture editor"
+        onClick={handleOpenTextureEditor}
+        className={classes.openTextureButton}
+      >
+        <ControlCameraIcon />
+      </Fab>
     </div>
   );
 });

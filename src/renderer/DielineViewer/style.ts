@@ -12,6 +12,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     left: theme.spacing(1),
     position: 'fixed',
   },
+  openTextureButton: {
+    bottom: theme.spacing(1),
+    right: theme.spacing(1),
+    position: 'fixed',
+  },
   hide: {
     display: 'none',
   },

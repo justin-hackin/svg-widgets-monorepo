@@ -86,7 +86,6 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
     const setCutHoleHandler = (e, d, transform) => { store.pyramidNetSpec.setFaceHoleProperties(d, transform); };
     // @ts-ignore
     const sendShapeUpdateHandler = () => { store.pyramidNetSpec.sendTextureEditorUpdate(); };
-    sendShapeUpdateHandler();
     globalThis.ipcRenderer.on(EVENTS.SET_DIELINE_CUT_HOLES, setCutHoleHandler);
     globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
 
