@@ -113,13 +113,21 @@ app.on('ready', async () => {
   await assignTextureWindow();
 
   ipcMain.on(EVENTS.OPEN_TEXTURE_WINDOW, () => {
-    assignTextureWindow();
+    if (!browserWindows.tex) {
+      assignTextureWindow();
+    } else {
+      browserWindows.tex.show();
+    }
   });
 
   browserWindows.die.on('close', () => {
     removeEventListenersForWindow('die');
     browserWindows.tex.close();
     removeEventListenersForWindow('tex');
+  });
+
+  browserWindows.tex.on('close', () => {
+    browserWindows.tex = undefined;
   });
 
 
