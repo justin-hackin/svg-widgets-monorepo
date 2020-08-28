@@ -9,7 +9,6 @@ import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import { Box, Paper } from '@material-ui/core';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
-
 // @ts-ignore
 import { point, Polygon } from '@flatten-js/core';
 import darkTheme from '../DielineViewer/data/material-ui-dark-theme.json';
@@ -138,11 +137,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
     (coord) => coord / (faceFittingScale * faceScaleDragged),
   );
 
-  const svgToAbsoluteMovement = (absCoords) => absCoords.map(
-    (coord) => coord * faceFittingScale * faceScaleDragged,
-  );
-
-
   // eslint-disable-next-line max-len
   const absoluteToRelativeCoords = (absCoords: PointTuple):PointTuple => matrixTupleTransformPoint(
     ((new DOMMatrixReadOnly())
@@ -167,10 +161,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
     );
   };
 
-
-  const relativeToAbsCoords = (relCoords) => matrixTupleTransformPoint(
-    matrixWithTransformCenter(transformOrigin).inverse(), relCoords,
-  );
 
   const m = (new DOMMatrixReadOnly())
     .translate(...textureTranslationDragged)
