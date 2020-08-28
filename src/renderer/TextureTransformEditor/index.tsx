@@ -82,15 +82,21 @@ const TextureTransformEditorLOC = ({ classes }) => {
   // can't use early exit because image must render before it's onload sets imageDimensions
   const [imageDimensions, setImageDimensions] = useState<DimensionsObject>();
 
-
   const [faceScale, setFaceScale] = useState(1);
   const [faceScaleMux, setFaceScaleMux] = useState(1);
   const faceScaleDragged = faceScaleMux * faceScale;
 
-
   const [textureScale, setTextureScale] = useState<number>(1);
-  const [textureScaleMux, setTextureScaleMux] = useState<number>(1);
+  const [textureScaleMux, setTextureScaleMuxRaw] = useState<number>(1);
   const textureScaleDragged = textureScale * textureScaleMux;
+  const MIN_SCALE = 0.1;
+  const MAX_SCALE = 5;
+
+  const setTextureScaleMux = (val) => {
+    if (inRange(val * textureScale, MIN_SCALE, MAX_SCALE)) {
+      setTextureScaleMuxRaw(val);
+    }
+  };
 
   // since both controls and matrix function require degrees, use degrees as unit instead of radians
   const [textureRotation, setTextureRotationRaw] = useState<number>(0);
