@@ -58,6 +58,7 @@ export const ShapePreview = ({
       setCamera(theCamera);
 
       const theControls = new OrbitControls(theCamera, theRenderer.domElement);
+      theControls.enablePan = false;
       theControls.autoRotate = true;
       theScene.add(theCamera);
       setScene(theScene);
