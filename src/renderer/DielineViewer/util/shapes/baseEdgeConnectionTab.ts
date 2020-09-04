@@ -24,6 +24,12 @@ export interface BaseEdgeConnectionTab {
   cut: PathData,
 }
 
+// "base" is crease upon which tab it folds
+// "edge" is opposite the base (most distant from it)
+// "depth" is the distance from the base to the edge
+// "fin" is the male part of the tab which enters the hole of the tab
+// "handle" is the part of the tab that surrounds the hole of the tab
+
 export function baseEdgeConnectionTab(
   start: PointLike, end: PointLike,
   ascendantEdgeTabDepth, tabSpec: BaseEdgeConnectionTabSpec, scoreDashSpec: StrokeDashPathSpec,
