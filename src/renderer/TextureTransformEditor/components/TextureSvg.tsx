@@ -100,6 +100,7 @@ export const TextureSvg = ({
           </g>
         )}
       </g>
+      <path fill="none" strokeWidth={2} stroke={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
     </svg>
   );
 };
