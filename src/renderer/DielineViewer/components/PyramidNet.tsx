@@ -165,23 +165,39 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
   cutPathAggregate.concatPath(ascendantTabs.female.cut);
   scorePathAggregate.concatPath(ascendantTabs.female.score);
 
-  if (activeCutHolePatternD && textureTransform) {
-    range(faceCount).forEach((index) => {
-      const isOdd = !!(index % 2);
-      const yScale = isOdd ? -1 : 1;
-
-      const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
-      const rotationRad = -1 * yScale * index * faceInteriorAngles[2] + asymetryNudge;
-      cutPathAggregate.concatPath(PathData.fromDValue(activeCutHolePatternD)
-        .transform(borderInsetFaceHoleTransformMatrix)
-        .transform(`scale(${yScale}, 1) rotate(${radToDeg(rotationRad)})`));
-    });
-  }
+  const CUT_HOLES_ID = 'cut-holes';
 
   return (
     <g>
       <path className="score" {...scoreProps} d={scorePathAggregate.getD()} />
       <path className="cut" {...cutProps} d={cutPathAggregate.getD()} />
+      { activeCutHolePatternD && textureTransform && (
+        <g>
+          {range(faceCount).map((index) => {
+            const isOdd = !!(index % 2);
+            const yScale = isOdd ? -1 : 1;
+            const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+            const rotationRad = -1 * yScale * index * faceInteriorAngles[2] + asymetryNudge;
+            const transformStr = `scale(${yScale
+            }, 1) rotate(${radToDeg(rotationRad)}) ${borderInsetFaceHoleTransformMatrix}`;
+
+            return index === 0
+              ? (
+                <path
+                  id={CUT_HOLES_ID}
+                  d={activeCutHolePatternD}
+                  transform={transformStr}
+                  {...cutProps}
+                />
+              ) : (
+                <use
+                  xlinkHref={`#${CUT_HOLES_ID}`}
+                  transform={transformStr}
+                />
+              );
+          })}
+        </g>
+      ) }
     </g>
   );
 });
