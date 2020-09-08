@@ -179,7 +179,7 @@ export class PyramidNetStore {
   get borderInsetFaceHoleTransformMatrix() {
     const scale = (this.insetPolygon.box.width) / this.borderPolygon.box.width;
     const { x: inX, y: inY } = this.insetPolygon.vertices[0];
-    return (new DOMMatrixReadOnly()).scale(scale, scale).translate(inX, inY);
+    return (new DOMMatrixReadOnly()).translate(inX, inY).scale(scale, scale);
   }
 
   @action

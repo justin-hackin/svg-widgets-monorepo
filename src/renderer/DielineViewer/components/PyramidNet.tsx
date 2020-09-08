@@ -11,7 +11,7 @@ import { PathData } from '../util/PathData';
 import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
 import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs, AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
-import { roundedEdgePath } from '../util/shapes/generic';
+import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
 import { PyramidGeometrySpec } from '../data/polyhedra';
 import { EVENTS } from '../../../main/ipc';
 
@@ -77,7 +77,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
       interFaceScoreDashSpec, baseScoreDashSpec,
       ascendantEdgeTabsSpec, baseEdgeTabSpec,
       // @ts-ignore
-      tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, textureTransform, borderInsetFaceHoleTransformMatrix, // eslint-disable-line
+      tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, insetPolygon, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, borderInsetFaceHoleTransformMatrix, // eslint-disable-line
     },
   } = store;
 
@@ -100,6 +100,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
 
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
   const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
+  const insetProps = { ...styleSpec.dieLineProps, stroke: '#00BBFF' };
 
   const cutPathAggregate = new PathData();
   const scorePathAggregate = new PathData();
@@ -166,41 +167,39 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
   scorePathAggregate.concatPath(ascendantTabs.female.score);
 
   const CUT_HOLES_ID = 'cut-holes';
-
   return (
     <g>
       <path className="score" {...scoreProps} d={scorePathAggregate.getD()} />
       <path className="cut" {...cutProps} d={cutPathAggregate.getD()} />
-      { activeCutHolePatternD && textureTransform && (
-        <g>
-          {range(faceCount).map((index) => {
-            const isOdd = !!(index % 2);
-            const xScale = isOdd ? -1 : 1;
-            const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
-            const rotationRad = -1 * xScale * index * faceInteriorAngles[2] + asymetryNudge;
+      <g />
+      <g>
+        {range(faceCount).map((index) => {
+          const isOdd = !!(index % 2);
+          const xScale = isOdd ? -1 : 1;
+          const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+          const rotationRad = -1 * xScale * index * faceInteriorAngles[2] + asymetryNudge;
 
-            return index === 0
-              ? (
-                <path
-                  id={CUT_HOLES_ID}
-                  d={activeCutHolePatternD}
-                  transform={borderInsetFaceHoleTransformMatrix.toString()}
-                  {...cutProps}
-                />
-              ) : (
-                <use
-                  xlinkHref={`#${CUT_HOLES_ID}`}
-                  transform={
-                    (new DOMMatrixReadOnly())
-                      .scale(xScale, 1)
-                      .rotate(radToDeg(rotationRad))
-                      .toString()
-                  }
-                />
-              );
-          })}
-        </g>
-      ) }
+          return index === 0
+            ? (
+              <g id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
+                <path d={closedPolygonPath(boundaryPoints).getD()} {...insetProps} />
+                { activeCutHolePatternD && (
+                  <path d={activeCutHolePatternD} {...cutProps} />
+                ) }
+              </g>
+            ) : (
+              <use
+                xlinkHref={`#${CUT_HOLES_ID}`}
+                transform={
+                  (new DOMMatrixReadOnly())
+                    .scale(xScale, 1)
+                    .rotate(radToDeg(rotationRad))
+                    .toString()
+                }
+              />
+            );
+        })}
+      </g>
     </g>
   );
 });
