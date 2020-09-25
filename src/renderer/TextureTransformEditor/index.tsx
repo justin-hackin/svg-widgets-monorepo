@@ -268,12 +268,12 @@ const TextureTransformEditorLOC = ({ classes }) => {
       // the boundary update will trigger the offscreen canvas which will flip the changeRenderFlag
       // that happens too early on first render
       // TODO: make shape preview request canvas update when ready instead
-      setTimeout(() => {
-        setTransformOrigin([0, 0]);
-        setTextureTranslation(imageCoverWidthIsClamp
-          ? [xmin, (height - (imageDimensions.height * textureScaleValue)) / 2]
-          : [xmin + (width - (imageDimensions.width * textureScaleValue)) / 2, 0]);
-      }, 100);
+      setTransformOrigin([0, 0]);
+      setTextureRotation(0);
+      setTextureScale(1);
+      setTextureTranslation(imageCoverWidthIsClamp
+        ? [xmin, (height - (imageDimensions.height * imageCoverScale)) / 2]
+        : [xmin + (width - (imageDimensions.width * imageCoverScale)) / 2, 0]);
     }
   }, [viewBoxAttrs, imageDimensions]);
 
