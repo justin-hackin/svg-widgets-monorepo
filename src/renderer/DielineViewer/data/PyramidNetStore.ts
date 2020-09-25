@@ -36,7 +36,6 @@ const defaultNet:PyramidNetSpec = {
     holeBreadthToHalfWidth: 0.25,
     holeDepthToTabDepth: 0.5,
     holeTaper: 0.6981317007977318,
-    roundingDistanceRatio: 1,
     tabDepthToAscendantEdgeLength: 1.5,
   },
   baseScoreDashSpec: {

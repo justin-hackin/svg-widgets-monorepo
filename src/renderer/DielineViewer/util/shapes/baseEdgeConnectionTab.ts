@@ -11,7 +11,6 @@ import { arrowTab } from './symmetricRoundedTab';
 
 export interface BaseEdgeConnectionTabSpec {
   tabDepthToAscendantEdgeLength: number,
-  roundingDistanceRatio: number,
   holeDepthToTabDepth: number,
   holeTaper: number,
   holeBreadthToHalfWidth: number,
@@ -36,7 +35,6 @@ export function baseEdgeConnectionTab(
 ): BaseEdgeConnectionTab {
   const {
     tabDepthToAscendantEdgeLength,
-    roundingDistanceRatio,
     holeDepthToTabDepth,
     holeTaper,
     holeBreadthToHalfWidth,
@@ -78,14 +76,7 @@ export function baseEdgeConnectionTab(
     finDepth / finTraversal, holeTheta, scoreDashSpec,
   );
 
-
-  const roundingEdgeLengths: number[] = [
-    [holeBases[0], holeEdges[0]],
-    [holeEdges[0], holeEdges[1]],
-    [holeBases[1], holeEdges[1]],
-  ].map(([pt1, pt2]) => distanceBetweenPoints(pt1, pt2));
-  const roundingDistance = roundingDistanceRatio * Math.min(...roundingEdgeLengths);
-  const roundedHole = roundedEdgePath([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]], roundingDistance);
+  const holePath = connectedLineSegments([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]]);
   // TODO: only taper as much as needed for clearance
   const handleEdges = [
     hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
@@ -101,7 +92,7 @@ export function baseEdgeConnectionTab(
   const handleValleyEdges = handleValleyEdgeCasters.map(
     (castPt) => intersectLineLine(handleEdges[0], handleEdges[1], handleValleyDip, castPt),
   );
-  cutPath.concatPath(roundedHole);
+  cutPath.concatPath(holePath);
   cutPath.close();
   const handleCornerPoints = [start, handleEdges[0],
     handleValleyEdges[0], handleValleyDip, handleValleyEdges[1],

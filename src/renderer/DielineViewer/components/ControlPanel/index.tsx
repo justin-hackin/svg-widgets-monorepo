@@ -160,10 +160,6 @@ export const ControlPanel = observer(({ store }) => {
       min: Math.PI / 8,
       max: Math.PI / 3,
       step: VERY_SMALL_NUMBER,
-    }, {
-      component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.roundingDistanceRatio',
-      ...ratioSliderProps,
     },
     // @ts-ignore
   ].map(mapControlsSpecToComponents);
