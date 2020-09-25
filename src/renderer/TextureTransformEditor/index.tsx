@@ -55,6 +55,17 @@ const getFitScale = (bounds: DimensionsObject, image: DimensionsObject) => {
   };
 };
 
+const getCoverScale = (bounds: DimensionsObject, image: DimensionsObject) => {
+  if (!bounds || !image) { return null; }
+  const widthScale = bounds.width / image.width;
+  const heightScale = bounds.height / image.height;
+  const widthIsClamp = widthScale >= heightScale;
+  return {
+    widthIsClamp,
+    scale: widthIsClamp ? widthScale : heightScale,
+  };
+};
+
 const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
 const matrixTupleTransformPoint = (matrix: DOMMatrixReadOnly, tuple: PointTuple): PointTuple => {
@@ -135,8 +146,10 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
-  const { scale: imageFittingScale = 1 } = getFitScale(placementAreaDimensions, imageDimensions) || {};
-  const textureScaleValue = (textureScaleDragged * imageFittingScale) / faceFittingScale;
+  const { scale: imageCoverScale = 1, widthIsClamp: imageCoverWidthIsClamp } = getCoverScale(
+    viewBoxAttrs, imageDimensions,
+  ) || {};
+  const textureScaleValue = textureScaleDragged * imageCoverScale;
 
 
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
@@ -249,13 +262,17 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   useEffect(() => {
     if (imageDimensions && viewBoxAttrs) {
-      const { height, xmin } = viewBoxAttrs;
+      const {
+        height, width, xmin,
+      } = viewBoxAttrs;
       // the boundary update will trigger the offscreen canvas which will flip the changeRenderFlag
       // that happens too early on first render
       // TODO: make shape preview request canvas update when ready instead
       setTimeout(() => {
-        setTransformOrigin([imageDimensions.width / 2, imageDimensions.height / 2]);
-        setTextureTranslation([xmin, (height - (imageDimensions.height * textureScaleValue)) / 2]);
+        setTransformOrigin([0, 0]);
+        setTextureTranslation(imageCoverWidthIsClamp
+          ? [xmin, (height - (imageDimensions.height * textureScaleValue)) / 2]
+          : [xmin + (width - (imageDimensions.width * textureScaleValue)) / 2, 0]);
       }, 100);
     }
   }, [viewBoxAttrs, imageDimensions]);
@@ -390,7 +407,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   }, [textureUrl]);
 
   useEffect(() => {
-    // eslint-disable-next-line eqeqeq
     if (textureRef.current && fileIndex !== null && fileList && fileList[fileIndex]) {
       // @ts-ignore
       setTextureUrl(`${__static}/images/textures/${fileList[fileIndex]}`);
@@ -405,8 +421,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
     }
   }, [texturePathD]);
 
-  // when texture boundary or texture changes, recenter texture and
-  // update offscreen canvas to match aspect of boundary
+  // update offscreen canvas
   useEffect(() => {
     if (textureCanvas.current && viewBoxAttrs && textureTransformMatrixStr && imageDimensions) {
       const ctx = textureCanvas.current.getContext('2d');
