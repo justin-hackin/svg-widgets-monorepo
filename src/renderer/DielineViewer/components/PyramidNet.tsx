@@ -77,7 +77,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
       interFaceScoreDashSpec, baseScoreDashSpec,
       ascendantEdgeTabsSpec, baseEdgeTabSpec,
       // @ts-ignore
-      tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, insetPolygon, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, borderInsetFaceHoleTransformMatrix, // eslint-disable-line
+      tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, pathScaleMatrix, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, borderInsetFaceHoleTransformMatrix, // eslint-disable-line
     },
   } = store;
 
@@ -184,7 +184,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
               <g id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
                 <path d={closedPolygonPath(boundaryPoints).getD()} {...insetProps} />
                 { activeCutHolePatternD && (
-                  <path d={activeCutHolePatternD} {...cutProps} />
+                  <path d={activeCutHolePatternD} transform={pathScaleMatrix.toString()} {...cutProps} />
                 ) }
               </g>
             ) : (

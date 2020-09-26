@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Line, Point } from '@flatten-js/core';
-import { isNaN } from 'lodash';
+import { isNaN, range } from 'lodash';
 
 import { circularSlice } from './data';
 
@@ -33,10 +33,21 @@ export function triangleAnglesGivenSides(sideLengths) {
   });
 }
 
+
 // positive distance is to the right moving from pt1 to pt2
 export function hingedPlot(p1:PointLike, p2:PointLike, theta, length) {
   return Point.fromPolar([p1.subtract(p2).angle + theta, length]).add(p2);
 }
+
+export const polygonPointsGivenAnglesAndSides = (angles, sides) => {
+  if (sides.length !== angles.length) {
+    throw new Error('polygonPointsGivenSidesAndAngles: length of sides is not equal to length of angles');
+  }
+  return range(2, sides.length).reduce((acc, i) => {
+    acc.push(hingedPlot(acc[i - 2], acc[i - 1], angles[i - 2], sides[i - 1]));
+    return acc;
+  }, [new Point(0, 0), Point.fromPolar([Math.PI - angles[0], sides[0]])]);
+};
 
 // positive distance is to the right moving from pt1 to pt2
 export function hingedPlotLerp(p1:PointLike, p2:PointLike, theta, lengthRatio) {

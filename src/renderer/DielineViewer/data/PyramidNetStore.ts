@@ -1,12 +1,12 @@
 import { action, computed, observable } from 'mobx';
 // @ts-ignore
-import { Point, Polygon } from '@flatten-js/core';
+import { Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 import { subtract } from '@flatten-js/boolean-op';
 import { chunk, flatten, range } from 'lodash';
 import { polyhedra } from './polyhedra';
 import {
-  CM_TO_PIXELS_RATIO, hingedPlot, triangleAnglesGivenSides,
+  CM_TO_PIXELS_RATIO, polygonPointsGivenAnglesAndSides, triangleAnglesGivenSides,
 } from '../util/geom';
 import { PyramidNetSpec } from '../components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
@@ -15,6 +15,7 @@ import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
 import { BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 import { EVENTS } from '../../../main/ipc';
 
+const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
 const defaultNet:PyramidNetSpec = {
   pyramidGeometryId: 'small-triambic-icosahedron',
@@ -72,7 +73,11 @@ export class PyramidNetStore {
   @action
   sendTextureEditorUpdate() {
     globalThis.ipcRenderer.send(EVENTS.SHAPE_UPDATE,
-      this.boundaryPoints.map((pt) => pt.toArray()), this.pyramidGeometryId);
+      polygonPointsGivenAnglesAndSides(
+        this.faceInteriorAngles,
+        this.normalizedFaceEdgeLengths,
+      ).map((pt) => pt.toArray()),
+      this.pyramidGeometryId);
   }
 
   @computed
@@ -103,15 +108,12 @@ export class PyramidNetStore {
 
   @computed
   get faceInteriorAngles(): number[] {
-    return triangleAnglesGivenSides(this.pyramidGeometry.relativeFaceEdgeLengths);
+    return triangleAnglesGivenSides(this.normalizedFaceEdgeLengths);
   }
 
   @computed
   get boundaryPoints() {
-    const p1 = new Point(0, 0);
-    const p2 = Point.fromPolar([Math.PI - this.faceInteriorAngles[0], this.actualFaceEdgeLengths[0]]);
-    const p3 = hingedPlot(p1, p2, this.faceInteriorAngles[0], this.actualFaceEdgeLengths[1]);
-    return [p1, p2, p3];
+    return polygonPointsGivenAnglesAndSides(this.faceInteriorAngles, this.actualFaceEdgeLengths);
   }
 
   @computed
@@ -135,15 +137,33 @@ export class PyramidNetStore {
   }
 
   @computed
-  get actualFaceEdgeLengths() {
+  get faceEdgeNormalizer() {
+    return FACE_FIRST_EDGE_NORMALIZED_SIZE / this.pyramidGeometry.relativeFaceEdgeLengths[0];
+  }
+
+  @computed
+  get normalizedFaceEdgeLengths() {
+    return this.pyramidGeometry.relativeFaceEdgeLengths.map(
+      // @ts-ignore
+      (val) => val * this.faceEdgeNormalizer,
+    );
+  }
+
+  // factor to scale face lengths such that the first edge will be equal to 1
+  @computed
+  get faceLengthAdjustRatio() {
     const {
       pyramidGeometry: { relativeFaceEdgeLengths, diameter }, shapeHeightInCm,
     } = this;
     const baseEdgeLengthToShapeHeight = diameter / relativeFaceEdgeLengths[1];
     const heightInPixels = CM_TO_PIXELS_RATIO * shapeHeightInCm;
     const desiredFirstLength = heightInPixels / baseEdgeLengthToShapeHeight;
-    const faceLengthAdjustRatio = desiredFirstLength / relativeFaceEdgeLengths[0];
-    return relativeFaceEdgeLengths.map((len) => len * faceLengthAdjustRatio);
+    return desiredFirstLength / this.normalizedFaceEdgeLengths[0];
+  }
+
+  @computed
+  get actualFaceEdgeLengths() {
+    return this.normalizedFaceEdgeLengths.map((len) => len * this.faceLengthAdjustRatio);
   }
 
   @computed
@@ -179,6 +199,11 @@ export class PyramidNetStore {
     const scale = (this.insetPolygon.box.width) / this.borderPolygon.box.width;
     const { x: inX, y: inY } = this.insetPolygon.vertices[0];
     return (new DOMMatrixReadOnly()).translate(inX, inY).scale(scale, scale);
+  }
+
+  @computed
+  get pathScaleMatrix() {
+    return (new DOMMatrixReadOnly()).scale(this.faceLengthAdjustRatio, this.faceLengthAdjustRatio);
   }
 
   @action
