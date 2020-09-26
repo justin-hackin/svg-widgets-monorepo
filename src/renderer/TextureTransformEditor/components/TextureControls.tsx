@@ -6,10 +6,12 @@ import {
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 import CachedIcon from '@material-ui/icons/Cached';
 import TelegramIcon from '@material-ui/icons/Telegram';
+import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
 
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
+import { EVENTS } from '../../../main/ipc';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -31,7 +33,7 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 
 export const TextureControls = ({
   classes, textureRotation, setTextureRotation,
-  sendTexture, repositionTextureWithOriginOverCorner, repositionOriginOverCorner,
+  sendTexture, setTextureDFromFile, repositionTextureWithOriginOverCorner, repositionOriginOverCorner,
   isPositive, setIsPositive, dragMode,
 }) => {
   const [cornerSnapMenuAnchorEl, setCornerSnapMenuAnchorEl] = React.useState(null);
@@ -132,6 +134,19 @@ export const TextureControls = ({
       <DragModeOptionsGroup dragMode={dragMode} />
       <IconButton onClick={sendTexture} color="primary" aria-label="send texture" component="span">
         <TelegramIcon fontSize="large" />
+      </IconButton>
+      <IconButton
+        onClick={async () => {
+          const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_PATH);
+          if (texturePath) {
+            setTextureDFromFile(texturePath);
+          }
+        }}
+        color="primary"
+        aria-label="send texture"
+        component="span"
+      >
+        <FolderOpenIcon fontSize="large" />
       </IconButton>
     </div>
   );

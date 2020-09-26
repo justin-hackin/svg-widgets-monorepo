@@ -469,6 +469,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
               showCenterMarker
               {...{
                 boundaryPathD,
+                setTextureDFromFile,
                 textureRef,
                 textureScaleValue,
                 textureApplicationSvgRef,
@@ -491,6 +492,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
           sendTexture,
           repositionTextureWithOriginOverCorner,
           repositionOriginOverCorner,
+          setTextureDFromFile,
           isPositive,
           setIsPositive,
           dragMode,

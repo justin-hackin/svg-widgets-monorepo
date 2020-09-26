@@ -15,6 +15,7 @@ export const EVENTS = {
   OPEN_TEXTURE_WINDOW: 'open-texture-window',
   RESET_DRAG_MODE: 'reset-drag-mode',
   GET_SVG_STRING_BY_PATH: 'get-svg-string-by-path',
+  GET_SVG_PATH: 'get-svg-path',
   REQUEST_SHAPE_UPDATE: 'request-shape-update',
   SHAPE_UPDATE: `tex${EVENT_TARGET_DELIMITER}shape-update`,
   SET_DIELINE_CUT_HOLES: `die${EVENT_TARGET_DELIMITER}set-dieline-cut-holes`,
@@ -84,6 +85,14 @@ export const setupIpc = (ipcMain) => {
     message,
     filters: svgFilters,
   }));
+
+  ipcMain.handle(EVENTS.GET_SVG_PATH, async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      message: 'Open texture path',
+      filters: svgFilters,
+    });
+    return canceled ? null : filePaths[0];
+  });
 
   ipcMain.handle(EVENTS.GET_SVG_STRING_BY_PATH, (e, absolutePath) => fsPromises.readFile(
     absolutePath, 'utf8',
