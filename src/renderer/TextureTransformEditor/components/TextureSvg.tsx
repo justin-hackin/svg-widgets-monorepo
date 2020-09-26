@@ -24,6 +24,7 @@ export const TextureSvg = ({
   const OPACITY = 0.3;
   const CROSSHAIR_START_RATIO = 0.2;
   const DOT_RADIUS_TO_WHOLE = 0.05;
+
   return (
     <svg overflow="visible">
       <defs>
@@ -58,7 +59,7 @@ export const TextureSvg = ({
           fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
           d={texturePathD}
         />
-        {showCenterMarker && (
+        {showCenterMarker && texturePathD && (
           <g
             {...transformOriginUseDrag()}
             transform={`translate(${transformOriginDragged[0]}, ${transformOriginDragged[1]})`}

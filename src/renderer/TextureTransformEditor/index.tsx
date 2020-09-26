@@ -129,10 +129,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const [transformOriginDelta, setTransformOriginDelta] = useState<PointTuple>([0, 0]);
   const transformOriginDragged = addTuple(transformOrigin, transformOriginDelta);
 
-  const FILE_UNSELECTED_VALUE = '';
-  const [fileList, setFileList] = useState<string[]>();
-  const [fileIndex, setFileIndex] = useState<string>(FILE_UNSELECTED_VALUE);
-  const [textureUrl, setTextureUrl] = useState<string>();
   const [texturePathD, setTexturePathD] = useState<string>();
 
   const [boundary, setBoundary] = useState<Boundary>();
@@ -250,11 +246,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
       resizeHandler();
     });
 
-    globalThis.ipcRenderer.invoke(EVENTS.LIST_TEXTURE_FILES).then((list:string[]) => {
-      setFileList(list);
-      setTimeout(() => { setFileIndex('0'); }, 1000);
-    });
-
     return () => {
       window.removeEventListener('resize', resizeHandler);
     };
@@ -306,7 +297,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
         alert('Whoa there, only one file at a time in the Texture Fitting zone please');
       } else {
         setTextureDFromFile(files[0].path);
-        setFileIndex(FILE_UNSELECTED_VALUE);
       }
     };
 
@@ -399,20 +389,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
     },
   });
 
-  // update texture path d-value when textureUrl changes
-  useEffect(() => {
-    if (textureUrl) {
-      setTextureDFromFile(textureUrl);
-    }
-  }, [textureUrl]);
-
-  useEffect(() => {
-    if (textureRef.current && fileIndex !== null && fileList && fileList[fileIndex]) {
-      // @ts-ignore
-      setTextureUrl(`${__static}/images/textures/${fileList[fileIndex]}`);
-    }
-  }, [textureRef.current, fileIndex, fileList]);
-
   // update image dimensions when the image changes
   useEffect(() => {
     if (textureRef.current) {
@@ -438,12 +414,11 @@ const TextureTransformEditorLOC = ({ classes }) => {
     }
   }, [textureCanvas.current, viewBoxAttrs, textureTransformMatrixStr, imageDimensions, isPositive]);
 
-  if (!fileList || !placementAreaDimensions || !viewBoxAttrs || !textureTransformMatrixStr) { return null; }
+  if (!placementAreaDimensions || !viewBoxAttrs || !textureTransformMatrixStr) { return null; }
 
 
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
-  const textureOptions = fileList.map((item, index) => ({ label: item, value: `${index}` }));
   const faceScalePercentStr = `${faceScaleDragged * 100}%`;
   const faceScaleCenterPercentStr = `${((1 - faceScaleDragged) * 100) / 2}%`;
   const sendTexture = async () => {
@@ -511,7 +486,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
         <TextureControls {...{
           classes,
-          textureOptions,
           textureRotation,
           setTextureRotation,
           sendTexture,
@@ -519,8 +493,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
           repositionOriginOverCorner,
           isPositive,
           setIsPositive,
-          fileIndex,
-          setFileIndex,
           dragMode,
         }}
         />

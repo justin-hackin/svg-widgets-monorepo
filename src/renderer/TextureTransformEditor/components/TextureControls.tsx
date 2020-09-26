@@ -9,7 +9,6 @@ import TelegramIcon from '@material-ui/icons/Telegram';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
 
-import { PanelSelect } from '../../common/components/PanelSelect';
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
@@ -31,9 +30,9 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 
 
 export const TextureControls = ({
-  classes, textureOptions, textureRotation, setTextureRotation,
+  classes, textureRotation, setTextureRotation,
   sendTexture, repositionTextureWithOriginOverCorner, repositionOriginOverCorner,
-  isPositive, setIsPositive, fileIndex, setFileIndex, dragMode,
+  isPositive, setIsPositive, dragMode,
 }) => {
   const [cornerSnapMenuAnchorEl, setCornerSnapMenuAnchorEl] = React.useState(null);
   const handleCornerSnapMenuClick = (event) => {
@@ -129,14 +128,6 @@ export const TextureControls = ({
           />
         )}
         label="Fill is positive"
-      />
-      <PanelSelect
-        label="Tile"
-        className="select-texture"
-        value={fileIndex}
-        displayEmpty
-        setter={setFileIndex}
-        options={textureOptions}
       />
       <DragModeOptionsGroup dragMode={dragMode} />
       <IconButton onClick={sendTexture} color="primary" aria-label="send texture" component="span">

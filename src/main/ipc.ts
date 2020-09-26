@@ -1,7 +1,6 @@
 const { dialog } = require('electron');
 const svgpath = require('svgpath');
 const fsPromises = require('fs').promises;
-const path = require('path');
 const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean-addon');
 const { VERY_LARGE_NUMBER } = require('../renderer/DielineViewer/util/geom');
 const { PathData } = require('../renderer/DielineViewer/util/PathData');
@@ -11,7 +10,6 @@ export const EVENTS = {
   SAVE_SVG: 'save-svg',
   SAVE_NET_SVG_AND_SPEC: 'save-net-svg-and-spec',
   INTERSECT_SVG: 'intersect-svg',
-  LIST_TEXTURE_FILES: 'list-texture-files',
   LOAD_NET_SPEC: 'load-net-spec',
   OPEN_SVG: 'open-svg',
   OPEN_TEXTURE_WINDOW: 'open-texture-window',
@@ -76,10 +74,6 @@ export const setupIpc = (ipcMain) => {
       fsPromises.writeFile(filePath, svgContent),
       fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, jsonContent)]);
   }));
-
-  // @ts-ignore
-  ipcMain.handle(EVENTS.LIST_TEXTURE_FILES, () => fsPromises.readdir(path.resolve(__static, 'images/textures'))
-    .then((filesList) => filesList.filter((fileName) => path.extname(fileName) === '.svg')));
 
   ipcMain.handle(EVENTS.LOAD_NET_SPEC, () => resolveStringDataFromDialog(
     { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },
