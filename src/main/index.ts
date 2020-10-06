@@ -122,7 +122,9 @@ app.on('ready', async () => {
 
   browserWindows.die.on('close', () => {
     removeEventListenersForWindow('die');
-    browserWindows.tex.close();
+    if (browserWindows.tex) {
+      browserWindows.tex.close();
+    }
     removeEventListenersForWindow('tex');
   });
 
