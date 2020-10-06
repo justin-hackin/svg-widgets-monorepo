@@ -1,6 +1,4 @@
-import Canvg, { presets } from 'canvg';
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
 import { useDrag, useGesture } from 'react-use-gesture';
 import { inRange } from 'lodash';
 
@@ -21,6 +19,7 @@ import { PointTuple } from '../DielineViewer/util/geom';
 import { PathData } from '../DielineViewer/util/PathData';
 import { TextureControls } from './components/TextureControls';
 import { EVENTS } from '../../main/ipc';
+import { viewBoxAttrsToString } from './util';
 
 interface DimensionsObject {
   width: number,
@@ -39,7 +38,7 @@ interface Boundary {
 }
 
 const {
-  createRef, useRef, useEffect, useState,
+  createRef, useEffect, useState,
 } = React;
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
@@ -66,8 +65,6 @@ const getCoverScale = (bounds: DimensionsObject, image: DimensionsObject) => {
   };
 };
 
-const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
-
 const matrixTupleTransformPoint = (matrix: DOMMatrixReadOnly, tuple: PointTuple): PointTuple => {
   const domPoint = matrix.transformPoint(new DOMPoint(...tuple));
   return [domPoint.x, domPoint.y];
@@ -84,8 +81,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const textureRef = createRef<SVGGraphicsElement>();
   const textureApplicationSvgRef = createRef<SVGElement>();
   const textureSvgRef = createRef<SVGSVGElement>();
-
-  const textureCanvas = useRef<OffscreenCanvas>();
 
   const [isPositive, setIsPositive] = useState(true);
 
@@ -137,7 +132,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const boundaryPathD = path ? path.getD() : null;
 
   const [shapeId, setShapeId] = useState();
-  const [changeRenderFlag, setChangeRenderFlag] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
@@ -229,7 +223,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
       const viewBoxAttrs = {
         xmin, ymin, width, height,
       };
-      textureCanvas.current = new window.OffscreenCanvas(width, height);
       setTimeout(() => {
         setBoundary({ viewBoxAttrs, path: closedPolygonPath(points), vertices: faceVertices });
       });
@@ -397,26 +390,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
     }
   }, [texturePathD]);
 
-  // update offscreen canvas
-  useEffect(() => {
-    if (textureCanvas.current && viewBoxAttrs && textureTransformMatrixStr && imageDimensions) {
-      const ctx = textureCanvas.current.getContext('2d');
-      // @ts-ignore
-      const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, {
-        texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginDragged, isPositive,
-      }));
-      const svgStr = `<svg viewBox="${
-        viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
-      Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
-        await v.render();
-        setChangeRenderFlag(!changeRenderFlag);
-      });
-    }
-  }, [textureCanvas.current, viewBoxAttrs, textureTransformMatrixStr, imageDimensions, isPositive]);
-
   if (!placementAreaDimensions || !viewBoxAttrs || !textureTransformMatrixStr) { return null; }
-
-
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   const faceScalePercentStr = `${faceScaleDragged * 100}%`;
@@ -441,9 +415,15 @@ const TextureTransformEditorLOC = ({ classes }) => {
           <ShapePreview
             width={placementAreaDimensions.width}
             height={placementAreaDimensions.height}
-            changeRenderFlag={changeRenderFlag}
-            textureCanvas={textureCanvas.current}
-            shapeId={shapeId}
+            {...{
+              viewBoxAttrs,
+              shapeId,
+              texturePathD,
+              boundaryPathD,
+              textureTransformMatrixStr,
+              transformOriginDragged,
+              isPositive,
+            }}
           />
         </div>
         <Paper
@@ -469,7 +449,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
               showCenterMarker
               {...{
                 boundaryPathD,
-                setTextureDFromFile,
                 textureRef,
                 textureScaleValue,
                 textureApplicationSvgRef,
