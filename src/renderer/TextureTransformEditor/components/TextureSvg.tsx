@@ -1,5 +1,5 @@
 import React from 'react';
-import { PointTuple } from '../../DielineViewer/util/geom';
+import { PointTuple } from '../../common/util/geom';
 
 const normalizedBoxCoords:PointTuple[] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const HOLES_COLOR = '#101010';

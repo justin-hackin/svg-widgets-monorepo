@@ -2,7 +2,7 @@ const { dialog } = require('electron');
 const svgpath = require('svgpath');
 const fsPromises = require('fs').promises;
 const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean-addon');
-const { VERY_LARGE_NUMBER } = require('../renderer/DielineViewer/util/geom');
+const { VERY_LARGE_NUMBER } = require('../renderer/common/util/geom');
 const { PathData } = require('../renderer/DielineViewer/util/PathData');
 
 export const EVENT_TARGET_DELIMITER = '<=';

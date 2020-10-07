@@ -1,5 +1,5 @@
 import { last } from 'lodash';
-import { hingedPlot, PointLike } from '../geom';
+import { hingedPlot, PointLike } from '../../../common/util/geom';
 import { PathData } from '../PathData';
 
 interface RoundPoint {

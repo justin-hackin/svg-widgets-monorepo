@@ -1,4 +1,4 @@
-import { PointTuple } from '../DielineViewer/util/geom';
+import { PointTuple } from './geom';
 
 export const matrixTupleTransformPoint = (matrix: DOMMatrixReadOnly, tuple: PointTuple): PointTuple => {
   const domPoint = matrix.transformPoint(new DOMPoint(...tuple));
@@ -13,7 +13,7 @@ const matrixWithTransformCenter = (origin, scale, rotation) => (new DOMMatrixRea
   .scale(scale, scale)
   .rotate(rotation)
   .translate(...origin.map(negateMap));
-// TODO: can this calculation be siplified?
+// TODO: can this calculation be simplified?
 export const calculateTransformOriginChangeOffset = (
   oldTransformOrigin, newTransformOrigin,
   scale, rotation, translation,
@@ -25,6 +25,7 @@ export const calculateTransformOriginChangeOffset = (
     matrixTupleTransformPoint(oldMatrix, translation).map(negateMap),
   );
 };
+
 export const getTextureTransformMatrix = (origin, scale, rotation, translation) => (new DOMMatrixReadOnly())
   .translate(...translation)
   .multiply(matrixWithTransformCenter(origin, scale, rotation));

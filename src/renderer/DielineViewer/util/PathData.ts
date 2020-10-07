@@ -8,7 +8,7 @@ import {
 } from 'svg-path-parser';
 import svgpath from 'svgpath';
 
-import { PointTuple, Coord } from './geom';
+import { PointTuple, Coord } from '../../common/util/geom';
 
 /* eslint-disable no-param-reassign */
 

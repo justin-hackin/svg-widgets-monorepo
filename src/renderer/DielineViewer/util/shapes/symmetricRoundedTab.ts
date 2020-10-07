@@ -1,6 +1,6 @@
 import {
   intersectLineLine, parallelLinePointsAtDistance, symmetricHingePlot, hingedPlotByProjectionDistance,
-} from '../geom';
+} from '../../../common/util/geom';
 import { connectedLineSegments, roundedEdgePath } from './generic';
 import { PathData } from '../PathData';
 import { strokeDashPath } from './strokeDashPath';

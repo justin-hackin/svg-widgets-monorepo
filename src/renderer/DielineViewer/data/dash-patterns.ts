@@ -1,5 +1,5 @@
 import { convertMessageToMorseBooleanString } from './morse';
-import { PHI } from '../util/geom';
+import { PHI } from '../../common/util/geom';
 
 const scoreMessage = convertMessageToMorseBooleanString('playful geometer is symmetrically excellent')
   .reduce((acc, isLong) => {

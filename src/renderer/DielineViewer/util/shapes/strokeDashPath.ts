@@ -1,5 +1,5 @@
 import { last, range, sum } from 'lodash';
-import { lineLerp, PointLike } from '../geom';
+import { lineLerp, PointLike } from '../../../common/util/geom';
 import { PathData } from '../PathData';
 import { DOTTED_SCORES } from '../../config';
 

@@ -21,7 +21,7 @@ import { useStyles } from '../../style';
 import { ControlsAccordion } from './components/ControlsAccordion';
 import { PanelColorPicker } from '../../../common/components/PanelColorPicker';
 import { dashPatterns } from '../../data/dash-patterns';
-import { VERY_SMALL_NUMBER } from '../../util/geom';
+import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { MIRRORED_STROKES } from '../../config';
 import { EVENTS } from '../../../../main/ipc';
 

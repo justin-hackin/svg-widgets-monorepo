@@ -15,7 +15,7 @@ import { ShapePreview } from './components/ShapePreview';
 import { DRAG_MODES, useDragMode } from './dragMode';
 import { extractCutHolesFromSvgString } from '../DielineViewer/util/svg';
 import { TextureSvg } from './components/TextureSvg';
-import { PointTuple } from '../DielineViewer/util/geom';
+import { PointTuple } from '../common/util/geom';
 import { PathData } from '../DielineViewer/util/PathData';
 import { TextureControls } from './components/TextureControls';
 import { EVENTS } from '../../main/ipc';
@@ -26,7 +26,7 @@ import {
   getTextureTransformMatrix,
   matrixTupleTransformPoint,
   negateMap,
-} from './2d-transform';
+} from '../common/util/2d-transform';
 
 interface DimensionsObject {
   width: number,

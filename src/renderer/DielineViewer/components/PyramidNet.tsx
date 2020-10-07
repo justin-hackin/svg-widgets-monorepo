@@ -6,7 +6,7 @@ import {
   degToRad, hingedPlot,
   hingedPlotByProjectionDistance,
   radToDeg,
-} from '../util/geom';
+} from '../../common/util/geom';
 import { PathData } from '../util/PathData';
 import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
 import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';

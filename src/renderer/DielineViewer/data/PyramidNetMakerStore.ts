@@ -6,7 +6,7 @@ import React from 'react';
 import {
   FaceBoundarySVG, PyramidNet, PyramidNetSpec, StoreSpec, StyleSpec,
 } from '../components/PyramidNet';
-import { CM_TO_PIXELS_RATIO } from '../util/geom';
+import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { polyhedra } from './polyhedra';
 import { SVGWrapper } from './SVGWrapper';
 import { PyramidNetStore } from './PyramidNetStore';

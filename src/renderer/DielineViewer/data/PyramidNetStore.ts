@@ -7,7 +7,7 @@ import { chunk, flatten, range } from 'lodash';
 import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, polygonPointsGivenAnglesAndSides, triangleAnglesGivenSides,
-} from '../util/geom';
+} from '../../common/util/geom';
 import { PyramidNetSpec } from '../components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
 import { AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';

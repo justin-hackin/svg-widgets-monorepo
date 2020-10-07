@@ -4,7 +4,7 @@ import {
   hingedPlotByProjectionDistance,
   hingedPlotLerp, intersectLineLine,
   PointLike, VERY_LARGE_NUMBER,
-} from '../geom';
+} from '../../../common/util/geom';
 import { strokeDashPath, StrokeDashPathSpec } from './strokeDashPath';
 import { connectedLineSegments, roundedEdgePath } from './generic';
 import { arrowTab } from './symmetricRoundedTab';

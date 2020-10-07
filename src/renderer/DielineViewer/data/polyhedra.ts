@@ -1,4 +1,4 @@
-import { PHI } from '../util/geom';
+import { PHI } from '../../common/util/geom';
 
 export interface PyramidGeometrySpec {
   relativeFaceEdgeLengths: [number, number, number],

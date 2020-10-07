@@ -2,7 +2,7 @@
 import { Point } from '@flatten-js/core';
 import { last, range } from 'lodash';
 import { PathData } from '../PathData';
-import { lineLerp, PointLike, symmetricHingePlotByProjectionDistance } from '../geom';
+import { lineLerp, PointLike, symmetricHingePlotByProjectionDistance } from '../../../common/util/geom';
 import { strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
