@@ -17,8 +17,8 @@ export const EVENTS = {
   GET_SVG_STRING_BY_PATH: 'get-svg-string-by-path',
   GET_SVG_PATH: 'get-svg-path',
   REQUEST_SHAPE_UPDATE: 'request-shape-update',
-  SHAPE_UPDATE: `tex${EVENT_TARGET_DELIMITER}shape-update`,
-  SET_DIELINE_CUT_HOLES: `die${EVENT_TARGET_DELIMITER}set-dieline-cut-holes`,
+  UPDATE_TEXTURE_EDITOR: `tex${EVENT_TARGET_DELIMITER}update-texture-editor`,
+  UPDATE_DIELINE_VIEWER: `die${EVENT_TARGET_DELIMITER}update-dieline-viewer`,
 };
 
 const svgFilters = [{

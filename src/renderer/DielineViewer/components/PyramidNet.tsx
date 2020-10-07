@@ -86,11 +86,11 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
     const setCutHoleHandler = (e, d, transform) => { store.pyramidNetSpec.setFaceHoleProperties(d, transform); };
     // @ts-ignore
     const sendShapeUpdateHandler = () => { store.pyramidNetSpec.sendTextureEditorUpdate(); };
-    globalThis.ipcRenderer.on(EVENTS.SET_DIELINE_CUT_HOLES, setCutHoleHandler);
+    globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, setCutHoleHandler);
     globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
 
     return () => {
-      globalThis.ipcRenderer.removeListener(EVENTS.SET_DIELINE_CUT_HOLES, setCutHoleHandler);
+      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_DIELINE_VIEWER, setCutHoleHandler);
       globalThis.ipcRenderer.removeListener('die>request-shape-update', sendShapeUpdateHandler);
     };
   }, []);

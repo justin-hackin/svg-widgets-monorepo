@@ -155,28 +155,31 @@ const TextureTransformEditorLOC = ({ classes }) => {
     absoluteMovementToSvg(absCoords),
   );
 
-  const matrixWithTransformCenter = (origin) => (new DOMMatrixReadOnly())
+  const matrixWithTransformCenter = (origin, scale, rotation) => (new DOMMatrixReadOnly())
     .translate(...origin)
-    .scale(textureScaleValue, textureScaleValue)
-    .rotate(textureRotationDragged)
+    .scale(scale, scale)
+    .rotate(rotation)
     .translate(...origin.map(negateMap));
 
+  // TODO: can this calculation be siplified?
   const calculateTransformOriginChangeOffset = (newTransformOrigin) => {
-    const newMatrix = matrixWithTransformCenter(newTransformOrigin);
-    const oldMatrix = matrixWithTransformCenter(transformOrigin);
+    const newMatrix = matrixWithTransformCenter(newTransformOrigin, textureScaleValue, textureRotationDragged);
+    const oldMatrix = matrixWithTransformCenter(transformOrigin, textureScaleValue, textureRotationDragged);
     return addTuple(
       matrixTupleTransformPoint(newMatrix, textureTranslation),
       matrixTupleTransformPoint(oldMatrix, textureTranslation).map(negateMap),
     );
   };
 
+  const getTextureTransformMatrix = (origin, scale, rotation, translation) => (new DOMMatrixReadOnly())
+    .translate(...translation)
+    .multiply(matrixWithTransformCenter(origin, scale, rotation));
 
-  const m = (new DOMMatrixReadOnly())
-    .translate(...textureTranslationDragged)
-    .multiply(matrixWithTransformCenter(transformOrigin));
+  const m = getTextureTransformMatrix(
+    transformOriginDragged, textureScaleValue, textureRotationDragged, textureTranslationDragged,
+  );
 
-  const textureTransformMatrixStr = `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;
-
+  const textureTransformMatrixStr = m.toString();
 
   const repositionTextureWithOriginOverCorner = (vertexIndex) => {
     const originAbsolute = matrixTupleTransformPoint(
@@ -208,7 +211,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   // Init
   useEffect(() => {
-    globalThis.ipcRenderer.on(EVENTS.SHAPE_UPDATE, (e, faceVertices, aShapeId) => {
+    globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR, (e, faceVertices, aShapeId) => {
       setShapeId(aShapeId);
       const points = faceVertices.map((vert) => point(...vert));
       const poly = new Polygon();
@@ -390,16 +393,16 @@ const TextureTransformEditorLOC = ({ classes }) => {
     }
   }, [texturePathD]);
 
-  if (!placementAreaDimensions || !viewBoxAttrs || !textureTransformMatrixStr) { return null; }
+  if (!placementAreaDimensions || !viewBoxAttrs) { return null; }
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   const faceScalePercentStr = `${faceScaleDragged * 100}%`;
   const faceScaleCenterPercentStr = `${((1 - faceScaleDragged) * 100) / 2}%`;
   const sendTexture = async () => {
-    const dd = await globalThis.ipcRenderer.invoke(
+    const croppedTextureD = await globalThis.ipcRenderer.invoke(
       EVENTS.INTERSECT_SVG, boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
     );
-    globalThis.ipcRenderer.send(EVENTS.SET_DIELINE_CUT_HOLES, dd, textureTransformMatrixStr);
+    globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, croppedTextureD, textureTransformMatrixStr);
   };
 
 

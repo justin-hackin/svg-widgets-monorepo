@@ -72,7 +72,7 @@ export class PyramidNetStore {
 
   @action
   sendTextureEditorUpdate() {
-    globalThis.ipcRenderer.send(EVENTS.SHAPE_UPDATE,
+    globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR,
       polygonPointsGivenAnglesAndSides(
         this.faceInteriorAngles,
         this.normalizedFaceEdgeLengths,
