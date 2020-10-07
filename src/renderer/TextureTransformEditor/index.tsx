@@ -162,12 +162,15 @@ const TextureTransformEditorLOC = ({ classes }) => {
     .translate(...origin.map(negateMap));
 
   // TODO: can this calculation be siplified?
-  const calculateTransformOriginChangeOffset = (newTransformOrigin) => {
-    const newMatrix = matrixWithTransformCenter(newTransformOrigin, textureScaleValue, textureRotationDragged);
-    const oldMatrix = matrixWithTransformCenter(transformOrigin, textureScaleValue, textureRotationDragged);
+  const calculateTransformOriginChangeOffset = (
+    oldTransformOrigin, newTransformOrigin,
+    scale, rotation, translation,
+  ) => {
+    const newMatrix = matrixWithTransformCenter(newTransformOrigin, scale, rotation);
+    const oldMatrix = matrixWithTransformCenter(oldTransformOrigin, scale, rotation);
     return addTuple(
-      matrixTupleTransformPoint(newMatrix, textureTranslation),
-      matrixTupleTransformPoint(oldMatrix, textureTranslation).map(negateMap),
+      matrixTupleTransformPoint(newMatrix, translation),
+      matrixTupleTransformPoint(oldMatrix, translation).map(negateMap),
     );
   };
 
@@ -198,7 +201,8 @@ const TextureTransformEditorLOC = ({ classes }) => {
     setTransformOrigin(newTransformOrigin);
     setTextureTranslation(addTuple(
       textureTranslation,
-      calculateTransformOriginChangeOffset(newTransformOrigin).map(negateMap),
+      calculateTransformOriginChangeOffset(transformOrigin, newTransformOrigin,
+        textureScaleValue, textureRotationDragged, textureTranslationDragged).map(negateMap),
     ));
   };
 
@@ -347,7 +351,10 @@ const TextureTransformEditorLOC = ({ classes }) => {
     if (down) {
       setTransformOriginDelta(relDelta);
     } else {
-      const relativeDifference = calculateTransformOriginChangeOffset(transformOriginDragged);
+      const relativeDifference = calculateTransformOriginChangeOffset(
+        transformOrigin, transformOriginDragged,
+        textureScaleValue, textureRotationDragged, textureTranslationDragged,
+      );
       setTransformOrigin(transformOriginDragged);
       setTransformOriginDelta([0, 0]);
       setTextureTranslation(addTuple(textureTranslation, relativeDifference.map(negateMap)));
