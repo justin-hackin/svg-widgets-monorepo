@@ -20,6 +20,13 @@ import { PathData } from '../DielineViewer/util/PathData';
 import { TextureControls } from './components/TextureControls';
 import { EVENTS } from '../../main/ipc';
 import { viewBoxAttrsToString } from './util';
+import {
+  addTuple,
+  calculateTransformOriginChangeOffset,
+  getTextureTransformMatrix,
+  matrixTupleTransformPoint,
+  negateMap,
+} from './2d-transform';
 
 interface DimensionsObject {
   width: number,
@@ -40,6 +47,7 @@ interface Boundary {
 const {
   createRef, useEffect, useState,
 } = React;
+
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 // TODO: make router wrap with styles
@@ -64,16 +72,6 @@ const getCoverScale = (bounds: DimensionsObject, image: DimensionsObject) => {
     scale: widthIsClamp ? widthScale : heightScale,
   };
 };
-
-const matrixTupleTransformPoint = (matrix: DOMMatrixReadOnly, tuple: PointTuple): PointTuple => {
-  const domPoint = matrix.transformPoint(new DOMPoint(...tuple));
-  return [domPoint.x, domPoint.y];
-};
-
-const addTuple = ([ax, ay]: PointTuple, [bx, by]:PointTuple):PointTuple => [ax + bx, ay + by];
-
-const negateMap = (num) => num * -1;
-
 
 const TextureTransformEditorLOC = ({ classes }) => {
   const dragMode = useDragMode();
@@ -154,29 +152,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
       .inverse()),
     absoluteMovementToSvg(absCoords),
   );
-
-  const matrixWithTransformCenter = (origin, scale, rotation) => (new DOMMatrixReadOnly())
-    .translate(...origin)
-    .scale(scale, scale)
-    .rotate(rotation)
-    .translate(...origin.map(negateMap));
-
-  // TODO: can this calculation be siplified?
-  const calculateTransformOriginChangeOffset = (
-    oldTransformOrigin, newTransformOrigin,
-    scale, rotation, translation,
-  ) => {
-    const newMatrix = matrixWithTransformCenter(newTransformOrigin, scale, rotation);
-    const oldMatrix = matrixWithTransformCenter(oldTransformOrigin, scale, rotation);
-    return addTuple(
-      matrixTupleTransformPoint(newMatrix, translation),
-      matrixTupleTransformPoint(oldMatrix, translation).map(negateMap),
-    );
-  };
-
-  const getTextureTransformMatrix = (origin, scale, rotation, translation) => (new DOMMatrixReadOnly())
-    .translate(...translation)
-    .multiply(matrixWithTransformCenter(origin, scale, rotation));
 
   const m = getTextureTransformMatrix(
     transformOriginDragged, textureScaleValue, textureRotationDragged, textureTranslationDragged,
