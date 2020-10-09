@@ -1,19 +1,24 @@
-import { action, computed, observable } from 'mobx';
+import {
+  action, computed, observable, reaction, runInAction,
+} from 'mobx';
+
 // @ts-ignore
 import { Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 import { subtract } from '@flatten-js/boolean-op';
-import { chunk, flatten, range } from 'lodash';
+import { chunk, flatten, range, omit } from 'lodash';
 import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, polygonPointsGivenAnglesAndSides, triangleAnglesGivenSides,
 } from '../../common/util/geom';
-import { PyramidNetSpec } from '../components/PyramidNet';
+import { FaceDecorationSpec, PyramidNetSpec } from '../components/PyramidNet';
 import { DashPatternStore } from './DashPatternStore';
 import { AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
 import { BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
 import { EVENTS } from '../../../main/ipc';
+import { getTextureTransformMatrix } from '../../common/util/2d-transform';
+import { closedPolygonPath } from '../util/shapes/generic';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
@@ -55,34 +60,71 @@ const defaultNet:PyramidNetSpec = {
 export class PyramidNetStore {
   constructor(data = defaultNet) {
     this.loadSpec(data);
-    // no-op on initial BrowserWindow instantiation, ensures texture fitting is updated upon dieline viewer reload
-    this.sendTextureEditorUpdate();
+    reaction(() => this.faceDecoration, async (faceDecorationProxy) => {
+      // TODO: this is kludge, will upgrading to mobx6 fix the need for "unproxying"?
+      const faceDecoration = faceDecorationProxy && JSON.parse(JSON.stringify(faceDecorationProxy));
+
+      if (faceDecoration) {
+        const croppedD = await globalThis.ipcRenderer.invoke(
+          // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
+          EVENTS.INTERSECT_SVG,
+          closedPolygonPath(this.normalizedBoundaryPoints).getD(),
+          faceDecoration.pathD,
+          this.faceDecorationPathMatrix,
+          faceDecoration.isPositive,
+        );
+
+        runInAction(() => {
+          this.activeCutHolePatternD = croppedD;
+        });
+
+        globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR,
+          // @ts-ignore
+          this.normalizedBoundaryPoints.map((pt) => pt.toArray()),
+          this.pyramidGeometryId,
+          faceDecoration);
+      } else {
+        this.activeCutHolePatternD = '';
+      }
+    });
   }
 
   @observable
   public pyramidGeometryId;
 
-  @action
-  setPyramidGeometryId(id) {
-    this.activeCutHolePatternD = '';
-    this.textureTransform = '';
-    this.pyramidGeometryId = id;
-    this.sendTextureEditorUpdate();
-  }
+  @observable
+  public faceDecoration: FaceDecorationSpec;
 
   @action
-  sendTextureEditorUpdate() {
+  setPyramidGeometryId(id) {
+    this.pyramidGeometryId = id;
+    this.faceDecoration = null;
+    this.activeCutHolePatternD = '';
     globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR,
-      polygonPointsGivenAnglesAndSides(
-        this.faceInteriorAngles,
-        this.normalizedFaceEdgeLengths,
-      ).map((pt) => pt.toArray()),
+      // @ts-ignore
+      this.normalizedBoundaryPoints.map((pt) => pt.toArray()),
       this.pyramidGeometryId);
+  }
+
+  @computed
+  get normalizedBoundaryPoints() {
+    return polygonPointsGivenAnglesAndSides(
+      this.faceInteriorAngles,
+      this.normalizedFaceEdgeLengths,
+    );
   }
 
   @computed
   get pyramidGeometry() {
     return polyhedra[this.pyramidGeometryId];
+  }
+
+  @computed
+  get faceDecorationPathMatrix() {
+    const {
+      origin, rotate, scale, translate,
+    } = this.faceDecoration;
+    return getTextureTransformMatrix(origin, scale, rotate, translate).toString();
   }
 
   @observable
@@ -103,8 +145,6 @@ export class PyramidNetStore {
   @observable
   public activeCutHolePatternD: string;
 
-  @observable
-  public textureTransform: string;
 
   @computed
   get faceInteriorAngles(): number[] {
@@ -206,23 +246,22 @@ export class PyramidNetStore {
     return (new DOMMatrixReadOnly()).scale(this.faceLengthAdjustRatio, this.faceLengthAdjustRatio);
   }
 
-  @action
-  setFaceHoleProperties(d, transform) {
-    this.activeCutHolePatternD = d;
-    this.textureTransform = transform;
-  }
-
-  @action
-  clearFaceHolePattern() {
-    this.activeCutHolePatternD = '';
-  }
-
   exportToJSONString() {
-    return JSON.stringify(this, null, 2);
+    // activeCutHolePatternD is the only property that is derived from other properties but is not computed
+    // in order to avoid the use of async computed plugin
+    return JSON.stringify(omit(this, ['activeCutHolePatternD']), null, 2);
   }
 
+  @action
+  setFaceDecoration(faceDecoration) {
+    this.faceDecoration = faceDecoration;
+  }
+
+  @action
   loadSpec(specData: PyramidNetSpec) {
-    const { baseScoreDashSpec, interFaceScoreDashSpec, ...rest } = specData;
+    const {
+      baseScoreDashSpec, interFaceScoreDashSpec, faceDecoration, ...rest
+    } = specData;
     Object.assign(this, rest);
     this.baseScoreDashSpec = new DashPatternStore(
       baseScoreDashSpec.strokeDashPathPatternId,
@@ -234,5 +273,6 @@ export class PyramidNetStore {
       interFaceScoreDashSpec.strokeDashLength,
       interFaceScoreDashSpec.strokeDashOffsetRatio,
     );
+    this.setFaceDecoration(faceDecoration);
   }
 }

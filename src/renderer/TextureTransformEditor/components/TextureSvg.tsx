@@ -12,13 +12,12 @@ export const TextureSvg = ({
   boundaryPathD,
   texturePathD,
   textureTransformMatrixStr,
-  textureScaleValue,
-  textureRef,
+  textureScale,
   textureTranslationUseDrag,
   transformOriginUseDrag,
   isPositive,
 }) => {
-  const scaleAdjust = (textureScaleValue * faceFittingScale);
+  const scaleAdjust = (textureScale * faceFittingScale);
   const CENTER_MARKER_RADIUS = 30 / scaleAdjust;
   const CENTER_MARKER_STROKE = 2 / scaleAdjust;
   const OPACITY = 0.3;
@@ -52,13 +51,14 @@ export const TextureSvg = ({
       </defs>
       <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
       <g transform={textureTransformMatrixStr}>
-        <path
-          pointerEvents="bounding-box"
-          ref={textureRef}
-          {...(showCenterMarker && textureTranslationUseDrag())}
-          fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
-          d={texturePathD}
-        />
+        {texturePathD && (
+          <path
+            pointerEvents="bounding-box"
+            {...(textureTranslationUseDrag && textureTranslationUseDrag())}
+            fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
+            d={texturePathD}
+          />
+        )}
         {showCenterMarker && texturePathD && (
           <g
             {...transformOriginUseDrag()}

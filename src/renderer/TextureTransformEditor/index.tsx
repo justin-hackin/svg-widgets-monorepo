@@ -6,6 +6,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import { Box, Paper } from '@material-ui/core';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
+import { svgPathBbox } from 'svg-path-bbox';
 
 // @ts-ignore
 import { point, Polygon } from '@flatten-js/core';
@@ -44,6 +45,11 @@ interface Boundary {
   vertices: PointTuple[]
 }
 
+interface Texture {
+  pathD: string,
+  dimensions: DimensionsObject,
+}
+
 const {
   createRef, useEffect, useState,
 } = React;
@@ -76,31 +82,17 @@ const getCoverScale = (bounds: DimensionsObject, image: DimensionsObject) => {
 const TextureTransformEditorLOC = ({ classes }) => {
   const dragMode = useDragMode();
 
-  const textureRef = createRef<SVGGraphicsElement>();
   const textureApplicationSvgRef = createRef<SVGElement>();
   const textureSvgRef = createRef<SVGSVGElement>();
 
   const [isPositive, setIsPositive] = useState(true);
 
   const [placementAreaDimensions, setPlacementAreaDimensions] = useState<DimensionsObject>();
-  // can't use early exit because image must render before it's onload sets imageDimensions
-  const [imageDimensions, setImageDimensions] = useState<DimensionsObject>();
 
   const [faceScale, setFaceScale] = useState(1);
   const [faceScaleMux, setFaceScaleMux] = useState(1);
   const faceScaleDragged = faceScaleMux * faceScale;
 
-  const [textureScale, setTextureScale] = useState<number>(1);
-  const [textureScaleMux, setTextureScaleMuxRaw] = useState<number>(1);
-  const textureScaleDragged = textureScale * textureScaleMux;
-  const MIN_SCALE = 0.1;
-  const MAX_SCALE = 5;
-
-  const setTextureScaleMux = (val) => {
-    if (inRange(val * textureScale, MIN_SCALE, MAX_SCALE)) {
-      setTextureScaleMuxRaw(val);
-    }
-  };
 
   // since both controls and matrix function require degrees, use degrees as unit instead of radians
   const [textureRotation, setTextureRotationRaw] = useState<number>(0);
@@ -122,7 +114,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const [transformOriginDelta, setTransformOriginDelta] = useState<PointTuple>([0, 0]);
   const transformOriginDragged = addTuple(transformOrigin, transformOriginDelta);
 
-  const [texturePathD, setTexturePathD] = useState<string>();
+  const [texture, setTextureRaw] = useState<Texture>();
 
   const [boundary, setBoundary] = useState<Boundary>();
 
@@ -134,10 +126,58 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
-  const { scale: imageCoverScale = 1, widthIsClamp: imageCoverWidthIsClamp } = getCoverScale(
-    viewBoxAttrs, imageDimensions,
-  ) || {};
-  const textureScaleValue = textureScaleDragged * imageCoverScale;
+  const imageCoverScale = texture ? getCoverScale(
+    viewBoxAttrs, texture.dimensions,
+  ).scale : 1;
+  const [textureScale, setTextureScale] = useState<number>(imageCoverScale);
+  const [textureScaleMux, setTextureScaleMuxRaw] = useState<number>(1);
+  const textureScaleDragged = textureScale * textureScaleMux;
+  const MIN_SCALE = 0.1 * imageCoverScale;
+  const MAX_SCALE = 5 * imageCoverScale;
+
+
+  const setTextureScaleMux = (val) => {
+    if (inRange(val * textureScale, MIN_SCALE, MAX_SCALE)) {
+      setTextureScaleMuxRaw(val);
+    }
+  };
+
+  const fitFaceToBounds = () => {
+    setTextureScale(imageCoverScale);
+  };
+
+  const fitTextureToFace = (imgDimensions = texture.dimensions) => {
+    if (!imgDimensions) { return; }
+    if (!viewBoxAttrs) {
+      throw new Error('Unexpected condition: imgDimensions defined but viewBoxAttrs undefined');
+    }
+    const { height, width, xmin } = viewBoxAttrs;
+    const { scale: imgCoverScale, widthIsClamp: imgCoverWidthIsClamp } = getCoverScale(
+      viewBoxAttrs, imgDimensions,
+    ) || {};
+    setTextureScale(imgCoverScale);
+    setTextureTranslation(imgCoverWidthIsClamp
+      ? [xmin, (height - (imgDimensions.height * imgCoverScale)) / 2]
+      : [xmin + (width - (imgDimensions.width * imgCoverScale)) / 2, 0]);
+  };
+
+  const setTexture = (pathD, recenterPath = false) => {
+    if (!pathD) { setTextureRaw(null); return; }
+    const [xmin, ymin, xmax, ymax] = svgPathBbox(pathD);
+    const dimensions = { width: xmax - xmin, height: ymax - ymin };
+    setTextureRaw({ pathD, dimensions });
+    if (recenterPath) {
+      fitTextureToFace(dimensions);
+    }
+  };
+
+  const setTextureDFromFile = async (url) => {
+    const d = await globalThis.ipcRenderer
+      .invoke(EVENTS.GET_SVG_STRING_BY_PATH, url)
+      .then((svgString) => extractCutHolesFromSvgString(svgString));
+    // TODO: error handling
+    setTexture(d, true);
+  };
 
 
   const absoluteMovementToSvg = (absCoords) => absCoords.map(
@@ -147,19 +187,20 @@ const TextureTransformEditorLOC = ({ classes }) => {
   // eslint-disable-next-line max-len
   const absoluteToRelativeCoords = (absCoords: PointTuple):PointTuple => matrixTupleTransformPoint(
     ((new DOMMatrixReadOnly())
-      .scale(textureScaleValue, textureScaleValue)
+      .scale(textureScaleDragged, textureScaleDragged)
       .rotate(textureRotationDragged)
       .inverse()),
     absoluteMovementToSvg(absCoords),
   );
 
-  const m = getTextureTransformMatrix(
-    transformOriginDragged, textureScaleValue, textureRotationDragged, textureTranslationDragged,
-  );
+  const m = texture ? getTextureTransformMatrix(
+    transformOriginDragged, textureScaleDragged, textureRotationDragged, textureTranslationDragged,
+  ) : null;
 
-  const textureTransformMatrixStr = m.toString();
+  const textureTransformMatrixStr = m ? m.toString() : '';
 
   const repositionTextureWithOriginOverCorner = (vertexIndex) => {
+    if (!m) { return; }
     const originAbsolute = matrixTupleTransformPoint(
       m, transformOrigin,
     );
@@ -168,6 +209,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   };
 
   const repositionOriginOverCorner = (vertexIndex) => {
+    if (!m) { return; }
     const relVertex = matrixTupleTransformPoint(
       m.inverse(), vertices[vertexIndex],
     );
@@ -177,20 +219,13 @@ const TextureTransformEditorLOC = ({ classes }) => {
     setTextureTranslation(addTuple(
       textureTranslation,
       calculateTransformOriginChangeOffset(transformOrigin, newTransformOrigin,
-        textureScaleValue, textureRotationDragged, textureTranslationDragged).map(negateMap),
+        textureScaleDragged, textureRotationDragged, textureTranslationDragged).map(negateMap),
     ));
-  };
-
-  const setTextureDFromFile = (url) => {
-    globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_STRING_BY_PATH, url)
-      .then((svgString) => {
-        setTexturePathD(extractCutHolesFromSvgString(svgString));
-      });
   };
 
   // Init
   useEffect(() => {
-    globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR, (e, faceVertices, aShapeId) => {
+    globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR, (e, faceVertices, aShapeId, faceDecoration) => {
       setShapeId(aShapeId);
       const points = faceVertices.map((vert) => point(...vert));
       const poly = new Polygon();
@@ -205,9 +240,21 @@ const TextureTransformEditorLOC = ({ classes }) => {
       const viewBoxAttrs = {
         xmin, ymin, width, height,
       };
-      setTimeout(() => {
-        setBoundary({ viewBoxAttrs, path: closedPolygonPath(points), vertices: faceVertices });
-      });
+      setBoundary({ viewBoxAttrs, path: closedPolygonPath(points), vertices: faceVertices });
+      if (faceDecoration) {
+        const {
+          scale, origin, translate, rotate, pathD, isPositive: faceDecorationIsPositive,
+        } = faceDecoration;
+        setIsPositive(faceDecorationIsPositive);
+        setTextureRotation(rotate);
+        setTextureScale(scale);
+        setTextureTranslation(translate);
+        setTransformOrigin(origin);
+        setTexture(pathD);
+      } else {
+        fitFaceToBounds();
+        setTexture(null);
+      }
     });
 
     const resizeHandler = () => {
@@ -226,23 +273,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (imageDimensions && viewBoxAttrs) {
-      const {
-        height, width, xmin,
-      } = viewBoxAttrs;
-      // the boundary update will trigger the offscreen canvas which will flip the changeRenderFlag
-      // that happens too early on first render
-      // TODO: make shape preview request canvas update when ready instead
-      setTransformOrigin([0, 0]);
-      setTextureRotation(0);
-      setTextureScale(1);
-      setTextureTranslation(imageCoverWidthIsClamp
-        ? [xmin, (height - (imageDimensions.height * imageCoverScale)) / 2]
-        : [xmin + (width - (imageDimensions.width * imageCoverScale)) / 2, 0]);
-    }
-  }, [viewBoxAttrs, imageDimensions]);
-
+  // DOM rendered container textureSvgRef
   useEffect(() => {
     const dragOver: any = (e) => {
       e.preventDefault();
@@ -292,7 +323,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
     };
   }, [textureSvgRef]);
 
-
   const textureTranslationUseDrag = useDrag(({ movement, down }) => {
     // accommodates the scale of svg so that the texture stays under the mouse
     if (dragMode === DRAG_MODES.TRANSLATE) {
@@ -328,7 +358,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
     } else {
       const relativeDifference = calculateTransformOriginChangeOffset(
         transformOrigin, transformOriginDragged,
-        textureScaleValue, textureRotationDragged, textureTranslationDragged,
+        textureScaleDragged, textureRotationDragged, textureTranslationDragged,
       );
       setTransformOrigin(transformOriginDragged);
       setTransformOriginDelta([0, 0]);
@@ -338,6 +368,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   const MIN_VIEW_SCALE = 0.3;
   const MAX_VIEW_SCALE = 3;
+  // mouse wheel scale/rotate/zoom
   const viewUseWheel = useGesture({
     onWheel: ({ movement: [, y] }) => {
       const percentHeightDelta = (y / placementAreaDimensions.height);
@@ -367,24 +398,22 @@ const TextureTransformEditorLOC = ({ classes }) => {
     },
   });
 
-  // update image dimensions when the image changes
-  useEffect(() => {
-    if (textureRef.current) {
-      const bb = textureRef.current.getBBox();
-      setImageDimensions({ width: bb.width, height: bb.height });
-    }
-  }, [texturePathD]);
-
   if (!placementAreaDimensions || !viewBoxAttrs) { return null; }
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   const faceScalePercentStr = `${faceScaleDragged * 100}%`;
   const faceScaleCenterPercentStr = `${((1 - faceScaleDragged) * 100) / 2}%`;
   const sendTexture = async () => {
-    const croppedTextureD = await globalThis.ipcRenderer.invoke(
-      EVENTS.INTERSECT_SVG, boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
-    );
-    globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, croppedTextureD, textureTransformMatrixStr);
+    if (!texture) { return; }
+    const faceDecoration = {
+      scale: textureScale,
+      rotate: textureRotation,
+      origin: transformOrigin,
+      translate: textureTranslation,
+      isPositive,
+      pathD: texture.pathD,
+    };
+    globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, faceDecoration);
   };
 
 
@@ -403,7 +432,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
             {...{
               viewBoxAttrs,
               shapeId,
-              texturePathD,
+              texturePathD: texture ? texture.pathD : '',
               boundaryPathD,
               textureTransformMatrixStr,
               transformOriginDragged,
@@ -434,11 +463,10 @@ const TextureTransformEditorLOC = ({ classes }) => {
               showCenterMarker
               {...{
                 boundaryPathD,
-                textureRef,
-                textureScaleValue,
+                textureScale: textureScaleDragged,
                 textureApplicationSvgRef,
                 transformOriginDragged,
-                texturePathD,
+                texturePathD: texture ? texture.pathD : '',
                 textureTransformMatrixStr,
                 textureTranslationUseDrag,
                 faceFittingScale,

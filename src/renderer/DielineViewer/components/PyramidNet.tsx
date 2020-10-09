@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { range } from 'lodash';
 import {
   degToRad, hingedPlot,
-  hingedPlotByProjectionDistance,
+  hingedPlotByProjectionDistance, PointTuple,
   radToDeg,
 } from '../../common/util/geom';
 import { PathData } from '../util/PathData';
@@ -28,6 +28,15 @@ export interface StoreSpec {
   pyramidNetSpec: PyramidNetSpec,
 }
 
+export interface FaceDecorationSpec {
+  pathD: string,
+  scale: number,
+  translate: PointTuple,
+  rotate: number,
+  origin: PointTuple,
+  isPositive: boolean,
+}
+
 export interface PyramidNetSpec {
   pyramidGeometryId: string,
   pyramidGeometry?: PyramidGeometrySpec,
@@ -36,8 +45,7 @@ export interface PyramidNetSpec {
   ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
   baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
   shapeHeightInCm: number,
-  activeCutHolePatternD?: string,
-  textureTransform?: string,
+  faceDecoration?: FaceDecorationSpec,
 }
 
 
@@ -83,14 +91,14 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
 
   useEffect(() => {
     // @ts-ignore
-    const setCutHoleHandler = (e, d, transform) => { store.pyramidNetSpec.setFaceHoleProperties(d, transform); };
+    const setFaceDecorationHandler = (e, faceDecoration) => { store.pyramidNetSpec.setFaceDecoration(faceDecoration); };
     // @ts-ignore
     const sendShapeUpdateHandler = () => { store.pyramidNetSpec.sendTextureEditorUpdate(); };
-    globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, setCutHoleHandler);
+    globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, setFaceDecorationHandler);
     globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
 
     return () => {
-      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_DIELINE_VIEWER, setCutHoleHandler);
+      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_DIELINE_VIEWER, setFaceDecorationHandler);
       globalThis.ipcRenderer.removeListener('die>request-shape-update', sendShapeUpdateHandler);
     };
   }, []);
