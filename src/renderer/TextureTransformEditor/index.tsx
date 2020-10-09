@@ -5,7 +5,6 @@ import { inRange } from 'lodash';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, withStyles } from '@material-ui/core/styles';
 import { Box, Paper } from '@material-ui/core';
-import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 import { svgPathBbox } from 'svg-path-bbox';
 
 // @ts-ignore
@@ -83,7 +82,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const dragMode = useDragMode();
 
   const textureApplicationSvgRef = createRef<SVGElement>();
-  const textureSvgRef = createRef<SVGSVGElement>();
 
   const [isPositive, setIsPositive] = useState(true);
 
@@ -122,7 +120,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const boundaryPathD = path ? path.getD() : null;
 
   const [shapeId, setShapeId] = useState();
-  const [isDragOver, setIsDragOver] = useState(false);
 
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
@@ -273,56 +270,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
     };
   }, []);
 
-  // DOM rendered container textureSvgRef
-  useEffect(() => {
-    const dragOver: any = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-
-    const dragEnter = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsDragOver(true);
-    };
-
-    const dragLeave = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsDragOver(false);
-    };
-
-    const drop: EventListener = (event:DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setIsDragOver(false);
-      const { dataTransfer: { files } = {} } = event;
-
-      if (files.length > 1) {
-        // eslint-disable-next-line no-alert
-        alert('Whoa there, only one file at a time in the Texture Fitting zone please');
-      } else {
-        setTextureDFromFile(files[0].path);
-      }
-    };
-
-    if (textureSvgRef.current) {
-      textureSvgRef.current.addEventListener('drop', drop, false);
-      textureSvgRef.current.addEventListener('dragover', dragOver, false);
-      textureSvgRef.current.addEventListener('dragenter', dragEnter, false);
-      textureSvgRef.current.addEventListener('dragleave', dragLeave, false);
-    }
-
-    return () => {
-      if (textureSvgRef.current) {
-        textureSvgRef.current.removeEventListener('drop', drop);
-        textureSvgRef.current.removeEventListener('dragover', dragOver);
-        textureSvgRef.current.removeEventListener('dragenter', dragEnter);
-        textureSvgRef.current.removeEventListener('dragleave', dragLeave);
-      }
-    };
-  }, [textureSvgRef]);
-
   const textureTranslationUseDrag = useDrag(({ movement, down }) => {
     // accommodates the scale of svg so that the texture stays under the mouse
     if (dragMode === DRAG_MODES.TRANSLATE) {
@@ -420,11 +367,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root} {...viewUseWheel()}>
-        {isDragOver && (
-          <div className={classes.loadingContainer}>
-            <SystemUpdateIcon />
-          </div>
-        )}
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview
             width={placementAreaDimensions.width}
@@ -451,7 +393,6 @@ const TextureTransformEditorLOC = ({ classes }) => {
           style={{ overflow: 'hidden', width: '50%' }}
         >
           <svg
-            ref={textureSvgRef}
             x={faceScaleCenterPercentStr}
             y={faceScaleCenterPercentStr}
             width={faceScalePercentStr}
