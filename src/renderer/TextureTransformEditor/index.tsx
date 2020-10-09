@@ -270,6 +270,9 @@ const TextureTransformEditorLOC = ({ classes }) => {
     };
   }, []);
 
+  // TODO: drag and drop functionality, removed in fd71f4aba9dd4a698e5a2667595cff82c8fb5cf5
+  // see commit message for rationale
+
   const textureTranslationUseDrag = useDrag(({ movement, down }) => {
     // accommodates the scale of svg so that the texture stays under the mouse
     if (dragMode === DRAG_MODES.TRANSLATE) {
