@@ -90,10 +90,15 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
   } = store;
 
   useEffect(() => {
+    const setFaceDecorationHandler = (e, faceDecoration) => {
     // @ts-ignore
-    const setFaceDecorationHandler = (e, faceDecoration) => { store.pyramidNetSpec.setFaceDecoration(faceDecoration); };
+      store.pyramidNetSpec.setFaceDecoration(faceDecoration);
+    };
+    const sendShapeUpdateHandler = () => {
     // @ts-ignore
-    const sendShapeUpdateHandler = () => { store.pyramidNetSpec.sendTextureEditorUpdate(); };
+      store.pyramidNetSpec.sendTextureEditorUpdate();
+    };
+
     globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, setFaceDecorationHandler);
     globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
 
@@ -179,7 +184,6 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
     <g>
       <path className="score" {...scoreProps} d={scorePathAggregate.getD()} />
       <path className="cut" {...cutProps} d={cutPathAggregate.getD()} />
-      <g />
       <g>
         {range(faceCount).map((index) => {
           const isOdd = !!(index % 2);
@@ -189,7 +193,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
 
           return index === 0
             ? (
-              <g id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
+              <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
                 <path d={closedPolygonPath(boundaryPoints).getD()} {...insetProps} />
                 { activeCutHolePatternD && (
                   <path d={activeCutHolePatternD} transform={pathScaleMatrix.toString()} {...cutProps} />
@@ -197,6 +201,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
               </g>
             ) : (
               <use
+                key={index}
                 xlinkHref={`#${CUT_HOLES_ID}`}
                 transform={
                   (new DOMMatrixReadOnly())
