@@ -191,7 +191,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   );
 
   const m = texture ? getTextureTransformMatrix(
-    transformOriginDragged, textureScaleDragged, textureRotationDragged, textureTranslationDragged,
+    transformOrigin, textureScaleDragged, textureRotationDragged, textureTranslationDragged,
   ) : null;
 
   const textureTransformMatrixStr = m ? m.toString() : '';
