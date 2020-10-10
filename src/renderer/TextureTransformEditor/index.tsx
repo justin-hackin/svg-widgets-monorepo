@@ -265,6 +265,8 @@ const TextureTransformEditorLOC = ({ classes }) => {
       resizeHandler();
     });
 
+    globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_UPDATE);
+
     return () => {
       window.removeEventListener('resize', resizeHandler);
     };

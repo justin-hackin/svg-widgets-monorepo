@@ -108,7 +108,6 @@ app.on('ready', async () => {
       webPreferences,
     }, 'texture-transform-editor');
     addEventListenersForWindow('tex');
-    browserWindows.die.webContents.send(EVENTS.REQUEST_SHAPE_UPDATE);
   };
   await assignTextureWindow();
 

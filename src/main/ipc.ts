@@ -16,7 +16,7 @@ export const EVENTS = {
   RESET_DRAG_MODE: 'reset-drag-mode',
   GET_SVG_STRING_BY_PATH: 'get-svg-string-by-path',
   GET_SVG_PATH: 'get-svg-path',
-  REQUEST_SHAPE_UPDATE: 'request-shape-update',
+  REQUEST_SHAPE_UPDATE: `die${EVENT_TARGET_DELIMITER}request-shape-update`,
   UPDATE_TEXTURE_EDITOR: `tex${EVENT_TARGET_DELIMITER}update-texture-editor`,
   UPDATE_DIELINE_VIEWER: `die${EVENT_TARGET_DELIMITER}update-dieline-viewer`,
 };

@@ -6,7 +6,9 @@ import {
 import { Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 import { subtract } from '@flatten-js/boolean-op';
-import { chunk, flatten, range, omit } from 'lodash';
+import {
+  chunk, flatten, range, omit,
+} from 'lodash';
 import { polyhedra } from './polyhedra';
 import {
   CM_TO_PIXELS_RATIO, polygonPointsGivenAnglesAndSides, triangleAnglesGivenSides,
@@ -56,13 +58,13 @@ const defaultNet:PyramidNetSpec = {
   },
   shapeHeightInCm: 40,
 };
-
+const jsonClone = (obj) => JSON.parse(JSON.stringify(obj));
 export class PyramidNetStore {
   constructor(data = defaultNet) {
     this.loadSpec(data);
     reaction(() => this.faceDecoration, async (faceDecorationProxy) => {
       // TODO: this is kludge, will upgrading to mobx6 fix the need for "unproxying"?
-      const faceDecoration = faceDecorationProxy && JSON.parse(JSON.stringify(faceDecorationProxy));
+      const faceDecoration = faceDecorationProxy && jsonClone(faceDecorationProxy);
 
       if (faceDecoration) {
         const croppedD = await globalThis.ipcRenderer.invoke(
@@ -77,16 +79,18 @@ export class PyramidNetStore {
         runInAction(() => {
           this.activeCutHolePatternD = croppedD;
         });
-
-        globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR,
-          // @ts-ignore
-          this.normalizedBoundaryPoints.map((pt) => pt.toArray()),
-          this.pyramidGeometryId,
-          faceDecoration);
       } else {
         this.activeCutHolePatternD = '';
       }
     });
+
+    reaction(
+      () => [this.normalizedBoundaryPoints, this.pyramidGeometryId, this.faceDecoration],
+      (props) => {
+        const [normalizedBoundaryPoints, pyramidGeometryId, faceDecoration] = props.map((prop) => jsonClone(prop));
+        this.sendTextureEditorUpdate(normalizedBoundaryPoints, pyramidGeometryId, faceDecoration);
+      },
+    );
   }
 
   @observable
@@ -100,10 +104,6 @@ export class PyramidNetStore {
     this.pyramidGeometryId = id;
     this.faceDecoration = null;
     this.activeCutHolePatternD = '';
-    globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR,
-      // @ts-ignore
-      this.normalizedBoundaryPoints.map((pt) => pt.toArray()),
-      this.pyramidGeometryId);
   }
 
   @computed
@@ -255,6 +255,19 @@ export class PyramidNetStore {
   @action
   setFaceDecoration(faceDecoration) {
     this.faceDecoration = faceDecoration;
+  }
+
+  @action
+  sendTextureEditorUpdate(
+    normalizedBoundaryPoints = this.normalizedBoundaryPoints,
+    pyramidGeometryId = this.pyramidGeometryId,
+    faceDecoration = this.faceDecoration,
+  ) {
+    globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR,
+      // @ts-ignore
+      normalizedBoundaryPoints.map((pt) => ([pt.x, pt.y])),
+      pyramidGeometryId,
+      faceDecoration);
   }
 
   @action
