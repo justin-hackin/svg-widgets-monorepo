@@ -1,5 +1,7 @@
 import { last } from 'lodash';
-import { hingedPlot, PointLike } from '../../../common/util/geom';
+import {
+  Coord, hingedPlot, PointLike, PointTuple,
+} from '../../../common/util/geom';
 import { PathData } from '../PathData';
 
 interface RoundPoint {
@@ -26,7 +28,7 @@ export const roundedEdgePath = (points: RoundPointPointsItem[], retractionDistan
   return path.line(last(points));
 };
 
-export const connectedLineSegments = (points) => {
+export const connectedLineSegments = (points: Coord[]) => {
   const path = new PathData();
   path.move(points[0]);
   for (const pt of points.slice(1)) {
@@ -35,4 +37,4 @@ export const connectedLineSegments = (points) => {
   return path;
 };
 
-export const closedPolygonPath = (points) => connectedLineSegments(points).close();
+export const closedPolygonPath = (points: Coord[]) => connectedLineSegments(points).close();

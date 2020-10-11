@@ -24,6 +24,7 @@ import { dashPatterns } from '../../data/dash-patterns';
 import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { MIRRORED_STROKES } from '../../config';
 import { EVENTS } from '../../../../main/ipc';
+import { store } from '../../data/PyramidNetMakerStore';
 
 
 export const ControlPanel = observer(({ store }) => {
@@ -38,6 +39,7 @@ export const ControlPanel = observer(({ store }) => {
   const [open, setOpen] = React.useState(false);
 
   const mapControlsSpecToComponents = ({
+  // @ts-ignore
     component, valuePath, label, disabled, ...props
   }) => {
     if (disabled) { return null; }
@@ -76,6 +78,7 @@ export const ControlPanel = observer(({ store }) => {
   // @ts-ignore
     .map(mapControlsSpecToComponents);
   const dashPatternOptions = Object.entries(dashPatterns).map(([key, { label }]) => ({ value: key, label }));
+
   const strokeControls = [{
     component: PanelSelect,
     valuePath: 'pyramidNetSpec.interFaceScoreDashSpec.strokeDashPathPatternId',
@@ -134,29 +137,29 @@ export const ControlPanel = observer(({ store }) => {
   const baseEdgeTabControl = [
     {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.tabDepthToAscendantEdgeLength',
+      valuePath: 'pyramidNetSpec.baseEdgeTabsSpec.tabDepthToAscendantEdgeLength',
       min: 0.6,
       max: 2,
       step: VERY_SMALL_NUMBER,
     }, {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finDepthToTabDepth',
+      valuePath: 'pyramidNetSpec.baseEdgeTabsSpec.finDepthToTabDepth',
       ...ratioSliderProps,
     }, {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeDepthToTabDepth',
+      valuePath: 'pyramidNetSpec.baseEdgeTabsSpec.holeDepthToTabDepth',
       ...ratioSliderProps,
     }, {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.finOffsetRatio',
+      valuePath: 'pyramidNetSpec.baseEdgeTabsSpec.finOffsetRatio',
       ...ratioSliderProps,
     }, {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeBreadthToHalfWidth',
+      valuePath: 'pyramidNetSpec.baseEdgeTabsSpec.holeBreadthToHalfWidth',
       ...ratioSliderProps,
     }, {
       component: PanelSlider,
-      valuePath: 'pyramidNetSpec.baseEdgeTabSpec.holeTaper',
+      valuePath: 'pyramidNetSpec.baseEdgeTabsSpec.holeTaper',
       min: Math.PI / 8,
       max: Math.PI / 3,
       step: VERY_SMALL_NUMBER,
@@ -265,7 +268,7 @@ export const ControlPanel = observer(({ store }) => {
               globalThis.ipcRenderer.invoke(
                 EVENTS.SAVE_NET_SVG_AND_SPEC,
                 store.renderPyramidNetToString(),
-                store.pyramidNetSpec.exportToJSONString(),
+                store.pyramidNetSpec.asJSON,
                 'Save pyramid net dielines and model',
               );
             }}

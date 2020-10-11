@@ -56,7 +56,9 @@ export const COMMAND_FACTORY = {
     code: 'T',
     to: castToArray(to),
   }),
-  A: (radiusX, radiusY, sweepFlag, largeArcFlag, xAxisRotation, to):Command => ({
+  A: (
+    radiusX: number, radiusY: number, sweepFlag: boolean, largeArcFlag: boolean, xAxisRotation: number, to:Coord,
+  ):Command => ({
     code: 'A',
     radius: [radiusX, radiusY],
     flags: [sweepFlag, largeArcFlag],
@@ -118,25 +120,27 @@ export class PathData {
     return this;
   }
 
-  cubicBezier(ctrl1, ctrl2, to):PathData {
+  cubicBezier(ctrl1: Coord, ctrl2: Coord, to: Coord):PathData {
     const command = COMMAND_FACTORY.C(ctrl1, ctrl2, to);
     this.commands.push(command);
     return this;
   }
 
-  quadraticBezier(ctrl1, to):PathData {
+  quadraticBezier(ctrl1: Coord, to: Coord):PathData {
     const command = COMMAND_FACTORY.Q(ctrl1, to);
     this.commands.push(command);
     return this;
   }
 
-  smoothQuadraticBezier(to):PathData {
+  smoothQuadraticBezier(to: Coord):PathData {
     const command = COMMAND_FACTORY.T(to);
     this.commands.push(command);
     return this;
   }
 
-  elipticalArc(to, radiusX, radiusY, sweepFlag, largeArcFlag, xAxisRotation):PathData {
+  elipticalArc(
+    to: Coord, radiusX:number, radiusY:number, sweepFlag:boolean, largeArcFlag:boolean, xAxisRotation:number,
+  ):PathData {
     const command = COMMAND_FACTORY.A(radiusX, radiusY, sweepFlag, largeArcFlag, xAxisRotation, to);
     this.commands.push(command);
     return this;
@@ -176,6 +180,7 @@ export class PathData {
       }
       // @ts-ignore
       acc.at = command.code === 'Z' ? commandsArray[this.getLastMoveIndex(index)] : command.to;
+      // @ts-ignore
       acc.commands.push(command);
       return acc;
     }, { at: [0, 0], commands: [] }).commands;

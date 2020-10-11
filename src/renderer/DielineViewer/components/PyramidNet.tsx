@@ -4,52 +4,19 @@ import React, { useEffect } from 'react';
 import { range } from 'lodash';
 import {
   degToRad, hingedPlot,
-  hingedPlotByProjectionDistance, PointTuple,
+  hingedPlotByProjectionDistance,
   radToDeg,
 } from '../../common/util/geom';
 import { PathData } from '../util/PathData';
-import { strokeDashPath, StrokeDashPathSpec } from '../util/shapes/strokeDashPath';
-import { baseEdgeConnectionTab, BaseEdgeConnectionTabSpec } from '../util/shapes/baseEdgeConnectionTab';
-import { ascendantEdgeConnectionTabs, AscendantEdgeTabsSpec } from '../util/shapes/ascendantEdgeConnectionTabs';
+import { strokeDashPath } from '../util/shapes/strokeDashPath';
+import { baseEdgeConnectionTab } from '../util/shapes/baseEdgeConnectionTab';
+import { ascendantEdgeConnectionTabs } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
-import { PyramidGeometrySpec } from '../data/polyhedra';
 import { EVENTS } from '../../../main/ipc';
+import { IPyramidNetFactoryModel } from '../data/PyramidNetMakerStore';
 
 
-export interface StyleSpec {
-  dieLineProps: object,
-  cutLineProps: object,
-  scoreLineProps: object,
-  designBoundaryProps: object,
-}
-
-export interface StoreSpec {
-  styleSpec: StyleSpec,
-  pyramidNetSpec: PyramidNetSpec,
-}
-
-export interface FaceDecorationSpec {
-  pathD: string,
-  scale: number,
-  translate: PointTuple,
-  rotate: number,
-  origin: PointTuple,
-  isPositive: boolean,
-}
-
-export interface PyramidNetSpec {
-  pyramidGeometryId: string,
-  pyramidGeometry?: PyramidGeometrySpec,
-  interFaceScoreDashSpec: StrokeDashPathSpec,
-  baseScoreDashSpec: StrokeDashPathSpec,
-  ascendantEdgeTabsSpec: AscendantEdgeTabsSpec,
-  baseEdgeTabSpec: BaseEdgeConnectionTabSpec,
-  shapeHeightInCm: number,
-  faceDecoration?: FaceDecorationSpec,
-}
-
-
-export const FaceBoundary = observer(({ store }:{store: StoreSpec}) => {
+export const FaceBoundary = observer(({ store }:{store: IPyramidNetFactoryModel}) => {
   const {
     styleSpec: { designBoundaryProps },
     // @ts-ignore
@@ -60,7 +27,7 @@ export const FaceBoundary = observer(({ store }:{store: StoreSpec}) => {
   return (<path {...designBoundaryProps} d={borderOverlay.pathAttrs().d} />);
 });
 
-export const FaceBoundarySVG = ({ store }:{store: StoreSpec}) => {
+export const FaceBoundarySVG = ({ store }:{store: IPyramidNetFactoryModel}) => {
   const {
     // @ts-ignore
     pyramidNetSpec: { borderPolygon, borderOverlay },
@@ -77,14 +44,13 @@ export const FaceBoundarySVG = ({ store }:{store: StoreSpec}) => {
   );
 };
 
-export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
+export const PyramidNet = observer(({ store }: {store: IPyramidNetFactoryModel}) => {
   const {
     styleSpec,
     pyramidNetSpec: {
       pyramidGeometry: { faceCount },
       interFaceScoreDashSpec, baseScoreDashSpec,
-      ascendantEdgeTabsSpec, baseEdgeTabSpec,
-      // @ts-ignore
+      ascendantEdgeTabsSpec, baseEdgeTabsSpec,
       tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, pathScaleMatrix, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, borderInsetFaceHoleTransformMatrix, // eslint-disable-line
     },
   } = store;
@@ -158,7 +124,7 @@ export const PyramidNet = observer(({ store }: {store: StoreSpec}) => {
   faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
     const edgePt2 = faceTabFenceposts[index + 1];
     const baseEdgeTab = baseEdgeConnectionTab(
-      edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabSpec, baseScoreDashSpec,
+      edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabsSpec, baseScoreDashSpec,
     );
     cutPathAggregate.concatPath(baseEdgeTab.cut);
     scorePathAggregate.concatPath(baseEdgeTab.score);

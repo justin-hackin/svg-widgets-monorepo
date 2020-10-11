@@ -3,15 +3,16 @@ import { Point } from '@flatten-js/core';
 import { last, range } from 'lodash';
 import { PathData } from '../PathData';
 import { lineLerp, PointLike, symmetricHingePlotByProjectionDistance } from '../../../common/util/geom';
-import { strokeDashPath, strokeDashPathRatios, StrokeDashPathSpec } from './strokeDashPath';
+import { strokeDashPath, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
 import { DOTTED_SCORES, MIRRORED_STROKES } from '../../config';
 import { symmetricRoundedTab } from './symmetricRoundedTab';
+import { IAscendantEdgeTabsModel, IStrokeDashPathPatternModel } from '../../data/PyramidNetStore';
 
 export const ascendantEdgeConnectionTabs = (
   start: PointLike, end: PointLike,
-  tabSpec: AscendantEdgeTabsSpec, scoreDashSpec: StrokeDashPathSpec, tabIntervalRatios, tabGapIntervalRatios,
+  tabSpec: IAscendantEdgeTabsModel, scoreDashSpec: IStrokeDashPathPatternModel, tabIntervalRatios, tabGapIntervalRatios,
 ): AscendantEdgeConnectionPaths => {
   const {
     holeFlapTaperAngle,

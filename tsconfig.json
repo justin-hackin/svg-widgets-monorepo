@@ -7,9 +7,12 @@
     "strict": false,
     "incremental": true,
     "noUnusedLocals": false,
+    "noStrictGenericChecks": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
     "noImplicitAny": false,
-    "strictNullChecks": false,
-    "noStrictGenericChecks": true
+    "noImplicitReturns": true,
+    "noImplicitThis": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

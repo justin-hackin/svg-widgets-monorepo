@@ -42,7 +42,7 @@ export const TextureControls = ({
   };
 
 
-  const handleCornerSnapMenuClose = (index:number = undefined, isOriginOnly: boolean = false) => {
+  const handleCornerSnapMenuClose = (index, isOriginOnly: boolean = false) => {
     if (index !== undefined) {
       if (isOriginOnly) {
         repositionOriginOverCorner(index);
@@ -72,6 +72,7 @@ export const TextureControls = ({
               <CachedIcon />
             </InputAdornment>
           ),
+          // @ts-ignore
           inputComponent: NumberFormatDecimalDegrees,
         }}
         variant="filled"
@@ -90,7 +91,7 @@ export const TextureControls = ({
         keepMounted
         variant="menu"
         open={Boolean(cornerSnapMenuAnchorEl)}
-        onClose={() => { handleCornerSnapMenuClose(); }}
+        onClose={() => { handleCornerSnapMenuClose(undefined); }}
       >
         {range(3).map((index) => (
           <MenuItem

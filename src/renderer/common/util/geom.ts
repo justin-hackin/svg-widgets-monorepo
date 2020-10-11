@@ -15,7 +15,7 @@ export interface PointLike {
 export type PointTuple = Array<number>;
 export type Coord = PointTuple | PointLike;
 
-export const PHI = (1 + Math.sqrt(5)) / 2;
+export const PHI:number = (1 + Math.sqrt(5)) / 2;
 export const CM_TO_PIXELS_RATIO = 37.7952755906;
 
 export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;

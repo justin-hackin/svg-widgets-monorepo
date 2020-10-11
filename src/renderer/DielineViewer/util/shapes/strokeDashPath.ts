@@ -2,6 +2,7 @@ import { last, range, sum } from 'lodash';
 import { lineLerp, PointLike } from '../../../common/util/geom';
 import { PathData } from '../PathData';
 import { DOTTED_SCORES } from '../../config';
+import { IStrokeDashPathPatternModel } from '../../data/PyramidNetStore';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -13,20 +14,8 @@ export function lineSeries(startEndArray) {
   return path;
 }
 
-interface StrokeDashPathPatternSpec {
-  relativeStrokeDasharray: number[],
-  label: string,
-}
-
-export interface StrokeDashPathSpec {
-  strokeDashPathPatternId: string,
-  strokeDashPathPattern?: StrokeDashPathPatternSpec,
-  strokeDashLength: number,
-  strokeDashOffsetRatio: number,
-}
-
 export function strokeDashPathRatios(
-  start: PointLike, end: PointLike, dashSpec: StrokeDashPathSpec,
+  start: PointLike, end: PointLike, dashSpec: IStrokeDashPathPatternModel,
 ) {
   const {
     strokeDashPathPattern: { relativeStrokeDasharray },

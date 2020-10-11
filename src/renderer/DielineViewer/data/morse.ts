@@ -1,5 +1,7 @@
-
-const charCodeBool = {
+interface CharCodeBool {
+  [key: string]: boolean[]
+}
+const charCodeBool:CharCodeBool = {
   0: [true, true, true, true, true],
   1: [false, true, true, true, true],
   2: [false, false, true, true, true],
@@ -38,8 +40,8 @@ const charCodeBool = {
   z: [true, true, false, false],
 };
 
-export const convertMessageToMorseBooleanString = (message) => {
-  const booleanMessage = [];
+export const convertMessageToMorseBooleanString = (message):boolean[] => {
+  const booleanMessage:boolean[] = [];
   for (const char of message.toLowerCase().replace(/\s/g, '')) {
     if (!charCodeBool[char]) {
       throw new Error('message contains invalid characters, use only alphanumeric characters and spaces (stripped)');

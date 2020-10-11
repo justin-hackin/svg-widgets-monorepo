@@ -5,18 +5,10 @@ import {
   hingedPlotLerp, intersectLineLine,
   PointLike, VERY_LARGE_NUMBER,
 } from '../../../common/util/geom';
-import { strokeDashPath, StrokeDashPathSpec } from './strokeDashPath';
-import { connectedLineSegments, roundedEdgePath } from './generic';
+import { strokeDashPath } from './strokeDashPath';
+import { connectedLineSegments } from './generic';
 import { arrowTab } from './symmetricRoundedTab';
-
-export interface BaseEdgeConnectionTabSpec {
-  tabDepthToAscendantEdgeLength: number,
-  holeDepthToTabDepth: number,
-  holeTaper: number,
-  holeBreadthToHalfWidth: number,
-  finDepthToTabDepth: number,
-  finOffsetRatio: number,
-}
+import { IBaseEdgeTabsModel, IDashPatternModel } from '../../data/PyramidNetStore';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,
@@ -31,7 +23,7 @@ export interface BaseEdgeConnectionTab {
 
 export function baseEdgeConnectionTab(
   start: PointLike, end: PointLike,
-  ascendantEdgeTabDepth, tabSpec: BaseEdgeConnectionTabSpec, scoreDashSpec: StrokeDashPathSpec,
+  ascendantEdgeTabDepth, tabSpec: IBaseEdgeTabsModel, scoreDashSpec: IDashPatternModel,
 ): BaseEdgeConnectionTab {
   const {
     tabDepthToAscendantEdgeLength,

@@ -27,6 +27,7 @@ import {
   matrixTupleTransformPoint,
   negateMap,
 } from '../common/util/2d-transform';
+import { IFaceDecorationModel } from '../DielineViewer/data/PyramidNetStore';
 
 interface DimensionsObject {
   width: number,
@@ -58,7 +59,7 @@ const {
 // TODO: make router wrap with styles
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
-const getFitScale = (bounds: DimensionsObject, image: DimensionsObject) => {
+const getFitScale = (bounds: (DimensionsObject | undefined), image: (DimensionsObject | undefined)) => {
   if (!bounds || !image) { return null; }
   const widthIsClamp = (bounds.width / bounds.height) <= (image.width / image.height);
   return {
@@ -67,7 +68,7 @@ const getFitScale = (bounds: DimensionsObject, image: DimensionsObject) => {
   };
 };
 
-const getCoverScale = (bounds: DimensionsObject, image: DimensionsObject) => {
+const getCoverScale = (bounds: (DimensionsObject | undefined), image: (DimensionsObject | undefined)) => {
   if (!bounds || !image) { return null; }
   const widthScale = bounds.width / image.width;
   const heightScale = bounds.height / image.height;
@@ -123,6 +124,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   // slider component should enforce range and prevent tile from going outside bounds on change of window size
   const { scale: faceFittingScale = 1 } = getFitScale(placementAreaDimensions, viewBoxAttrs) || {};
+  // @ts-ignore
   const imageCoverScale = texture ? getCoverScale(
     viewBoxAttrs, texture.dimensions,
   ).scale : 1;
@@ -143,13 +145,15 @@ const TextureTransformEditorLOC = ({ classes }) => {
     setTextureScale(imageCoverScale);
   };
 
-  const fitTextureToFace = (imgDimensions = texture.dimensions) => {
+  const { dimensions: textureDimensions } = texture || {};
+
+  const fitTextureToFace = (imgDimensions: (DimensionsObject | undefined) = textureDimensions) => {
     if (!imgDimensions) { return; }
     if (!viewBoxAttrs) {
       throw new Error('Unexpected condition: imgDimensions defined but viewBoxAttrs undefined');
     }
     const { height, width, xmin } = viewBoxAttrs;
-    const { scale: imgCoverScale, widthIsClamp: imgCoverWidthIsClamp } = getCoverScale(
+    const { scale: imgCoverScale = 1, widthIsClamp: imgCoverWidthIsClamp } = getCoverScale(
       viewBoxAttrs, imgDimensions,
     ) || {};
     setTextureScale(imgCoverScale);
@@ -159,7 +163,11 @@ const TextureTransformEditorLOC = ({ classes }) => {
   };
 
   const setTexture = (pathD, recenterPath = false) => {
-    if (!pathD) { setTextureRaw(null); return; }
+    if (!pathD) {
+      // @ts-ignore
+      setTextureRaw(null);
+      return;
+    }
     const [xmin, ymin, xmax, ymax] = svgPathBbox(pathD);
     const dimensions = { width: xmax - xmin, height: ymax - ymin };
     setTextureRaw({ pathD, dimensions });
@@ -197,7 +205,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   const textureTransformMatrixStr = m ? m.toString() : '';
 
   const repositionTextureWithOriginOverCorner = (vertexIndex) => {
-    if (!m) { return; }
+    if (!m || !vertices) { return; }
     const originAbsolute = matrixTupleTransformPoint(
       m, transformOrigin,
     );
@@ -206,7 +214,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   };
 
   const repositionOriginOverCorner = (vertexIndex) => {
-    if (!m) { return; }
+    if (!m || !vertices) { return; }
     const relVertex = matrixTupleTransformPoint(
       m.inverse(), vertices[vertexIndex],
     );
@@ -276,6 +284,8 @@ const TextureTransformEditorLOC = ({ classes }) => {
   // see commit message for rationale
 
   const textureTranslationUseDrag = useDrag(({ movement, down }) => {
+    // early exit not possible before hooks
+    if (!placementAreaDimensions) { return; }
     // accommodates the scale of svg so that the texture stays under the mouse
     if (dragMode === DRAG_MODES.TRANSLATE) {
       if (down) {
@@ -323,6 +333,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
   // mouse wheel scale/rotate/zoom
   const viewUseWheel = useGesture({
     onWheel: ({ movement: [, y] }) => {
+      if (!placementAreaDimensions) { return; }
       const percentHeightDelta = (y / placementAreaDimensions.height);
       const newScaleViewMux = (percentHeightDelta + 1) * faceScaleMux;
       if (
