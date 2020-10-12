@@ -229,7 +229,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
   // Init
   useEffect(() => {
-    globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR, (e, faceVertices, aShapeId, faceDecoration) => {
+    const updateTextureEditorHandler = (e, faceVertices, aShapeId, faceDecoration) => {
       setShapeId(aShapeId);
       const points = faceVertices.map((vert) => point(...vert));
       const poly = new Polygon();
@@ -259,7 +259,8 @@ const TextureTransformEditorLOC = ({ classes }) => {
         fitFaceToBounds();
         setTexture(null);
       }
-    });
+    };
+    globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR, updateTextureEditorHandler);
 
     const resizeHandler = () => {
       const { outerWidth: width, outerHeight: height } = window;
@@ -276,6 +277,7 @@ const TextureTransformEditorLOC = ({ classes }) => {
 
     return () => {
       window.removeEventListener('resize', resizeHandler);
+      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR, updateTextureEditorHandler);
     };
   }, []);
 
