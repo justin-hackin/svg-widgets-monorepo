@@ -3,6 +3,7 @@ import { set } from 'lodash';
 import { types, Instance } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+// eslint-disable-next-line import/no-cycle
 import {
   FaceBoundarySVG, PyramidNet,
 } from '../components/PyramidNet';

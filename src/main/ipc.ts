@@ -5,8 +5,12 @@ const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean-a
 const { VERY_LARGE_NUMBER } = require('../renderer/common/util/geom');
 const { PathData } = require('../renderer/DielineViewer/util/PathData');
 
+interface Events {
+  [key: string]: string,
+}
+
 export const EVENT_TARGET_DELIMITER = '<=';
-export const EVENTS = {
+export const EVENTS:Events = {
   SAVE_SVG: 'save-svg',
   SAVE_NET_SVG_AND_SPEC: 'save-net-svg-and-spec',
   INTERSECT_SVG: 'intersect-svg',

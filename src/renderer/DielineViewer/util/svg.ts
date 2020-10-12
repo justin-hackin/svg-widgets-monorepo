@@ -8,11 +8,13 @@ const parseString = (str) => {
 export const extractCutHolesFromSvgString = (svgString:string):string => {
   const doc = parseString(svgString);
   const path = doc.querySelector('path:last-of-type');
-  return path ? path.getAttribute('d') : null;
+  return path ? (path.getAttribute('d') || '') : '';
 };
 
-export const extractViewBoxFromSvg = (svgString:string):string => {
+export const extractViewBoxFromSvg = (svgString:string) => {
   const doc = parseString(svgString);
+  // TODO: error handling
+  // @ts-ignore
   return doc.querySelector('svg').getAttribute('viewBox');
 };
 

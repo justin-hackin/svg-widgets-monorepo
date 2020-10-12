@@ -8,11 +8,11 @@ import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
 import { DOTTED_SCORES, MIRRORED_STROKES } from '../../config';
 import { symmetricRoundedTab } from './symmetricRoundedTab';
-import { IAscendantEdgeTabsModel, IStrokeDashPathPatternModel } from '../../data/PyramidNetStore';
+import { IAscendantEdgeTabsModel, IDashPatternModel } from '../../data/PyramidNetStore';
 
 export const ascendantEdgeConnectionTabs = (
   start: PointLike, end: PointLike,
-  tabSpec: IAscendantEdgeTabsModel, scoreDashSpec: IStrokeDashPathPatternModel, tabIntervalRatios, tabGapIntervalRatios,
+  tabSpec: IAscendantEdgeTabsModel, scoreDashSpec: IDashPatternModel, tabIntervalRatios, tabGapIntervalRatios,
 ): AscendantEdgeConnectionPaths => {
   const {
     holeFlapTaperAngle,
@@ -88,6 +88,7 @@ export const ascendantEdgeConnectionTabs = (
       midpointDepthToTabDepth, tabDepthToBaseLength, tabRoundingDistanceRatio, tabWideningAngle,
     );
 
+    // @ts-ignore
     maleScoreLineIntervals.push([new Point(...tabPath.commands[0].to), new Point(...last(tabPath.commands).to)]);
     tabPath.sliceCommandsDangerously(1);
     // roundedEdgePath assumes first point is move command but we needed and applied line

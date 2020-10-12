@@ -21,6 +21,7 @@ export const PanelSlider = ({
         aria-labelledby={labelId}
         valueLabelDisplay="auto"
         valueLabelFormat={(val) => val && val.toFixed(2)}
+        // @ts-ignore
         onChange={(e:any, val:number) => {
           setter(val);
         }}

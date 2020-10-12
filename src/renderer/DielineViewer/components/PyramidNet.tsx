@@ -13,6 +13,7 @@ import { baseEdgeConnectionTab } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
 import { EVENTS } from '../../../main/ipc';
+// eslint-disable-next-line import/no-cycle
 import { IPyramidNetFactoryModel } from '../data/PyramidNetMakerStore';
 
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { hot } from 'react-hot-loader/root';
 import { TextureTransformEditor } from './TextureTransformEditor';
 import { DielineViewer } from './DielineViewer';
 import './common/style/index.css';

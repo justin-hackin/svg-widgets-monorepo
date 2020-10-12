@@ -59,7 +59,8 @@ app.on('ready', async () => {
   const browserWindows:windowMappingObject = {};
   const routedEventListeners = {};
 
-  const getRoutedEventsByPrefix = (windowPrefix) => Object.values(EVENTS)
+  const getRoutedEventsByPrefix = (windowPrefix:string):string[] => Object.values(EVENTS)
+  // @ts-ignore
     .filter((eventName:string) => eventName.startsWith(`${windowPrefix}${EVENT_TARGET_DELIMITER}`));
 
   const addEventListenersForWindow = (windowPrefix) => {

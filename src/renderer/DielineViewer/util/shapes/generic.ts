@@ -1,6 +1,6 @@
 import { last } from 'lodash';
 import {
-  Coord, hingedPlot, PointLike, PointTuple,
+  Coord, hingedPlot, PointLike,
 } from '../../../common/util/geom';
 import { PathData } from '../PathData';
 

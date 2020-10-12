@@ -8,7 +8,7 @@
     "incremental": true,
     "noUnusedLocals": false,
     "noStrictGenericChecks": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "strictFunctionTypes": true,
     "noImplicitAny": false,
     "noImplicitReturns": true,

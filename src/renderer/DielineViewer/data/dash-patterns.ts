@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { IStrokeDashPathPatternModel } from './PyramidNetStore';
 import { convertMessageToMorseBooleanString } from './morse';
 import { PHI } from '../../common/util/geom';

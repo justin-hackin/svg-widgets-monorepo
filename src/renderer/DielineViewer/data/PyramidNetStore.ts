@@ -18,6 +18,7 @@ import {
 import { EVENTS } from '../../../main/ipc';
 import { getTextureTransformMatrix } from '../../common/util/2d-transform';
 import { closedPolygonPath } from '../util/shapes/generic';
+// eslint-disable-next-line import/no-cycle
 import { dashPatterns } from './dash-patterns';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
@@ -223,6 +224,7 @@ export const PyramidNetModel = types.model({
       this.setFaceDecoration(undefined);
     },
 
+    // eslint-disable-next-line func-names
     setFaceDecoration: flow(function* (faceDecoration) {
       debugger; // eslint-disable-line no-debugger
       self.faceDecoration = faceDecoration;

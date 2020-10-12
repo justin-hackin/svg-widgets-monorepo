@@ -24,8 +24,6 @@ import { dashPatterns } from '../../data/dash-patterns';
 import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { MIRRORED_STROKES } from '../../config';
 import { EVENTS } from '../../../../main/ipc';
-import { store } from '../../data/PyramidNetMakerStore';
-
 
 export const ControlPanel = observer(({ store }) => {
   // @ts-ignore
@@ -79,6 +77,7 @@ export const ControlPanel = observer(({ store }) => {
     .map(mapControlsSpecToComponents);
   const dashPatternOptions = Object.entries(dashPatterns).map(([key, { label }]) => ({ value: key, label }));
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const strokeControls = [{
     component: PanelSelect,
     valuePath: 'pyramidNetSpec.interFaceScoreDashSpec.strokeDashPathPatternId',

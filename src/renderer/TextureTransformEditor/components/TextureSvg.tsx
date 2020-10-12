@@ -6,16 +6,16 @@ const HOLES_COLOR = '#101010';
 const MATERIAL_COLOR = '#ffaa00';
 
 export const TextureSvg = ({
-  showCenterMarker,
-  faceFittingScale,
-  transformOriginDragged,
+  showCenterMarker = undefined,
+  faceFittingScale = 1,
+  transformOriginDragged = [0, 0],
   boundaryPathD,
-  texturePathD,
-  textureTransformMatrixStr,
-  textureScale,
-  textureTranslationUseDrag,
-  transformOriginUseDrag,
-  isPositive,
+  texturePathD = undefined,
+  textureTransformMatrixStr = undefined,
+  textureScale = 1,
+  textureTranslationUseDrag = () => null,
+  transformOriginUseDrag = () => null,
+  isPositive = undefined,
 }) => {
   const scaleAdjust = (textureScale * faceFittingScale);
   const CENTER_MARKER_RADIUS = 30 / scaleAdjust;
@@ -86,7 +86,7 @@ export const TextureSvg = ({
                   key={index}
                   stroke="#000"
                   opacity={OPACITY + 0.4}
-                  markerEnd={index === 2 ? 'url(#Arrow1Lend)' : null}
+                  markerEnd={index === 2 ? 'url(#Arrow1Lend)' : ''}
                   strokeWidth={CENTER_MARKER_STROKE}
                 />
               );

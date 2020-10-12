@@ -33,7 +33,7 @@ export const ShapePreview = ({
   const polyhedronObjectRef = useRef<Object3D>();
   const threeContainerRef = useRef<HTMLDivElement>();
   const textureCanvasRef = useRef<OffscreenCanvas>();
-  const requestRef = React.useRef<number>();
+  const requestRef = React.useRef<number>(0);
 
   // update shape texture
   useEffect(() => {
@@ -42,16 +42,18 @@ export const ShapePreview = ({
       // TODO: throw if material not MeshPhong
       // @ts-ignore
       const { material }: {material: MeshPhongMaterial} = polyhedronMesh;
-      const ctx = textureCanvasRef.current.getContext('2d');
-      // @ts-ignore
+      const ctx = textureCanvasRef.current.getContext('2d') as OffscreenCanvasRenderingContext2D;
       const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, {
         texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginDragged, isPositive,
       }));
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
+      // @ts-ignore
       Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
         await v.render();
+        // @ts-ignore
         material.map.image = textureCanvasRef.current.transferToImageBitmap();
+        // @ts-ignore
         material.map.needsUpdate = true;
       });
     }
@@ -75,6 +77,7 @@ export const ShapePreview = ({
       preserveDrawingBuffer: true,
     });
     theRenderer.setPixelRatio(window.devicePixelRatio);
+    // @ts-ignore
     threeContainerRef.current.appendChild(theRenderer.domElement);
     setRenderer(theRenderer);
 
@@ -117,6 +120,7 @@ export const ShapePreview = ({
         polyhedronObjectRef.current = importScene;
 
         // only set the polyhedron once, there should be only one mesh
+        // @ts-ignore
         scene.traverse((child: Mesh) => {
           if (child.isMesh) {
             const scale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
@@ -126,16 +130,10 @@ export const ShapePreview = ({
           }
         });
       },
-      null,
-      // called when loading has errors
-      () => {
-        // TODO: handle error
-      },
     );
   }, [shapeId, camera, scene]);
 
 
-  return (
-    <div ref={threeContainerRef} id="3d-preview-container" />
-  );
+  // @ts-ignore
+  return (<div ref={threeContainerRef} id="3d-preview-container" />);
 };

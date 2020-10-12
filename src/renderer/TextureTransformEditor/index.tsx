@@ -27,7 +27,6 @@ import {
   matrixTupleTransformPoint,
   negateMap,
 } from '../common/util/2d-transform';
-import { IFaceDecorationModel } from '../DielineViewer/data/PyramidNetStore';
 
 interface DimensionsObject {
   width: number,
