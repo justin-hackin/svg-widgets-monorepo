@@ -3,9 +3,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { range } from 'lodash';
 import {
-  degToRad, hingedPlot,
-  hingedPlotByProjectionDistance,
-  radToDeg,
+  degToRad, hingedPlot, hingedPlotByProjectionDistance, radToDeg,
 } from '../../common/util/geom';
 import { PathData } from '../util/PathData';
 import { strokeDashPath } from '../util/shapes/strokeDashPath';
@@ -16,35 +14,6 @@ import { EVENTS } from '../../../main/ipc';
 // eslint-disable-next-line import/no-cycle
 import { IPyramidNetFactoryModel } from '../data/PyramidNetMakerStore';
 
-
-export const FaceBoundary = observer(({ store }:{store: IPyramidNetFactoryModel}) => {
-  const {
-    styleSpec: { designBoundaryProps },
-    // @ts-ignore
-    pyramidNetSpec: { borderOverlay },
-  } = store;
-
-  // TODO: can be converted to a path inset using @flatten-js/polygon-offset
-  return (<path {...designBoundaryProps} d={borderOverlay.pathAttrs().d} />);
-});
-
-export const FaceBoundarySVG = ({ store }:{store: IPyramidNetFactoryModel}) => {
-  const {
-    // @ts-ignore
-    pyramidNetSpec: { borderPolygon, borderOverlay },
-  } = store;
-  const {
-    xmin, xmax, ymin, ymax,
-  } = borderOverlay.box;
-
-  // TODO: can be converted to a path inset using @flatten-js/polygon-offset
-  return (
-    <svg viewBox={`${xmin} ${ymin} ${xmax - xmin} ${ymax - ymin}`}>
-      <path fill="#FFD900" stroke="#000" d={borderPolygon.pathAttrs().d} />
-    </svg>
-  );
-};
-
 export const PyramidNet = observer(({ store }: {store: IPyramidNetFactoryModel}) => {
   const {
     styleSpec,
@@ -52,7 +21,10 @@ export const PyramidNet = observer(({ store }: {store: IPyramidNetFactoryModel})
       pyramidGeometry: { faceCount },
       interFaceScoreDashSpec, baseScoreDashSpec,
       ascendantEdgeTabsSpec, baseEdgeTabsSpec,
-      tabIntervalRatios, tabGapIntervalRatios, boundaryPoints, pathScaleMatrix, faceInteriorAngles, actualFaceEdgeLengths, ascendantEdgeTabDepth, activeCutHolePatternD, borderInsetFaceHoleTransformMatrix, // eslint-disable-line
+      tabIntervalRatios, tabGapIntervalRatios,
+      boundaryPoints, pathScaleMatrix, faceInteriorAngles,
+      actualFaceEdgeLengths, ascendantEdgeTabDepth,
+      activeCutHolePatternD, borderInsetFaceHoleTransformMatrix,
     },
   } = store;
 

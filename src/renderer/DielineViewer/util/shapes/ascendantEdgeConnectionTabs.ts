@@ -1,14 +1,31 @@
 // @ts-ignore
 import { Point } from '@flatten-js/core';
 import { last, range } from 'lodash';
+import { Instance, types } from 'mobx-state-tree';
+
 import { PathData } from '../PathData';
 import { lineLerp, PointLike, symmetricHingePlotByProjectionDistance } from '../../../common/util/geom';
-import { strokeDashPath, strokeDashPathRatios } from './strokeDashPath';
+import { IDashPatternModel, strokeDashPath, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
 import { DOTTED_SCORES, MIRRORED_STROKES } from '../../config';
 import { symmetricRoundedTab } from './symmetricRoundedTab';
-import { IAscendantEdgeTabsModel, IDashPatternModel } from '../../data/PyramidNetStore';
+
+export const AscendantEdgeTabsModel = types.model({
+  flapRoundingDistanceRatio: types.number,
+  holeFlapTaperAngle: types.number,
+  holeReachToTabDepth: types.number,
+  holeWidthRatio: types.number,
+  midpointDepthToTabDepth: types.number,
+  tabDepthToTraversalLength: types.number,
+  tabRoundingDistanceRatio: types.number,
+  tabStartGapToTabDepth: types.number,
+  tabWideningAngle: types.number,
+  tabsCount: types.integer,
+});
+
+export interface IAscendantEdgeTabsModel extends Instance<typeof AscendantEdgeTabsModel> {
+}
 
 export const ascendantEdgeConnectionTabs = (
   start: PointLike, end: PointLike,

@@ -1,12 +1,10 @@
 /* eslint-disable max-classes-per-file,no-param-reassign */
 import { set } from 'lodash';
-import { types, Instance } from 'mobx-state-tree';
+import { Instance, types } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 // eslint-disable-next-line import/no-cycle
-import {
-  FaceBoundarySVG, PyramidNet,
-} from '../components/PyramidNet';
+import { PyramidNet } from '../components/PyramidNet';
 import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { polyhedra } from './polyhedra';
 import { SVGWrapper } from './SVGWrapper';
@@ -57,6 +55,22 @@ const defaultModelData:IPyramidNetFactoryModel = {
   },
 };
 
+export const FaceBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
+  const {
+    // @ts-ignore
+    pyramidNetSpec: { borderPolygon, borderOverlay },
+  } = store;
+  const {
+    xmin, xmax, ymin, ymax,
+  } = borderOverlay.box;
+
+  // TODO: can be converted to a path inset using @flatten-js/polygon-offset
+  return (
+    <svg viewBox={`${xmin} ${ymin} ${xmax - xmin} ${ymax - ymin}`}>
+      <path fill="#FFD900" stroke="#000" d={borderPolygon.pathAttrs().d} />
+    </svg>
+  );
+};
 const PyramidNetFactoryModel = types.model({
   pyramidNetSpec: PyramidNetModel,
   polyhedraPyramidGeometries: types.frozen(polyhedra),

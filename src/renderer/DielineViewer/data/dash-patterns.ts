@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/no-cycle
-import { IStrokeDashPathPatternModel } from './PyramidNetStore';
+import { Instance, types } from 'mobx-state-tree';
 import { convertMessageToMorseBooleanString } from './morse';
 import { PHI } from '../../common/util/geom';
 
@@ -8,6 +7,14 @@ const scoreMessage:number[] = convertMessageToMorseBooleanString('playful geomet
     acc.push(isLong ? PHI ** 2 : 1 / PHI, 1);
     return acc;
   }, []);
+
+const StrokeDashPathPatternModel = types.model({
+  relativeStrokeDasharray: types.frozen(),
+  label: types.string,
+});
+
+export interface IStrokeDashPathPatternModel extends Instance<typeof StrokeDashPathPatternModel> {
+}
 
 interface DashPatterns {
   [key: string]: IStrokeDashPathPatternModel,

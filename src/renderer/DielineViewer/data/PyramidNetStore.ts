@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
-import { types, flow, Instance } from 'mobx-state-tree';
+import { flow, Instance, types } from 'mobx-state-tree';
 
 // @ts-ignore
 import { Polygon } from '@flatten-js/core';
@@ -9,71 +9,31 @@ import { offset } from '@flatten-js/polygon-offset';
 // @ts-ignore
 import { subtract } from '@flatten-js/boolean-op';
 import {
-  chunk, flatten, range, omit,
+  chunk, flatten, omit, range,
 } from 'lodash';
 import { polyhedra } from './polyhedra';
 import {
-  CM_TO_PIXELS_RATIO, PointLike, PointTuple, polygonPointsGivenAnglesAndSides, triangleAnglesGivenSides,
+  CM_TO_PIXELS_RATIO,
+  PointLike,
+  PointTuple,
+  polygonPointsGivenAnglesAndSides,
+  triangleAnglesGivenSides,
 } from '../../common/util/geom';
 import { EVENTS } from '../../../main/ipc';
 import { getTextureTransformMatrix } from '../../common/util/2d-transform';
 import { closedPolygonPath } from '../util/shapes/generic';
-// eslint-disable-next-line import/no-cycle
-import { dashPatterns } from './dash-patterns';
+import { AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
+import { BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
+import { DashPatternModel } from '../util/shapes/strokeDashPath';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
-export const AscendantEdgeTabsModel = types.model({
-  flapRoundingDistanceRatio: types.number,
-  holeFlapTaperAngle: types.number,
-  holeReachToTabDepth: types.number,
-  holeWidthRatio: types.number,
-  midpointDepthToTabDepth: types.number,
-  tabDepthToTraversalLength: types.number,
-  tabRoundingDistanceRatio: types.number,
-  tabStartGapToTabDepth: types.number,
-  tabWideningAngle: types.number,
-  tabsCount: types.integer,
-});
-export interface IAscendantEdgeTabsModel extends Instance<typeof AscendantEdgeTabsModel> {}
-
-export const BaseEdgeTabsModel = types.model({
-  finDepthToTabDepth: types.number,
-  finOffsetRatio: types.number,
-  holeBreadthToHalfWidth: types.number,
-  holeDepthToTabDepth: types.number,
-  holeTaper: types.number,
-  tabDepthToAscendantEdgeLength: types.number,
-});
-export interface IBaseEdgeTabsModel extends Instance<typeof BaseEdgeTabsModel> {}
-
-
-export const DashPatternModel = types.model({
-  strokeDashPathPatternId: types.string,
-  strokeDashLength: types.number,
-  strokeDashOffsetRatio: types.number,
-}).views((self) => ({
-  get pathPattern():IStrokeDashPathPatternModel {
-    // @ts-ignore
-    return dashPatterns[self.strokeDashPathPatternId];
-  },
-}));
-
-export interface IDashPatternModel extends Instance<typeof DashPatternModel> {}
 
 //
 // const DimensionsModel = types.model({
 //   width: types.number,
 //   height: types.number,
 // });
-
-
-const StrokeDashPathPatternModel = types.model({
-  relativeStrokeDasharray: types.frozen(),
-  label: types.string,
-});
-
-export interface IStrokeDashPathPatternModel extends Instance<typeof StrokeDashPathPatternModel> {}
 
 
 export const FaceDecorationModel = types.model({

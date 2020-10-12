@@ -7,7 +7,6 @@ import { createMuiTheme } from '@material-ui/core';
 import darkTheme from './data/material-ui-dark-theme.json';
 import { store } from './data/PyramidNetMakerStore';
 import { PyramidNet } from './components/PyramidNet';
-// eslint-disable-next-line import/no-cycle
 import { ControlPanel } from './components/ControlPanel';
 import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';
 import { ResizableZoomPan } from './components/ResizableZoomPan';

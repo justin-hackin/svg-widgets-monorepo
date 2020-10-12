@@ -1,14 +1,18 @@
+import { Instance, types } from 'mobx-state-tree';
+
 import { PathData } from '../PathData';
 import {
-  distanceBetweenPoints, hingedPlot,
+  distanceBetweenPoints,
+  hingedPlot,
   hingedPlotByProjectionDistance,
-  hingedPlotLerp, intersectLineLine,
-  PointLike, VERY_LARGE_NUMBER,
+  hingedPlotLerp,
+  intersectLineLine,
+  PointLike,
+  VERY_LARGE_NUMBER,
 } from '../../../common/util/geom';
-import { strokeDashPath } from './strokeDashPath';
+import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
 import { connectedLineSegments } from './generic';
 import { arrowTab } from './symmetricRoundedTab';
-import { IBaseEdgeTabsModel, IDashPatternModel } from '../../data/PyramidNetStore';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,
@@ -20,6 +24,18 @@ export interface BaseEdgeConnectionTab {
 // "depth" is the distance from the base to the edge
 // "fin" is the male part of the tab which enters the hole of the tab
 // "handle" is the part of the tab that surrounds the hole of the tab
+
+export const BaseEdgeTabsModel = types.model({
+  finDepthToTabDepth: types.number,
+  finOffsetRatio: types.number,
+  holeBreadthToHalfWidth: types.number,
+  holeDepthToTabDepth: types.number,
+  holeTaper: types.number,
+  tabDepthToAscendantEdgeLength: types.number,
+});
+
+export interface IBaseEdgeTabsModel extends Instance<typeof BaseEdgeTabsModel> {
+}
 
 export function baseEdgeConnectionTab(
   start: PointLike, end: PointLike,

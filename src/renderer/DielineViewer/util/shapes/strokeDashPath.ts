@@ -1,8 +1,10 @@
 import { last, range, sum } from 'lodash';
+import { Instance, types } from 'mobx-state-tree';
+
 import { lineLerp, PointLike } from '../../../common/util/geom';
 import { PathData } from '../PathData';
 import { DOTTED_SCORES } from '../../config';
-import { IDashPatternModel } from '../../data/PyramidNetStore';
+import { dashPatterns, IStrokeDashPathPatternModel } from '../../data/dash-patterns';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -12,6 +14,20 @@ export function lineSeries(startEndArray) {
     path.move(start).line(end);
   });
   return path;
+}
+
+export const DashPatternModel = types.model({
+  strokeDashPathPatternId: types.string,
+  strokeDashLength: types.number,
+  strokeDashOffsetRatio: types.number,
+}).views((self) => ({
+  get pathPattern(): IStrokeDashPathPatternModel {
+    // @ts-ignore
+    return dashPatterns[self.strokeDashPathPatternId];
+  },
+}));
+
+export interface IDashPatternModel extends Instance<typeof DashPatternModel> {
 }
 
 export function strokeDashPathRatios(
