@@ -32,18 +32,20 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
   const dragMode = useDragMode();
   // ==================================================================================================================
   const {
-    texture: {
-      setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
-      reconcileTranslateDiff, reconcileRotateDiff, reconcileScaleDiff, reconcileTransformOriginDiff,
-    } = {},
     placementAreaDimensions, setPlacementAreaDimensions,
     textureEditorUpdateHandler,
     absoluteMovementToSvg, translateAbsoluteCoordsToRelative,
     texture, boundary,
     viewScalePercentStr, viewScaleCenterPercentStr,
+    faceFittingScale,
     minImageScale, maxImageScale,
     viewScaleDiff, setViewScaleDiff, reconcileViewScaleDiff,
   } = useMst();
+  const {
+    setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
+    reconcileTranslateDiff, reconcileRotateDiff, reconcileScaleDiff, reconcileTransformOriginDiff,
+  } = texture || {};
+
   // Init
   useEffect(() => {
     globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR, textureEditorUpdateHandler);
@@ -166,6 +168,9 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
             <TextureSvg
               showCenterMarker
               {...{
+                texture,
+                boundary,
+                faceFittingScale,
                 textureTranslationUseDrag,
                 transformOriginUseDrag,
               }}

@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
-import { flow, Instance, types } from 'mobx-state-tree';
+import { Instance, types } from 'mobx-state-tree';
 
 // @ts-ignore
 import { Polygon } from '@flatten-js/core';
@@ -36,11 +36,11 @@ export const FaceDecorationModel = types.model({
   scale: types.number,
   isPositive: types.boolean,
 }).views((self) => ({
-  get pathMatrix() {
+  get transformMatrix() {
     const {
       transformOrigin, rotate, scale, translate,
     } = self;
-    return getTextureTransformMatrix(transformOrigin, scale, rotate, translate).toString();
+    return getTextureTransformMatrix(transformOrigin, scale, rotate, translate);
   },
 }));
 
@@ -192,14 +192,14 @@ export const PyramidNetModel = types.model({
     async setFaceDecoration(faceDecoration) {
       self.faceDecoration = faceDecoration;
       if (faceDecoration) {
-        const { pathD, pathMatrix, isPositive } = self.faceDecoration as IFaceDecorationModel;
+        const { pathD, transformMatrix, isPositive } = self.faceDecoration as IFaceDecorationModel;
         // @ts-ignore
         const croppedD = await globalThis.ipcRenderer.invoke(
           // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
           EVENTS.INTERSECT_SVG,
           closedPolygonPath(self.normalizedBoundaryPoints).getD(),
           pathD,
-          pathMatrix,
+          transformMatrix.toString(),
           isPositive,
         );
         this.setActiveCutHolePatternD(croppedD);

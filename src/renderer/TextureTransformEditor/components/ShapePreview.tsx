@@ -35,19 +35,19 @@ export const ShapePreview = observer(() => {
 
   const polyhedronObjectRef = useRef<Object3D>();
   const threeContainerRef = useRef<HTMLDivElement>();
-  const textureCanvasRef = useRef<OffscreenCanvas>();
   const requestRef = React.useRef<number>(0);
 
-  const { viewBoxAttrs } = boundary || {};
+  const { viewBoxAttrs, pathD: boundaryPathD } = boundary || {};
+  const { transformMatrixDraggedStr, isPositive } = texture || {};
 
   // update shape texture
   useEffect(() => {
     if (polyhedronMesh && viewBoxAttrs) {
-      textureCanvasRef.current = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
+      const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
       // TODO: throw if material not MeshPhong
       // @ts-ignore
       const { material }: {material: MeshPhongMaterial} = polyhedronMesh;
-      const ctx = textureCanvasRef.current.getContext('2d') as OffscreenCanvasRenderingContext2D;
+      const ctx = textureCanvas.getContext('2d');
       // @ts-ignore
       const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, { boundary, texture }));
       const svgStr = `<svg viewBox="${
@@ -56,12 +56,12 @@ export const ShapePreview = observer(() => {
       Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
         await v.render();
         // @ts-ignore
-        material.map.image = textureCanvasRef.current.transferToImageBitmap();
+        material.map.image = textureCanvas.transferToImageBitmap();
         // @ts-ignore
         material.map.needsUpdate = true;
       });
     }
-  }, [polyhedronMesh, texture, boundary]);
+  }, [polyhedronMesh, transformMatrixDraggedStr, isPositive, boundaryPathD]);
 
   // renderer boundary size change
   useEffect(() => {

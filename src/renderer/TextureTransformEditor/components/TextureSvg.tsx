@@ -2,25 +2,23 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { PointTuple } from '../../common/util/geom';
-import { useMst } from '../models';
 
 const normalizedBoxCoords:PointTuple[] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const HOLES_COLOR = '#101010';
 const MATERIAL_COLOR = '#ffaa00';
 
 export const TextureSvg = observer(({
+  boundary: { pathD: boundaryPathD = '' } = {},
+  texture: {
+  // @ts-ignore
+    pathD: texturePathD, scale: textureScale, transformOriginDragged, isPositive, transformMatrixDraggedStr,
+  } = {},
+  faceFittingScale: { scale: faceFittingScaleValue = 1 } = {},
   showCenterMarker = undefined,
   textureTranslationUseDrag = () => {},
   transformOriginUseDrag = () => {},
 }) => {
-  const {
-    boundary: { pathD: boundaryPathD = '' } = {},
-    faceFittingScale: { scale: faceFittingScaleValue = 1 } = {},
-    texture: {
-      // @ts-ignore
-      pathD: texturePathD, scale: textureScale, transformOriginDragged, isPositive, transformMatrix,
-    } = {},
-  } = useMst();
+  // TODO: consider if passing props from parent is more apt than useMst
   if (!boundaryPathD) { return null; }
 
   const scaleAdjust = (textureScale * faceFittingScaleValue);
@@ -57,7 +55,7 @@ export const TextureSvg = observer(({
       </defs>
       <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
       {texturePathD && (
-      <g transform={transformMatrix.toString()}>
+      <g transform={transformMatrixDraggedStr}>
         <path
           pointerEvents="bounding-box"
           {...textureTranslationUseDrag()}

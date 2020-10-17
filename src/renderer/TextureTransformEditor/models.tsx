@@ -86,11 +86,14 @@ export const TextureModel = FaceDecorationModel
     get scaleDragged() {
       return self.scale * self.scaleDiff;
     },
-    get transformMatrix() {
+    get transformMatrixDragged() {
       return getTextureTransformMatrix(
-        this.transformOriginDragged,
+        self.transformOrigin,
         this.scaleDragged, this.rotateDragged, this.translateDragged,
       );
+    },
+    get transformMatrixDraggedStr() {
+      return this.transformMatrixDragged && this.transformMatrixDragged.toString();
     },
   }))
   .actions((self) => ({
@@ -99,7 +102,7 @@ export const TextureModel = FaceDecorationModel
     },
     reconcileScaleDiff() {
       self.scale *= self.scaleDiff;
-      self.scale = 1;
+      self.scaleDiff = 1;
     },
     setTranslateDiff(delta) {
       self.translateDiff = delta;
@@ -197,11 +200,6 @@ export const TextureTransformEditorModel = types
       self.viewScale = self.viewScaleDragged;
       self.viewScaleDiff = 1;
     },
-    fitFaceToBounds() {
-      if (self.imageCoverScale) {
-        self.texture.scale = self.imageCoverScale.scale;
-      }
-    },
     fitTextureToFace() {
       const { viewBoxAttrs } = self.boundary;
       const { dimensions: textureDimensions } = self.texture;
@@ -213,6 +211,7 @@ export const TextureTransformEditorModel = types
       self.texture.translate = widthIsClamp
         ? [xmin, (height - (textureDimensions.height * scale)) / 2]
         : [xmin + (width - (textureDimensions.width * scale)) / 2, 0];
+      self.texture.scale = self.imageCoverScale.scale;
     },
     setTextureInstance(pathD) {
       self.texture = TextureModel.create({
@@ -242,10 +241,9 @@ export const TextureTransformEditorModel = types
       self.boundary = { faceVertices };
 
       if (faceDecoration) {
-        Object.assign(self.texture, faceDecoration);
+        self.texture = TextureModel.create(faceDecoration);
       } else {
         self.texture = undefined;
-        this.fitFaceToBounds();
       }
     },
     absoluteMovementToSvg(absCoords) {
@@ -265,7 +263,7 @@ export const TextureTransformEditorModel = types
         return;
       }
       const originAbsolute = matrixTupleTransformPoint(
-        self.texture.transformMatrix, self.texture.transformOrigin,
+        self.texture.transformMatrixDragged, self.texture.transformOrigin,
       );
       const delta = addTuple(originAbsolute, self.boundary.faceVertices[vertexIndex].map(negateMap)).map(negateMap);
       self.texture.translate = addTuple(delta, self.texture.translate);
@@ -295,8 +293,11 @@ export const TextureTransformEditorModel = types
 export interface ITextureTransformEditorModel extends Instance<typeof TextureTransformEditorModel> {}
 
 export const textureTransformEditorStore = TextureTransformEditorModel.create();
-const TextureTransformEditorStoreContext = createContext<null | ITextureTransformEditorModel>(textureTransformEditorStore);
-
+// @ts-ignore
+window.editorStore = textureTransformEditorStore;
+const TextureTransformEditorStoreContext = createContext<ITextureTransformEditorModel>(
+  textureTransformEditorStore,
+);
 
 export const { Provider } = TextureTransformEditorStoreContext;
 
