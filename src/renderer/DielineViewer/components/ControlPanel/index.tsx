@@ -24,8 +24,10 @@ import { dashPatterns } from '../../data/dash-patterns';
 import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { MIRRORED_STROKES } from '../../config';
 import { EVENTS } from '../../../../main/ipc';
+import { IPyramidNetFactoryModel } from '../../data/PyramidNetMakerStore';
+import { extractCutHolesFromSvgString } from '../../util/svg';
 
-export const ControlPanel = observer(({ store }) => {
+export const ControlPanel = observer(({ store }: { store: IPyramidNetFactoryModel}) => {
   // @ts-ignore
   const classes = useStyles();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -116,9 +118,9 @@ export const ControlPanel = observer(({ store }) => {
 
   const topLevelControls = [{
     component: PanelSelect,
-    valuePath: 'pyramidNetSpec.pyramidGeometryId',
-    setter: (value) => {
-      store.pyramidNetSpec.setPyramidGeometryId(value);
+    valuePath: 'pyramidNetSpec.pyramid.shapeName',
+    setter: (name) => {
+      store.pyramidNetSpec.pyramid.setShapeName(name);
     },
     label: 'Polyhedron',
     options: polyhedronOptions,
@@ -279,7 +281,7 @@ export const ControlPanel = observer(({ store }) => {
             onClick={() => {
               globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderFaceBoundaryToString(), {
                 message: 'Save face template',
-                defaultPath: `${store.pyramidNetSpec.pyramidGeometryId}__template.svg`,
+                defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
               });
             }}
           >
@@ -290,7 +292,8 @@ export const ControlPanel = observer(({ store }) => {
             onClick={() => {
               globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, 'Upload face cut pattern')
                 .then((svgString) => {
-                  store.pyramidNetSpec.applyFaceHolePattern(svgString);
+                  const d = extractCutHolesFromSvgString(svgString);
+                  store.pyramidNetSpec.setActiveCutHolePatternD(d);
                 });
             }}
           >

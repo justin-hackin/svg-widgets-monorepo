@@ -1,4 +1,5 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 import {
   Mesh, MeshPhongMaterial, Object3D, PerspectiveCamera, Renderer, Scene, WebGLRenderer,
 } from 'three';
@@ -12,6 +13,8 @@ import '../style.css';
 import requireStatic from '../../requireStatic';
 import { TextureSvg } from './TextureSvg';
 import { viewBoxAttrsToString } from '../util';
+// eslint-disable-next-line import/no-cycle
+import { useMst } from '../models';
 
 const { useEffect, useRef, useState } = React;
 
@@ -19,10 +22,10 @@ const IDEAL_RADIUS = 60;
 
 const loader = new GLTFLoader();
 
-export const ShapePreview = ({
-  width, height, shapeId, viewBoxAttrs, textureTransformMatrixStr,
-  texturePathD, boundaryPathD, transformOriginDragged, isPositive,
-}) => {
+export const ShapePreview = observer(() => {
+  const {
+    texture, boundary, shapeName, placementAreaDimensions: { width, height },
+  } = useMst();
   const [renderer, setRenderer] = useState<Renderer>();
   const [camera, setCamera] = useState<PerspectiveCamera>();
   const [polyhedronMesh, setPolyhedronMesh] = useState<Mesh>();
@@ -35,6 +38,8 @@ export const ShapePreview = ({
   const textureCanvasRef = useRef<OffscreenCanvas>();
   const requestRef = React.useRef<number>(0);
 
+  const { viewBoxAttrs } = boundary || {};
+
   // update shape texture
   useEffect(() => {
     if (polyhedronMesh && viewBoxAttrs) {
@@ -43,9 +48,8 @@ export const ShapePreview = ({
       // @ts-ignore
       const { material }: {material: MeshPhongMaterial} = polyhedronMesh;
       const ctx = textureCanvasRef.current.getContext('2d') as OffscreenCanvasRenderingContext2D;
-      const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, {
-        texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginDragged, isPositive,
-      }));
+      // @ts-ignore
+      const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, { boundary, texture }));
       const svgStr = `<svg viewBox="${
         viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
       // @ts-ignore
@@ -57,7 +61,7 @@ export const ShapePreview = ({
         material.map.needsUpdate = true;
       });
     }
-  }, [polyhedronMesh, texturePathD, boundaryPathD, textureTransformMatrixStr, transformOriginDragged, isPositive]);
+  }, [polyhedronMesh, texture, boundary]);
 
   // renderer boundary size change
   useEffect(() => {
@@ -108,10 +112,10 @@ export const ShapePreview = ({
 
 
   useEffect(() => {
-    if (!shapeId || !camera || !scene) { return; }
+    if (!shapeName || !camera || !scene) { return; }
     loader.load(
       // resource URL
-      requireStatic(`models/${shapeId}.gltf`),
+      requireStatic(`models/${shapeName}.gltf`),
       ({ scene: importScene }) => {
         if (polyhedronObjectRef.current) {
           scene.remove(polyhedronObjectRef.current);
@@ -131,9 +135,9 @@ export const ShapePreview = ({
         });
       },
     );
-  }, [shapeId, camera, scene]);
+  }, [shapeName, camera, scene]);
 
 
   // @ts-ignore
   return (<div ref={threeContainerRef} id="3d-preview-container" />);
-};
+});

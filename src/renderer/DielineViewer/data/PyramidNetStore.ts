@@ -28,17 +28,9 @@ import { DashPatternModel } from '../util/shapes/strokeDashPath';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
-
-//
-// const DimensionsModel = types.model({
-//   width: types.number,
-//   height: types.number,
-// });
-
-
 export const FaceDecorationModel = types.model({
   pathD: types.string,
-  origin: types.frozen<PointTuple>(),
+  transformOrigin: types.frozen<PointTuple>(),
   translate: types.frozen<PointTuple>(),
   rotate: types.number,
   scale: types.number,
@@ -46,16 +38,28 @@ export const FaceDecorationModel = types.model({
 }).views((self) => ({
   get pathMatrix() {
     const {
-      origin, rotate, scale, translate,
+      transformOrigin, rotate, scale, translate,
     } = self;
-    return getTextureTransformMatrix(origin, scale, rotate, translate).toString();
+    return getTextureTransformMatrix(transformOrigin, scale, rotate, translate).toString();
   },
 }));
+
 export interface IFaceDecorationModel extends Instance<typeof FaceDecorationModel> {}
 
+export const PyramidModel = types.model({
+  shapeName: types.string,
+}).views((self) => ({
+  get geometry() {
+    return polyhedra[self.shapeName];
+  },
+})).actions((self) => ({
+  setShapeName(name) {
+    self.shapeName = name;
+  },
+}));
 
 export const PyramidNetModel = types.model({
-  pyramidGeometryId: types.string,
+  pyramid: PyramidModel,
   ascendantEdgeTabsSpec: types.late(() => AscendantEdgeTabsModel),
   baseEdgeTabsSpec: types.late(() => BaseEdgeTabsModel),
   shapeHeightInCm: types.number,
@@ -65,10 +69,6 @@ export const PyramidNetModel = types.model({
   activeCutHolePatternD: types.maybe(types.string),
 })
   .views((self) => ({
-    get pyramidGeometry() {
-      return polyhedra[self.pyramidGeometryId];
-    },
-
     get tabIntervalRatios() {
       const {
         tabsCount, tabStartGapToTabDepth, tabDepthToTraversalLength, holeWidthRatio,
@@ -88,11 +88,11 @@ export const PyramidNetModel = types.model({
     },
 
     get faceEdgeNormalizer() {
-      return FACE_FIRST_EDGE_NORMALIZED_SIZE / this.pyramidGeometry.relativeFaceEdgeLengths[0];
+      return FACE_FIRST_EDGE_NORMALIZED_SIZE / self.pyramid.geometry.relativeFaceEdgeLengths[0];
     },
 
     get normalizedFaceEdgeLengths() {
-      return this.pyramidGeometry.relativeFaceEdgeLengths.map(
+      return self.pyramid.geometry.relativeFaceEdgeLengths.map(
         // @ts-ignore
         (val) => val * self.faceEdgeNormalizer,
       );
@@ -116,7 +116,7 @@ export const PyramidNetModel = types.model({
     // factor to scale face lengths such that the first edge will be equal to 1
     get faceLengthAdjustRatio() {
       const { shapeHeightInCm } = self;
-      const { relativeFaceEdgeLengths, diameter } = this.pyramidGeometry;
+      const { relativeFaceEdgeLengths, diameter } = self.pyramid.geometry;
       const baseEdgeLengthToShapeHeight = diameter / relativeFaceEdgeLengths[1];
       const heightInPixels = CM_TO_PIXELS_RATIO * shapeHeightInCm;
       const desiredFirstLength = heightInPixels / baseEdgeLengthToShapeHeight;
@@ -172,30 +172,29 @@ export const PyramidNetModel = types.model({
     afterCreate() {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       reaction(
-        () => [self.normalizedBoundaryPoints, self.pyramidGeometryId, self.faceDecoration],
+        () => [self.normalizedBoundaryPoints, self.pyramid, self.faceDecoration],
         () => {
           this.sendTextureEditorUpdate();
         },
       );
     },
 
-    setPyramidGeometryId(id: string) {
-      self.pyramidGeometryId = id;
+    setPyramidGeometryId(name: string) {
+      self.pyramid.shapeName = name;
       this.setFaceDecoration(undefined);
     },
 
+    setActiveCutHolePatternD(d) {
+      self.activeCutHolePatternD = d;
+    },
+
     // eslint-disable-next-line func-names
-    setFaceDecoration: flow(function* (faceDecoration) {
-      debugger; // eslint-disable-line no-debugger
+    async setFaceDecoration(faceDecoration) {
       self.faceDecoration = faceDecoration;
-      if (!faceDecoration) {
-        self.activeCutHolePatternD = undefined;
-        return;
-      }
       if (faceDecoration) {
         const { pathD, pathMatrix, isPositive } = self.faceDecoration as IFaceDecorationModel;
         // @ts-ignore
-        const croppedD = yield globalThis.ipcRenderer.invoke(
+        const croppedD = await globalThis.ipcRenderer.invoke(
           // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
           EVENTS.INTERSECT_SVG,
           closedPolygonPath(self.normalizedBoundaryPoints).getD(),
@@ -203,15 +202,17 @@ export const PyramidNetModel = types.model({
           pathMatrix,
           isPositive,
         );
-        self.activeCutHolePatternD = croppedD;
+        this.setActiveCutHolePatternD(croppedD);
+      } else {
+        this.setActiveCutHolePatternD(undefined);
       }
-    }),
+    },
 
     sendTextureEditorUpdate() {
       // @ts-ignore
       globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR,
         self.normalizedBoundaryPoints.map((pt) => ([pt.x, pt.y])),
-        self.pyramidGeometryId,
+        self.pyramid.shapeName,
         self.faceDecoration);
     },
 

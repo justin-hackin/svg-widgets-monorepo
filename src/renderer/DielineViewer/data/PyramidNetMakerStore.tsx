@@ -18,7 +18,8 @@ const defaultModelData:IPyramidNetFactoryModel = {
     designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
   },
   pyramidNetSpec: {
-    pyramidGeometryId: 'small-triambic-icosahedron',
+    // @ts-ignore
+    pyramid: { shapeName: 'small-triambic-icosahedron' },
     ascendantEdgeTabsSpec: {
       flapRoundingDistanceRatio: 1,
       holeFlapTaperAngle: 0.3141592653589793,

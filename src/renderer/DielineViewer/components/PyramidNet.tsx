@@ -18,7 +18,9 @@ export const PyramidNet = observer(({ store }: {store: IPyramidNetFactoryModel})
   const {
     styleSpec,
     pyramidNetSpec: {
-      pyramidGeometry: { faceCount },
+      pyramid: {
+        geometry: { faceCount },
+      },
       interFaceScoreDashSpec, baseScoreDashSpec,
       ascendantEdgeTabsSpec, baseEdgeTabsSpec,
       tabIntervalRatios, tabGapIntervalRatios,
