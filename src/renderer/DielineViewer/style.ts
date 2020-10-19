@@ -4,6 +4,28 @@ import { Theme } from '@material-ui/core';
 const drawerWidth = 360;
 
 export const useStyles = makeStyles((theme: Theme) => createStyles({
+  '@global': {
+    // borrowed from https://github.com/mui-org/material-ui/issues/22594#issue-701034896
+    scrollbarColor: `${theme.palette.grey['700']}  ${theme.palette.grey.A400}`,
+    '*::-webkit-scrollbar': {
+      backgroundColor: theme.palette.grey.A400,
+    },
+    '*::-webkit-scrollbar-thumb': {
+      borderRadius: 8,
+      backgroundColor: theme.palette.grey['700'],
+      minHeight: 24,
+      border: `2px solid ${theme.palette.grey.A400}`,
+    },
+    '*::-webkit-scrollbar-thumb:focus': {
+      backgroundColor: theme.palette.grey['500'],
+    },
+    '*::-webkit-scrollbar-thumb:active': {
+      backgroundColor: theme.palette.grey['500'],
+    },
+    '*::-webkit-scrollbar-corner': {
+      backgroundColor: theme.palette.grey.A400,
+    },
+  },
   root: {
     display: 'flex',
   },
