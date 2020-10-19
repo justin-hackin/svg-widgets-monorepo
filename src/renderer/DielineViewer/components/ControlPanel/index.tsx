@@ -25,7 +25,7 @@ import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { MIRRORED_STROKES } from '../../config';
 import { EVENTS } from '../../../../main/ipc';
 import { IPyramidNetFactoryModel } from '../../data/PyramidNetMakerStore';
-import { extractCutHolesFromSvgString } from '../../util/svg';
+import { extractCutHolesFromSvgString } from '../../../../common/util/svg';
 
 export const ControlPanel = observer(({ store }: { store: IPyramidNetFactoryModel}) => {
   // @ts-ignore

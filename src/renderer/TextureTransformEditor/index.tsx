@@ -16,10 +16,10 @@ import { DRAG_MODES, useDragMode } from './dragMode';
 import { TextureSvg } from './components/TextureSvg';
 import { TextureControls } from './components/TextureControls';
 import { EVENTS } from '../../main/ipc';
-import { viewBoxAttrsToString } from './util';
 import {
   useMst, Provider, textureTransformEditorStore,
 } from './models';
+import { viewBoxAttrsToString } from '../../common/util/svg';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 // TODO: make router wrap with styles

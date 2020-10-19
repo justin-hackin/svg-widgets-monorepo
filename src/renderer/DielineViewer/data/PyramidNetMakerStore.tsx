@@ -9,6 +9,8 @@ import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { polyhedra } from './polyhedra';
 import { SVGWrapper } from './SVGWrapper';
 import { PyramidNetModel } from './PyramidNetStore';
+import { closedPolygonPath } from '../util/shapes/generic';
+import { pathDToViewBoxStr } from '../../../common/util/svg';
 
 const defaultModelData:IPyramidNetFactoryModel = {
   styleSpec: {
@@ -59,19 +61,18 @@ const defaultModelData:IPyramidNetFactoryModel = {
 export const FaceBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
     // @ts-ignore
-    pyramidNetSpec: { borderPolygon, borderOverlay },
+    pyramidNetSpec: { normalizedBoundaryPoints },
   } = store;
-  const {
-    xmin, xmax, ymin, ymax,
-  } = borderOverlay.box;
+  const normalizedBoundaryPathD = closedPolygonPath(normalizedBoundaryPoints).getD();
 
   // TODO: can be converted to a path inset using @flatten-js/polygon-offset
   return (
-    <svg viewBox={`${xmin} ${ymin} ${xmax - xmin} ${ymax - ymin}`}>
-      <path fill="#FFD900" stroke="#000" d={borderPolygon.pathAttrs().d} />
+    <svg viewBox={pathDToViewBoxStr(normalizedBoundaryPathD)}>
+      <path fill="#FFD900" stroke="#000" d={normalizedBoundaryPathD} />
     </svg>
   );
 };
+
 const PyramidNetFactoryModel = types.model({
   pyramidNetSpec: PyramidNetModel,
   polyhedraPyramidGeometries: types.frozen(polyhedra),

@@ -6,7 +6,7 @@ import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
 import { DimensionsModel } from './DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
-import { extractCutHolesFromSvgString } from '../../DielineViewer/util/svg';
+import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import {
   addTuple,
   calculateTransformOriginChangeOffset,

@@ -12,9 +12,9 @@ import OrbitControls from 'threejs-orbit-controls';
 import '../style.css';
 import requireStatic from '../../requireStatic';
 import { TextureSvg } from './TextureSvg';
-import { viewBoxAttrsToString } from '../util';
 // eslint-disable-next-line import/no-cycle
 import { useMst } from '../models';
+import { viewBoxAttrsToString } from '../../../common/util/svg';
 
 const { useEffect, useRef, useState } = React;
 
@@ -50,8 +50,7 @@ export const ShapePreview = observer(() => {
       const ctx = textureCanvas.getContext('2d');
       // @ts-ignore
       const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, { boundary, texture }));
-      const svgStr = `<svg viewBox="${
-        viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
+      const svgStr = `<svg viewBox="${viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
       // @ts-ignore
       Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
         await v.render();

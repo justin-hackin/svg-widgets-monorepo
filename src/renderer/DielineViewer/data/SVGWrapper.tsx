@@ -1,5 +1,5 @@
 import React from 'react';
-import { namespacedElementFactory } from '../util/svg';
+import { namespacedElementFactory } from '../../../common/util/svg';
 
 
 const svgNamespaceAttributes = {

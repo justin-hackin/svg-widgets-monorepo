@@ -1,5 +1,4 @@
 import { Instance } from 'mobx-state-tree';
-import { svgPathBbox } from 'svg-path-bbox';
 
 import { FaceDecorationModel } from '../../DielineViewer/data/PyramidNetStore';
 import {
@@ -8,6 +7,7 @@ import {
   getTextureTransformMatrix,
   negateMap,
 } from '../../common/util/2d-transform';
+import { getDimensionsFromPathD } from '../../../common/util/svg';
 
 const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);
@@ -18,12 +18,12 @@ const transformDiffDefaults = {
   scaleDiff: 1,
   transformOriginDiff: [0, 0],
 };
+
 export const TextureModel = FaceDecorationModel
   .volatile(() => ({ ...transformDiffDefaults }))
   .views((self) => ({
     get dimensions() {
-      const [xmin, ymin, xmax, ymax] = svgPathBbox(self.pathD);
-      return { width: xmax - xmin, height: ymax - ymin };
+      return getDimensionsFromPathD(self.pathD);
     },
     get transformOriginDragged() {
       return addTuple(self.transformOrigin, self.transformOriginDiff);

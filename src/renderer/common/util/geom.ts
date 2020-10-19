@@ -2,7 +2,7 @@
 import { Line, Point } from '@flatten-js/core';
 import { isNaN, range } from 'lodash';
 
-import { circularSlice } from '../../DielineViewer/util/data';
+import { circularSlice } from '../../../common/util/data';
 
 // TODO: use ts defs in project
 export interface PointLike {
