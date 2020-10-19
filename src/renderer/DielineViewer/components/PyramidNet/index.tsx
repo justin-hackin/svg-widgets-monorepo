@@ -4,15 +4,15 @@ import React, { useEffect } from 'react';
 import { range } from 'lodash';
 import {
   degToRad, hingedPlot, hingedPlotByProjectionDistance, radToDeg,
-} from '../../common/util/geom';
-import { PathData } from '../util/PathData';
-import { strokeDashPath } from '../util/shapes/strokeDashPath';
-import { baseEdgeConnectionTab } from '../util/shapes/baseEdgeConnectionTab';
-import { ascendantEdgeConnectionTabs } from '../util/shapes/ascendantEdgeConnectionTabs';
-import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
-import { EVENTS } from '../../../main/ipc';
+} from '../../../common/util/geom';
+import { PathData } from '../../util/PathData';
+import { strokeDashPath } from '../../util/shapes/strokeDashPath';
+import { baseEdgeConnectionTab } from '../../util/shapes/baseEdgeConnectionTab';
+import { ascendantEdgeConnectionTabs } from '../../util/shapes/ascendantEdgeConnectionTabs';
+import { closedPolygonPath, roundedEdgePath } from '../../util/shapes/generic';
+import { EVENTS } from '../../../../main/ipc';
 // eslint-disable-next-line import/no-cycle
-import { IPyramidNetFactoryModel } from '../data/PyramidNetMakerStore';
+import { IPyramidNetFactoryModel } from '../../data/PyramidNetMakerStore';
 
 export const PyramidNet = observer(({ store }: {store: IPyramidNetFactoryModel}) => {
   const {
