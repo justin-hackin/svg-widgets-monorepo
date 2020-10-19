@@ -52,10 +52,6 @@ export const PyramidModel = types.model({
   get geometry() {
     return polyhedra[self.shapeName];
   },
-})).actions((self) => ({
-  setShapeName(name) {
-    self.shapeName = name;
-  },
 }));
 
 export const PyramidNetModel = types.model({
@@ -160,12 +156,6 @@ export const PyramidNetModel = types.model({
     get pathScaleMatrix(): DOMMatrixReadOnly {
       return (new DOMMatrixReadOnly()).scale(this.faceLengthAdjustRatio, this.faceLengthAdjustRatio);
     },
-
-    get asJSON(): string {
-      // activeCutHolePatternD is the only property that is derived from other properties but is not computed
-      // in order to avoid the use of async computed plugin
-      return JSON.stringify(omit(self, ['activeCutHolePatternD']), null, 2);
-    },
   //  =========================================================
   }))
   .actions((self) => ({
@@ -179,9 +169,10 @@ export const PyramidNetModel = types.model({
       );
     },
 
-    setPyramidGeometryId(name: string) {
+    setPyramidShapeName(name: string) {
       self.pyramid.shapeName = name;
       this.setFaceDecoration(undefined);
+      this.setActiveCutHolePatternD(undefined);
     },
 
     setActiveCutHolePatternD(d) {
@@ -190,7 +181,7 @@ export const PyramidNetModel = types.model({
 
     // eslint-disable-next-line func-names
     async setFaceDecoration(faceDecoration) {
-      self.faceDecoration = faceDecoration;
+      self.faceDecoration = FaceDecorationModel.create(faceDecoration);
       if (faceDecoration) {
         const { pathD, transformMatrix, isPositive } = self.faceDecoration as IFaceDecorationModel;
         // @ts-ignore
@@ -220,6 +211,10 @@ export const PyramidNetModel = types.model({
       const { faceDecoration, ...rest } = specData;
       Object.assign(self, rest);
       this.setFaceDecoration(faceDecoration);
+    },
+
+    getJSON() {
+      return JSON.stringify(omit(self, ['activeCutHolePatternD']), null, 2);
     },
   }));
 

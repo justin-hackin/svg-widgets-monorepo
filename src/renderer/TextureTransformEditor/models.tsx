@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { createContext, useContext } from 'react';
 import { types, Instance } from 'mobx-state-tree';
+import makeInspectable from 'mobx-devtools-mst';
+
 // @ts-ignore
 import { Polygon, point } from '@flatten-js/core';
 import { svgPathBbox } from 'svg-path-bbox';
@@ -40,6 +42,16 @@ const getCoverScale = (bounds: DimensionsObject, image: DimensionsObject) => {
     scale: widthIsClamp ? widthScale : heightScale,
   };
 };
+
+const getFitScale = (bounds: (DimensionsObject | undefined), image: (DimensionsObject | undefined)) => {
+  if (!bounds || !image) { return null; }
+  const widthIsClamp = (bounds.width / bounds.height) <= (image.width / image.height);
+  return {
+    widthIsClamp,
+    scale: widthIsClamp ? bounds.width / image.width : bounds.height / image.height,
+  };
+};
+
 const BoundaryModel = types.model({
   faceVertices: types.frozen(types.array(frozenPoint)),
 }).views((self) => ({
@@ -130,8 +142,8 @@ export const TextureModel = FaceDecorationModel
         self.scaleDragged, self.rotateDragged, self.translateDragged,
       );
       self.transformOrigin = self.transformOriginDragged;
-      self.transformOriginDiff = [0, 0];
       self.translate = addTuple(self.translate, relativeDifference.map(negateMap));
+      self.transformOriginDiff = [0, 0];
     },
     setIsPositive(isPositive) {
       self.isPositive = isPositive;
@@ -170,7 +182,7 @@ export const TextureTransformEditorModel = types
       if (!self.placementAreaDimensions || !self.boundary) {
         return undefined;
       }
-      return getCoverScale(self.placementAreaDimensions, self.boundary.viewBoxAttrs);
+      return getFitScale(self.placementAreaDimensions, self.boundary.viewBoxAttrs);
     },
     get minImageScale() {
       return this.imageCoverScale && (0.1 * this.imageCoverScale.scale);
@@ -238,11 +250,12 @@ export const TextureTransformEditorModel = types
     textureEditorUpdateHandler(e, faceVertices, shapeName, faceDecoration) {
       self.shapeName = shapeName;
       // @ts-ignore
-      self.boundary = { faceVertices };
+      self.boundary = BoundaryModel.create({ faceVertices });
 
       if (faceDecoration) {
         self.texture = TextureModel.create(faceDecoration);
       } else {
+        self.viewScale = 1;
         self.texture = undefined;
       }
     },
@@ -292,7 +305,7 @@ export const TextureTransformEditorModel = types
 
 export interface ITextureTransformEditorModel extends Instance<typeof TextureTransformEditorModel> {}
 
-export const textureTransformEditorStore = TextureTransformEditorModel.create();
+export const textureTransformEditorStore = makeInspectable(TextureTransformEditorModel.create());
 // @ts-ignore
 window.editorStore = textureTransformEditorStore;
 const TextureTransformEditorStoreContext = createContext<ITextureTransformEditorModel>(

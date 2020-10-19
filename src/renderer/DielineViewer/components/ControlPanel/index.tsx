@@ -120,7 +120,7 @@ export const ControlPanel = observer(({ store }: { store: IPyramidNetFactoryMode
     component: PanelSelect,
     valuePath: 'pyramidNetSpec.pyramid.shapeName',
     setter: (name) => {
-      store.pyramidNetSpec.pyramid.setShapeName(name);
+      store.pyramidNetSpec.setPyramidShapeName(name);
     },
     label: 'Polyhedron',
     options: polyhedronOptions,
@@ -269,7 +269,7 @@ export const ControlPanel = observer(({ store }: { store: IPyramidNetFactoryMode
               globalThis.ipcRenderer.invoke(
                 EVENTS.SAVE_NET_SVG_AND_SPEC,
                 store.renderPyramidNetToString(),
-                store.pyramidNetSpec.asJSON,
+                store.pyramidNetSpec.getJSON(),
                 'Save pyramid net dielines and model',
               );
             }}
