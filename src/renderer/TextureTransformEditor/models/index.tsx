@@ -8,18 +8,18 @@ import { Polygon, point } from '@flatten-js/core';
 import { svgPathBbox } from 'svg-path-bbox';
 import { inRange } from 'lodash';
 
-import { closedPolygonPath } from '../DielineViewer/util/shapes/generic';
-import { EVENTS } from '../../main/ipc';
-import { extractCutHolesFromSvgString } from '../DielineViewer/util/svg';
-import { PointTuple } from '../common/util/geom';
+import { closedPolygonPath } from '../../DielineViewer/util/shapes/generic';
+import { EVENTS } from '../../../main/ipc';
+import { extractCutHolesFromSvgString } from '../../DielineViewer/util/svg';
+import { PointTuple } from '../../common/util/geom';
 import {
   addTuple,
   calculateTransformOriginChangeOffset,
   getTextureTransformMatrix,
   matrixTupleTransformPoint,
   negateMap,
-} from '../common/util/2d-transform';
-import { FaceDecorationModel } from '../DielineViewer/data/PyramidNetStore';
+} from '../../common/util/2d-transform';
+import { FaceDecorationModel } from '../../DielineViewer/data/PyramidNetStore';
 
 interface DimensionsObject {
   width: number,
