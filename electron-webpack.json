@@ -6,7 +6,8 @@
     "react-moveable", "react-use-gesture", "react-router-static", "mobx-react"
   ],
   "renderer": {
-    "webpackConfig": "webpack.renderer.js"
+    "webpackConfig": "webpack.renderer.js",
+    "template": "src/renderer/index.html",
   },
   "main": {
     "webpackConfig": "webpack.main.js"
