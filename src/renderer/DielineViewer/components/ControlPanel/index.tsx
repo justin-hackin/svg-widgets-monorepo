@@ -36,7 +36,7 @@ export const ControlPanel = observer(({ store }: { store: IPyramidNetFactoryMode
   const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   const mapControlsSpecToComponents = ({
   // @ts-ignore
