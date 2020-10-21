@@ -1,6 +1,6 @@
 import { Instance } from 'mobx-state-tree';
 
-import { FaceDecorationModel } from '../../DielineViewer/data/PyramidNetStore';
+import { FaceDecorationModel } from '../../DielineViewer/models/PyramidNetStore';
 import {
   addTuple,
   calculateTransformOriginChangeOffset,

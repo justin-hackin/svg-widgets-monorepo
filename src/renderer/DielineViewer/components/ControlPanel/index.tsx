@@ -24,7 +24,7 @@ import { dashPatterns } from '../../data/dash-patterns';
 import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { MIRRORED_STROKES } from '../../config';
 import { EVENTS } from '../../../../main/ipc';
-import { IPyramidNetFactoryModel } from '../../data/PyramidNetMakerStore';
+import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../../common/util/svg';
 
 export const ControlPanel = observer(({ store }: { store: IPyramidNetFactoryModel}) => {

@@ -5,11 +5,11 @@ import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
 
 import darkTheme from './data/material-ui-dark-theme.json';
-import { store } from './data/PyramidNetMakerStore';
 import { PyramidNet } from './components/PyramidNet';
 import { ControlPanel } from './components/ControlPanel';
 import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
+import { store } from './models';
 
 const patternId = 'grid-pattern';
 // @ts-ignore

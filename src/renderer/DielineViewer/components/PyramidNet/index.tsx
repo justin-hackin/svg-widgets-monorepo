@@ -12,7 +12,7 @@ import { ascendantEdgeConnectionTabs } from '../../util/shapes/ascendantEdgeConn
 import { closedPolygonPath, roundedEdgePath } from '../../util/shapes/generic';
 import { EVENTS } from '../../../../main/ipc';
 // eslint-disable-next-line import/no-cycle
-import { IPyramidNetFactoryModel } from '../../data/PyramidNetMakerStore';
+import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 
 export const PyramidNet = observer(({ store }: {store: IPyramidNetFactoryModel}) => {
   const {

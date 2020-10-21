@@ -11,7 +11,7 @@ import { subtract } from '@flatten-js/boolean-op';
 import {
   chunk, flatten, omit, range,
 } from 'lodash';
-import { polyhedra } from './polyhedra';
+import { polyhedra } from '../data/polyhedra';
 import {
   CM_TO_PIXELS_RATIO,
   PointLike,

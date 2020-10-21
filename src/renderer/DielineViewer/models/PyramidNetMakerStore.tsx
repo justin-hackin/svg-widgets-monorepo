@@ -6,57 +6,11 @@ import React from 'react';
 // eslint-disable-next-line import/no-cycle
 import { PyramidNet } from '../components/PyramidNet';
 import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
-import { polyhedra } from './polyhedra';
-import { SVGWrapper } from './SVGWrapper';
+import { polyhedra } from '../data/polyhedra';
+import { SVGWrapper } from '../data/SVGWrapper';
 import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
-
-const defaultModelData:IPyramidNetFactoryModel = {
-  styleSpec: {
-    dieLineProps: { fill: 'none', strokeWidth: 1 },
-    cutLineProps: { stroke: '#FF3A5E' },
-    scoreLineProps: { stroke: '#BDFF48' },
-    designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
-  },
-  pyramidNetSpec: {
-    // @ts-ignore
-    pyramid: { shapeName: 'small-triambic-icosahedron' },
-    ascendantEdgeTabsSpec: {
-      flapRoundingDistanceRatio: 1,
-      holeFlapTaperAngle: 0.3141592653589793,
-      holeReachToTabDepth: 0.1,
-      holeWidthRatio: 0.4,
-      midpointDepthToTabDepth: 0.64527027,
-      tabDepthToTraversalLength: 0.04810606060599847,
-      tabRoundingDistanceRatio: 0.75,
-      tabStartGapToTabDepth: 1,
-      tabWideningAngle: 0.19634954084936207,
-      tabsCount: 3,
-    },
-    baseEdgeTabsSpec: {
-      finDepthToTabDepth: 1.1,
-      finOffsetRatio: 0.75,
-      holeBreadthToHalfWidth: 0.25,
-      holeDepthToTabDepth: 0.5,
-      holeTaper: 0.6981317007977318,
-      tabDepthToAscendantEdgeLength: 1.5,
-    },
-    // @ts-ignore
-    baseScoreDashSpec: {
-      strokeDashPathPatternId: 'base',
-      strokeDashLength: 11,
-      strokeDashOffsetRatio: 0,
-    },
-    // @ts-ignore
-    interFaceScoreDashSpec: {
-      strokeDashPathPatternId: 'base',
-      strokeDashLength: 11,
-      strokeDashOffsetRatio: 0,
-    },
-    shapeHeightInCm: 40,
-  },
-};
 
 export const FaceBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
@@ -73,7 +27,7 @@ export const FaceBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) =
   );
 };
 
-const PyramidNetFactoryModel = types.model({
+export const PyramidNetFactoryModel = types.model({
   pyramidNetSpec: PyramidNetModel,
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
@@ -117,8 +71,3 @@ const PyramidNetFactoryModel = types.model({
 }));
 
 export interface IPyramidNetFactoryModel extends Instance<typeof PyramidNetFactoryModel> {}
-
-export const store = PyramidNetFactoryModel.create(defaultModelData);
-
-// @ts-ignore
-window.store = store;
