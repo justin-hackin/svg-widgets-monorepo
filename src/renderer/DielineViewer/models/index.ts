@@ -49,7 +49,6 @@ const defaultModelData: IPyramidNetFactoryModel = {
   },
 };
 export const netFactoryStore = makeInspectable(PyramidNetFactoryModel.create(defaultModelData));
-
 const NetFactoryStoreContext = createContext<IPyramidNetFactoryModel>(netFactoryStore);
 
 export const { Provider } = NetFactoryStoreContext;
