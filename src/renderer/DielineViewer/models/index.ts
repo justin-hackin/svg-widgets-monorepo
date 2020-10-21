@@ -1,3 +1,6 @@
+import { createContext, useContext } from 'react';
+import makeInspectable from 'mobx-devtools-mst';
+
 import { IPyramidNetFactoryModel, PyramidNetFactoryModel } from './PyramidNetMakerStore';
 
 const defaultModelData: IPyramidNetFactoryModel = {
@@ -45,4 +48,13 @@ const defaultModelData: IPyramidNetFactoryModel = {
     shapeHeightInCm: 40,
   },
 };
-export const store = PyramidNetFactoryModel.create(defaultModelData);
+export const netFactoryStore = makeInspectable(PyramidNetFactoryModel.create(defaultModelData));
+
+const NetFactoryStoreContext = createContext<IPyramidNetFactoryModel>(netFactoryStore);
+
+export const { Provider } = NetFactoryStoreContext;
+
+export function useMst() {
+  const store = useContext(NetFactoryStoreContext);
+  return store;
+}

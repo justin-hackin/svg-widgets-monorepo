@@ -24,15 +24,16 @@ import { dashPatterns } from '../../data/dash-patterns';
 import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { MIRRORED_STROKES } from '../../config';
 import { EVENTS } from '../../../../main/ipc';
-import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../../common/util/svg';
+import { useMst } from '../../models';
 
-export const ControlPanel = observer(({ store }: { store: IPyramidNetFactoryModel}) => {
+export const ControlPanel = observer(() => {
   // @ts-ignore
   const classes = useStyles();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme = useTheme();
-  const { polyhedraPyramidGeometries } = store;
+  const store = useMst();
+  const { polyhedraPyramidGeometries, setValueAtPath } = store;
   const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
@@ -44,7 +45,7 @@ export const ControlPanel = observer(({ store }: { store: IPyramidNetFactoryMode
   }) => {
     if (disabled) { return null; }
     const extraProps = {
-      setter: (value) => { store.setValueAtPath(valuePath, value); },
+      setter: (value) => { setValueAtPath(valuePath, value); },
       value: get(store, valuePath),
       valuePath,
       key: valuePath,

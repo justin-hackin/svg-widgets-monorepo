@@ -12,9 +12,9 @@ import { ascendantEdgeConnectionTabs } from '../../util/shapes/ascendantEdgeConn
 import { closedPolygonPath, roundedEdgePath } from '../../util/shapes/generic';
 import { EVENTS } from '../../../../main/ipc';
 // eslint-disable-next-line import/no-cycle
-import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
+import { useMst } from '../../models';
 
-export const PyramidNet = observer(({ store }: {store: IPyramidNetFactoryModel}) => {
+export const PyramidNet = observer(() => {
   const {
     styleSpec,
     pyramidNetSpec: {
@@ -27,17 +27,18 @@ export const PyramidNet = observer(({ store }: {store: IPyramidNetFactoryModel})
       boundaryPoints, pathScaleMatrix, faceInteriorAngles,
       actualFaceEdgeLengths, ascendantEdgeTabDepth,
       activeCutHolePatternD, borderInsetFaceHoleTransformMatrix,
+      sendTextureEditorUpdate, setFaceDecoration,
     },
-  } = store;
+  } = useMst();
 
   useEffect(() => {
     const setFaceDecorationHandler = (e, faceDecoration) => {
     // @ts-ignore
-      store.pyramidNetSpec.setFaceDecoration(faceDecoration);
+      setFaceDecoration(faceDecoration);
     };
     const sendShapeUpdateHandler = () => {
     // @ts-ignore
-      store.pyramidNetSpec.sendTextureEditorUpdate();
+      sendTextureEditorUpdate();
     };
 
     globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, setFaceDecorationHandler);
