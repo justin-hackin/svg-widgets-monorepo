@@ -35,6 +35,7 @@ export const FaceDecorationModel = types.model({
   rotate: types.number,
   scale: types.number,
   isPositive: types.boolean,
+  sourceFileName: types.string,
 }).views((self) => ({
   get transformMatrix() {
     const {
@@ -62,6 +63,9 @@ export const PyramidNetModel = types.model({
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
   baseScoreDashSpec: types.late(() => DashPatternModel),
   interFaceScoreDashSpec: types.late(() => DashPatternModel),
+  // in this case of faceDecoration being defined, this is a derived value thus could be made volatile
+  // however, it needs to be persisted in the model because
+  // it can also be defined by cut hole path import via templated svg file
   activeCutHolePatternD: types.maybe(types.string),
 })
   .views((self) => ({
@@ -210,10 +214,6 @@ export const PyramidNetModel = types.model({
       const { faceDecoration, ...rest } = specData;
       Object.assign(self, rest);
       this.setFaceDecoration(faceDecoration);
-    },
-
-    getJSON() {
-      return JSON.stringify(omit(self, ['activeCutHolePatternD']), null, 2);
     },
   }));
 

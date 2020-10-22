@@ -102,13 +102,13 @@ export const TextureTransformEditorModel = types
         : [xmin + (width - (textureDimensions.width * scale)) / 2, 0];
       self.texture.scale = self.imageCoverScale.scale;
     },
-    setTextureInstance(pathD) {
+    setTextureInstance(pathD, sourceFileName) {
       self.texture = TextureModel.create({
-        pathD, scale: 1, rotate: 0, translate: [0, 0], transformOrigin: [0, 0], isPositive: false,
+        pathD, sourceFileName, scale: 1, rotate: 0, translate: [0, 0], transformOrigin: [0, 0], isPositive: false,
       });
     },
-    setTexturePath(pathD, recenterPath = false) {
-      this.setTextureInstance(pathD);
+    setTexturePath(pathD, sourceFileName, recenterPath = false) {
+      this.setTextureInstance(pathD, sourceFileName);
       if (recenterPath) {
         this.fitTextureToFace();
       }
@@ -117,9 +117,11 @@ export const TextureTransformEditorModel = types
       const d = await globalThis.ipcRenderer
         .invoke(EVENTS.GET_SVG_STRING_BY_PATH, url)
         .then((svgString) => extractCutHolesFromSvgString(svgString));
+      const fileNameWithExtension = await globalThis.ipcRenderer.invoke(EVENTS.GET_PATH_BASENAME, url);
       // TODO: error handling
       // @ts-ignore
-      this.setTexturePath(d, true);
+      // file dialog filters only svg files thus slice is safe to trim extension
+      this.setTexturePath(d, fileNameWithExtension.slice(0, -4), true);
     },
     // TODO: add limits for view scale and
     // these seem like the domain of the texture model but setters for

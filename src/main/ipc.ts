@@ -1,5 +1,6 @@
 const { dialog } = require('electron');
 const svgpath = require('svgpath');
+const path = require('path');
 const fsPromises = require('fs').promises;
 const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean-addon');
 const { VERY_LARGE_NUMBER } = require('../renderer/common/util/geom');
@@ -10,6 +11,8 @@ interface Events {
 }
 
 export const EVENT_TARGET_DELIMITER = '<=';
+
+// TODO: use enum if event names allow
 export const EVENTS:Events = {
   SAVE_SVG: 'save-svg',
   SAVE_NET_SVG_AND_SPEC: 'save-net-svg-and-spec',
@@ -20,6 +23,7 @@ export const EVENTS:Events = {
   RESET_DRAG_MODE: 'reset-drag-mode',
   GET_SVG_STRING_BY_PATH: 'get-svg-string-by-path',
   GET_SVG_PATH: 'get-svg-path',
+  GET_PATH_BASENAME: 'get-path-basename',
   REQUEST_SHAPE_UPDATE: `die${EVENT_TARGET_DELIMITER}request-shape-update`,
   UPDATE_TEXTURE_EDITOR: `tex${EVENT_TARGET_DELIMITER}update-texture-editor`,
   UPDATE_DIELINE_VIEWER: `die${EVENT_TARGET_DELIMITER}update-dieline-viewer`,
@@ -64,21 +68,30 @@ export const setupIpc = (ipcMain) => {
     return fsPromises.writeFile(filePath, fileContent);
   }));
 
+  ipcMain.handle(EVENTS.GET_PATH_BASENAME, (e, pathName) => path.basename(pathName));
+
   const resolveStringDataFromDialog = async (dialogOptions) => {
     const { canceled, filePaths } = await dialog.showOpenDialog(dialogOptions);
     if (canceled) { return null; }
     return fsPromises.readFile(filePaths[0], 'utf8');
   };
 
-  ipcMain.handle(EVENTS.SAVE_NET_SVG_AND_SPEC, (e, svgContent, jsonContent, message) => dialog.showSaveDialog({
-    message,
-    filters: svgFilters,
-  }).then(({ canceled, filePath }) => {
-    if (canceled) { return null; }
-    return Promise.all([
-      fsPromises.writeFile(filePath, svgContent),
-      fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, jsonContent)]);
-  }));
+  ipcMain.handle(EVENTS.SAVE_NET_SVG_AND_SPEC, (e, svgContent, pyramidNetSpec, message) => {
+    const { pyramid: { shapeName }, faceDecoration: { sourceFileName = undefined } = {} } = pyramidNetSpec;
+    const defaultPath = `${shapeName}${sourceFileName ? `__${sourceFileName}` : ''}.svg`;
+    return dialog.showSaveDialog({
+      message,
+      filters: svgFilters,
+      defaultPath,
+    }).then(({ canceled, filePath }) => {
+      if (canceled) {
+        return null;
+      }
+      return Promise.all([
+        fsPromises.writeFile(filePath, svgContent),
+        fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, JSON.stringify(pyramidNetSpec, null, 2))]);
+    });
+  });
 
   ipcMain.handle(EVENTS.LOAD_NET_SPEC, () => resolveStringDataFromDialog(
     { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },

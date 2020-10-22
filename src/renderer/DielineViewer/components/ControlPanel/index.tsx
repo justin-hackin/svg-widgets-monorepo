@@ -88,7 +88,7 @@ export const ControlPanel = observer(() => {
               globalThis.ipcRenderer.invoke(
                 EVENTS.SAVE_NET_SVG_AND_SPEC,
                 store.renderPyramidNetToString(),
-                store.pyramidNetSpec.getJSON(),
+                store.pyramidNetSpec,
                 'Save pyramid net dielines and model',
               );
             }}
