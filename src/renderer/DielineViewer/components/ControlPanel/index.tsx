@@ -9,6 +9,7 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
+import Toolbar from '@material-ui/core/Toolbar';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import SaveIcon from '@material-ui/icons/Save';
 import ArchiveIcon from '@material-ui/icons/Archive';
@@ -69,7 +70,7 @@ export const ControlPanel = observer(() => {
           paper: classes.drawerPaper,
         }}
       >
-        <div className={classes.drawerHeader}>
+        <Toolbar className={classes.dielineToolbar}>
           <IconButton
             aria-label="save"
             onClick={() => {
@@ -120,39 +121,41 @@ export const ControlPanel = observer(() => {
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
-        </div>
+        </Toolbar>
         <Divider />
 
-        <ControlElement
-          component={PanelSelect}
-          valuePath="pyramidNetSpec.pyramid.shapeName"
-          label="Polyhedron"
-          options={polyhedronOptions}
-        />
-        <ControlElement
-          component={PanelSlider}
-          valuePath="pyramidNetSpec.shapeHeightInCm"
-          min={20}
-          max={60}
-          step={VERY_SMALL_NUMBER}
-        />
+        <div className={classes.drawerContent}>
+          <ControlElement
+            component={PanelSelect}
+            valuePath="pyramidNetSpec.pyramid.shapeName"
+            label="Polyhedron"
+            options={polyhedronOptions}
+          />
+          <ControlElement
+            component={PanelSlider}
+            valuePath="pyramidNetSpec.shapeHeightInCm"
+            min={20}
+            max={60}
+            step={VERY_SMALL_NUMBER}
+          />
 
-        <ControlsAccordion summary="Ascendant Edge Tabs">
-          <AscendantEdgeTabsControls />
-        </ControlsAccordion>
+          <ControlsAccordion summary="Ascendant Edge Tabs">
+            <AscendantEdgeTabsControls />
+          </ControlsAccordion>
 
-        <ControlsAccordion summary="Base Edge Tab">
-          <BaseEdgeTabControls />
-        </ControlsAccordion>
+          <ControlsAccordion summary="Base Edge Tab">
+            <BaseEdgeTabControls />
+          </ControlsAccordion>
 
-        {/* TODO: re-add stroke controls when refined */}
-        {/* <ControlsAccordion summary="Stroke"> */}
-        {/*  <StrokeControls /> */}
-        {/* </ControlsAccordion> */}
+          {/* TODO: re-add stroke controls when refined */}
+          {/* <ControlsAccordion summary="Stroke"> */}
+          {/*  <StrokeControls /> */}
+          {/* </ControlsAccordion> */}
 
-        <ControlsAccordion summary="Path Styles">
-          <StyleControls />
-        </ControlsAccordion>
+          <ControlsAccordion summary="Path Styles">
+            <StyleControls />
+          </ControlsAccordion>
+        </div>
       </Drawer>
       <Fab
         color="inherit"

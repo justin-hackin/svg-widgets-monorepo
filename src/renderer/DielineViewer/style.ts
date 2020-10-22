@@ -46,15 +46,18 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     width: drawerWidth,
     flexShrink: 0,
   },
-  drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
-  },
   drawerPaper: {
     width: drawerWidth,
+    overflowY: 'hidden',
+  },
+  drawerContent: {
+    overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  dielineToolbar: {
+    display: 'flex',
+    placeContent: 'flex-end',
   },
   formControl: {
     margin: theme.spacing(1),
