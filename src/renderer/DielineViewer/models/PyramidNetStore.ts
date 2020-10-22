@@ -137,9 +137,8 @@ export const PyramidNetModel = types.model({
     get insetPolygon(): Polygon {
       return offset(this.borderPolygon, -this.ascendantEdgeTabDepth);
     },
-
+    // TODO: make use of this by adding a toggle to render it to PyramidNet
     get borderOverlay(): Polygon {
-      // TODO: can be converted to a path inset using @flatten-js/polygon-offset
       return subtract(this.borderPolygon, this.insetPolygon);
     },
     // get borderInsetFaceHoleTransform() {

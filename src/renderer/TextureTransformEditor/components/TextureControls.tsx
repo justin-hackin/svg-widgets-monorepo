@@ -68,8 +68,9 @@ export const TextureControls = observer(({
           label="Rotate"
           value={textureRotate}
           onChange={({ target: { value } = {} }) => {
-            // TODO: this should not run when value changes via props
-            // TODO: once above is fixed, use textureRotateDragged
+            // TODO: use onKeyPress for enter submission
+            // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
+            // TODO: once above is fixed, use textureRotateDragged as value
             if (isNumber(value) && !isNaN(value)) {
               texture.setRotate(value);
             }

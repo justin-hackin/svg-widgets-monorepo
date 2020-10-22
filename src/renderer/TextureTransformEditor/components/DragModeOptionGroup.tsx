@@ -22,7 +22,6 @@ export const DragModeOptionsGroup = ({ dragMode }) => (
     exclusive
     aria-label="drag mode"
   >
-    {/* translate is too technical for end user */}
     <ToggleButton
       title="drag"
       value={DRAG_MODES.TRANSLATE}

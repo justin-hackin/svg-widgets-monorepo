@@ -4,7 +4,6 @@ import { isNaN, range } from 'lodash';
 
 import { circularSlice } from '../../../common/util/data';
 
-// TODO: use ts defs in project
 export interface PointLike {
   x: number,
   y: number,

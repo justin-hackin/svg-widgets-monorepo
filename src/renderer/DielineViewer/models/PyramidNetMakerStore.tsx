@@ -19,7 +19,6 @@ export const FaceBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) =
   } = store;
   const normalizedBoundaryPathD = closedPolygonPath(normalizedBoundaryPoints).getD();
 
-  // TODO: can be converted to a path inset using @flatten-js/polygon-offset
   return (
     <svg viewBox={pathDToViewBoxStr(normalizedBoundaryPathD)}>
       <path fill="#FFD900" stroke="#000" d={normalizedBoundaryPathD} />

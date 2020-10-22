@@ -10,9 +10,8 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 const { default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = require('electron-devtools-installer');
 const { setupIpc, EVENTS, EVENT_TARGET_DELIMITER } = require('./ipc');
 
-
-// TODO: remove isEnabled once builder works
-debug({ showDevTools: false, isEnabled: true });
+// for debugging build, add isEnabled: true
+debug({ showDevTools: false });
 
 // @ts-ignore
 const icon = nativeImage.createFromPath(`${path.resolve(__static, '..')}/build/icons/256x256.png`);

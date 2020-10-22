@@ -13,7 +13,7 @@ const matrixWithTransformCenter = (origin, scale, rotation) => (new DOMMatrixRea
   .scale(scale, scale)
   .rotate(rotation)
   .translate(...origin.map(negateMap));
-// TODO: can this calculation be simplified?
+
 export const calculateTransformOriginChangeOffset = (
   oldTransformOrigin, newTransformOrigin,
   scale, rotation, translation,

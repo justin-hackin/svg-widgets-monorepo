@@ -51,8 +51,6 @@ export const PyramidNet = observer(() => {
   }, []);
 
 
-  // TODO: can be converted to a path inset using @flatten-js/polygon-offset
-
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
   const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
   const insetProps = { ...styleSpec.dieLineProps, stroke: '#00BBFF' };

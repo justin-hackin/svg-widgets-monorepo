@@ -85,9 +85,9 @@ export function baseEdgeConnectionTab(
   );
 
   const holePath = connectedLineSegments([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]]);
-  // TODO: only taper as much as needed for clearance
   const handleEdges = [
     hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
+    // TODO: should this go back to symmetric?
     hingedPlotByProjectionDistance(start, finBases[0], Math.PI * 0.6, tabDepth),
   ];
   const valleyDepthRatio = 0.3;

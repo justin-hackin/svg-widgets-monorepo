@@ -11,6 +11,7 @@ interface PolyhedraDefs {
   [propName: string]: PyramidGeometrySpec,
 }
 
+// TODO: more accurate lengths for some shapes
 export const polyhedra:PolyhedraDefs = {
   'great-stellated-dodecahedron': {
     relativeFaceEdgeLengths: [PHI, 1, PHI],
@@ -109,38 +110,38 @@ export const polyhedra:PolyhedraDefs = {
   //   diameter: 30.8546,
   //   copiesNeeded: 6,
   // },
-  'triakis-octahedron': { // TODO: more accurate lengths
+  'triakis-octahedron': {
     relativeFaceEdgeLengths: [14.9287, 25.4848, 14.9287],
     diameter: 36.041,
     faceCount: 3,
     copiesNeeded: 8,
   },
-  'disdyakis-dodecahedron': { // TODO: more accurate lengths
+  'disdyakis-dodecahedron': {
     relativeFaceEdgeLengths: [3.13, 5.1, 4.18],
     diameter: 11.5,
     faceCount: 4,
     copiesNeeded: 6,
   },
-  'pentakis-dodecahedron': { // TODO: more accurate lengths
+  'pentakis-dodecahedron': {
     relativeFaceEdgeLengths: [3.32, 3.74, 3.32],
     diameter: 9.79,
     faceCount: 5,
     copiesNeeded: 12,
   },
   // too tight
-  // 'disdyakis-triacontahedron': { // TODO: more accurate lengths
+  // 'disdyakis-triacontahedron': {
   //   relativeFaceEdgeLengths: [1.83, 3.39, 2.88],
   //   diameter: 28.8374,
   //   faceCount: 4,
   //   copiesNeeded: 30,
   // },
-  '5-octahedra-compound': { // TODO: more accurate lengths
+  '5-octahedra-compound': {
     relativeFaceEdgeLengths: [1.95, 2.42, 2.7],
     diameter: 10,
     faceCount: 4,
     copiesNeeded: 30,
   },
-  // 'strombic-icositetrahedorn': { //TODO: more accurate lengths
+  // 'strombic-icositetrahedorn': {
   //   relativeFaceEdgeLengths: [3.87, 2.99, 2.99, 2.87],
   //   diameter: 10.1,
   //   faceCount: 1,

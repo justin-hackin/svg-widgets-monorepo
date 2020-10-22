@@ -26,8 +26,6 @@ import { viewBoxAttrsToString } from '../../common/util/svg';
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
 
-// TODO: find classes type
-// eslint-disable-next-line no-shadow
 const TextureTransformEditorLOC = observer(({ classes }) => {
   const dragMode = useDragMode();
   // ==================================================================================================================
