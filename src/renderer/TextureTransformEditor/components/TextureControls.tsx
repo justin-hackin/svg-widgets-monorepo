@@ -143,7 +143,7 @@ export const TextureControls = observer(({
           label="Fill is positive"
         />
         <DragModeOptionsGroup dragMode={dragMode} />
-        <IconButton onClick={sendTexture} color="primary" aria-label="send texture" component="span">
+        <IconButton onClick={() => { sendTexture(); }} color="primary" aria-label="send texture" component="span">
           <TelegramIcon fontSize="large" />
         </IconButton>
       </>

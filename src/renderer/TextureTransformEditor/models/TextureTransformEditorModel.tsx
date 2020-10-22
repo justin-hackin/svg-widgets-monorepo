@@ -124,7 +124,7 @@ export const TextureTransformEditorModel = types
     // TODO: add limits for view scale and
     // these seem like the domain of the texture model but setters for
     // textureScaleDiff (and more to follow) need boundary
-    textureEditorUpdateHandler(e, faceVertices, shapeName, faceDecoration) {
+    textureEditorUpdateHandler(faceVertices, shapeName, faceDecoration) {
       self.shapeName = shapeName;
       // @ts-ignore
       self.boundary = BoundaryModel.create({ faceVertices });

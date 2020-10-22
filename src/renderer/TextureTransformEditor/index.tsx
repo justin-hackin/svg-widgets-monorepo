@@ -48,7 +48,10 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
 
   // Init
   useEffect(() => {
-    globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR, textureEditorUpdateHandler);
+    globalThis.ipcRenderer
+      .on(EVENTS.UPDATE_TEXTURE_EDITOR, (_, faceVertices, shapeName, faceDecoration) => { // @ts-ignore
+        textureEditorUpdateHandler(faceVertices, shapeName, faceDecoration);
+      });
 
     const resizeHandler = () => {
       const { outerWidth: width, outerHeight: height } = window;
