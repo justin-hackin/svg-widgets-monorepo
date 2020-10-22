@@ -1,10 +1,16 @@
 import { createContext, useContext } from 'react';
+import { connectReduxDevtools } from 'mst-middlewares';
 import makeInspectable from 'mobx-devtools-mst';
+import remotedev from 'remotedev';
 
 import { ITextureTransformEditorModel, TextureTransformEditorModel } from './TextureTransformEditorModel';
 
 export const textureTransformEditorStore = TextureTransformEditorModel.create();
-makeInspectable(textureTransformEditorStore);
+if (process.env.NODE_ENV !== 'production') {
+  makeInspectable(textureTransformEditorStore);
+  connectReduxDevtools(remotedev, textureTransformEditorStore);
+}
+
 const TextureTransformEditorStoreContext = createContext<ITextureTransformEditorModel>(
   textureTransformEditorStore,
 );

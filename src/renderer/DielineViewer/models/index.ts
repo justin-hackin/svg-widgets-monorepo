@@ -1,9 +1,11 @@
 import { createContext, useContext } from 'react';
+import { connectReduxDevtools } from 'mst-middlewares';
 import makeInspectable from 'mobx-devtools-mst';
+import remotedev from 'remotedev';
 
 import { IPyramidNetFactoryModel, PyramidNetFactoryModel } from './PyramidNetMakerStore';
 
-const defaultModelData: IPyramidNetFactoryModel = {
+const defaultModelData = {
   styleSpec: {
     dieLineProps: { fill: 'none', strokeWidth: 1 },
     cutLineProps: { stroke: '#FF3A5E' },
@@ -49,7 +51,10 @@ const defaultModelData: IPyramidNetFactoryModel = {
   },
 };
 export const netFactoryStore = PyramidNetFactoryModel.create(defaultModelData);
-makeInspectable(netFactoryStore);
+if (process.env.NODE_ENV !== 'production') {
+  connectReduxDevtools(remotedev, netFactoryStore);
+  makeInspectable(netFactoryStore);
+}
 const NetFactoryStoreContext = createContext<IPyramidNetFactoryModel>(netFactoryStore);
 
 export const { Provider } = NetFactoryStoreContext;

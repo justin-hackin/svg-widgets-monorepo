@@ -27,7 +27,7 @@ export const FaceBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) =
   );
 };
 
-export const PyramidNetFactoryModel = types.model({
+export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   pyramidNetSpec: PyramidNetModel,
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
@@ -47,12 +47,7 @@ export const PyramidNetFactoryModel = types.model({
       fill: types.string,
     }),
   }),
-
 }).actions((self) => ({
-  // afterCreate() {
-  //   Object.assign(self, defaultModelData);
-  // },
-
   renderFaceBoundaryToString():string {
     // @ts-ignore
     return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: self }));

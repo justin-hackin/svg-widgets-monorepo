@@ -34,7 +34,7 @@ const getFitScale = (bounds, image) => {
   };
 };
 export const TextureTransformEditorModel = types
-  .model({
+  .model('TextureTransformEditor', {
     shapeName: types.maybe(types.string),
     boundary: types.maybe(BoundaryModel),
     texture: types.maybe(TextureModel),
