@@ -3,9 +3,8 @@ import makeInspectable from 'mobx-devtools-mst';
 
 import { ITextureTransformEditorModel, TextureTransformEditorModel } from './TextureTransformEditorModel';
 
-export const textureTransformEditorStore = makeInspectable(TextureTransformEditorModel.create());
-// @ts-ignore
-window.editorStore = textureTransformEditorStore;
+export const textureTransformEditorStore = TextureTransformEditorModel.create();
+makeInspectable(textureTransformEditorStore);
 const TextureTransformEditorStoreContext = createContext<ITextureTransformEditorModel>(
   textureTransformEditorStore,
 );

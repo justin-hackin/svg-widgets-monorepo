@@ -48,7 +48,8 @@ const defaultModelData: IPyramidNetFactoryModel = {
     shapeHeightInCm: 40,
   },
 };
-export const netFactoryStore = makeInspectable(PyramidNetFactoryModel.create(defaultModelData));
+export const netFactoryStore = PyramidNetFactoryModel.create(defaultModelData);
+makeInspectable(netFactoryStore);
 const NetFactoryStoreContext = createContext<IPyramidNetFactoryModel>(netFactoryStore);
 
 export const { Provider } = NetFactoryStoreContext;
