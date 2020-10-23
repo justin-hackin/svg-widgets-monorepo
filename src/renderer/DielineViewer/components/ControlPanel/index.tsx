@@ -9,13 +9,11 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
+import FolderIcon from '@material-ui/icons/Folder';
 import Toolbar from '@material-ui/core/Toolbar';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import SaveIcon from '@material-ui/icons/Save';
-import ArchiveIcon from '@material-ui/icons/Archive';
-import BlurOnIcon from '@material-ui/icons/BlurOn';
-import DescriptionIcon from '@material-ui/icons/Description';
 import ControlCameraIcon from '@material-ui/icons/ControlCamera';
+import { Menu, MenuItem, Button } from '@material-ui/core';
 import { PanelSelect } from '../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../common/components/PanelSlider';
 import { useStyles } from '../../style';
@@ -39,11 +37,10 @@ export const ControlPanel = observer(() => {
   const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
+  const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
+  const resetFileMenuRef = () => { setFileMenuRef(null); };
+
   const [open, setOpen] = React.useState(true);
-
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
 
   const handleDrawerOpen = () => { setOpen(true); };
 
@@ -71,53 +68,62 @@ export const ControlPanel = observer(() => {
         }}
       >
         <Toolbar className={classes.dielineToolbar}>
-          <IconButton
-            aria-label="save"
-            onClick={() => {
-              globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((netSpecData) => {
-                store.pyramidNetSpec.loadSpec(netSpecData);
+          <Button
+            startIcon={<FolderIcon />}
+            onClick={(e) => {
+              setFileMenuRef(e.currentTarget);
+            }}
+          >
+            File
+          </Button>
+          <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
+            <MenuItem onClick={async () => {
+              await globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((netSpecData) => {
+                // falsy if file dialog cancelled
+                if (netSpecData) {
+                  store.pyramidNetSpec.loadSpec(netSpecData);
+                }
               });
+              resetFileMenuRef();
             }}
-          >
-            <DescriptionIcon />
-          </IconButton>
-
-          <IconButton
-            aria-label="save"
-            onClick={() => {
-              globalThis.ipcRenderer.invoke(
-                EVENTS.SAVE_NET_SVG_AND_SPEC,
-                store.renderPyramidNetToString(),
-                store.pyramidNetSpec,
-                'Save pyramid net dielines and model',
-              );
-            }}
-          >
-            <SaveIcon />
-          </IconButton>
-          <IconButton
-            aria-label="save"
-            onClick={() => {
-              globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderFaceBoundaryToString(), {
+            >
+              Open JSON data
+            </MenuItem>
+            <MenuItem
+              onClick={async () => {
+                await globalThis.ipcRenderer.invoke(
+                  EVENTS.SAVE_NET_SVG_AND_SPEC,
+                  store.renderPyramidNetToString(),
+                  store.pyramidNetSpec,
+                  'Save pyramid net dielines and model',
+                );
+                resetFileMenuRef();
+              }}
+            >
+              Save to SVG w/ JSON
+            </MenuItem>
+            <MenuItem onClick={async () => {
+              await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderFaceBoundaryToString(), {
                 message: 'Save face template',
                 defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
               });
+              resetFileMenuRef();
             }}
-          >
-            <ArchiveIcon />
-          </IconButton>
-          <IconButton
-            aria-label="save"
-            onClick={() => {
-              globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, 'Upload face cut pattern')
+            >
+              Download face template SVG (current shape)
+            </MenuItem>
+            <MenuItem onClick={async () => {
+              await globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, 'Upload face cut pattern')
                 .then((svgString) => {
                   const d = extractCutHolesFromSvgString(svgString);
                   store.pyramidNetSpec.setActiveCutHolePatternD(d);
                 });
+              resetFileMenuRef();
             }}
-          >
-            <BlurOnIcon />
-          </IconButton>
+            >
+              Import face cut path from template
+            </MenuItem>
+          </Menu>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
