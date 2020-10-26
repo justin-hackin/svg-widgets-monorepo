@@ -9,7 +9,7 @@ export const BaseEdgeTabControls = () => (
   <>
     <ControlElement
       component={PanelSlider}
-      valuePath="pyramidNetSpec.baseEdgeTabsSpec.tabDepthToAscendantEdgeLength"
+      valuePath="pyramidNetSpec.baseEdgeTabsSpec.tabDepthToAscendantTabDepth"
       min={0.6}
       max={2}
       step={VERY_SMALL_NUMBER}

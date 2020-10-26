@@ -33,7 +33,7 @@ const defaultModelData = {
       holeBreadthToHalfWidth: 0.25,
       holeDepthToTabDepth: 0.5,
       holeTaper: 0.6981317007977318,
-      tabDepthToAscendantEdgeLength: 1.5,
+      tabDepthToAscendantTabDepth: 1.5,
     },
     // @ts-ignore
     baseScoreDashSpec: {

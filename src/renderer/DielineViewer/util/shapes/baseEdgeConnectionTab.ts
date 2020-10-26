@@ -31,7 +31,7 @@ export const BaseEdgeTabsModel = types.model({
   holeBreadthToHalfWidth: types.number,
   holeDepthToTabDepth: types.number,
   holeTaper: types.number,
-  tabDepthToAscendantEdgeLength: types.number,
+  tabDepthToAscendantTabDepth: types.number,
 });
 
 export interface IBaseEdgeTabsModel extends Instance<typeof BaseEdgeTabsModel> {
@@ -42,14 +42,14 @@ export function baseEdgeConnectionTab(
   ascendantEdgeTabDepth, tabSpec: IBaseEdgeTabsModel, scoreDashSpec: IDashPatternModel,
 ): BaseEdgeConnectionTab {
   const {
-    tabDepthToAscendantEdgeLength,
+    tabDepthToAscendantTabDepth,
     holeDepthToTabDepth,
     holeTaper,
     holeBreadthToHalfWidth,
     finDepthToTabDepth,
     finOffsetRatio,
   } = tabSpec;
-  const tabDepth = tabDepthToAscendantEdgeLength * ascendantEdgeTabDepth;
+  const tabDepth = tabDepthToAscendantTabDepth * ascendantEdgeTabDepth;
   const cutPath = new PathData();
   const mid = hingedPlotLerp(start, end, 0, 0.5);
   const holeHandleThicknessRatio = (1 - holeBreadthToHalfWidth) / 2;
