@@ -62,8 +62,8 @@ export const AscendantEdgeTabsControls = () => (
     <ControlElement
       component={PanelSlider}
       valuePath="pyramidNetSpec.ascendantEdgeTabsSpec.holeFlapTaperAngle"
-      min={Math.PI / 12}
-      max={Math.PI / 8}
+      min={Math.PI / 16}
+      max={Math.PI / 4}
       step={VERY_SMALL_NUMBER}
     />
     <ControlElement
