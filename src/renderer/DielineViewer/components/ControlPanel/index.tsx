@@ -13,11 +13,12 @@ import FolderIcon from '@material-ui/icons/Folder';
 import Toolbar from '@material-ui/core/Toolbar';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ControlCameraIcon from '@material-ui/icons/ControlCamera';
-import { Menu, MenuItem, Button } from '@material-ui/core';
+import {
+  Menu, MenuItem, Button, Paper, Tabs, Tab,
+} from '@material-ui/core';
 import { PanelSelect } from '../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../common/components/PanelSlider';
 import { useStyles } from '../../style';
-import { ControlsAccordion } from './components/ControlsAccordion';
 import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { EVENTS } from '../../../../main/ipc';
 import { extractCutHolesFromSvgString } from '../../../../common/util/svg';
@@ -26,6 +27,30 @@ import { ControlElement } from './components/ControlElement';
 import { StyleControls } from './components/StyleControls';
 import { BaseEdgeTabControls } from './components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './components/AscendantEdgeTabsControls';
+import { ScoreControls } from './components/ScoreControls';
+
+const controlsTabs = [
+  {
+    label: 'Asc.',
+    title: 'Ascendant Edge Tab',
+    component: AscendantEdgeTabsControls,
+  },
+  {
+    label: 'Base',
+    title: 'Base Edge Tab',
+    component: BaseEdgeTabControls,
+  },
+  {
+    label: 'Score',
+    title: 'Score Pattern',
+    component: ScoreControls,
+  },
+  {
+    label: 'Style',
+    title: 'Dieline Style',
+    component: StyleControls,
+  },
+];
 
 export const ControlPanel = observer(() => {
   // @ts-ignore
@@ -40,10 +65,14 @@ export const ControlPanel = observer(() => {
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
 
+  const [activeControlsIndex, setActiveControlsIndex] = React.useState(0);
+
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setActiveControlsIndex(newValue);
+  };
+
   const [open, setOpen] = React.useState(true);
-
   const handleDrawerOpen = () => { setOpen(true); };
-
   const handleDrawerClose = () => { setOpen(false); };
 
   const handleOpenTextureEditor = () => { globalThis.ipcRenderer.send(EVENTS.OPEN_TEXTURE_WINDOW); };
@@ -130,37 +159,35 @@ export const ControlPanel = observer(() => {
         </Toolbar>
         <Divider />
 
-        <div className={classes.drawerContent}>
-          <ControlElement
-            component={PanelSelect}
-            valuePath="pyramidNetSpec.pyramid.shapeName"
-            label="Polyhedron"
-            options={polyhedronOptions}
-          />
-          <ControlElement
-            component={PanelSlider}
-            valuePath="pyramidNetSpec.shapeHeightInCm"
-            min={20}
-            max={60}
-            step={VERY_SMALL_NUMBER}
-          />
-
-          <ControlsAccordion summary="Ascendant Edge Tabs">
-            <AscendantEdgeTabsControls />
-          </ControlsAccordion>
-
-          <ControlsAccordion summary="Base Edge Tab">
-            <BaseEdgeTabControls />
-          </ControlsAccordion>
-
-          {/* TODO: re-add stroke controls when refined */}
-          {/* <ControlsAccordion summary="Stroke"> */}
-          {/*  <StrokeControls /> */}
-          {/* </ControlsAccordion> */}
-
-          <ControlsAccordion summary="Path Styles">
-            <StyleControls />
-          </ControlsAccordion>
+        <ControlElement
+          component={PanelSelect}
+          valuePath="pyramidNetSpec.pyramid.shapeName"
+          label="Polyhedron"
+          options={polyhedronOptions}
+        />
+        <ControlElement
+          component={PanelSlider}
+          valuePath="pyramidNetSpec.shapeHeightInCm"
+          min={20}
+          max={60}
+          step={VERY_SMALL_NUMBER}
+        />
+        <Divider />
+        <Paper square>
+          <Tabs
+            value={activeControlsIndex}
+            indicatorColor="primary"
+            textColor="primary"
+            centered
+            onChange={handleTabChange}
+          >
+            { controlsTabs.map(({ label }, index) => (
+              <Tab className={classes.dielineToolbarTab} label={label} key={index} />))}
+          </Tabs>
+        </Paper>
+        <div className={classes.tabContent}>
+          <h3>{controlsTabs[activeControlsIndex].title}</h3>
+          { React.createElement(controlsTabs[activeControlsIndex].component) }
         </div>
       </Drawer>
       <Fab

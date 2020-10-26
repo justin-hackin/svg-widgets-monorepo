@@ -9,15 +9,15 @@ export const BaseEdgeTabControls = () => (
   <>
     <ControlElement
       component={PanelSlider}
+      valuePath="pyramidNetSpec.baseEdgeTabsSpec.finDepthToTabDepth"
+      {...{ ...ratioSliderProps, min: 0.05 }}
+    />
+    <ControlElement
+      component={PanelSlider}
       valuePath="pyramidNetSpec.baseEdgeTabsSpec.tabDepthToAscendantTabDepth"
       min={0.6}
       max={2}
       step={VERY_SMALL_NUMBER}
-    />
-    <ControlElement
-      component={PanelSlider}
-      valuePath="pyramidNetSpec.baseEdgeTabsSpec.finDepthToTabDepth"
-      {...{ ...ratioSliderProps, min: 0.05 }}
     />
     <ControlElement
       component={PanelSlider}

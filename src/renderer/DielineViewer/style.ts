@@ -1,7 +1,7 @@
 import { makeStyles, createStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core';
 
-const drawerWidth = 360;
+const drawerWidth = 500;
 
 export const useStyles = makeStyles((theme: Theme) => createStyles({
   '@global': {
@@ -48,20 +48,24 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   drawerPaper: {
     width: drawerWidth,
-    overflowY: 'hidden',
+    overflowY: 'unset',
   },
-  drawerContent: {
-    overflowY: 'auto',
+  tabContent: {
     display: 'flex',
+    padding: theme.spacing(1),
     flexDirection: 'column',
+    overflowY: 'auto',
+    overflowX: 'hidden',
   },
   dielineToolbar: {
     display: 'flex',
     placeContent: 'flex-end',
   },
+  dielineToolbarTab: {
+    minWidth: 120,
+  },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
   },
   colorPickerInputPaper: {
     width: '100%',

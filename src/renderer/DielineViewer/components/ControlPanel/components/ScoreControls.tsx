@@ -10,7 +10,7 @@ import { ratioSliderProps } from './constants';
 
 const strokeLengthProps = { min: 1, max: 3000, step: VERY_SMALL_NUMBER };
 const dashPatternOptions = Object.entries(dashPatterns).map(([key, { label }]) => ({ value: key, label }));
-export const StrokeControls = () => (
+export const ScoreControls = () => (
   <>
     <ControlElement
       component={PanelSelect}
