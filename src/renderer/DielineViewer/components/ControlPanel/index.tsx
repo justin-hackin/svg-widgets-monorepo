@@ -31,14 +31,14 @@ import { ScoreControls } from './components/ScoreControls';
 
 const controlsTabs = [
   {
-    label: 'Asc.',
-    title: 'Ascendant Edge Tab',
-    component: AscendantEdgeTabsControls,
-  },
-  {
     label: 'Base',
     title: 'Base Edge Tab',
     component: BaseEdgeTabControls,
+  },
+  {
+    label: 'Asc.',
+    title: 'Ascendant Edge Tab',
+    component: AscendantEdgeTabsControls,
   },
   {
     label: 'Score',
