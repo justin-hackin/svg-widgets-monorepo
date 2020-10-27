@@ -57,9 +57,22 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     overflowY: 'auto',
     overflowX: 'hidden',
   },
+  shapeSection: {
+    padding: theme.spacing(1),
+    display: 'flex',
+    flexDirection: 'column',
+  },
   dielineToolbar: {
     display: 'flex',
-    placeContent: 'flex-end',
+    padding: `0 ${theme.spacing(1)}px`,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.background.paper,
+  },
+  dielineToolbarItem: {
+    color: 'inherit',
+  },
+  closeDielineControlsIcon: {
+    marginLeft: 'auto',
   },
   dielineToolbarTab: {
     minWidth: 120,

@@ -11,7 +11,7 @@ import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
 import FolderIcon from '@material-ui/icons/Folder';
 import Toolbar from '@material-ui/core/Toolbar';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import ControlCameraIcon from '@material-ui/icons/ControlCamera';
 import {
   Menu, MenuItem, Button, Paper, Tabs, Tab,
@@ -98,6 +98,7 @@ export const ControlPanel = observer(() => {
       >
         <Toolbar className={classes.dielineToolbar}>
           <Button
+            className={classes.dielineToolbarItem}
             startIcon={<FolderIcon />}
             onClick={(e) => {
               setFileMenuRef(e.currentTarget);
@@ -153,25 +154,30 @@ export const ControlPanel = observer(() => {
               Import face cut path from template
             </MenuItem>
           </Menu>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
+          <IconButton
+            className={`${classes.dielineToolbarItem} ${classes.closeDielineControlsIcon}`}
+            onClick={handleDrawerClose}
+          >
+            <CloseSharpIcon />
           </IconButton>
         </Toolbar>
-        <Divider />
 
-        <ControlElement
-          component={PanelSelect}
-          valuePath="pyramidNetSpec.pyramid.shapeName"
-          label="Polyhedron"
-          options={polyhedronOptions}
-        />
-        <ControlElement
-          component={PanelSlider}
-          valuePath="pyramidNetSpec.shapeHeightInCm"
-          min={20}
-          max={60}
-          step={VERY_SMALL_NUMBER}
-        />
+        <div className={classes.shapeSection}>
+          <h3>Shape</h3>
+          <ControlElement
+            component={PanelSelect}
+            valuePath="pyramidNetSpec.pyramid.shapeName"
+            label="Polyhedron"
+            options={polyhedronOptions}
+          />
+          <ControlElement
+            component={PanelSlider}
+            valuePath="pyramidNetSpec.shapeHeightInCm"
+            min={20}
+            max={60}
+            step={VERY_SMALL_NUMBER}
+          />
+        </div>
         <Divider />
         <Paper square>
           <Tabs
