@@ -10,11 +10,11 @@ import IconButton from '@material-ui/core/IconButton';
 import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
 import FolderIcon from '@material-ui/icons/Folder';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import Toolbar from '@material-ui/core/Toolbar';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
-import ControlCameraIcon from '@material-ui/icons/ControlCamera';
 import {
-  Menu, MenuItem, Button, Paper, Tabs, Tab,
+  Menu, MenuItem, Button, Paper, Tabs, Tab, Tooltip,
 } from '@material-ui/core';
 import { PanelSelect } from '../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../common/components/PanelSlider';
@@ -97,15 +97,26 @@ export const ControlPanel = observer(() => {
         }}
       >
         <Toolbar className={classes.dielineToolbar}>
-          <Button
-            className={classes.dielineToolbarItem}
-            startIcon={<FolderIcon />}
-            onClick={(e) => {
-              setFileMenuRef(e.currentTarget);
-            }}
-          >
-            File
-          </Button>
+          <Tooltip title="File ..." arrow>
+            <Button
+              className={classes.dielineToolbarItem}
+              startIcon={<FolderIcon />}
+              onClick={(e) => {
+                setFileMenuRef(e.currentTarget);
+              }}
+            >
+              File
+            </Button>
+          </Tooltip>
+          <Tooltip title="Open/reveal texture editor" arrow>
+            <Button
+              className={classes.dielineToolbarItem}
+              startIcon={<OpenInNewIcon />}
+              onClick={handleOpenTextureEditor}
+            >
+              Texture
+            </Button>
+          </Tooltip>
           <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
             <MenuItem onClick={async () => {
               await globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((netSpecData) => {
@@ -196,14 +207,6 @@ export const ControlPanel = observer(() => {
           { React.createElement(controlsTabs[activeControlsIndex].component) }
         </div>
       </Drawer>
-      <Fab
-        color="inherit"
-        aria-label="open texture editor"
-        onClick={handleOpenTextureEditor}
-        className={classes.openTextureButton}
-      >
-        <ControlCameraIcon />
-      </Fab>
     </div>
   );
 });
