@@ -23,7 +23,7 @@
       "contrastText": "rgba(0, 0, 0, 0.87)"
     },
     "secondary": {
-      "main": "#f48fb1",
+      "main": "#F4B151",
       "light": "rgb(246, 165, 192)",
       "dark": "rgb(170, 100, 123)",
       "contrastText": "rgba(0, 0, 0, 0.87)"

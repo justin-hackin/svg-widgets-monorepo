@@ -24,6 +24,7 @@ export interface BaseEdgeConnectionTab {
 // "depth" is the distance from the base to the edge
 // "fin" is the male part of the tab which enters the hole of the tab
 // "handle" is the part of the tab that surrounds the hole of the tab
+const defaultBendGuideValley = { depthRatio: 0.5, theta: Math.PI / 4 };
 
 export const BaseEdgeTabsModel = types.model({
   finDepthToTabDepth: types.number,
@@ -32,7 +33,18 @@ export const BaseEdgeTabsModel = types.model({
   holeDepthToTabDepth: types.number,
   holeTaper: types.number,
   tabDepthToAscendantTabDepth: types.number,
-});
+  bendGuideValley: types.maybe(types.model({
+    depthRatio: types.number,
+    theta: types.number,
+  })),
+}).actions((self) => ({
+  unsetBendGuideValley() {
+    self.bendGuideValley = undefined;
+  },
+  resetBendGuideValleyToDefault() {
+    self.bendGuideValley = { ...defaultBendGuideValley };
+  },
+}));
 
 export interface IBaseEdgeTabsModel extends Instance<typeof BaseEdgeTabsModel> {
 }
@@ -48,7 +60,9 @@ export function baseEdgeConnectionTab(
     holeBreadthToHalfWidth,
     finDepthToTabDepth,
     finOffsetRatio,
+    bendGuideValley,
   } = tabSpec;
+
   const tabDepth = tabDepthToAscendantTabDepth * ascendantEdgeTabDepth;
   const cutPath = new PathData();
   const mid = hingedPlotLerp(start, end, 0, 0.5);
@@ -85,26 +99,29 @@ export function baseEdgeConnectionTab(
   );
 
   const holePath = connectedLineSegments([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]]);
+  cutPath.concatPath(holePath);
+  cutPath.close();
+
   const handleEdges = [
     hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
     // TODO: should this go back to symmetric?
     hingedPlotByProjectionDistance(start, finBases[0], Math.PI * 0.6, tabDepth),
   ];
-  const valleyDepthRatio = 0.3;
-  const valleyTheta = Math.PI / 4;
-  const handleValleyDip = hingedPlot(end, mid, Math.PI / 2, valleyDepthRatio * tabDepth);
-  const handleValleyEdgeCasters = [
-    hingedPlot(mid, handleValleyDip, Math.PI + valleyTheta, VERY_LARGE_NUMBER),
-    hingedPlot(mid, handleValleyDip, Math.PI - valleyTheta, VERY_LARGE_NUMBER),
-  ];
-  const handleValleyEdges = handleValleyEdgeCasters.map(
-    (castPt) => intersectLineLine(handleEdges[0], handleEdges[1], handleValleyDip, castPt),
-  );
-  cutPath.concatPath(holePath);
-  cutPath.close();
-  const handleCornerPoints = [start, handleEdges[0],
-    handleValleyEdges[0], handleValleyDip, handleValleyEdges[1],
-    handleEdges[1], finBases[0]];
+  const handleCornerPoints = [start, handleEdges[0]];
+
+  if (bendGuideValley) {
+    const { depthRatio: valleyDepthRatio, theta: valleyTheta } = bendGuideValley;
+    const handleValleyDip = hingedPlot(end, mid, Math.PI / 2, valleyDepthRatio * tabDepth);
+    const handleValleyEdgeCasters = [
+      hingedPlot(mid, handleValleyDip, Math.PI + valleyTheta, VERY_LARGE_NUMBER),
+      hingedPlot(mid, handleValleyDip, Math.PI - valleyTheta, VERY_LARGE_NUMBER),
+    ];
+    const handleValleyEdges = handleValleyEdgeCasters.map(
+      (castPt) => intersectLineLine(handleEdges[0], handleEdges[1], handleValleyDip, castPt),
+    );
+    handleCornerPoints.push(handleValleyEdges[0], handleValleyDip, handleValleyEdges[1]);
+  }
+  handleCornerPoints.push(handleEdges[1], finBases[0]);
   // cutPath.concatPath(roundedEdgePath(handleCornerPoints, roundingDistance));
   cutPath.concatPath(connectedLineSegments(handleCornerPoints));
   cutPath.line(finBases[0]).concatPath(finCutPath.sliceCommandsDangerously(1));

@@ -9,12 +9,13 @@ export const ControlElement = observer(({
 }) => {
   if (!valuePath) { return null; }
   const store = useMst();
-
+  const value = get(store, valuePath);
+  if (!value) { return null; }
   const extraProps = {
     setter: (val) => {
       store.setValueAtPath(valuePath, val);
     },
-    value: get(store, valuePath),
+    value,
     valuePath,
     key: valuePath,
     label: label || startCase(last((valuePath.split('.')))),

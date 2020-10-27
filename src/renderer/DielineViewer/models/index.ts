@@ -34,6 +34,10 @@ const defaultModelData = {
       holeDepthToTabDepth: 0.5,
       holeTaper: 0.6981317007977318,
       tabDepthToAscendantTabDepth: 1.5,
+      bendGuideValley: {
+        depthRatio: 0.5,
+        theta: Math.PI / 4,
+      },
     },
     // @ts-ignore
     baseScoreDashSpec: {
