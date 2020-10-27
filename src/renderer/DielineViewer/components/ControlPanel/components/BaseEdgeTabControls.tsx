@@ -75,7 +75,7 @@ export const BaseEdgeTabControls = observer(() => {
         component={PanelSlider}
         valuePath="pyramidNetSpec.baseEdgeTabsSpec.bendGuideValley.theta"
         min={Math.PI / 16}
-        max={Math.PI / 8}
+        max={Math.PI / 3}
         step={VERY_SMALL_NUMBER}
       />
     </>
