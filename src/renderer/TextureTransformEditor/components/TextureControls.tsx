@@ -37,9 +37,12 @@ export const TextureControls = observer(({
   classes, dragMode,
 }) => {
   const {
-    texture, sendTexture, setTextureFromFile,
-    repositionTextureWithOriginOverCorner, repositionOriginOverCorner,
+    texture, sendTexture, setTextureFromFile, boundary, selectedTextureNodeIndex,
+    showNodes, setShowNodes,
+    repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
   } = useMst();
+  const faceSides = boundary.faceVertices.length;
+
   const [cornerSnapMenuAnchorEl, setCornerSnapMenuAnchorEl] = React.useState(null);
 
   const { isPositive, setIsPositive, rotate: textureRotate } = texture || {};
@@ -47,22 +50,46 @@ export const TextureControls = observer(({
     setCornerSnapMenuAnchorEl(event.currentTarget);
   };
 
+  const resetCornerSnapMenuAnchorEl = () => { setCornerSnapMenuAnchorEl(null); };
 
-  const handleCornerSnapMenuClose = (index, isOriginOnly: boolean = false) => {
+  const handleTextureOriginSnapMenuClose = (index) => {
     if (index !== undefined) {
-      if (isOriginOnly) {
-        repositionOriginOverCorner(index);
-      } else {
-        repositionTextureWithOriginOverCorner(index);
-      }
+      repositionTextureWithOriginOverCorner(index);
     }
-    setCornerSnapMenuAnchorEl(null);
+    resetCornerSnapMenuAnchorEl();
+  };
+
+  const handleOriginSnapMenuClose = (index) => {
+    if (index !== undefined) {
+      repositionOriginOverCorner(index);
+    }
+    resetCornerSnapMenuAnchorEl();
+  };
+
+  const handleSelectedNodeSnapMenuClose = (index) => {
+    if (index !== undefined) {
+      repositionSelectedNodeOverCorner(index);
+    }
+    resetCornerSnapMenuAnchorEl();
   };
 
   return (
     <div className={classes.select}>
       {texture && (
       <>
+        <FormControlLabel
+          className={classes.checkboxControlLabel}
+          control={(
+            <Switch
+              checked={showNodes}
+              onChange={(e) => {
+                setShowNodes(e.target.checked);
+              }}
+              color="primary"
+            />
+          )}
+          label="Node selection"
+        />
         <TextField
           className={classes.rotationInput}
           label="Rotate"
@@ -101,14 +128,14 @@ export const TextureControls = observer(({
           variant="menu"
           open={Boolean(cornerSnapMenuAnchorEl)}
           onClose={() => {
-            handleCornerSnapMenuClose(undefined);
+            resetCornerSnapMenuAnchorEl();
           }}
         >
-          {range(3).map((index) => (
+          {range(faceSides).map((index) => (
             <MenuItem
               key={index}
               onClick={() => {
-                handleCornerSnapMenuClose(index);
+                handleTextureOriginSnapMenuClose(index);
               }}
             >
               Texture & origin to corner
@@ -116,14 +143,27 @@ export const TextureControls = observer(({
               {index + 1}
             </MenuItem>
           ))}
-          {range(3).map((index) => (
+          {range(faceSides).map((index) => (
             <MenuItem
               key={index}
               onClick={() => {
-                handleCornerSnapMenuClose(index, true);
+                handleOriginSnapMenuClose(index);
               }}
             >
               Origin to corner
+              {' '}
+              {index + 1}
+            </MenuItem>
+          ))}
+
+          {selectedTextureNodeIndex !== null && range(faceSides).map((index) => (
+            <MenuItem
+              key={index}
+              onClick={() => {
+                handleSelectedNodeSnapMenuClose(index);
+              }}
+            >
+              Selected node to corner
               {' '}
               {index + 1}
             </MenuItem>
@@ -140,7 +180,7 @@ export const TextureControls = observer(({
               }}
               color="primary"
             />
-      )}
+          )}
           label="Fill is positive"
         />
         <DragModeOptionsGroup dragMode={dragMode} />

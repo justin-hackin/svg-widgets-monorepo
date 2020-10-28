@@ -44,6 +44,8 @@ export const TextureTransformEditorModel = types
   })
   .volatile(() => ({
     viewScaleDiff: 1,
+    showNodes: false,
+    selectedTextureNodeIndex: null,
     MIN_VIEW_SCALE: 0.3,
     MAX_VIEW_SCALE: 3,
 
@@ -76,6 +78,10 @@ export const TextureTransformEditorModel = types
     get viewScalePercentStr() {
       return this.viewScaleDragged && `${this.viewScaleDragged * 100}%`;
     },
+    get selectedTextureNode() {
+      return (self.selectedTextureNodeIndex !== null && self.texture)
+        && self.texture.destinationPoints[self.selectedTextureNodeIndex];
+    },
   })).actions((self) => ({
     setPlacementAreaDimensions(placementAreaDimensions) {
       self.placementAreaDimensions = placementAreaDimensions;
@@ -84,6 +90,13 @@ export const TextureTransformEditorModel = types
       if (inRange(mux * self.viewScale, self.MIN_VIEW_SCALE, self.MAX_VIEW_SCALE)) {
         self.viewScaleDiff = mux;
       }
+    },
+    setSelectedTextureNodeIndex(index) {
+      self.selectedTextureNodeIndex = index;
+    },
+    setShowNodes(showNodes) {
+      self.showNodes = showNodes;
+      if (!self.showNodes) { self.selectedTextureNodeIndex = undefined; }
     },
     reconcileViewScaleDiff() {
       self.viewScale = self.viewScaleDragged;
@@ -103,6 +116,8 @@ export const TextureTransformEditorModel = types
       self.texture.scale = self.imageCoverScale.scale;
     },
     setTextureInstance(pathD, sourceFileName) {
+      self.showNodes = false;
+      self.selectedTextureNodeIndex = null;
       self.texture = TextureModel.create({
         pathD, sourceFileName, scale: 1, rotate: 0, translate: [0, 0], transformOrigin: [0, 0], isPositive: false,
       });
@@ -157,8 +172,18 @@ export const TextureTransformEditorModel = types
       const originAbsolute = matrixTupleTransformPoint(
         self.texture.transformMatrixDragged, self.texture.transformOrigin,
       );
-      const delta = addTuple(originAbsolute, self.boundary.faceVertices[vertexIndex].map(negateMap)).map(negateMap);
+      const delta = addTuple(originAbsolute.map(negateMap), self.boundary.faceVertices[vertexIndex]);
       self.texture.translate = addTuple(delta, self.texture.translate);
+    },
+    repositionSelectedNodeOverCorner(vertexIndex) {
+      if (!self.texture || !self.boundary) {
+        return;
+      }
+      const svgTextureNode = matrixTupleTransformPoint(
+        self.texture.transformMatrixDragged, self.selectedTextureNode,
+      );
+      const diff = addTuple(svgTextureNode, self.boundary.faceVertices[vertexIndex].map(negateMap));
+      self.texture.translate = addTuple(diff.map(negateMap), self.texture.translate);
     },
     repositionOriginOverCorner(vertexIndex) {
       if (!self.texture || !self.boundary) {
@@ -176,6 +201,7 @@ export const TextureTransformEditorModel = types
       );
       self.texture.transformOrigin = newTransformOrigin;
     },
+
     sendTexture() {
       if (!self.texture) {
         return;

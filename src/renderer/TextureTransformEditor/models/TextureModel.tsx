@@ -1,4 +1,6 @@
 import { Instance } from 'mobx-state-tree';
+// @ts-ignore
+import { point } from '@flatten-js/core';
 
 import { FaceDecorationModel } from '../../DielineViewer/models/PyramidNetStore';
 import {
@@ -8,6 +10,8 @@ import {
   negateMap,
 } from '../../common/util/2d-transform';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
+import { PathData } from '../../DielineViewer/util/PathData';
+import { distanceBetweenPoints, PointTuple } from '../../common/util/geom';
 
 const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);
@@ -45,6 +49,9 @@ export const TextureModel = FaceDecorationModel
     },
     get transformMatrixDraggedStr() {
       return this.transformMatrixDragged && this.transformMatrixDragged.toString();
+    },
+    get destinationPoints() {
+      return PathData.fromDValue(self.pathD).getDestinationPoints();
     },
   }))
   .actions((self) => ({
@@ -89,6 +96,16 @@ export const TextureModel = FaceDecorationModel
     },
     resetTransformDiff() {
       Object.assign(self, transformDiffDefaults);
+    },
+    getClosestDestinationPoint(target: PointTuple, cutoff = Infinity) {
+      return self.destinationPoints.reduce((acc, candidate, index) => {
+        const distanceToTarget = distanceBetweenPoints(point(...candidate), point(...target));
+        if (distanceToTarget < acc.closestDistance && distanceToTarget < cutoff) {
+          acc.closestDistance = distanceToTarget;
+          acc.closestIndex = index;
+        }
+        return acc;
+      }, { closestDistance: Infinity, closestIndex: null }).closestIndex;
     },
   }));
 

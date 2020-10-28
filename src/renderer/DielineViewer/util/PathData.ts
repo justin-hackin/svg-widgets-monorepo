@@ -9,6 +9,7 @@ import {
 import svgpath from 'svgpath';
 
 import { PointTuple, Coord } from '../../common/util/geom';
+import { addTuple } from '../../common/util/2d-transform';
 
 /* eslint-disable no-param-reassign */
 
@@ -99,7 +100,7 @@ export class PathData {
   }
 
   static fromDValue(d):PathData {
-    return new PathData(parseSVG(d));
+    return ((new PathData(parseSVG(d))).makePathAbsolute());
   }
 
   move(to):PathData {
@@ -155,9 +156,10 @@ export class PathData {
     return null;
   }
 
+  // TODO: fix bug in conversion
   makePathAbsolute() {
     this.commands = this.commands.reduce((acc, command, index, commandsArray) => {
-      const isRelative = command.code.toUpperCase() === command.code;
+      const isRelative = command.code.toUpperCase() !== command.code;
       if (command.value) {
         // command is vert or horiz line (relative or abs)
         command.code = 'L';
@@ -174,12 +176,15 @@ export class PathData {
         // command is relative
         Object.keys(command).filter((prop) => TRANSFORMABLE_COMMAND_PROPS.includes(prop))
           .forEach((prop) => {
-            command[prop] = [acc.at[0] + command[prop][0], acc.at[1] + command[prop][1]];
+            command[prop] = addTuple(acc.at, command[prop]);
           });
         command.code = command.code.toUpperCase();
       }
+      if (Number.isNaN(acc.at[0]) || Number.isNaN(acc.at[1])) {
+        throw new Error('makePathAbsolute encountered NaN in on or more at coordinate values');
+      }
       // @ts-ignore
-      acc.at = command.code === 'Z' ? commandsArray[this.getLastMoveIndex(index)] : command.to;
+      acc.at = command.code === 'Z' ? commandsArray[this.getLastMoveIndex(index)].to : command.to;
       // @ts-ignore
       acc.commands.push(command);
       return acc;
@@ -202,6 +207,10 @@ export class PathData {
   sliceCommandsDangerously(...params):PathData {
     this.commands = this.commands.slice(...params);
     return this;
+  }
+
+  getDestinationPoints() {
+    return this.commands.filter((cmd) => cmd.to !== undefined).map((cmd) => cmd.to);
   }
 
   transform(matrix:string) {

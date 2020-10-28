@@ -36,6 +36,7 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
     texture, boundary,
     viewScalePercentStr, viewScaleCenterPercentStr,
     faceFittingScale,
+    selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, setShowNodes,
     minImageScale, maxImageScale,
     viewScaleDiff, setViewScaleDiff, reconcileViewScaleDiff,
   } = useMst();
@@ -172,6 +173,10 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
                 texture,
                 boundary,
                 faceFittingScale,
+                selectedTextureNodeIndex,
+                setSelectedTextureNodeIndex,
+                showNodes,
+                setShowNodes,
                 textureTranslationUseDrag,
                 transformOriginUseDrag,
               }}

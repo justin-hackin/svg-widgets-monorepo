@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { PointTuple } from '../../common/util/geom';
+import { TexturePathNodes } from './TexturePathNodes';
 
 const normalizedBoxCoords:PointTuple[] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const HOLES_COLOR = '#101010';
@@ -9,10 +10,8 @@ const MATERIAL_COLOR = '#ffaa00';
 
 export const TextureSvg = observer(({
   boundary: { pathD: boundaryPathD = '' } = {},
-  texture: {
-  // @ts-ignore
-    pathD: texturePathD, scale: textureScale, transformOriginDragged, isPositive, transformMatrixDraggedStr,
-  } = {},
+  texture,
+  selectedTextureNodeIndex, setSelectedTextureNodeIndex,
   faceFittingScale: { scale: faceFittingScaleValue = 1 } = {},
   showCenterMarker = undefined,
   textureTranslationUseDrag = () => {},
@@ -20,7 +19,10 @@ export const TextureSvg = observer(({
 }) => {
   // TODO: consider if passing props from parent is more apt than useMst
   if (!boundaryPathD) { return null; }
-
+  const {
+    // @ts-ignore
+    pathD: texturePathD, scale: textureScale, transformOriginDragged, isPositive, transformMatrixDraggedStr,
+  } = texture || {};
   const scaleAdjust = (textureScale * faceFittingScaleValue);
   const CENTER_MARKER_RADIUS = 30 / scaleAdjust;
   const CENTER_MARKER_STROKE = 2 / scaleAdjust;
@@ -62,6 +64,9 @@ export const TextureSvg = observer(({
           fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
           d={texturePathD}
         />
+
+        <TexturePathNodes />
+
         {showCenterMarker && (
         <g
           {...transformOriginUseDrag()}
