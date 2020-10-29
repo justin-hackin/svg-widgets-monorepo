@@ -1,15 +1,11 @@
 import {
-  cloneDeep, isNaN,
+  cloneDeep, isNaN, includes,
 } from 'lodash';
 // @ts-ignore
 import { Point } from '@flatten-js/core';
-import {
-  composeSVG, parseSVG,
-} from 'svg-path-parser';
 import svgpath from 'svgpath';
 
 import { PointTuple, Coord } from '../../common/util/geom';
-import { addTuple } from '../../common/util/2d-transform';
 
 /* eslint-disable no-param-reassign */
 
@@ -27,6 +23,26 @@ const castToArray = (pt: Coord):PointTuple => {
   return pt;
 };
 
+const commandToString = (command) => {
+  if (command.code === 'Z') { return command.code; }
+  if (includes(['L', 'M', 'T'], command.code)) {
+    return `${command.code} ${command.to.join(',')}`;
+  }
+  if (command.code === 'Q') {
+    return `${command.code} ${command.ctrl1.join(',')} ${command.to.join(',')}`;
+  }
+  if (command.code === 'C') {
+    return `${command.code} ${command.ctrl1.join(',')} ${command.ctrl2.join(',')} ${command.to.join(',')}`;
+  }
+  if (command.code === 'S') {
+    return `${command.code} ${command.ctrl2.join(',')} ${command.to.join(',')}`;
+  }
+  if (command.code === 'A') {
+    return `${command.code} ${command.radius.join(',')} ${command.xAxisRotation} ${
+      command.flags.map((flag) => (flag ? 1 : 0))} ${command.to.join(',')}`;
+  }
+  throw new Error('Unrecognized command code');
+};
 
 export const COMMAND_FACTORY = {
   M: (to:Coord):Command => ({
@@ -58,7 +74,7 @@ export const COMMAND_FACTORY = {
     to: castToArray(to),
   }),
   A: (
-    radiusX: number, radiusY: number, sweepFlag: boolean, largeArcFlag: boolean, xAxisRotation: number, to:Coord,
+    radiusX: number, radiusY: number, xAxisRotation: number, sweepFlag: boolean, largeArcFlag: boolean, to:Coord,
   ):Command => ({
     code: 'A',
     radius: [radiusX, radiusY],
@@ -72,6 +88,43 @@ export const COMMAND_FACTORY = {
   }),
 };
 
+const parseSVG = (d) => {
+  const commandList = [];
+  const absPath = svgpath(d).abs();
+  // @ts-ignore
+  absPath.iterate(([code, ...params], index, x, y) => {
+    if (code === 'Z') {
+      commandList.push(COMMAND_FACTORY.Z());
+    }
+    if (includes(['L', 'M', 'T'], code)) {
+      commandList.push(COMMAND_FACTORY[code]([...params]));
+    } else if (code === 'V' || code === 'H') {
+      // V and H commands are irregular in that
+      // they don't have a .to parameter and thus complicate iteration modifications
+      // for convenience and consistency, convert to a L command
+      commandList.push(COMMAND_FACTORY.L(code === 'V' ? [x, params[0]] : [params[0], y]));
+    } else if (code === 'C') {
+      commandList.push(COMMAND_FACTORY.C(
+        [params[0], params[1]],
+        [params[2], params[3]],
+        [params[4], params[5]],
+      ));
+    } else if (code === 'Q' || code === 'S') {
+      commandList.push(COMMAND_FACTORY.Q(
+        [params[0], params[1]],
+        [params[2], params[3]],
+      ));
+    } else if (code === 'A') {
+      commandList.push(COMMAND_FACTORY.A(
+        params[0], params[1], params[2], !!params[3], !!params[4], [params[5], params[6]],
+      ));
+    }
+  });
+  return commandList;
+};
+
+const composeSVG = (commands) => commands.map((command) => commandToString(command)).join(' ');
+
 interface Command {
   code: string,
   to?: PointTuple,
@@ -82,8 +135,6 @@ interface Command {
   xAxisRotation?: number,
   value?: number,
 }
-
-const TRANSFORMABLE_COMMAND_PROPS = ['to', 'ctrl1', 'ctrl2'];
 
 export class PathData {
   commands: Command[];
@@ -100,7 +151,7 @@ export class PathData {
   }
 
   static fromDValue(d):PathData {
-    return ((new PathData(parseSVG(d))).makePathAbsolute());
+    return new PathData(parseSVG(d));
   }
 
   move(to):PathData {
@@ -139,10 +190,10 @@ export class PathData {
     return this;
   }
 
-  elipticalArc(
-    to: Coord, radiusX:number, radiusY:number, sweepFlag:boolean, largeArcFlag:boolean, xAxisRotation:number,
+  ellipticalArc(
+    radiusX:number, radiusY:number, xAxisRotation:number, sweepFlag:boolean, largeArcFlag:boolean, to: Coord,
   ):PathData {
-    const command = COMMAND_FACTORY.A(radiusX, radiusY, sweepFlag, largeArcFlag, xAxisRotation, to);
+    const command = COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, sweepFlag, largeArcFlag, to);
     this.commands.push(command);
     return this;
   }
@@ -154,42 +205,6 @@ export class PathData {
       }
     }
     return null;
-  }
-
-  // TODO: fix bug in conversion
-  makePathAbsolute() {
-    this.commands = this.commands.reduce((acc, command, index, commandsArray) => {
-      const isRelative = command.code.toUpperCase() !== command.code;
-      if (command.value) {
-        // command is vert or horiz line (relative or abs)
-        command.code = 'L';
-        // @ts-ignore
-        command.to = [...acc.at];
-        const modParam = command.code.toUpperCase() === 'V' ? 1 : 0;
-        if (isRelative) {
-          command.to[modParam] += command.value;
-        } else {
-          command.to[modParam] = command.value;
-        }
-        delete command.value;
-      } else if (isRelative) {
-        // command is relative
-        Object.keys(command).filter((prop) => TRANSFORMABLE_COMMAND_PROPS.includes(prop))
-          .forEach((prop) => {
-            command[prop] = addTuple(acc.at, command[prop]);
-          });
-        command.code = command.code.toUpperCase();
-      }
-      if (Number.isNaN(acc.at[0]) || Number.isNaN(acc.at[1])) {
-        throw new Error('makePathAbsolute encountered NaN in on or more at coordinate values');
-      }
-      // @ts-ignore
-      acc.at = command.code === 'Z' ? commandsArray[this.getLastMoveIndex(index)].to : command.to;
-      // @ts-ignore
-      acc.commands.push(command);
-      return acc;
-    }, { at: [0, 0], commands: [] }).commands;
-    return this;
   }
 
   concatCommands(commands):PathData {

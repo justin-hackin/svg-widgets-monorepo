@@ -5,13 +5,12 @@ import { PointTuple } from '../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
 
 const normalizedBoxCoords:PointTuple[] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
-const HOLES_COLOR = '#101010';
+const HOLES_COLOR = '#222';
 const MATERIAL_COLOR = '#ffaa00';
 
 export const TextureSvg = observer(({
   boundary: { pathD: boundaryPathD = '' } = {},
   texture,
-  selectedTextureNodeIndex, setSelectedTextureNodeIndex,
   faceFittingScale: { scale: faceFittingScaleValue = 1 } = {},
   showCenterMarker = undefined,
   textureTranslationUseDrag = () => {},
