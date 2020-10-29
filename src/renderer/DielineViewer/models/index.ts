@@ -1,8 +1,11 @@
 import { createContext, useContext } from 'react';
 import { connectReduxDevtools } from 'mst-middlewares';
 import makeInspectable from 'mobx-devtools-mst';
+// only used in dev build hence lint squelch
+// eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
 
+// eslint-disable-next-line import/no-cycle
 import { IPyramidNetFactoryModel, PyramidNetFactoryModel } from './PyramidNetMakerStore';
 
 const defaultModelData = {
