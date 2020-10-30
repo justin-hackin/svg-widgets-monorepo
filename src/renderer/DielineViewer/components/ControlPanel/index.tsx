@@ -14,7 +14,7 @@ import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import Toolbar from '@material-ui/core/Toolbar';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import {
-  Menu, MenuItem, Button, Paper, Tabs, Tab, Tooltip,
+  Menu, MenuItem, Button, Paper, Tabs, Tab, Tooltip, AppBar,
 } from '@material-ui/core';
 import { PanelSelect } from '../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../common/components/PanelSlider';
@@ -96,82 +96,84 @@ export const ControlPanel = observer(() => {
           paper: classes.drawerPaper,
         }}
       >
-        <Toolbar variant="dense" className={classes.dielineToolbar}>
-          <Tooltip title="File ..." arrow>
-            <Button
-              className={classes.dielineToolbarItem}
-              startIcon={<FolderIcon />}
-              onClick={(e) => {
-                setFileMenuRef(e.currentTarget);
-              }}
-            >
-              File
-            </Button>
-          </Tooltip>
-          <Tooltip title="Open/reveal texture editor" arrow>
-            <Button
-              className={classes.dielineToolbarItem}
-              startIcon={<OpenInNewIcon />}
-              onClick={handleOpenTextureEditor}
-            >
-              Texture
-            </Button>
-          </Tooltip>
-          <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
-            <MenuItem onClick={async () => {
-              await globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((netSpecData) => {
-                // falsy if file dialog cancelled
-                if (netSpecData) {
-                  store.pyramidNetSpec.loadSpec(netSpecData);
-                }
-              });
-              resetFileMenuRef();
-            }}
-            >
-              Open JSON data
-            </MenuItem>
-            <MenuItem
-              onClick={async () => {
-                await globalThis.ipcRenderer.invoke(
-                  EVENTS.SAVE_NET_SVG_AND_SPEC,
-                  store.renderPyramidNetToString(),
-                  store.pyramidNetSpec,
-                  'Save pyramid net dielines and model',
-                );
+        <AppBar position="sticky">
+          <Toolbar className={classes.dielineToolbar} variant="dense">
+            <Tooltip title="File ..." arrow>
+              <Button
+                className={classes.dielineToolbarItem}
+                startIcon={<FolderIcon />}
+                onClick={(e) => {
+                  setFileMenuRef(e.currentTarget);
+                }}
+              >
+                File
+              </Button>
+            </Tooltip>
+            <Tooltip title="Open/reveal texture editor" arrow>
+              <Button
+                className={classes.dielineToolbarItem}
+                startIcon={<OpenInNewIcon />}
+                onClick={handleOpenTextureEditor}
+              >
+                Texture
+              </Button>
+            </Tooltip>
+            <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
+              <MenuItem onClick={async () => {
+                await globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((netSpecData) => {
+                  // falsy if file dialog cancelled
+                  if (netSpecData) {
+                    store.pyramidNetSpec.loadSpec(netSpecData);
+                  }
+                });
                 resetFileMenuRef();
               }}
-            >
-              Save to SVG w/ JSON
-            </MenuItem>
-            <MenuItem onClick={async () => {
-              await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderDecorationBoundaryToString(), {
-                message: 'Save face template',
-                defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
-              });
-              resetFileMenuRef();
-            }}
-            >
-              Download face template SVG (current shape)
-            </MenuItem>
-            <MenuItem onClick={async () => {
-              await globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, 'Upload face cut pattern')
-                .then((svgString) => {
-                  const d = extractCutHolesFromSvgString(svgString);
-                  store.pyramidNetSpec.setActiveCutHolePatternD(d);
+              >
+                Open JSON data
+              </MenuItem>
+              <MenuItem
+                onClick={async () => {
+                  await globalThis.ipcRenderer.invoke(
+                    EVENTS.SAVE_NET_SVG_AND_SPEC,
+                    store.renderPyramidNetToString(),
+                    store.pyramidNetSpec,
+                    'Save pyramid net dielines and model',
+                  );
+                  resetFileMenuRef();
+                }}
+              >
+                Save to SVG w/ JSON
+              </MenuItem>
+              <MenuItem onClick={async () => {
+                await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderDecorationBoundaryToString(), {
+                  message: 'Save face template',
+                  defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
                 });
-              resetFileMenuRef();
-            }}
+                resetFileMenuRef();
+              }}
+              >
+                Download face template SVG (current shape)
+              </MenuItem>
+              <MenuItem onClick={async () => {
+                await globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, 'Upload face cut pattern')
+                  .then((svgString) => {
+                    const d = extractCutHolesFromSvgString(svgString);
+                    store.pyramidNetSpec.setActiveCutHolePatternD(d);
+                  });
+                resetFileMenuRef();
+              }}
+              >
+                Import face cut path from template
+              </MenuItem>
+            </Menu>
+            <IconButton
+              className={`${classes.dielineToolbarItem} ${classes.closeDielineControlsIcon}`}
+              onClick={handleDrawerClose}
             >
-              Import face cut path from template
-            </MenuItem>
-          </Menu>
-          <IconButton
-            className={`${classes.dielineToolbarItem} ${classes.closeDielineControlsIcon}`}
-            onClick={handleDrawerClose}
-          >
-            <CloseSharpIcon />
-          </IconButton>
-        </Toolbar>
+              <CloseSharpIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
 
         <div className={classes.shapeSection}>
           <h3>Shape</h3>

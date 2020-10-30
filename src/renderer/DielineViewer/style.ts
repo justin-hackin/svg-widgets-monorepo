@@ -63,10 +63,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     flexDirection: 'column',
   },
   dielineToolbar: {
-    display: 'flex',
     padding: `0 ${theme.spacing(1)}px`,
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.background.paper,
   },
   dielineToolbarItem: {
     color: 'inherit',
