@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { observer } from 'mobx-react';
 // @ts-ignore
 import { PathData } from '../../DielineViewer/util/PathData';
 import { useMst } from '../models';
 
-export const TexturePathNodes = () => {
+export const TexturePathNodes = observer(() => {
   const {
     texture, selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, imageCoverScale,
   } = useMst();
@@ -46,4 +47,4 @@ export const TexturePathNodes = () => {
 }
     </>
   );
-};
+});
