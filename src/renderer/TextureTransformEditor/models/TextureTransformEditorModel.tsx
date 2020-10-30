@@ -153,6 +153,7 @@ export const TextureTransformEditorModel = types
       this.setTextureInstance(pathD, sourceFileName);
       if (recenterPath) {
         this.fitTextureToFace();
+        this.repositionOriginOverCorner(0);
       }
     },
     async setTextureFromFile(url) {
