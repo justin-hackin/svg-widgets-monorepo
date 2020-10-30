@@ -1,16 +1,12 @@
 import { inRange } from 'lodash';
 import { Instance, types } from 'mobx-state-tree';
-// @ts-ignore
-import { Polygon } from '@flatten-js/core';
-// @ts-ignore
-import { offset } from '@flatten-js/polygon-offset';
 
 import { PointTuple } from '../../common/util/geom';
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
 import { DimensionsModel } from './DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
-import { extractCutHolesFromSvgString, polygonWithFace } from '../../../common/util/svg';
+import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import {
   addTuple,
   calculateTransformOriginChangeOffset,
