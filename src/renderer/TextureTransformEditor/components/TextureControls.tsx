@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   TextField, InputAdornment,
-  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem,
+  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
@@ -73,135 +73,142 @@ export const TextureControls = observer(({
     resetCornerSnapMenuAnchorEl();
   };
 
+  // TODO: add whitespace, improve button definition and input alignment
   return (
-    <div className={classes.select}>
-      {texture && (
-      <>
-        <FormControlLabel
-          className={classes.checkboxControlLabel}
-          control={(
-            <Switch
-              checked={showNodes}
-              onChange={(e) => {
-                setShowNodes(e.target.checked);
-              }}
-              color="primary"
-            />
-          )}
-          label="Node selection"
-        />
-        <TextField
-          className={classes.rotationInput}
-          label="Rotate"
-          value={textureRotate}
-          onChange={({ target: { value } = {} }) => {
-            // TODO: use onKeyPress for enter submission
-            // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
-            // TODO: once above is fixed, use textureRotateDragged as value
-            if (isNumber(value) && !isNaN(value)) {
-              texture.setRotate(value);
+    <AppBar
+      classes={{ root: classes.darkAppBar }}
+      color="inherit"
+      position="fixed"
+    >
+      <Toolbar variant="dense">
+        <IconButton
+          onClick={async () => {
+            const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_PATH);
+            if (texturePath) {
+              setTextureFromFile(texturePath);
             }
           }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <CachedIcon />
-              </InputAdornment>
-            ),
-            // @ts-ignore
-            inputComponent: NumberFormatDecimalDegrees,
-          }}
-          variant="filled"
-        />
-        <Button
-          startIcon={<TrackChangesIcon />}
-          aria-controls="simple-menu"
-          aria-haspopup="true"
-          onClick={handleCornerSnapMenuClick}
+          aria-label="send texture"
+          component="span"
         >
-          Snap
-        </Button>
-        <Menu
-          id="simple-menu"
-          anchorEl={cornerSnapMenuAnchorEl}
-          keepMounted
-          variant="menu"
-          open={Boolean(cornerSnapMenuAnchorEl)}
-          onClose={() => {
-            resetCornerSnapMenuAnchorEl();
-          }}
-        >
-          {range(faceSides).map((index) => (
-            <MenuItem
-              key={index}
-              onClick={() => {
-                handleTextureOriginSnapMenuClose(index);
-              }}
-            >
-              Texture & origin to corner
-              {' '}
-              {index + 1}
-            </MenuItem>
-          ))}
-          {range(faceSides).map((index) => (
-            <MenuItem
-              key={index}
-              onClick={() => {
-                handleOriginSnapMenuClose(index);
-              }}
-            >
-              Origin to corner
-              {' '}
-              {index + 1}
-            </MenuItem>
-          ))}
-
-          {showNodes && selectedTextureNodeIndex !== null && range(faceSides).map((index) => (
-            <MenuItem
-              key={index}
-              onClick={() => {
-                handleSelectedNodeSnapMenuClose(index);
-              }}
-            >
-              Selected node to corner
-              {' '}
-              {index + 1}
-            </MenuItem>
-          ))}
-        </Menu>
-
-        <FormControlLabel
-          className={classes.checkboxControlLabel}
-          control={(
-            <Switch
-              checked={isPositive}
-              onChange={(e) => {
-                setIsPositive(e.target.checked);
-              }}
-              color="primary"
-            />
-          )}
-          label="Fill is positive"
-        />
-        <DragModeOptionsGroup dragMode={dragMode} />
-        <IconButton onClick={() => { sendTexture(); }} color="primary" aria-label="send texture" component="span">
-          <TelegramIcon fontSize="large" />
+          <FolderOpenIcon fontSize="large" />
         </IconButton>
-      </>
-      )}
-      <IconButton
-        onClick={async () => {
-          const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_PATH);
-          if (texturePath) {
-            setTextureFromFile(texturePath);
-          }
-        }}
-        color="primary"
-        aria-label="send texture"
-        component="span"
-      >
-        <FolderOpenIcon fontSize="large" />
-      </IconButton>
-    </div>
+
+        {texture && (
+          <>
+            <IconButton onClick={() => { sendTexture(); }} aria-label="send texture" component="span">
+              <TelegramIcon fontSize="large" />
+            </IconButton>
+            <Button
+              startIcon={<TrackChangesIcon />}
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleCornerSnapMenuClick}
+            >
+              Snap
+            </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={cornerSnapMenuAnchorEl}
+              keepMounted
+              variant="menu"
+              open={Boolean(cornerSnapMenuAnchorEl)}
+              onClose={() => {
+                resetCornerSnapMenuAnchorEl();
+              }}
+            >
+              {range(faceSides).map((index) => (
+                <MenuItem
+                  key={index}
+                  onClick={() => {
+                    handleTextureOriginSnapMenuClose(index);
+                  }}
+                >
+                  Texture & origin to corner
+                  {' '}
+                  {index + 1}
+                </MenuItem>
+              ))}
+              {range(faceSides).map((index) => (
+                <MenuItem
+                  key={index}
+                  onClick={() => {
+                    handleOriginSnapMenuClose(index);
+                  }}
+                >
+                  Origin to corner
+                  {' '}
+                  {index + 1}
+                </MenuItem>
+              ))}
+
+              {showNodes && selectedTextureNodeIndex !== null && range(faceSides).map((index) => (
+                <MenuItem
+                  key={index}
+                  onClick={() => {
+                    handleSelectedNodeSnapMenuClose(index);
+                  }}
+                >
+                  Selected node to corner
+                  {' '}
+                  {index + 1}
+                </MenuItem>
+              ))}
+            </Menu>
+            <FormControlLabel
+              className={classes.checkboxControlLabel}
+              control={(
+                <Switch
+                  checked={showNodes}
+                  onChange={(e) => {
+                    setShowNodes(e.target.checked);
+                  }}
+                  color="primary"
+                />
+              )}
+              label="Node selection"
+            />
+            <TextField
+              className={classes.rotationInput}
+              label="Rotate"
+              value={textureRotate}
+              onChange={({ target: { value } = {} }) => {
+                // TODO: use onKeyPress for enter submission
+                // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
+                // TODO: once above is fixed, use textureRotateDragged as value
+                if (isNumber(value) && !isNaN(value)) {
+                  texture.setRotate(value);
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CachedIcon />
+                  </InputAdornment>
+                ),
+                // @ts-ignore
+                inputComponent: NumberFormatDecimalDegrees,
+              }}
+              variant="filled"
+            />
+
+            <FormControlLabel
+              className={classes.checkboxControlLabel}
+              control={(
+                <Switch
+                  checked={isPositive}
+                  onChange={(e) => {
+                    setIsPositive(e.target.checked);
+                  }}
+                  color="primary"
+                />
+              )}
+              label="Fill is positive"
+            />
+            <DragModeOptionsGroup dragMode={dragMode} />
+          </>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 });

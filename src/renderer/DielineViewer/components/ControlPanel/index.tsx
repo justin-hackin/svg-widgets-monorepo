@@ -97,10 +97,10 @@ export const ControlPanel = observer(() => {
         }}
       >
         <AppBar position="sticky">
-          <Toolbar className={classes.dielineToolbar} variant="dense">
+          <Toolbar className={classes.toolbar} variant="dense">
             <Tooltip title="File ..." arrow>
               <Button
-                className={classes.dielineToolbarItem}
+                color="inherit"
                 startIcon={<FolderIcon />}
                 onClick={(e) => {
                   setFileMenuRef(e.currentTarget);
@@ -111,7 +111,7 @@ export const ControlPanel = observer(() => {
             </Tooltip>
             <Tooltip title="Open/reveal texture editor" arrow>
               <Button
-                className={classes.dielineToolbarItem}
+                color="inherit"
                 startIcon={<OpenInNewIcon />}
                 onClick={handleOpenTextureEditor}
               >
@@ -167,7 +167,8 @@ export const ControlPanel = observer(() => {
               </MenuItem>
             </Menu>
             <IconButton
-              className={`${classes.dielineToolbarItem} ${classes.closeDielineControlsIcon}`}
+              color="inherit"
+              className={classes.closeDielineControlsIcon}
               onClick={handleDrawerClose}
             >
               <CloseSharpIcon />
