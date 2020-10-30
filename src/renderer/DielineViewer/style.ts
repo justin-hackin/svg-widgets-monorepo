@@ -67,7 +67,6 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     padding: `0 ${theme.spacing(1)}px`,
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.background.paper,
-    minHeight: 45,
   },
   dielineToolbarItem: {
     color: 'inherit',

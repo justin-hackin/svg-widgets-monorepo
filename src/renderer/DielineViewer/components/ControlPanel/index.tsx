@@ -96,7 +96,7 @@ export const ControlPanel = observer(() => {
           paper: classes.drawerPaper,
         }}
       >
-        <Toolbar className={classes.dielineToolbar}>
+        <Toolbar variant="dense" className={classes.dielineToolbar}>
           <Tooltip title="File ..." arrow>
             <Button
               className={classes.dielineToolbarItem}
