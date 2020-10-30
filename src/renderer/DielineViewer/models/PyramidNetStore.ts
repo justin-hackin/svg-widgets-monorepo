@@ -7,7 +7,9 @@ import { Polygon } from '@flatten-js/core';
 import { offset } from '@flatten-js/polygon-offset';
 // @ts-ignore
 import { subtract } from '@flatten-js/boolean-op';
-import { chunk, flatten, range } from 'lodash';
+import {
+  chunk, flatten, range, debounce,
+} from 'lodash';
 
 import { polyhedra } from '../data/polyhedra';
 import {
@@ -191,11 +193,11 @@ export const PyramidNetModel = types.model({
       });
     },
 
-    sendTextureBorderData() {
+    sendTextureBorderData: debounce(() => {
       globalThis.ipcRenderer.send(
         EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, self.borderToInsetRatio, self.insetToBorderOffset,
       );
-    },
+    }, 250),
 
     setPyramidShapeName(name: string) {
       self.pyramid.shapeName = name;
