@@ -10,6 +10,7 @@ const HOLES_COLOR = '#222';
 const MATERIAL_COLOR = '#ffaa00';
 
 export const TextureSvg = observer(({
+  viewBox = undefined,
   showCenterMarker = undefined,
   textureTranslationUseDrag = () => {},
   transformOriginUseDrag = () => {},
@@ -40,7 +41,7 @@ export const TextureSvg = observer(({
 
   const TEXTURE_CLIP_ID = 'texture-clip';
   return (
-    <svg overflow="visible">
+    <svg overflow="visible" viewBox={viewBox}>
       <defs>
         <marker
           style={{ overflow: 'visible' }}

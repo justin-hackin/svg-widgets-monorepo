@@ -49,10 +49,9 @@ export const ShapePreview = observer(() => {
       const { material }: {material: MeshPhongMaterial} = polyhedronMesh;
       const ctx = textureCanvas.getContext('2d');
       // @ts-ignore
-      const svgInnerContent = ReactDOMServer.renderToString(
-        React.createElement(TextureSvg),
+      const svgStr = ReactDOMServer.renderToString(
+        React.createElement(TextureSvg, { viewBox: viewBoxAttrsToString(viewBoxAttrs) }),
       );
-      const svgStr = `<svg viewBox="${viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
       // @ts-ignore
       Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
         await v.render();
