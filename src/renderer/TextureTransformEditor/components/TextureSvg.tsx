@@ -11,7 +11,7 @@ const MATERIAL_COLOR = '#ffaa00';
 
 export const TextureSvg = observer(({
   viewBox = undefined,
-  showCenterMarker = undefined,
+  isOnScreen = undefined,
   textureTranslationUseDrag = () => {},
   transformOriginUseDrag = () => {},
 }) => {
@@ -84,7 +84,7 @@ export const TextureSvg = observer(({
       <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={decorationBoundaryPathD} />
 
       {texturePathD && (
-      <g clipPath={showCenterMarker ? undefined : `url(#${TEXTURE_CLIP_ID})`}>
+      <g clipPath={isOnScreen ? undefined : `url(#${TEXTURE_CLIP_ID})`}>
         <g transform={transformMatrixDraggedStr}>
           <path
             pointerEvents="bounding-box"
@@ -93,9 +93,9 @@ export const TextureSvg = observer(({
             d={texturePathD}
           />
 
-          <TexturePathNodes />
+          {isOnScreen && (<TexturePathNodes />)}
 
-          {showCenterMarker && (
+          {isOnScreen && (
           <g
             {...transformOriginUseDrag()}
             transform={`translate(${transformOriginDragged[0]}, ${transformOriginDragged[1]})`}
@@ -139,7 +139,7 @@ export const TextureSvg = observer(({
         </g>
       </g>
       )}
-      {showCenterMarker && (
+      {isOnScreen && (
         <path
           fill="none"
           strokeWidth={FACE_OUTLINE_STROKE}

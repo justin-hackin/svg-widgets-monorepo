@@ -168,7 +168,7 @@ const TextureTransformEditorLOC = observer(() => {
             viewBox={viewBoxAttrsToString(decorationBoundary.viewBoxAttrs)}
           >
             <TextureSvg
-              showCenterMarker
+              isOnScreen
               {...{
                 textureTranslationUseDrag,
                 transformOriginUseDrag,
