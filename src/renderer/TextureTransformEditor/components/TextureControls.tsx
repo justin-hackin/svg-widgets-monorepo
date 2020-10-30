@@ -37,11 +37,11 @@ export const TextureControls = observer(({
   classes, dragMode,
 }) => {
   const {
-    texture, sendTexture, setTextureFromFile, boundary, selectedTextureNodeIndex,
+    texture, sendTexture, setTextureFromFile, decorationBoundary, selectedTextureNodeIndex,
     showNodes, setShowNodes,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
   } = useMst();
-  const faceSides = boundary.faceVertices.length;
+  const faceSides = decorationBoundary.vertices.length;
 
   const [cornerSnapMenuAnchorEl, setCornerSnapMenuAnchorEl] = React.useState(null);
 

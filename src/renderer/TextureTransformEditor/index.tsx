@@ -33,7 +33,7 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
     placementAreaDimensions, setPlacementAreaDimensions,
     textureEditorUpdateHandler,
     absoluteMovementToSvg, translateAbsoluteCoordsToRelative,
-    texture, boundary,
+    texture, decorationBoundary, faceBoundary,
     viewScalePercentStr, viewScaleCenterPercentStr,
     faceFittingScale,
     selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, setShowNodes,
@@ -48,8 +48,8 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
   // Init
   useEffect(() => {
     globalThis.ipcRenderer
-      .on(EVENTS.UPDATE_TEXTURE_EDITOR, (_, faceVertices, shapeName, faceDecoration) => { // @ts-ignore
-        textureEditorUpdateHandler(faceVertices, shapeName, faceDecoration);
+      .on(EVENTS.UPDATE_TEXTURE_EDITOR_TEXTURE, (_, decorationBoundaryVertices, shapeName, faceDecoration) => {
+        textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration);
       });
 
     const resizeHandler = () => {
@@ -67,7 +67,7 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
 
     return () => {
       window.removeEventListener('resize', resizeHandler);
-      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR, textureEditorUpdateHandler);
+      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_TEXTURE, textureEditorUpdateHandler);
     };
   }, []);
 
@@ -112,7 +112,7 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
   // mouse wheel scale/rotate/zoom
   const viewUseWheel = useGesture({
     onWheel: ({ movement: [, y] }) => {
-      if (!placementAreaDimensions || !boundary) { return; }
+      if (!placementAreaDimensions || !decorationBoundary) { return; }
       const percentHeightDelta = (y / placementAreaDimensions.height);
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
         const newViewScaleMux = (percentHeightDelta + 1) * viewScaleDiff;
@@ -127,7 +127,7 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
       }
     },
     onWheelEnd: () => {
-      if (!placementAreaDimensions || !boundary) { return; }
+      if (!placementAreaDimensions || !decorationBoundary) { return; }
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
         reconcileViewScaleDiff();
       }
@@ -140,7 +140,7 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
     },
   });
 
-  if (!placementAreaDimensions || !boundary) { return null; }
+  if (!placementAreaDimensions || !decorationBoundary) { return null; }
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   return (
@@ -165,14 +165,15 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
             width={viewScalePercentStr}
             height={viewScalePercentStr}
             className="root-svg"
-            viewBox={viewBoxAttrsToString(boundary.viewBoxAttrs)}
+            viewBox={viewBoxAttrsToString(decorationBoundary.viewBoxAttrs)}
           >
             <TextureSvg
               showCenterMarker
               {...{
                 texture,
-                boundary,
+                decorationBoundary,
                 faceFittingScale,
+                faceBoundary,
                 selectedTextureNodeIndex,
                 setSelectedTextureNodeIndex,
                 showNodes,

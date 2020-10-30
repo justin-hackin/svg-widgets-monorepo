@@ -24,7 +24,7 @@ const loader = new GLTFLoader();
 
 export const ShapePreview = observer(() => {
   const {
-    texture, boundary, shapeName, placementAreaDimensions: { width, height },
+    texture, decorationBoundary, faceBoundary, shapeName, placementAreaDimensions: { width, height },
   } = useMst();
   const [renderer, setRenderer] = useState<Renderer>();
   const [camera, setCamera] = useState<PerspectiveCamera>();
@@ -37,7 +37,7 @@ export const ShapePreview = observer(() => {
   const threeContainerRef = useRef<HTMLDivElement>();
   const requestRef = React.useRef<number>(0);
 
-  const { viewBoxAttrs, pathD: boundaryPathD } = boundary || {};
+  const { viewBoxAttrs } = faceBoundary || {};
   const { transformMatrixDraggedStr, isPositive } = texture || {};
 
   // update shape texture
@@ -49,7 +49,9 @@ export const ShapePreview = observer(() => {
       const { material }: {material: MeshPhongMaterial} = polyhedronMesh;
       const ctx = textureCanvas.getContext('2d');
       // @ts-ignore
-      const svgInnerContent = ReactDOMServer.renderToString(React.createElement(TextureSvg, { boundary, texture }));
+      const svgInnerContent = ReactDOMServer.renderToString(
+        React.createElement(TextureSvg, { decorationBoundary, texture, faceBoundary }),
+      );
       const svgStr = `<svg viewBox="${viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
       // @ts-ignore
       Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
@@ -60,7 +62,7 @@ export const ShapePreview = observer(() => {
         material.map.needsUpdate = true;
       });
     }
-  }, [polyhedronMesh, transformMatrixDraggedStr, isPositive, boundaryPathD]);
+  }, [polyhedronMesh, transformMatrixDraggedStr, isPositive, viewBoxAttrs]);
 
   // renderer boundary size change
   useEffect(() => {

@@ -9,15 +9,16 @@ const HOLES_COLOR = '#222';
 const MATERIAL_COLOR = '#ffaa00';
 
 export const TextureSvg = observer(({
-  boundary: { pathD: boundaryPathD = '' } = {},
+  decorationBoundary: { pathD: decorationBoundaryPathD = '' } = {},
   texture,
+  faceBoundary,
   faceFittingScale: { scale: faceFittingScaleValue = 1 } = {},
   showCenterMarker = undefined,
   textureTranslationUseDrag = () => {},
   transformOriginUseDrag = () => {},
 }) => {
   // TODO: consider if passing props from parent is more apt than useMst
-  if (!boundaryPathD) { return null; }
+  if (!decorationBoundaryPathD) { return null; }
   const {
     // @ts-ignore
     pathD: texturePathD, scale: textureScale, transformOriginDragged, isPositive, transformMatrixDraggedStr,
@@ -29,6 +30,7 @@ export const TextureSvg = observer(({
   const CROSSHAIR_START_RATIO = 0.2;
   const DOT_RADIUS_TO_WHOLE = 0.05;
 
+  const TEXTURE_CLIP_ID = 'texture-clip';
   return (
     <svg overflow="visible">
       <defs>
@@ -54,62 +56,72 @@ export const TextureSvg = observer(({
           />
         </marker>
       </defs>
-      <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
+
+      <clipPath id={TEXTURE_CLIP_ID}>
+        <path d={decorationBoundaryPathD} />
+      </clipPath>
+
+      {faceBoundary
+      && (<path fill={MATERIAL_COLOR} d={faceBoundary.pathD} />)}
+
+      <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={decorationBoundaryPathD} />
+
       {texturePathD && (
-      <g transform={transformMatrixDraggedStr}>
-        <path
-          pointerEvents="bounding-box"
-          {...textureTranslationUseDrag()}
-          fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
-          d={texturePathD}
-        />
-
-        <TexturePathNodes />
-
-        {showCenterMarker && (
-        <g
-          {...transformOriginUseDrag()}
-          transform={`translate(${transformOriginDragged[0]}, ${transformOriginDragged[1]})`}
-        >
-          <circle
-            r={CENTER_MARKER_RADIUS}
-            fill="red"
-            fillOpacity={OPACITY}
-            stroke="red"
-            strokeOpacity={1 - OPACITY}
-            strokeWidth={CENTER_MARKER_STROKE}
-            cx={0}
-            cy={0}
+      <g clipPath={showCenterMarker ? undefined : `url(#${TEXTURE_CLIP_ID})`}>
+        <g transform={transformMatrixDraggedStr}>
+          <path
+            pointerEvents="bounding-box"
+            {...textureTranslationUseDrag()}
+            fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
+            d={texturePathD}
           />
-          {normalizedBoxCoords.map((coords, index) => {
-            const end = coords.map((coord) => coord * CENTER_MARKER_RADIUS);
-            const start = coords.map((coord) => coord * CENTER_MARKER_RADIUS * CROSSHAIR_START_RATIO);
-            const lineProps = (([x1, y1]: PointTuple, [x2, y2]: PointTuple) => ({
-              x1, y1, x2, y2,
-            }))(start, end);
-            return (
-              <line
-                {...lineProps}
-                key={index}
-                stroke="#000"
-                opacity={OPACITY + 0.4}
-                markerEnd={index === 2 ? 'url(#Arrow1Lend)' : ''}
-                strokeWidth={CENTER_MARKER_STROKE}
-              />
-            );
-          })}
-          <circle
-            r={DOT_RADIUS_TO_WHOLE * CENTER_MARKER_RADIUS}
-            fill="black"
-            cx={0}
-            cy={0}
-            opacity={OPACITY + 0.4}
-          />
+
+          <TexturePathNodes />
+
+          {showCenterMarker && (
+          <g
+            {...transformOriginUseDrag()}
+            transform={`translate(${transformOriginDragged[0]}, ${transformOriginDragged[1]})`}
+          >
+            <circle
+              r={CENTER_MARKER_RADIUS}
+              fill="red"
+              fillOpacity={OPACITY}
+              stroke="red"
+              strokeOpacity={1 - OPACITY}
+              strokeWidth={CENTER_MARKER_STROKE}
+              cx={0}
+              cy={0}
+            />
+            {normalizedBoxCoords.map((coords, index) => {
+              const end = coords.map((coord) => coord * CENTER_MARKER_RADIUS);
+              const start = coords.map((coord) => coord * CENTER_MARKER_RADIUS * CROSSHAIR_START_RATIO);
+              const lineProps = (([x1, y1]: PointTuple, [x2, y2]: PointTuple) => ({
+                x1, y1, x2, y2,
+              }))(start, end);
+              return (
+                <line
+                  {...lineProps}
+                  key={index}
+                  stroke="#000"
+                  opacity={OPACITY + 0.4}
+                  markerEnd={index === 2 ? 'url(#Arrow1Lend)' : ''}
+                  strokeWidth={CENTER_MARKER_STROKE}
+                />
+              );
+            })}
+            <circle
+              r={DOT_RADIUS_TO_WHOLE * CENTER_MARKER_RADIUS}
+              fill="black"
+              cx={0}
+              cy={0}
+              opacity={OPACITY + 0.4}
+            />
+          </g>
+          )}
         </g>
-        )}
       </g>
       )}
-      <path fill="none" strokeWidth={2} stroke={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={boundaryPathD} />
     </svg>
   );
 });

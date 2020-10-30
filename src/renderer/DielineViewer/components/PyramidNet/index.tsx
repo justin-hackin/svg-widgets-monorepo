@@ -24,10 +24,10 @@ export const PyramidNet = observer(() => {
       interFaceScoreDashSpec, baseScoreDashSpec,
       ascendantEdgeTabsSpec, baseEdgeTabsSpec,
       tabIntervalRatios, tabGapIntervalRatios,
-      boundaryPoints, pathScaleMatrix, faceInteriorAngles,
+      decorationBoundaryPoints, pathScaleMatrix, faceInteriorAngles,
       actualFaceEdgeLengths, ascendantEdgeTabDepth,
       activeCutHolePatternD, borderInsetFaceHoleTransformMatrix,
-      sendTextureEditorUpdate, setFaceDecoration,
+      sendTextureUpdate, setFaceDecoration, sendTextureBorderData,
     },
   } = useMst();
 
@@ -38,7 +38,8 @@ export const PyramidNet = observer(() => {
     };
     const sendShapeUpdateHandler = () => {
     // @ts-ignore
-      sendTextureEditorUpdate();
+      sendTextureUpdate();
+      sendTextureBorderData();
     };
 
     globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, setFaceDecorationHandler);
@@ -60,12 +61,12 @@ export const PyramidNet = observer(() => {
   // inter-face scoring
   const faceTabFenceposts = range(faceCount + 1).map(
     (index) => hingedPlot(
-      boundaryPoints[1], boundaryPoints[0], Math.PI * 2 - index * faceInteriorAngles[2],
+      decorationBoundaryPoints[1], decorationBoundaryPoints[0], Math.PI * 2 - index * faceInteriorAngles[2],
       index % 2 ? actualFaceEdgeLengths[2] : actualFaceEdgeLengths[0],
     ),
   );
   faceTabFenceposts.slice(1, -1).forEach((endPt) => {
-    const pathData = strokeDashPath(boundaryPoints[0], endPt, interFaceScoreDashSpec);
+    const pathData = strokeDashPath(decorationBoundaryPoints[0], endPt, interFaceScoreDashSpec);
     scorePathAggregate.concatPath(pathData);
   });
 
@@ -79,17 +80,17 @@ export const PyramidNet = observer(() => {
 
   const flapApexAngle = Math.min(remainderGapAngle - FLAP_APEX_IMPINGE_MARGIN, faceInteriorAngles[2]);
   const outerPt1 = hingedPlotByProjectionDistance(
-    boundaryPoints[1], boundaryPoints[0], flapApexAngle, -ascendantEdgeTabDepth,
+    decorationBoundaryPoints[1], decorationBoundaryPoints[0], flapApexAngle, -ascendantEdgeTabDepth,
   );
   const outerPt2 = hingedPlotByProjectionDistance(
-    boundaryPoints[0], boundaryPoints[1], -FLAP_BASE_ANGLE, ascendantEdgeTabDepth,
+    decorationBoundaryPoints[0], decorationBoundaryPoints[1], -FLAP_BASE_ANGLE, ascendantEdgeTabDepth,
   );
   const maxRoundingDistance = Math.min(
-    boundaryPoints[0].subtract(outerPt1).length, boundaryPoints[1].subtract(outerPt2).length,
+    decorationBoundaryPoints[0].subtract(outerPt1).length, decorationBoundaryPoints[1].subtract(outerPt2).length,
   );
   cutPathAggregate.concatPath(
     roundedEdgePath(
-      [boundaryPoints[0], outerPt1, outerPt2, boundaryPoints[1]],
+      [decorationBoundaryPoints[0], outerPt1, outerPt2, decorationBoundaryPoints[1]],
       ascendantEdgeTabsSpec.flapRoundingDistanceRatio * maxRoundingDistance,
     ),
   );
@@ -106,7 +107,7 @@ export const PyramidNet = observer(() => {
 
   // male tabs
   const ascendantTabs = ascendantEdgeConnectionTabs(
-    boundaryPoints[1], boundaryPoints[0],
+    decorationBoundaryPoints[1], decorationBoundaryPoints[0],
     ascendantEdgeTabsSpec, interFaceScoreDashSpec, tabIntervalRatios, tabGapIntervalRatios,
   );
   const rotationMatrix = `rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`;
@@ -134,7 +135,7 @@ export const PyramidNet = observer(() => {
           return index === 0
             ? (
               <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
-                <path d={closedPolygonPath(boundaryPoints).getD()} {...insetProps} />
+                <path d={closedPolygonPath(decorationBoundaryPoints).getD()} {...insetProps} />
                 { activeCutHolePatternD && (
                   <path d={activeCutHolePatternD} transform={pathScaleMatrix.toString()} {...cutProps} />
                 ) }

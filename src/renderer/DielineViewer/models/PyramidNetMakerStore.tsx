@@ -12,16 +12,16 @@ import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
 
-export const FaceBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
+export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
     // @ts-ignore
-    pyramidNetSpec: { normalizedBoundaryPoints },
+    pyramidNetSpec: { normalizedDecorationBoundaryPoints },
   } = store;
-  const normalizedBoundaryPathD = closedPolygonPath(normalizedBoundaryPoints).getD();
+  const normalizedDecorationBoundaryPathD = closedPolygonPath(normalizedDecorationBoundaryPoints).getD();
 
   return (
-    <svg viewBox={pathDToViewBoxStr(normalizedBoundaryPathD)}>
-      <path fill="#FFD900" stroke="#000" d={normalizedBoundaryPathD} />
+    <svg viewBox={pathDToViewBoxStr(normalizedDecorationBoundaryPathD)}>
+      <path fill="#FFD900" stroke="#000" d={normalizedDecorationBoundaryPathD} />
     </svg>
   );
 };
@@ -47,9 +47,9 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     }),
   }),
 }).actions((self) => ({
-  renderFaceBoundaryToString():string {
+  renderDecorationBoundaryToString():string {
     // @ts-ignore
-    return ReactDOMServer.renderToString(React.createElement(FaceBoundarySVG, { store: self }));
+    return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: self }));
   },
 
   renderPyramidNetToString() {

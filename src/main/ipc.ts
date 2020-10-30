@@ -25,7 +25,8 @@ export const EVENTS:Events = {
   GET_SVG_PATH: 'get-svg-path',
   GET_PATH_BASENAME: 'get-path-basename',
   REQUEST_SHAPE_UPDATE: `die${EVENT_TARGET_DELIMITER}request-shape-update`,
-  UPDATE_TEXTURE_EDITOR: `tex${EVENT_TARGET_DELIMITER}update-texture-editor`,
+  UPDATE_TEXTURE_EDITOR_TEXTURE: `tex${EVENT_TARGET_DELIMITER}update-texture-editor-texture`,
+  UPDATE_TEXTURE_EDITOR_BORDER_DATA: `tex${EVENT_TARGET_DELIMITER}update-texture-editor-matrix`,
   UPDATE_DIELINE_VIEWER: `die${EVENT_TARGET_DELIMITER}update-dieline-viewer`,
 };
 
@@ -40,24 +41,25 @@ const jsonFilters = [{
 }];
 
 export const setupIpc = (ipcMain) => {
-  ipcMain.handle(EVENTS.INTERSECT_SVG, (e, boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive) => {
-    const texturePathTransformedD = svgpath.from(texturePathD).transform(textureTransformMatrixStr).toString();
-    if (isPositive) {
-      const punchoutPath = new PathData();
-      punchoutPath
-        .move([-VERY_LARGE_NUMBER, -VERY_LARGE_NUMBER])
-        .line([VERY_LARGE_NUMBER, -VERY_LARGE_NUMBER])
-        .line([VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
-        .line([-VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
-        .close();
-      const punchoutPathTransformedD = svgpath.from(
-        punchoutPath.getD(),
-      ).transform(textureTransformMatrixStr).toString();
-      const punchedPathD = subtractPathData(punchoutPathTransformedD, texturePathTransformedD);
-      return intersectPathData(punchedPathD, boundaryPathD);
-    }
-    return intersectPathData(texturePathTransformedD, boundaryPathD);
-  });
+  ipcMain.handle(EVENTS.INTERSECT_SVG,
+    (e, decorationBoundaryPathD, texturePathD, textureTransformMatrixStr, isPositive) => {
+      const texturePathTransformedD = svgpath.from(texturePathD).transform(textureTransformMatrixStr).toString();
+      if (isPositive) {
+        const punchoutPath = new PathData();
+        punchoutPath
+          .move([-VERY_LARGE_NUMBER, -VERY_LARGE_NUMBER])
+          .line([VERY_LARGE_NUMBER, -VERY_LARGE_NUMBER])
+          .line([VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
+          .line([-VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
+          .close();
+        const punchoutPathTransformedD = svgpath.from(
+          punchoutPath.getD(),
+        ).transform(textureTransformMatrixStr).toString();
+        const punchedPathD = subtractPathData(punchoutPathTransformedD, texturePathTransformedD);
+        return intersectPathData(punchedPathD, decorationBoundaryPathD);
+      }
+      return intersectPathData(texturePathTransformedD, decorationBoundaryPathD);
+    });
 
 
   ipcMain.handle(EVENTS.SAVE_SVG, (e, fileContent, options) => dialog.showSaveDialog({

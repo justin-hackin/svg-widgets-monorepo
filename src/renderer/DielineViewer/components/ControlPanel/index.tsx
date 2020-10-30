@@ -144,7 +144,7 @@ export const ControlPanel = observer(() => {
               Save to SVG w/ JSON
             </MenuItem>
             <MenuItem onClick={async () => {
-              await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderFaceBoundaryToString(), {
+              await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderDecorationBoundaryToString(), {
                 message: 'Save face template',
                 defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
               });

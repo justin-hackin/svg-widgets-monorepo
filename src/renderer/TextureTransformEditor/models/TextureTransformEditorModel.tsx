@@ -1,12 +1,16 @@
 import { inRange } from 'lodash';
 import { Instance, types } from 'mobx-state-tree';
+// @ts-ignore
+import { Polygon } from '@flatten-js/core';
+// @ts-ignore
+import { offset } from '@flatten-js/polygon-offset';
 
 import { PointTuple } from '../../common/util/geom';
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
 import { DimensionsModel } from './DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
-import { extractCutHolesFromSvgString } from '../../../common/util/svg';
+import { extractCutHolesFromSvgString, polygonWithFace } from '../../../common/util/svg';
 import {
   addTuple,
   calculateTransformOriginChangeOffset,
@@ -33,16 +37,19 @@ const getFitScale = (bounds, image) => {
     scale: widthIsClamp ? bounds.width / image.width : bounds.height / image.height,
   };
 };
+
 export const TextureTransformEditorModel = types
   .model('TextureTransformEditor', {
     shapeName: types.maybe(types.string),
-    boundary: types.maybe(BoundaryModel),
+    decorationBoundary: types.maybe(BoundaryModel),
     texture: types.maybe(TextureModel),
     // since both controls and matrix function require degrees, use degrees as unit instead of radians
     placementAreaDimensions: types.maybe(DimensionsModel),
     viewScale: types.optional(types.number, 1),
   })
   .volatile(() => ({
+    borderToInsetRatio: null,
+    insetToBorderOffset: null,
     viewScaleDiff: 1,
     showNodes: false,
     selectedTextureNodeIndex: null,
@@ -52,16 +59,16 @@ export const TextureTransformEditorModel = types
   }))
   .views((self) => ({
     get imageCoverScale() {
-      if (!self.boundary || !self.texture) {
+      if (!self.decorationBoundary || !self.texture) {
         return undefined;
       }
-      return getCoverScale(self.boundary.viewBoxAttrs, self.texture.dimensions);
+      return getCoverScale(self.decorationBoundary.viewBoxAttrs, self.texture.dimensions);
     },
     get faceFittingScale() {
-      if (!self.placementAreaDimensions || !self.boundary) {
+      if (!self.placementAreaDimensions || !self.decorationBoundary) {
         return undefined;
       }
-      return getFitScale(self.placementAreaDimensions, self.boundary.viewBoxAttrs);
+      return getFitScale(self.placementAreaDimensions, self.decorationBoundary.viewBoxAttrs);
     },
     get minImageScale() {
       return this.imageCoverScale && (0.1 * this.imageCoverScale.scale);
@@ -82,7 +89,27 @@ export const TextureTransformEditorModel = types
       return (self.selectedTextureNodeIndex !== null && self.texture)
         && self.texture.destinationPoints[self.selectedTextureNodeIndex];
     },
+    get faceBoundary() {
+      if (!self.decorationBoundary || !self.borderToInsetRatio) { return undefined; }
+      const vertices = self.decorationBoundary.vertices
+        .map(([x, y]) => [
+          (x * self.borderToInsetRatio) + self.insetToBorderOffset[0],
+          (y * self.borderToInsetRatio) + self.insetToBorderOffset[1]]);
+      return BoundaryModel.create({ vertices });
+    },
   })).actions((self) => ({
+    afterCreate() {
+      globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA,
+        (e, borderToInsetRatio, insetToBorderOffset) => {
+          this.setFaceBorderData(borderToInsetRatio, insetToBorderOffset);
+        });
+    },
+
+    setFaceBorderData(borderToInsetRatio, insetToBorderOffset) {
+      self.borderToInsetRatio = borderToInsetRatio;
+      self.insetToBorderOffset = insetToBorderOffset;
+    },
+
     setPlacementAreaDimensions(placementAreaDimensions) {
       self.placementAreaDimensions = placementAreaDimensions;
     },
@@ -103,9 +130,9 @@ export const TextureTransformEditorModel = types
       self.viewScaleDiff = 1;
     },
     fitTextureToFace() {
-      const { viewBoxAttrs } = self.boundary;
+      const { viewBoxAttrs } = self.decorationBoundary;
       const { dimensions: textureDimensions } = self.texture;
-      if (!self.texture || !self.boundary) {
+      if (!self.texture || !self.decorationBoundary) {
         return;
       }
       const { height, width, xmin } = viewBoxAttrs;
@@ -119,7 +146,7 @@ export const TextureTransformEditorModel = types
       self.showNodes = false;
       self.selectedTextureNodeIndex = null;
       self.texture = TextureModel.create({
-        pathD, sourceFileName, scale: 1, rotate: 0, translate: [0, 0], transformOrigin: [0, 0], isPositive: false,
+        pathD, sourceFileName, scale: 1, rotate: 0, translate: [0, 0], transformOrigin: [0, 0], isPositive: true,
       });
     },
     setTexturePath(pathD, sourceFileName, recenterPath = false) {
@@ -141,10 +168,10 @@ export const TextureTransformEditorModel = types
     // TODO: add limits for view scale and
     // these seem like the domain of the texture model but setters for
     // textureScaleDiff (and more to follow) need boundary
-    textureEditorUpdateHandler(faceVertices, shapeName, faceDecoration) {
+    textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration) {
       self.shapeName = shapeName;
       // @ts-ignore
-      self.boundary = BoundaryModel.create({ faceVertices });
+      self.decorationBoundary = BoundaryModel.create({ vertices: decorationBoundaryVertices });
 
       if (faceDecoration) {
         self.texture = TextureModel.create(faceDecoration);
@@ -166,31 +193,31 @@ export const TextureTransformEditorModel = types
       );
     },
     repositionTextureWithOriginOverCorner(vertexIndex) {
-      if (!self.texture || !self.boundary) {
+      if (!self.texture || !self.decorationBoundary) {
         return;
       }
       const originAbsolute = matrixTupleTransformPoint(
         self.texture.transformMatrixDragged, self.texture.transformOrigin,
       );
-      const delta = addTuple(originAbsolute.map(negateMap), self.boundary.faceVertices[vertexIndex]);
+      const delta = addTuple(originAbsolute.map(negateMap), self.decorationBoundary.vertices[vertexIndex]);
       self.texture.translate = addTuple(delta, self.texture.translate);
     },
     repositionSelectedNodeOverCorner(vertexIndex) {
-      if (!self.texture || !self.boundary) {
+      if (!self.texture || !self.decorationBoundary) {
         return;
       }
       const svgTextureNode = matrixTupleTransformPoint(
         self.texture.transformMatrixDragged, self.selectedTextureNode,
       );
-      const diff = addTuple(svgTextureNode, self.boundary.faceVertices[vertexIndex].map(negateMap));
+      const diff = addTuple(svgTextureNode, self.decorationBoundary.vertices[vertexIndex].map(negateMap));
       self.texture.translate = addTuple(diff.map(negateMap), self.texture.translate);
     },
     repositionOriginOverCorner(vertexIndex) {
-      if (!self.texture || !self.boundary) {
+      if (!self.texture || !self.decorationBoundary) {
         return;
       }
       const relVertex = matrixTupleTransformPoint(
-        self.texture.transformMatrix.inverse(), self.boundary.faceVertices[vertexIndex],
+        self.texture.transformMatrix.inverse(), self.decorationBoundary.vertices[vertexIndex],
       );
       const delta = addTuple(relVertex.map(negateMap), self.texture.transformOrigin).map(negateMap);
       const newTransformOrigin = addTuple(delta, self.texture.transformOrigin);

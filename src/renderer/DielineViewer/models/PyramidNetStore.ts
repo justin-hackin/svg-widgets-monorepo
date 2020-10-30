@@ -1,16 +1,14 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
 import { Instance, types } from 'mobx-state-tree';
-
 // @ts-ignore
 import { Polygon } from '@flatten-js/core';
 // @ts-ignore
 import { offset } from '@flatten-js/polygon-offset';
 // @ts-ignore
 import { subtract } from '@flatten-js/boolean-op';
-import {
-  chunk, flatten, omit, range,
-} from 'lodash';
+import { chunk, flatten, range } from 'lodash';
+
 import { polyhedra } from '../data/polyhedra';
 import {
   CM_TO_PIXELS_RATIO,
@@ -25,6 +23,7 @@ import { closedPolygonPath } from '../util/shapes/generic';
 import { AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
 import { DashPatternModel } from '../util/shapes/strokeDashPath';
+import { polygonWithFace } from '../../../common/util/svg';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
@@ -102,11 +101,11 @@ export const PyramidNetModel = types.model({
       return triangleAnglesGivenSides(this.normalizedFaceEdgeLengths);
     },
 
-    get boundaryPoints() {
+    get decorationBoundaryPoints() {
       return polygonPointsGivenAnglesAndSides(this.faceInteriorAngles, this.actualFaceEdgeLengths);
     },
 
-    get normalizedBoundaryPoints():PointLike[] {
+    get normalizedDecorationBoundaryPoints():PointLike[] {
       return polygonPointsGivenAnglesAndSides(
         this.faceInteriorAngles,
         this.normalizedFaceEdgeLengths,
@@ -133,17 +132,29 @@ export const PyramidNetModel = types.model({
     },
 
     get borderPolygon(): Polygon {
-      const poly = new Polygon();
-      poly.addFace(this.boundaryPoints);
-      return poly;
+      return this.decorationBoundaryPoints && polygonWithFace(this.decorationBoundaryPoints);
     },
 
     get insetPolygon(): Polygon {
       return offset(this.borderPolygon, -this.ascendantEdgeTabDepth);
     },
+    get normalizedInsetPolygon(): Polygon {
+      return offset(
+        polygonWithFace(this.normalizedDecorationBoundaryPoints),
+        -this.ascendantEdgeTabDepth / this.faceLengthAdjustRatio,
+      );
+    },
     // TODO: make use of this by adding a toggle to render it to PyramidNet
     get borderOverlay(): Polygon {
       return subtract(this.borderPolygon, this.insetPolygon);
+    },
+    get borderToInsetRatio() {
+      return (this.borderPolygon.box.width) / this.insetPolygon.box.width;
+    },
+
+    get insetToBorderOffset() {
+      const { x, y } = this.normalizedInsetPolygon.vertices[0];
+      return [x, y].map((value) => -value * this.borderToInsetRatio);
     },
     // get borderInsetFaceHoleTransform() {
     //   return `translate(${self.insetPolygon.vertices[0].x}, ${self.insetPolygon.vertices[0].y}) scale(${
@@ -151,9 +162,14 @@ export const PyramidNetModel = types.model({
     //   })`;
 
     get borderInsetFaceHoleTransformMatrix(): DOMMatrixReadOnly {
-      const scale = (this.insetPolygon.box.width) / this.borderPolygon.box.width;
+      const scale = 1 / this.borderToInsetRatio;
       const { x: inX, y: inY } = this.insetPolygon.vertices[0];
       return (new DOMMatrixReadOnly()).translate(inX, inY).scale(scale, scale);
+    },
+
+    get textureBorderWidth() {
+      const { ascendantEdgeTabsSpec: { tabDepthToTraversalLength } } = self;
+      return tabDepthToTraversalLength * FACE_FIRST_EDGE_NORMALIZED_SIZE * this.borderToInsetRatio;
     },
 
     get pathScaleMatrix(): DOMMatrixReadOnly {
@@ -165,10 +181,19 @@ export const PyramidNetModel = types.model({
     afterCreate() {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       reaction(
-        () => [self.normalizedBoundaryPoints, self.pyramid, self.faceDecoration],
+        () => [self.normalizedDecorationBoundaryPoints, self.pyramid, self.faceDecoration],
         () => {
-          this.sendTextureEditorUpdate();
+          this.sendTextureUpdate();
         },
+      );
+      reaction(() => self.textureBorderWidth, () => {
+        this.sendTextureBorderData();
+      });
+    },
+
+    sendTextureBorderData() {
+      globalThis.ipcRenderer.send(
+        EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, self.borderToInsetRatio, self.insetToBorderOffset,
       );
     },
 
@@ -191,7 +216,7 @@ export const PyramidNetModel = types.model({
         const croppedD = await globalThis.ipcRenderer.invoke(
           // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
           EVENTS.INTERSECT_SVG,
-          closedPolygonPath(self.normalizedBoundaryPoints).getD(),
+          closedPolygonPath(self.normalizedDecorationBoundaryPoints).getD(),
           pathD,
           transformMatrix.toString(),
           isPositive,
@@ -202,10 +227,10 @@ export const PyramidNetModel = types.model({
       }
     },
 
-    sendTextureEditorUpdate() {
+    sendTextureUpdate() {
       // @ts-ignore
-      globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR,
-        self.normalizedBoundaryPoints.map((pt) => ([pt.x, pt.y])),
+      globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR_TEXTURE,
+        self.normalizedDecorationBoundaryPoints.map((pt) => ([pt.x, pt.y])),
         self.pyramid.shapeName,
         self.faceDecoration);
     },
