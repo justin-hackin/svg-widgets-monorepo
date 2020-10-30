@@ -170,14 +170,6 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
             <TextureSvg
               showCenterMarker
               {...{
-                texture,
-                decorationBoundary,
-                faceFittingScale,
-                faceBoundary,
-                selectedTextureNodeIndex,
-                setSelectedTextureNodeIndex,
-                showNodes,
-                setShowNodes,
                 textureTranslationUseDrag,
                 transformOriginUseDrag,
               }}

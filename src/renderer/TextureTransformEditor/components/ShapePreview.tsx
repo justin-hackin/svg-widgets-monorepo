@@ -24,7 +24,7 @@ const loader = new GLTFLoader();
 
 export const ShapePreview = observer(() => {
   const {
-    texture, decorationBoundary, faceBoundary, shapeName, placementAreaDimensions: { width, height },
+    texture, faceBoundary, shapeName, placementAreaDimensions: { width, height },
   } = useMst();
   const [renderer, setRenderer] = useState<Renderer>();
   const [camera, setCamera] = useState<PerspectiveCamera>();
@@ -50,7 +50,7 @@ export const ShapePreview = observer(() => {
       const ctx = textureCanvas.getContext('2d');
       // @ts-ignore
       const svgInnerContent = ReactDOMServer.renderToString(
-        React.createElement(TextureSvg, { decorationBoundary, texture, faceBoundary }),
+        React.createElement(TextureSvg),
       );
       const svgStr = `<svg viewBox="${viewBoxAttrsToString(viewBoxAttrs)}">${svgInnerContent}</svg>`;
       // @ts-ignore

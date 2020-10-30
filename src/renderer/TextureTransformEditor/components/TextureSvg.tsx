@@ -3,27 +3,35 @@ import { observer } from 'mobx-react';
 
 import { PointTuple } from '../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
+import { useMst } from '../models';
 
 const normalizedBoxCoords:PointTuple[] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const HOLES_COLOR = '#222';
 const MATERIAL_COLOR = '#ffaa00';
 
 export const TextureSvg = observer(({
-  decorationBoundary: { pathD: decorationBoundaryPathD = '' } = {},
-  texture,
-  faceBoundary,
-  faceFittingScale: { scale: faceFittingScaleValue = 1 } = {},
   showCenterMarker = undefined,
   textureTranslationUseDrag = () => {},
   transformOriginUseDrag = () => {},
 }) => {
+  const {
+    decorationBoundary: { pathD: decorationBoundaryPathD = '' } = {},
+    texture,
+    faceBoundary,
+    faceFittingScale,
+    placementAreaDimensions,
+  } = useMst();
   // TODO: consider if passing props from parent is more apt than useMst
   if (!decorationBoundaryPathD) { return null; }
   const {
     // @ts-ignore
     pathD: texturePathD, scale: textureScale, transformOriginDragged, isPositive, transformMatrixDraggedStr,
   } = texture || {};
-  const scaleAdjust = (textureScale * faceFittingScaleValue);
+  if (!faceBoundary || !decorationBoundaryPathD) { return null; }
+  const scaleAdjust = (textureScale * faceFittingScale.scale);
+  const FACE_OUTLINE_STROKE = (faceFittingScale.widthIsClamp
+    ? placementAreaDimensions.width
+    : placementAreaDimensions.height) / 300;
   const CENTER_MARKER_RADIUS = 30 / scaleAdjust;
   const CENTER_MARKER_STROKE = 2 / scaleAdjust;
   const OPACITY = 0.3;
@@ -62,7 +70,14 @@ export const TextureSvg = observer(({
       </clipPath>
 
       {faceBoundary
-      && (<path fill={MATERIAL_COLOR} d={faceBoundary.pathD} />)}
+      && (
+      <path
+        stroke={HOLES_COLOR}
+        strokeWidth={FACE_OUTLINE_STROKE}
+        fill={MATERIAL_COLOR}
+        d={faceBoundary.pathD}
+      />
+      )}
 
       <path fill={isPositive ? HOLES_COLOR : MATERIAL_COLOR} d={decorationBoundaryPathD} />
 
@@ -121,6 +136,15 @@ export const TextureSvg = observer(({
           )}
         </g>
       </g>
+      )}
+      {showCenterMarker && (
+        <path
+          fill="none"
+          strokeWidth={FACE_OUTLINE_STROKE}
+          stroke="#ff0000"
+          strokeOpacity={0.4}
+          d={decorationBoundaryPathD}
+        />
       )}
     </svg>
   );
