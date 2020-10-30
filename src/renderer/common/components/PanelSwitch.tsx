@@ -22,6 +22,7 @@ export const PanelSwitch = ({
         {...(defaultValue ? { value: defaultValue } : { checked: value })}
         name={valuePath}
         aria-labelledby={labelId}
+        color="primary"
         // @ts-ignore
         onChange={(e:any) => {
           setter(e.target.checked);
