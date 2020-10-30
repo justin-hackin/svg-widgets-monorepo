@@ -32,10 +32,19 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   checkboxControlLabel: {
     color: '#fff',
   },
-  unselectedTextureNodeHighlight: {
+  textureNodeHighlight: {
     fill: 'rgba(255, 0, 255, 0.00001)',
     '&:hover': {
       fill: 'rgba(255, 0, 255, 0.3)',
+    },
+    '&.selected': {
+      fill: 'none',
+    },
+  },
+  textureNode: {
+    fill: '#00A9F4',
+    '&.selected': {
+      fill: '#ff00ff',
     },
   },
 }));

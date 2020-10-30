@@ -20,14 +20,16 @@ export const TexturePathNodes = observer(() => {
           <g key={`${index}--${cx},${cy}`}>
             <circle
               {...{ cx, cy }}
-              fill={selectedTextureNodeIndex === index ? '#ff00ff' : '#00A9F4'}
+              className={`${classes.textureNode} ${selectedTextureNodeIndex === index ? 'selected' : ''}`}
               stroke="none"
               r={(imageCoverScale.widthIsClamp ? texture.dimensions.width : texture.dimensions.height) / 500}
             />
             <circle
               {...{ cx, cy }}
               stroke="none"
-              className={index === selectedTextureNodeIndex ? undefined : classes.unselectedTextureNodeHighlight}
+              className={`${classes.textureNodeHighlight
+              } ${index === selectedTextureNodeIndex ? 'selected' : undefined
+              }`}
               r={(imageCoverScale.widthIsClamp ? texture.dimensions.width : texture.dimensions.height) / 100}
               onClick={() => {
                 setSelectedTextureNodeIndex(index);
