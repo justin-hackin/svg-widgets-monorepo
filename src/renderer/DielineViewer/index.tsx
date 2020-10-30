@@ -18,19 +18,19 @@ export const DielineViewer = observer(() => {
   const { svgDimensions } = useMst();
   return (
     <Provider value={netFactoryStore}>
-      <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
-        <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
-          <svg {...svgDimensions}>
-            <GridPattern patternId={patternId} />
-            <g transform="translate(300, 300)">
-              <PyramidNet />
-            </g>
-          </svg>
-        </ResizableZoomPan>
-        <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
+        <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
+          <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
+            <svg {...svgDimensions}>
+              <GridPattern patternId={patternId} />
+              <g transform="translate(300, 300)">
+                <PyramidNet />
+              </g>
+            </svg>
+          </ResizableZoomPan>
           <ControlPanel />
-        </ThemeProvider>
-      </div>
+        </div>
+      </ThemeProvider>
     </Provider>
   );
 });

@@ -65,9 +65,6 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   toolbar: {
     padding: `0 ${theme.spacing(1)}px`,
   },
-  darkAppBar: {
-    backgroundColor: theme.palette.background.default,
-  },
   closeDielineControlsIcon: {
     marginLeft: 'auto',
   },

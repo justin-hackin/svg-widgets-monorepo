@@ -22,6 +22,7 @@ export const TextureSvg = observer(({
     faceFittingScale,
     placementAreaDimensions,
   } = useMst();
+
   // TODO: consider if passing props from parent is more apt than useMst
   if (!decorationBoundaryPathD) { return null; }
   const {

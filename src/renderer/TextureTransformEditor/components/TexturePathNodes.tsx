@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react';
 // @ts-ignore
 import { PathData } from '../../DielineViewer/util/PathData';
 import { useMst } from '../models';
+import { useStyles } from '../style';
 
 export const TexturePathNodes = observer(() => {
   const {
     texture, selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, imageCoverScale,
   } = useMst();
-
-  const [hoveredItemIndex, setHoveredItemIndex] = useState<number>(undefined);
+  const classes = useStyles();
 
   if (!texture.pathD || !showNodes) { return null; }
   const points = PathData.fromDValue(texture.pathD).getDestinationPoints();
@@ -23,28 +23,19 @@ export const TexturePathNodes = observer(() => {
               fill={selectedTextureNodeIndex === index ? '#ff00ff' : '#00A9F4'}
               stroke="none"
               r={(imageCoverScale.widthIsClamp ? texture.dimensions.width : texture.dimensions.height) / 500}
-
             />
             <circle
               {...{ cx, cy }}
-              fill={index === hoveredItemIndex && index !== selectedTextureNodeIndex
-                ? 'rgba(255, 0, 255, 0.3)'
-                : 'rgba(255, 0, 255, 0.00001)'}
               stroke="none"
+              className={index === selectedTextureNodeIndex ? undefined : classes.unselectedTextureNodeHighlight}
               r={(imageCoverScale.widthIsClamp ? texture.dimensions.width : texture.dimensions.height) / 100}
-              onMouseEnter={() => {
-                setHoveredItemIndex(index);
-              }}
-              onMouseLeave={() => {
-                setHoveredItemIndex(undefined);
-              }}
               onClick={() => {
                 setSelectedTextureNodeIndex(index);
               }}
             />
           </g>
         ))
-}
+      }
     </>
   );
 });

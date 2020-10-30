@@ -5,7 +5,7 @@ import { useDrag, useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash';
 
 import { ThemeProvider } from '@material-ui/styles';
-import { createMuiTheme, withStyles } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
 import { Box, Paper } from '@material-ui/core';
 
 // @ts-ignore
@@ -20,23 +20,23 @@ import {
   useMst, Provider, textureTransformEditorStore,
 } from './models';
 import { viewBoxAttrsToString } from '../../common/util/svg';
+import { useStyles } from './style';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 // TODO: make router wrap with styles
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
 
-const TextureTransformEditorLOC = observer(({ classes }) => {
+const TextureTransformEditorLOC = observer(() => {
   const dragMode = useDragMode();
+  const classes = useStyles();
   // ==================================================================================================================
   const {
     placementAreaDimensions, setPlacementAreaDimensions,
     textureEditorUpdateHandler,
     absoluteMovementToSvg, translateAbsoluteCoordsToRelative,
-    texture, decorationBoundary, faceBoundary,
+    texture, decorationBoundary,
     viewScalePercentStr, viewScaleCenterPercentStr,
-    faceFittingScale,
-    selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, setShowNodes,
     minImageScale, maxImageScale,
     viewScaleDiff, setViewScaleDiff, reconcileViewScaleDiff,
   } = useMst();
@@ -183,44 +183,8 @@ const TextureTransformEditorLOC = observer(({ classes }) => {
   );
 });
 
-function TextureTransformEditorHOC({ classes }) {
-  return (
-    <Provider value={textureTransformEditorStore}>
-      <TextureTransformEditorLOC classes={classes} />
-    </Provider>
-  );
-}
-
-export const TextureTransformEditor = withStyles({
-  root: {
-    backgroundColor:
-     '#333',
-    display: 'block',
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    color: '#fff',
-  },
-  select: {
-    display: 'flex', position: 'absolute', top: 0, right: 0,
-  },
-  rotationInput: {
-    width: '6.5em',
-  },
-  loadingContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#fff',
-    zIndex: 100,
-  },
-  checkboxControlLabel: {
-    color: '#fff',
-  },
-// @ts-ignore
-})(TextureTransformEditorHOC);
+export const TextureTransformEditor = () => (
+  <Provider value={textureTransformEditorStore}>
+    <TextureTransformEditorLOC />
+  </Provider>
+);
