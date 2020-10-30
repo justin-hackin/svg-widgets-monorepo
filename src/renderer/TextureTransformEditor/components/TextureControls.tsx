@@ -156,7 +156,7 @@ export const TextureControls = observer(({
             </MenuItem>
           ))}
 
-          {selectedTextureNodeIndex !== null && range(faceSides).map((index) => (
+          {showNodes && selectedTextureNodeIndex !== null && range(faceSides).map((index) => (
             <MenuItem
               key={index}
               onClick={() => {
