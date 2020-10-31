@@ -11,12 +11,10 @@ import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
 import FolderIcon from '@material-ui/icons/Folder';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-import RedoIcon from '@material-ui/icons/Redo';
-import UndoIcon from '@material-ui/icons/Undo';
 import Toolbar from '@material-ui/core/Toolbar';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import {
-  Menu, MenuItem, Button, Paper, Tabs, Tab, Tooltip, AppBar,
+  AppBar, Button, Menu, MenuItem, Paper, Tab, Tabs, Tooltip,
 } from '@material-ui/core';
 import { PanelSelect } from '../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../common/components/PanelSlider';
@@ -30,6 +28,7 @@ import { StyleControls } from './components/StyleControls';
 import { BaseEdgeTabControls } from './components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './components/AscendantEdgeTabsControls';
 import { ScoreControls } from './components/ScoreControls';
+import { HistoryButtons } from './components/HistoryButtons';
 
 const controlsTabs = [
   {
@@ -119,26 +118,13 @@ export const ControlPanel = observer(() => {
                 Texture
               </Button>
             </Tooltip>
-            <Button
-              color="inherit"
-              startIcon={<UndoIcon />}
-              disabled={!history.canUndo}
-              onClick={() => {
-                history.undo();
-              }}
-            >
-              Undo
-            </Button>
-            <Button
-              color="inherit"
-              startIcon={<RedoIcon />}
-              disabled={!history.canRedo}
-              onClick={() => {
-                history.redo();
-              }}
-            >
-              Redo
-            </Button>
+            {/*
+              By default disabled elements like Button do not trigger user interactions
+               thus span wrapping required by tooltip for disabled buttons
+            */}
+            <HistoryButtons
+              history={history}
+            />
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={async () => {
                 await globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((netSpecData) => {
@@ -222,13 +208,13 @@ export const ControlPanel = observer(() => {
             centered
             onChange={handleTabChange}
           >
-            { controlsTabs.map(({ label }, index) => (
+            {controlsTabs.map(({ label }, index) => (
               <Tab className={classes.dielineToolbarTab} label={label} key={index} />))}
           </Tabs>
         </Paper>
         <div className={classes.tabContent}>
           <h3>{controlsTabs[activeControlsIndex].title}</h3>
-          { React.createElement(controlsTabs[activeControlsIndex].component) }
+          {React.createElement(controlsTabs[activeControlsIndex].component)}
         </div>
       </Drawer>
     </div>

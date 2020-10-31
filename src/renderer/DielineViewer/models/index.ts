@@ -25,7 +25,7 @@ export const defaultModelData = {
       holeFlapTaperAngle: 0.3141592653589793,
       holeReachToTabDepth: 0.1,
       holeWidthRatio: 0.4,
-      midpointDepthToTabDepth: 0.64527027,
+      midpointDepthToTabDepth: 0.5,
       tabDepthToTraversalLength: 0.04810606060599847,
       tabRoundingDistanceRatio: 0.75,
       tabStartGapToTabDepth: 1,
