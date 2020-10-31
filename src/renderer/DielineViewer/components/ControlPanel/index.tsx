@@ -11,6 +11,8 @@ import Fab from '@material-ui/core/Fab';
 import MenuIcon from '@material-ui/icons/Menu';
 import FolderIcon from '@material-ui/icons/Folder';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import RedoIcon from '@material-ui/icons/Redo';
+import UndoIcon from '@material-ui/icons/Undo';
 import Toolbar from '@material-ui/core/Toolbar';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import {
@@ -58,7 +60,7 @@ export const ControlPanel = observer(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme = useTheme();
   const store = useMst();
-  const { polyhedraPyramidGeometries } = store;
+  const { polyhedraPyramidGeometries, history } = store;
   const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
@@ -76,7 +78,6 @@ export const ControlPanel = observer(() => {
   const handleDrawerClose = () => { setOpen(false); };
 
   const handleOpenTextureEditor = () => { globalThis.ipcRenderer.send(EVENTS.OPEN_TEXTURE_WINDOW); };
-
   return (
     <div className={classes.root}>
       <Fab
@@ -118,6 +119,26 @@ export const ControlPanel = observer(() => {
                 Texture
               </Button>
             </Tooltip>
+            <Button
+              color="inherit"
+              startIcon={<UndoIcon />}
+              disabled={!history.canUndo}
+              onClick={() => {
+                history.undo();
+              }}
+            >
+              Undo
+            </Button>
+            <Button
+              color="inherit"
+              startIcon={<RedoIcon />}
+              disabled={!history.canRedo}
+              onClick={() => {
+                history.redo();
+              }}
+            >
+              Redo
+            </Button>
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={async () => {
                 await globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((netSpecData) => {

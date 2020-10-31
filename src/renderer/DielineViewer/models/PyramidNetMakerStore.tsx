@@ -3,6 +3,8 @@ import { set } from 'lodash';
 import { Instance, types } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import { UndoManager } from 'mst-middlewares';
+
 // eslint-disable-next-line import/no-cycle
 import { PyramidNet } from '../components/PyramidNet';
 import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
@@ -32,6 +34,7 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   dashPatterns: DashPatternsModel,
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
+  history: types.optional(UndoManager, {}),
   styleSpec: types.model({
     dieLineProps: types.model({
       fill: types.string,
