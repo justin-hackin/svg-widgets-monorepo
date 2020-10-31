@@ -48,10 +48,10 @@ export const TextureTransformEditorModel = types
     insetToBorderOffset: null,
     viewScaleDiff: 1,
     showNodes: false,
+    nodeScaleMux: 1,
     selectedTextureNodeIndex: null,
     MIN_VIEW_SCALE: 0.3,
     MAX_VIEW_SCALE: 3,
-
   }))
   .views((self) => ({
     get imageCoverScale() {
@@ -120,6 +120,9 @@ export const TextureTransformEditorModel = types
     setShowNodes(showNodes) {
       self.showNodes = showNodes;
       if (!self.showNodes) { self.selectedTextureNodeIndex = undefined; }
+    },
+    setNodeScaleMux(mux) {
+      self.nodeScaleMux = mux;
     },
     reconcileViewScaleDiff() {
       self.viewScale = self.viewScaleDragged;

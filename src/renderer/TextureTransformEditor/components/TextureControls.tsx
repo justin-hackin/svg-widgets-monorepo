@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   TextField, InputAdornment,
-  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar,
+  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar, Divider,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
@@ -14,6 +14,12 @@ import NumberFormat from 'react-number-format';
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
 import { EVENTS } from '../../../main/ipc';
 import { useMst } from '../models';
+import { PanelSlider } from '../../common/components/PanelSlider';
+import { VERY_SMALL_NUMBER } from '../../common/util/geom';
+
+const VertDivider = () => (
+  <Divider orientation="vertical" flexItem variant="middle" />
+);
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -38,7 +44,7 @@ export const TextureControls = observer(({
 }) => {
   const {
     texture, sendTexture, setTextureFromFile, decorationBoundary, selectedTextureNodeIndex,
-    showNodes, setShowNodes,
+    showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
   } = useMst();
   const faceSides = decorationBoundary.vertices.length;
@@ -96,9 +102,78 @@ export const TextureControls = observer(({
 
         {texture && (
           <>
+            <VertDivider />
             <IconButton onClick={() => { sendTexture(); }} aria-label="send texture" component="span">
               <TelegramIcon fontSize="large" />
             </IconButton>
+            <VertDivider />
+            <FormControlLabel
+              className={classes.checkboxControlLabel}
+              labelPlacement="top"
+              control={(
+                <Switch
+                  checked={showNodes}
+                  onChange={(e) => {
+                    setShowNodes(e.target.checked);
+                  }}
+                  color="primary"
+                />
+              )}
+              label="Node selection"
+            />
+            <VertDivider />
+            <PanelSlider
+              className={classes.nodeScaleMuxSlider}
+              setter={(val) => {
+                setNodeScaleMux(val);
+              }}
+              value={nodeScaleMux}
+              valuePath="nodeScaleMux"
+              label="Node size"
+              min={0.1}
+              max={10}
+              step={VERY_SMALL_NUMBER}
+            />
+            <VertDivider />
+            <FormControlLabel
+              className={classes.checkboxControlLabel}
+              labelPlacement="top"
+              control={(
+                <Switch
+                  checked={isPositive}
+                  onChange={(e) => {
+                    setIsPositive(e.target.checked);
+                  }}
+                  color="primary"
+                />
+              )}
+              label="Fill is positive"
+            />
+            <VertDivider />
+            <TextField
+              className={classes.rotationInput}
+              label="Rotate"
+              value={textureRotate}
+              onChange={({ target: { value } = {} }) => {
+                // TODO: use onKeyPress for enter submission
+                // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
+                // TODO: once above is fixed, use textureRotateDragged as value
+                if (isNumber(value) && !isNaN(value)) {
+                  texture.setRotate(value);
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CachedIcon />
+                  </InputAdornment>
+                ),
+                // @ts-ignore
+                inputComponent: NumberFormatDecimalDegrees,
+              }}
+              variant="filled"
+            />
+            <VertDivider />
             <Button
               startIcon={<TrackChangesIcon />}
               aria-controls="simple-menu"
@@ -155,56 +230,7 @@ export const TextureControls = observer(({
                 </MenuItem>
               ))}
             </Menu>
-            <FormControlLabel
-              className={classes.checkboxControlLabel}
-              control={(
-                <Switch
-                  checked={showNodes}
-                  onChange={(e) => {
-                    setShowNodes(e.target.checked);
-                  }}
-                  color="primary"
-                />
-              )}
-              label="Node selection"
-            />
-            <TextField
-              className={classes.rotationInput}
-              label="Rotate"
-              value={textureRotate}
-              onChange={({ target: { value } = {} }) => {
-                // TODO: use onKeyPress for enter submission
-                // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
-                // TODO: once above is fixed, use textureRotateDragged as value
-                if (isNumber(value) && !isNaN(value)) {
-                  texture.setRotate(value);
-                }
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <CachedIcon />
-                  </InputAdornment>
-                ),
-                // @ts-ignore
-                inputComponent: NumberFormatDecimalDegrees,
-              }}
-              variant="filled"
-            />
-
-            <FormControlLabel
-              className={classes.checkboxControlLabel}
-              control={(
-                <Switch
-                  checked={isPositive}
-                  onChange={(e) => {
-                    setIsPositive(e.target.checked);
-                  }}
-                  color="primary"
-                />
-              )}
-              label="Fill is positive"
-            />
+            <VertDivider />
             <DragModeOptionsGroup dragMode={dragMode} />
           </>
         )}

@@ -47,4 +47,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
       fill: '#ff00ff',
     },
   },
+  nodeScaleMuxSlider: {
+    width: theme.spacing(10),
+  },
 }));
