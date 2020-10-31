@@ -41,7 +41,7 @@ export const TextureTransformEditorModel = types
     texture: types.maybe(TextureModel),
     // since both controls and matrix function require degrees, use degrees as unit instead of radians
     placementAreaDimensions: types.maybe(DimensionsModel),
-    viewScale: types.optional(types.number, 1),
+    viewScale: types.maybe(types.number),
   })
   .volatile(() => ({
     borderToInsetRatio: null,
@@ -173,9 +173,9 @@ export const TextureTransformEditorModel = types
       if (faceDecoration) {
         self.texture = TextureModel.create(faceDecoration);
       } else {
-        self.viewScale = 1;
         self.texture = undefined;
       }
+      self.viewScale = 0.8;
     },
     absoluteMovementToSvg(absCoords) {
       return absCoords.map((coord) => coord / (self.viewScaleDragged * self.faceFittingScale.scale));
