@@ -7,6 +7,7 @@ import remotedev from 'remotedev';
 
 // eslint-disable-next-line import/no-cycle
 import { IPyramidNetFactoryModel, PyramidNetFactoryModel } from './PyramidNetMakerStore';
+import { dashPatterns } from '../data/dash-patterns';
 
 export const defaultModelData = {
   styleSpec: {
@@ -15,6 +16,7 @@ export const defaultModelData = {
     scoreLineProps: { stroke: '#BDFF48' },
     designBoundaryProps: { stroke: 'none', fill: 'rgb(68,154,255)' },
   },
+  dashPatterns,
   pyramidNetSpec: {
     // @ts-ignore
     pyramid: { shapeName: 'small-triambic-icosahedron' },

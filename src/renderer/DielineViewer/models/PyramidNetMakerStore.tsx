@@ -11,6 +11,7 @@ import { SVGWrapper } from '../data/SVGWrapper';
 import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
+import { DashPatternsModel } from '../data/dash-patterns';
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
@@ -29,6 +30,7 @@ export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryMode
 export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   pyramidNetSpec: types.maybe(types.late(() => PyramidNetModel)),
   polyhedraPyramidGeometries: types.frozen(polyhedra),
+  dashPatterns: DashPatternsModel,
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
   styleSpec: types.model({
     dieLineProps: types.model({

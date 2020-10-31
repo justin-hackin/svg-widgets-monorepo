@@ -5,16 +5,20 @@ import { VERY_SMALL_NUMBER } from '../../../../common/util/geom';
 import { PanelSelect } from '../../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../../common/components/PanelSlider';
 import { ControlElement } from './ControlElement';
-import { dashPatterns } from '../../../data/dash-patterns';
 import { ratioSliderProps } from './constants';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 import { useMst } from '../../../models';
 
 const strokeLengthProps = { min: 1, max: 3000, step: VERY_SMALL_NUMBER };
-const dashPatternOptions = Object.entries(dashPatterns).map(([key, { label }]) => ({ value: key, label }));
-export const ScoreControls = observer(() => {
-  const { pyramidNetSpec: { useDottedStroke, setUseDottedStroke } = {} } = useMst();
 
+export const ScoreControls = observer(() => {
+  const {
+    pyramidNetSpec: {
+      useDottedStroke, setUseDottedStroke,
+      interFaceScoreDashSpec, baseScoreDashSpec, setInterFaceScoreDashSpecPattern, setBaseScoreDashSpecPattern,
+    } = {}, dashPatterns,
+  } = useMst();
+  const dashPatternOptions = dashPatterns.map(({ label, id }) => ({ value: id, label }));
   return (
     <>
       <PanelSwitch
@@ -25,10 +29,13 @@ export const ScoreControls = observer(() => {
       />
       {useDottedStroke && (
         <>
-          <ControlElement
-            component={PanelSelect}
-            valuePath="pyramidNetSpec.interFaceScoreDashSpec.strokeDashPathPatternId"
-            label="Inter-face Stroke Pattern"
+
+          <PanelSelect
+            value={interFaceScoreDashSpec.strokeDashPathPattern.id}
+            label="Inter-face stroke dash pattern"
+            setter={(id) => {
+              setInterFaceScoreDashSpecPattern(id);
+            }}
             options={dashPatternOptions}
           />
           <ControlElement
@@ -43,10 +50,12 @@ export const ScoreControls = observer(() => {
             label="Inter-face Stroke Dash Offset Ratio"
             {...ratioSliderProps}
           />
-          <ControlElement
-            component={PanelSelect}
-            valuePath="pyramidNetSpec.baseScoreDashSpec.strokeDashPathPatternId"
-            label="Base Stroke Pattern"
+          <PanelSelect
+            value={baseScoreDashSpec.strokeDashPathPattern.id}
+            label="Base Stroke Dash Pattern"
+            setter={(id) => {
+              setBaseScoreDashSpecPattern(id);
+            }}
             options={dashPatternOptions}
           />
           <ControlElement

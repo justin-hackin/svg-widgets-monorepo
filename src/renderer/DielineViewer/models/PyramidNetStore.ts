@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
-import { Instance, types } from 'mobx-state-tree';
+import {
+  Instance, types, resolveIdentifier, getParent,
+} from 'mobx-state-tree';
 // @ts-ignore
 import { Polygon } from '@flatten-js/core';
 // @ts-ignore
@@ -26,6 +28,7 @@ import { AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTa
 import { BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
 import { DashPatternModel } from '../util/shapes/strokeDashPath';
 import { polygonWithFace } from '../../../common/util/svg';
+import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
@@ -57,10 +60,11 @@ export const PyramidModel = types.model({
 }));
 
 export const defaultStrokeDashSpec = {
-  strokeDashPathPatternId: 'base',
+  strokeDashPathPattern: '● 1 ○ 2',
   strokeDashLength: 11,
   strokeDashOffsetRatio: 0,
 };
+
 export const PyramidNetModel = types.model({
   pyramid: PyramidModel,
   ascendantEdgeTabsSpec: types.late(() => AscendantEdgeTabsModel),
@@ -244,6 +248,18 @@ export const PyramidNetModel = types.model({
         self.interFaceScoreDashSpec = undefined;
         self.baseScoreDashSpec = undefined;
       }
+    },
+
+    setInterFaceScoreDashSpecPattern(id) {
+      self.interFaceScoreDashSpec.strokeDashPathPattern = resolveIdentifier(
+        StrokeDashPathPatternModel, getParent(self), id,
+      );
+    },
+
+    setBaseScoreDashSpecPattern(id) {
+      self.baseScoreDashSpec.strokeDashPathPattern = resolveIdentifier(
+        StrokeDashPathPatternModel, getParent(self), id,
+      );
     },
 
     sendTextureUpdate() {

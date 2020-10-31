@@ -7,7 +7,7 @@ import React from 'react';
 import { useStyles } from '../../DielineViewer/style';
 
 export const PanelSelect = ({
-  label, options, displayEmpty, setter, value, className,
+  label, options, displayEmpty = undefined, setter, value, className = '',
 }) => {
   const classes = useStyles();
   const labelId = `${label}__${uuid()}`;
