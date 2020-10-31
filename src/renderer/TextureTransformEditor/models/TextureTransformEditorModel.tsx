@@ -47,6 +47,7 @@ export const TextureTransformEditorModel = types
     borderToInsetRatio: null,
     insetToBorderOffset: null,
     viewScaleDiff: 1,
+    autoRotatePreview: true,
     showNodes: false,
     nodeScaleMux: 1,
     selectedTextureNodeIndex: null,
@@ -123,6 +124,9 @@ export const TextureTransformEditorModel = types
     },
     setNodeScaleMux(mux) {
       self.nodeScaleMux = mux;
+    },
+    setAutoRotatePreview(shouldRotate) {
+      self.autoRotatePreview = shouldRotate;
     },
     reconcileViewScaleDiff() {
       self.viewScale = self.viewScaleDragged;

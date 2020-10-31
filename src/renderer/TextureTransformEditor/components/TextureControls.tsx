@@ -44,7 +44,7 @@ export const TextureControls = observer(({
 }) => {
   const {
     texture, sendTexture, setTextureFromFile, decorationBoundary, selectedTextureNodeIndex,
-    showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux,
+    showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
   } = useMst();
   const faceSides = decorationBoundary.vertices.length;
@@ -232,6 +232,21 @@ export const TextureControls = observer(({
             </Menu>
             <VertDivider />
             <DragModeOptionsGroup dragMode={dragMode} />
+            <VertDivider />
+            <FormControlLabel
+              className={classes.checkboxControlLabel}
+              labelPlacement="top"
+              control={(
+                <Switch
+                  checked={autoRotatePreview}
+                  onChange={(e) => {
+                    setAutoRotatePreview(e.target.checked);
+                  }}
+                  color="primary"
+                />
+              )}
+              label="Auto-rotate preview"
+            />
           </>
         )}
       </Toolbar>

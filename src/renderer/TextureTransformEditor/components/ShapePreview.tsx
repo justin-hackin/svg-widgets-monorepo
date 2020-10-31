@@ -24,11 +24,12 @@ const loader = new GLTFLoader();
 
 export const ShapePreview = observer(() => {
   const {
-    texture, faceBoundary, shapeName, placementAreaDimensions: { width, height },
+    texture, faceBoundary, shapeName, placementAreaDimensions: { width, height }, autoRotatePreview,
   } = useMst();
   const [renderer, setRenderer] = useState<Renderer>();
   const [camera, setCamera] = useState<PerspectiveCamera>();
   const [polyhedronMesh, setPolyhedronMesh] = useState<Mesh>();
+  const [controls, setControls] = useState<OrbitControls>();
   const [scene, setScene] = useState<Scene>();
   // TODO: use this or loose it
   const [offsetY] = useState(85);
@@ -96,7 +97,8 @@ export const ShapePreview = observer(() => {
 
     const theControls = new OrbitControls(theCamera, theRenderer.domElement);
     theControls.enablePan = false;
-    theControls.autoRotate = true;
+    theControls.autoRotate = autoRotatePreview;
+    setControls(theControls);
     theScene.add(theCamera);
     setScene(theScene);
 
@@ -110,6 +112,11 @@ export const ShapePreview = observer(() => {
     return () => cancelAnimationFrame(requestRef.current);
   }, [threeContainerRef, polyhedronMesh]);
 
+  useEffect(() => {
+    if (controls) {
+      controls.autoRotate = autoRotatePreview;
+    }
+  }, [autoRotatePreview, controls]);
 
   useEffect(() => {
     if (!shapeName || !camera || !scene) { return; }
