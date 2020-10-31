@@ -27,7 +27,7 @@ export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryMode
 };
 
 export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
-  pyramidNetSpec: PyramidNetModel,
+  pyramidNetSpec: types.maybe(types.late(() => PyramidNetModel)),
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
   styleSpec: types.model({

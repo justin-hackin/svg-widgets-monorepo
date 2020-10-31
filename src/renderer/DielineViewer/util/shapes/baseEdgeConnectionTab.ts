@@ -129,7 +129,7 @@ export function baseEdgeConnectionTab(
   cutPath.line(end);
   const scorePath = new PathData();
   scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
-  scorePath.concatPath(strokeDashPath(holeBases[1], finBases[1], scoreDashSpec));
+  scorePath.concatPath(strokeDashPath(holeBases[1], finBases[0], scoreDashSpec));
   scorePath.concatPath(finScorePath);
 
   return { cut: cutPath, score: scorePath };

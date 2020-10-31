@@ -5,10 +5,9 @@ import { Instance, types } from 'mobx-state-tree';
 
 import { PathData } from '../PathData';
 import { lineLerp, PointLike, symmetricHingePlotByProjectionDistance } from '../../../common/util/geom';
-import { IDashPatternModel, strokeDashPath, strokeDashPathRatios } from './strokeDashPath';
+import { IDashPatternModel, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
-import { DOTTED_SCORES, MIRRORED_STROKES } from '../../config';
 import { symmetricRoundedTab } from './symmetricRoundedTab';
 
 export const AscendantEdgeTabsModel = types.model({
@@ -48,44 +47,15 @@ export const ascendantEdgeConnectionTabs = (
   ];
 
   const maleScoreLineIntervals = [];
-  const getFemaleScorePathData = () => {
-    if (MIRRORED_STROKES && DOTTED_SCORES) {
-      return new PathData();
-    }
-    return range(tabsCount - 1).reduce((acc, tabIndex) => {
-      const [, previousBaseEnd] = getTabBaseInterval(tabIndex);
-      const [nextBaseStart] = getTabBaseInterval(tabIndex + 1);
-
-      acc.concatPath(strokeDashPath(previousBaseEnd, nextBaseStart, scoreDashSpec));
-      return acc;
-    }, (new PathData()).concatPath(strokeDashPath(
-      start,
-      getTabBaseInterval(0)[0],
-      scoreDashSpec,
-    )))
-      .concatPath(strokeDashPath(getTabBaseInterval(tabsCount - 1)[1], end, scoreDashSpec));
-  };
-
-  const getMaleScorePathData = () => {
-    if (MIRRORED_STROKES && DOTTED_SCORES) {
-      return new PathData();
-    }
-    return range(tabsCount).reduce((acc, tabIndex) => {
-      const [tabStart, tabEnd] = getTabBaseInterval(tabIndex);
-
-      acc.concatPath(strokeDashPath(tabStart, tabEnd, scoreDashSpec));
-      return acc;
-    }, (new PathData()));
-  };
 
   const commands = {
     female: {
       cut: (new PathData()),
-      score: getFemaleScorePathData(),
+      score: (new PathData()),
     },
     male: {
       cut: (new PathData()).move(start),
-      score: getMaleScorePathData(),
+      score: (new PathData()),
     },
   };
   const vector = end.subtract(start);
@@ -116,17 +86,15 @@ export const ascendantEdgeConnectionTabs = (
   });
 
   commands.male.cut.line(end);
-  if (DOTTED_SCORES && MIRRORED_STROKES) {
-    const dashRatios = strokeDashPathRatios(start, end, scoreDashSpec);
-    const tabDashRatios = subtractRangeSet(dashRatios, tabIntervalRatios);
-    const tabGapDashRatios = subtractRangeSet(dashRatios, tabGapIntervalRatios);
+  const dashRatios = strokeDashPathRatios(start, end, scoreDashSpec);
+  const tabDashRatios = subtractRangeSet(dashRatios, tabIntervalRatios);
+  const tabGapDashRatios = subtractRangeSet(dashRatios, tabGapIntervalRatios);
 
-    for (const [femaleStart, femaleEnd] of tabDashRatios) {
-      commands.female.score.move(lineLerp(start, end, femaleStart)).line(lineLerp(start, end, femaleEnd));
-    }
-    for (const [maleStart, maleEnd] of tabGapDashRatios) {
-      commands.male.score.move(lineLerp(start, end, maleStart)).line(lineLerp(start, end, maleEnd));
-    }
+  for (const [femaleStart, femaleEnd] of tabDashRatios) {
+    commands.female.score.move(lineLerp(start, end, femaleStart)).line(lineLerp(start, end, femaleEnd));
+  }
+  for (const [maleStart, maleEnd] of tabGapDashRatios) {
+    commands.male.score.move(lineLerp(start, end, maleStart)).line(lineLerp(start, end, maleEnd));
   }
   return commands;
 };

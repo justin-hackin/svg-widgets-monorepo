@@ -3,7 +3,6 @@ import { Instance, types } from 'mobx-state-tree';
 
 import { lineLerp, PointLike } from '../../../common/util/geom';
 import { PathData } from '../PathData';
-import { DOTTED_SCORES } from '../../config';
 import { dashPatterns, IStrokeDashPathPatternModel } from '../../data/dash-patterns';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
@@ -33,12 +32,13 @@ export interface IDashPatternModel extends Instance<typeof DashPatternModel> {
 export function strokeDashPathRatios(
   start: PointLike, end: PointLike, dashSpec: IDashPatternModel,
 ) {
+  if (!dashSpec) { return [[0, 1]]; }
+  const vector = end.subtract(start);
   const {
     pathPattern: { relativeStrokeDasharray },
     strokeDashLength,
     strokeDashOffsetRatio,
   } = dashSpec;
-  const vector = end.subtract(start);
   const vectorLength = vector.length;
   const strokeDashLengthToVectorLength = strokeDashLength / vectorLength;
 
@@ -96,9 +96,6 @@ export function strokeDashPathRatios(
 export function strokeDashPath(
   start: PointLike, end: PointLike, dashSpec: IDashPatternModel,
 ) {
-  if (!DOTTED_SCORES) {
-    return (new PathData()).move(start).line(end);
-  }
   const ratios = strokeDashPathRatios(start, end, dashSpec);
   return lineSeries(ratios
     .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp))));

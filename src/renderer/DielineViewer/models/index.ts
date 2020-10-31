@@ -8,7 +8,7 @@ import remotedev from 'remotedev';
 // eslint-disable-next-line import/no-cycle
 import { IPyramidNetFactoryModel, PyramidNetFactoryModel } from './PyramidNetMakerStore';
 
-const defaultModelData = {
+export const defaultModelData = {
   styleSpec: {
     dieLineProps: { fill: 'none', strokeWidth: 1 },
     cutLineProps: { stroke: '#FF3A5E' },
@@ -43,17 +43,7 @@ const defaultModelData = {
       },
     },
     // @ts-ignore
-    baseScoreDashSpec: {
-      strokeDashPathPatternId: 'base',
-      strokeDashLength: 11,
-      strokeDashOffsetRatio: 0,
-    },
-    // @ts-ignore
-    interFaceScoreDashSpec: {
-      strokeDashPathPatternId: 'base',
-      strokeDashLength: 11,
-      strokeDashOffsetRatio: 0,
-    },
+    useDottedStroke: false,
     shapeHeightInCm: 40,
   },
 };

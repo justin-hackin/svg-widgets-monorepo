@@ -8,7 +8,7 @@ import { offset } from '@flatten-js/polygon-offset';
 // @ts-ignore
 import { subtract } from '@flatten-js/boolean-op';
 import {
-  chunk, flatten, range, debounce,
+  chunk, debounce, flatten, range,
 } from 'lodash';
 
 import { polyhedra } from '../data/polyhedra';
@@ -56,14 +56,20 @@ export const PyramidModel = types.model({
   },
 }));
 
+export const defaultStrokeDashSpec = {
+  strokeDashPathPatternId: 'base',
+  strokeDashLength: 11,
+  strokeDashOffsetRatio: 0,
+};
 export const PyramidNetModel = types.model({
   pyramid: PyramidModel,
   ascendantEdgeTabsSpec: types.late(() => AscendantEdgeTabsModel),
   baseEdgeTabsSpec: types.late(() => BaseEdgeTabsModel),
   shapeHeightInCm: types.number,
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
-  baseScoreDashSpec: types.late(() => DashPatternModel),
-  interFaceScoreDashSpec: types.late(() => DashPatternModel),
+  useDottedStroke: types.boolean,
+  baseScoreDashSpec: types.maybe(types.late(() => DashPatternModel)),
+  interFaceScoreDashSpec: types.maybe(types.late(() => DashPatternModel)),
   // in this case of faceDecoration being defined, this is a derived value thus could be made volatile
   // however, it needs to be persisted in the model because
   // it can also be defined by cut hole path import via templated svg file
@@ -226,6 +232,17 @@ export const PyramidNetModel = types.model({
         this.setActiveCutHolePatternD(croppedD);
       } else {
         this.setActiveCutHolePatternD(undefined);
+      }
+    },
+
+    setUseDottedStroke(useDotted) {
+      self.useDottedStroke = useDotted;
+      if (useDotted) {
+        self.interFaceScoreDashSpec = DashPatternModel.create(defaultStrokeDashSpec);
+        self.baseScoreDashSpec = DashPatternModel.create(defaultStrokeDashSpec);
+      } else {
+        self.interFaceScoreDashSpec = undefined;
+        self.baseScoreDashSpec = undefined;
       }
     },
 
