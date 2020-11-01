@@ -14,6 +14,7 @@ import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
 import { DashPatternsModel } from '../data/dash-patterns';
+import { EVENTS } from '../../../main/ipc';
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
@@ -52,6 +53,11 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     }),
   }),
 }).actions((self) => ({
+  sendShapeUpdate() {
+    // @ts-ignore
+    self.pyramidNetSpec.sendTextureUpdate();
+    self.pyramidNetSpec.sendTextureBorderData();
+  },
   renderDecorationBoundaryToString():string {
     // @ts-ignore
     return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: self }));
@@ -67,6 +73,20 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   setValueAtPath(path: string, value: any) {
     set(self, path, value);
   },
-}));
+})).actions((self) => {
+  const updateDielineHandler = (e, faceDecoration) => { self.pyramidNetSpec.setFaceDecoration(faceDecoration); };
+  const sendShapeUpdateHandler = () => { self.sendShapeUpdate(); };
+
+  return {
+    afterCreate() {
+      globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
+      globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, updateDielineHandler);
+    },
+    beforeDestroy() {
+      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_DIELINE_VIEWER, updateDielineHandler);
+      globalThis.ipcRenderer.removeListener(EVENTS.REQUEST_SHAPE_UPDATE, updateDielineHandler);
+    },
+  };
+});
 
 export interface IPyramidNetFactoryModel extends Instance<typeof PyramidNetFactoryModel> {}

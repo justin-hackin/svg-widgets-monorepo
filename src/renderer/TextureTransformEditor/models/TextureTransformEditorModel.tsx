@@ -97,13 +97,6 @@ export const TextureTransformEditorModel = types
       return BoundaryModel.create({ vertices });
     },
   })).actions((self) => ({
-    afterCreate() {
-      globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA,
-        (e, borderToInsetRatio, insetToBorderOffset) => {
-          this.setFaceBorderData(borderToInsetRatio, insetToBorderOffset);
-        });
-    },
-
     setFaceBorderData(borderToInsetRatio, insetToBorderOffset) {
       self.borderToInsetRatio = borderToInsetRatio;
       self.insetToBorderOffset = insetToBorderOffset;
@@ -254,7 +247,20 @@ export const TextureTransformEditorModel = types
       }
       globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, self.texture);
     },
-  }));
+  }))
+  .actions((self) => {
+    const updateBorderDataHandler = (e, borderToInsetRatio, insetToBorderOffset) => {
+      self.setFaceBorderData(borderToInsetRatio, insetToBorderOffset);
+    };
+    return {
+      afterCreate() {
+        globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, updateBorderDataHandler);
+      },
+      beforeDestroy() {
+        globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, updateBorderDataHandler);
+      },
+    };
+  });
 
 export interface ITextureTransformEditorModel extends Instance<typeof TextureTransformEditorModel> {
 }

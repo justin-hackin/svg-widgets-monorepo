@@ -27,29 +27,8 @@ export const PyramidNet = observer(() => {
       decorationBoundaryPoints, pathScaleMatrix, faceInteriorAngles,
       actualFaceEdgeLengths, ascendantEdgeTabDepth,
       activeCutHolePatternD, borderInsetFaceHoleTransformMatrix,
-      sendTextureUpdate, setFaceDecoration, sendTextureBorderData,
     },
   } = useMst();
-
-  useEffect(() => {
-    const setFaceDecorationHandler = (e, faceDecoration) => {
-    // @ts-ignore
-      setFaceDecoration(faceDecoration);
-    };
-    const sendShapeUpdateHandler = () => {
-    // @ts-ignore
-      sendTextureUpdate();
-      sendTextureBorderData();
-    };
-
-    globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, setFaceDecorationHandler);
-    globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
-
-    return () => {
-      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_DIELINE_VIEWER, setFaceDecorationHandler);
-      globalThis.ipcRenderer.removeListener('die>request-shape-update', sendShapeUpdateHandler);
-    };
-  }, []);
 
 
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
