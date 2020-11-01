@@ -50,36 +50,37 @@ export const TextureControls = observer(({
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, downloadShapeGLTF,
   } = useMst();
-  const faceSides = decorationBoundary.vertices.length;
-
-  const [cornerSnapMenuAnchorEl, setCornerSnapMenuAnchorEl] = React.useState(null);
-
   const { isPositive, setIsPositive, rotate: textureRotate } = texture || {};
+  const numFaceSides = decorationBoundary.vertices.length;
+
+  // when truthy, snap menu is open
+  const [positionSnapMenuAnchorEl, setPositionSnapMenuAnchorEl] = React.useState(null);
+
   const handleCornerSnapMenuClick = (event) => {
-    setCornerSnapMenuAnchorEl(event.currentTarget);
+    setPositionSnapMenuAnchorEl(event.currentTarget);
   };
 
-  const resetCornerSnapMenuAnchorEl = () => { setCornerSnapMenuAnchorEl(null); };
+  const resetPositionSnapMenuAnchorEl = () => { setPositionSnapMenuAnchorEl(null); };
 
   const handleTextureOriginSnapMenuClose = (index) => {
     if (index !== undefined) {
       repositionTextureWithOriginOverCorner(index);
     }
-    resetCornerSnapMenuAnchorEl();
+    resetPositionSnapMenuAnchorEl();
   };
 
   const handleOriginSnapMenuClose = (index) => {
     if (index !== undefined) {
       repositionOriginOverCorner(index);
     }
-    resetCornerSnapMenuAnchorEl();
+    resetPositionSnapMenuAnchorEl();
   };
 
   const handleSelectedNodeSnapMenuClose = (index) => {
     if (index !== undefined) {
       repositionSelectedNodeOverCorner(index);
     }
-    resetCornerSnapMenuAnchorEl();
+    resetPositionSnapMenuAnchorEl();
   };
 
   // TODO: add whitespace, improve button definition and input alignment
@@ -92,7 +93,7 @@ export const TextureControls = observer(({
       <Toolbar variant="dense">
         <IconButton
           onClick={async () => {
-            const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_PATH);
+            const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_FILE_PATH);
             if (texturePath) {
               setTextureFromFile(texturePath);
             }
@@ -192,15 +193,15 @@ export const TextureControls = observer(({
             </Button>
             <Menu
               id="simple-menu"
-              anchorEl={cornerSnapMenuAnchorEl}
+              anchorEl={positionSnapMenuAnchorEl}
               keepMounted
               variant="menu"
-              open={Boolean(cornerSnapMenuAnchorEl)}
+              open={Boolean(positionSnapMenuAnchorEl)}
               onClose={() => {
-                resetCornerSnapMenuAnchorEl();
+                resetPositionSnapMenuAnchorEl();
               }}
             >
-              {range(faceSides).map((index) => (
+              {range(numFaceSides).map((index) => (
                 <MenuItem
                   key={index}
                   onClick={() => {
@@ -212,7 +213,7 @@ export const TextureControls = observer(({
                   {index + 1}
                 </MenuItem>
               ))}
-              {range(faceSides).map((index) => (
+              {range(numFaceSides).map((index) => (
                 <MenuItem
                   key={index}
                   onClick={() => {
@@ -225,7 +226,7 @@ export const TextureControls = observer(({
                 </MenuItem>
               ))}
 
-              {showNodes && selectedTextureNodeIndex !== null && range(faceSides).map((index) => (
+              {showNodes && selectedTextureNodeIndex !== null && range(numFaceSides).map((index) => (
                 <MenuItem
                   key={index}
                   onClick={() => {

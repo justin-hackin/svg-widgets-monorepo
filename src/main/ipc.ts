@@ -25,7 +25,7 @@ export const EVENTS:Events = {
   OPEN_TEXTURE_WINDOW: 'open-texture-window',
   RESET_DRAG_MODE: 'reset-drag-mode',
   GET_SVG_STRING_BY_PATH: 'get-svg-string-by-path',
-  GET_SVG_PATH: 'get-svg-path',
+  GET_SVG_FILE_PATH: 'get-svg-path',
   GET_PATH_BASENAME: 'get-path-basename',
   REQUEST_SHAPE_UPDATE: `die${EVENT_TARGET_DELIMITER}request-shape-update`,
   UPDATE_TEXTURE_EDITOR_TEXTURE: `tex${EVENT_TARGET_DELIMITER}update-texture-editor-texture`,
@@ -105,7 +105,7 @@ export const setupIpc = (ipcMain) => {
     filters: svgFilters,
   }));
 
-  ipcMain.handle(EVENTS.GET_SVG_PATH, async () => {
+  ipcMain.handle(EVENTS.GET_SVG_FILE_PATH, async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       message: 'Open texture path',
       filters: svgFilters,
