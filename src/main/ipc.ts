@@ -10,11 +10,14 @@ interface Events {
   [key: string]: string,
 }
 
+const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
+
 export const EVENT_TARGET_DELIMITER = '<=';
 
 // TODO: use enum if event names allow
 export const EVENTS:Events = {
   SAVE_SVG: 'save-svg',
+  SAVE_GLTF: 'save-gltf',
   SAVE_NET_SVG_AND_SPEC: 'save-net-svg-and-spec',
   INTERSECT_SVG: 'intersect-svg',
   LOAD_NET_SPEC: 'load-net-spec',
@@ -30,15 +33,9 @@ export const EVENTS:Events = {
   UPDATE_DIELINE_VIEWER: `die${EVENT_TARGET_DELIMITER}update-dieline-viewer`,
 };
 
-const svgFilters = [{
-  name: 'SVG - Scalable Vector Graphics',
-  extensions: ['svg'],
-}];
-
-const jsonFilters = [{
-  name: 'JSON',
-  extensions: ['json'],
-}];
+const svgFilters = [{ name: 'SVG - Scalable Vector Graphics', extensions: ['svg'] }];
+const jsonFilters = [{ name: 'JSON', extensions: ['json'] }];
+const gltfFilters = [{ name: 'GLTF 3D model', extensions: ['gltf'] }];
 
 export const setupIpc = (ipcMain) => {
   ipcMain.handle(EVENTS.INTERSECT_SVG,
@@ -62,12 +59,20 @@ export const setupIpc = (ipcMain) => {
     });
 
 
-  ipcMain.handle(EVENTS.SAVE_SVG, (e, fileContent, options) => dialog.showSaveDialog({
-    ...options,
+  ipcMain.handle(EVENTS.SAVE_SVG, (e, fileContent, dialogOptions) => dialog.showSaveDialog({
+    ...dialogOptions,
     filters: svgFilters,
   }).then(({ canceled, filePath }) => {
     if (canceled) { return null; }
     return fsPromises.writeFile(filePath, fileContent);
+  }));
+
+  ipcMain.handle(EVENTS.SAVE_GLTF, (e, gltfObj, dialogOptions) => dialog.showSaveDialog({
+    ...dialogOptions,
+    filters: gltfFilters,
+  }).then(({ canceled, filePath }) => {
+    if (canceled) { return null; }
+    return fsPromises.writeFile(filePath, formattedJSONStringify(gltfObj));
   }));
 
   ipcMain.handle(EVENTS.GET_PATH_BASENAME, (e, pathName) => path.basename(pathName));
@@ -78,22 +83,17 @@ export const setupIpc = (ipcMain) => {
     return fsPromises.readFile(filePaths[0], 'utf8');
   };
 
-  ipcMain.handle(EVENTS.SAVE_NET_SVG_AND_SPEC, (e, svgContent, pyramidNetSpec, message) => {
-    const { pyramid: { shapeName }, faceDecoration: { sourceFileName = undefined } = {} } = pyramidNetSpec;
-    const defaultPath = `${shapeName}${sourceFileName ? `__${sourceFileName}` : ''}.svg`;
-    return dialog.showSaveDialog({
-      message,
-      filters: svgFilters,
-      defaultPath,
-    }).then(({ canceled, filePath }) => {
-      if (canceled) {
-        return null;
-      }
-      return Promise.all([
-        fsPromises.writeFile(filePath, svgContent),
-        fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, JSON.stringify(pyramidNetSpec, null, 2))]);
-    });
-  });
+  ipcMain.handle(EVENTS.SAVE_NET_SVG_AND_SPEC, (e, svgContent, pyramidNetSpec, dialogOptions) => dialog.showSaveDialog({
+    ...dialogOptions,
+    filters: svgFilters,
+  }).then(({ canceled, filePath }) => {
+    if (canceled) {
+      return null;
+    }
+    return Promise.all([
+      fsPromises.writeFile(filePath, svgContent),
+      fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, formattedJSONStringify(pyramidNetSpec))]);
+  }));
 
   ipcMain.handle(EVENTS.LOAD_NET_SPEC, () => resolveStringDataFromDialog(
     { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },

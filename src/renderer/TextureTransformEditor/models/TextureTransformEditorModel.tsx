@@ -1,11 +1,13 @@
 import { inRange } from 'lodash';
-import { Instance, types } from 'mobx-state-tree';
+import { Instance, types, resolvePath } from 'mobx-state-tree';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
 import { UndoManager } from 'mst-middlewares';
 import { PointTuple } from '../../common/util/geom';
 import { BoundaryModel } from './BoundaryModel';
 // eslint-disable-next-line import/no-cycle
 import { TextureModel } from './TextureModel';
+
 import { DimensionsModel } from './DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
@@ -47,6 +49,8 @@ export const TextureTransformEditorModel = types
     history: types.optional(UndoManager, {}),
   })
   .volatile(() => ({
+    shapeObject: null,
+    gltfExporter: new GLTFExporter(),
     borderToInsetRatio: null,
     insetToBorderOffset: null,
     viewScaleDiff: 1,
@@ -157,6 +161,22 @@ export const TextureTransformEditorModel = types
         this.repositionOriginOverCorner(0);
       }
     },
+    setShapeObject(shape) {
+      self.shapeObject = shape;
+    },
+    // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
+    getFileBasename() {
+      return `${self.shapeName || 'shape'}__${resolvePath(self, '/texture/sourceFileName') || 'undecorated'}`;
+    },
+    async downloadShapeGLTF() {
+      return self.gltfExporter
+        .parse(self.shapeObject, (shapeGLTF) => {
+          globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLTF, shapeGLTF, {
+            message: 'Save shape preview',
+            defaultPath: `${this.getFileBasename()}.gltf`,
+          });
+        }, {});
+    },
     async setTextureFromFile(url) {
       const d = await globalThis.ipcRenderer
         .invoke(EVENTS.GET_SVG_STRING_BY_PATH, url)
@@ -263,5 +283,4 @@ export const TextureTransformEditorModel = types
     };
   });
 
-export interface ITextureTransformEditorModel extends Instance<typeof TextureTransformEditorModel> {
-}
+export interface ITextureTransformEditorModel extends Instance<typeof TextureTransformEditorModel> {}

@@ -7,7 +7,8 @@ import Canvg, { presets } from 'canvg';
 import ReactDOMServer from 'react-dom/server';
 
 import * as THREE from 'three';
-import GLTFLoader from 'three-gltf-loader';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
 import OrbitControls from 'threejs-orbit-controls';
 import '../style.css';
 import requireStatic from '../../requireStatic';
@@ -15,6 +16,7 @@ import { TextureSvg } from './TextureSvg';
 // eslint-disable-next-line import/no-cycle
 import { useMst } from '../models';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
+import { ITextureTransformEditorModel } from '../models/TextureTransformEditorModel';
 
 const { useEffect, useRef, useState } = React;
 
@@ -23,12 +25,13 @@ const IDEAL_RADIUS = 60;
 const loader = new GLTFLoader();
 
 export const ShapePreview = observer(() => {
+  const store:ITextureTransformEditorModel = useMst();
   const {
     texture, faceBoundary, shapeName, placementAreaDimensions: { width, height }, autoRotatePreview,
-  } = useMst();
+    shapeObject, setShapeObject,
+  } = store;
   const [renderer, setRenderer] = useState<Renderer>();
   const [camera, setCamera] = useState<PerspectiveCamera>();
-  const [polyhedronMesh, setPolyhedronMesh] = useState<Mesh>();
   const [controls, setControls] = useState<OrbitControls>();
   const [scene, setScene] = useState<Scene>();
   // TODO: use this or loose it
@@ -43,11 +46,11 @@ export const ShapePreview = observer(() => {
 
   // update shape texture
   useEffect(() => {
-    if (polyhedronMesh && viewBoxAttrs) {
+    if (shapeObject && viewBoxAttrs) {
       const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
       // TODO: throw if material not MeshPhong
       // @ts-ignore
-      const { material }: {material: MeshPhongMaterial} = polyhedronMesh;
+      const { material }: {material: MeshPhongMaterial} = shapeObject;
       const ctx = textureCanvas.getContext('2d');
       // @ts-ignore
       const svgStr = ReactDOMServer.renderToString(
@@ -62,7 +65,7 @@ export const ShapePreview = observer(() => {
         material.map.needsUpdate = true;
       });
     }
-  }, [polyhedronMesh, transformMatrixDraggedStr, isPositive, viewBoxAttrs]);
+  }, [shapeObject, transformMatrixDraggedStr, isPositive, viewBoxAttrs]);
 
   // renderer boundary size change
   useEffect(() => {
@@ -74,7 +77,7 @@ export const ShapePreview = observer(() => {
 
   // THREE rendering setup
   useEffect(() => {
-    if (threeContainerRef.current && polyhedronMesh) { return undefined; }
+    if (threeContainerRef.current && shapeObject) { return undefined; }
     const theScene = new Scene();
     const theRenderer = new WebGLRenderer({
       alpha: true,
@@ -110,7 +113,7 @@ export const ShapePreview = observer(() => {
     requestRef.current = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(requestRef.current);
-  }, [threeContainerRef, polyhedronMesh]);
+  }, [threeContainerRef, shapeObject]);
 
   useEffect(() => {
     if (controls) {
@@ -137,7 +140,7 @@ export const ShapePreview = observer(() => {
             const scale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
             camera.lookAt(child.position);
             child.scale.fromArray([scale, scale, scale]);
-            setPolyhedronMesh(child);
+            setShapeObject(child);
           }
         });
       },

@@ -144,7 +144,7 @@ export const ControlPanel = observer(() => {
                     EVENTS.SAVE_NET_SVG_AND_SPEC,
                     store.renderPyramidNetToString(),
                     store.pyramidNetSpec,
-                    'Save pyramid net dielines and model',
+                    { message: 'Save pyramid net dielines and model', defaultPath: store.getFileBasename() },
                   );
                   resetFileMenuRef();
                 }}

@@ -7,6 +7,7 @@ import { observer } from 'mobx-react';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 import CachedIcon from '@material-ui/icons/Cached';
 import TelegramIcon from '@material-ui/icons/Telegram';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
@@ -47,7 +48,7 @@ export const TextureControls = observer(({
     texture, sendTexture, setTextureFromFile, decorationBoundary, selectedTextureNodeIndex,
     showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
-    history,
+    history, downloadShapeGLTF,
   } = useMst();
   const faceSides = decorationBoundary.vertices.length;
 
@@ -105,6 +106,9 @@ export const TextureControls = observer(({
         <HistoryButtons history={history} />
         {texture && (
           <>
+            <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
+              <GetAppIcon />
+            </IconButton>
             <VertDivider />
             <IconButton onClick={() => { sendTexture(); }} aria-label="send texture" component="span">
               <TelegramIcon fontSize="large" />
