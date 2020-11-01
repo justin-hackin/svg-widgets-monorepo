@@ -106,6 +106,7 @@ export const TextureControls = observer(({
         <HistoryButtons history={history} />
         {texture && (
           <>
+            <VertDivider />
             <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
               <GetAppIcon />
             </IconButton>
