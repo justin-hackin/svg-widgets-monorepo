@@ -48,7 +48,7 @@ const TextureTransformEditorLOC = observer(() => {
   // Init
   useEffect(() => {
     globalThis.ipcRenderer
-      .on(EVENTS.UPDATE_TEXTURE_EDITOR_TEXTURE, (_, decorationBoundaryVertices, shapeName, faceDecoration) => {
+      .on(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION, (_, decorationBoundaryVertices, shapeName, faceDecoration) => {
         textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration);
       });
 
@@ -67,7 +67,7 @@ const TextureTransformEditorLOC = observer(() => {
 
     return () => {
       window.removeEventListener('resize', resizeHandler);
-      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_TEXTURE, textureEditorUpdateHandler);
+      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION, textureEditorUpdateHandler);
     };
   }, []);
 

@@ -264,7 +264,7 @@ export const PyramidNetModel = types.model({
 
     sendTextureUpdate() {
       // @ts-ignore
-      globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR_TEXTURE,
+      globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION,
         self.normalizedDecorationBoundaryPoints.map((pt) => ([pt.x, pt.y])),
         self.pyramid.shapeName,
         self.faceDecoration);

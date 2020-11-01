@@ -28,7 +28,7 @@ export const EVENTS:Events = {
   GET_SVG_FILE_PATH: 'get-svg-path',
   GET_PATH_BASENAME: 'get-path-basename',
   REQUEST_SHAPE_UPDATE: `die${EVENT_TARGET_DELIMITER}request-shape-update`,
-  UPDATE_TEXTURE_EDITOR_TEXTURE: `tex${EVENT_TARGET_DELIMITER}update-texture-editor-texture`,
+  UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION: `tex${EVENT_TARGET_DELIMITER}update-texture-editor-texture`,
   UPDATE_TEXTURE_EDITOR_BORDER_DATA: `tex${EVENT_TARGET_DELIMITER}update-texture-editor-matrix`,
   UPDATE_DIELINE_VIEWER: `die${EVENT_TARGET_DELIMITER}update-dieline-viewer`,
 };
@@ -105,9 +105,9 @@ export const setupIpc = (ipcMain) => {
     filters: svgFilters,
   }));
 
-  ipcMain.handle(EVENTS.GET_SVG_FILE_PATH, async () => {
+  ipcMain.handle(EVENTS.GET_SVG_FILE_PATH, async (_, dialogOptions) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
-      message: 'Open texture path',
+      ...dialogOptions,
       filters: svgFilters,
     });
     return canceled ? null : filePaths[0];

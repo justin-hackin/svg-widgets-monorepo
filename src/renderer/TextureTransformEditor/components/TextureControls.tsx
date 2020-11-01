@@ -93,7 +93,9 @@ export const TextureControls = observer(({
       <Toolbar variant="dense">
         <IconButton
           onClick={async () => {
-            const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_FILE_PATH);
+            const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_FILE_PATH, {
+              message: 'Open texture path',
+            });
             if (texturePath) {
               setTextureFromFile(texturePath);
             }
