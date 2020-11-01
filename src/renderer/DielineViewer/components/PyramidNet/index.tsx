@@ -1,6 +1,6 @@
 // @ts-ignore
 import { observer } from 'mobx-react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { range } from 'lodash';
 import {
   degToRad, hingedPlot, hingedPlotByProjectionDistance, radToDeg,
@@ -10,7 +10,6 @@ import { strokeDashPath } from '../../util/shapes/strokeDashPath';
 import { baseEdgeConnectionTab } from '../../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs } from '../../util/shapes/ascendantEdgeConnectionTabs';
 import { closedPolygonPath, roundedEdgePath } from '../../util/shapes/generic';
-import { EVENTS } from '../../../../main/ipc';
 // eslint-disable-next-line import/no-cycle
 import { useMst } from '../../models';
 

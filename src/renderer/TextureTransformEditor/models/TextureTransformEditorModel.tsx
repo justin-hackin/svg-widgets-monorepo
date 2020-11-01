@@ -4,6 +4,7 @@ import { Instance, types } from 'mobx-state-tree';
 import { UndoManager } from 'mst-middlewares';
 import { PointTuple } from '../../common/util/geom';
 import { BoundaryModel } from './BoundaryModel';
+// eslint-disable-next-line import/no-cycle
 import { TextureModel } from './TextureModel';
 import { DimensionsModel } from './DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
