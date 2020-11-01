@@ -1,6 +1,7 @@
 import { inRange } from 'lodash';
 import { Instance, types } from 'mobx-state-tree';
 
+import { UndoManager } from 'mst-middlewares';
 import { PointTuple } from '../../common/util/geom';
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
@@ -42,6 +43,7 @@ export const TextureTransformEditorModel = types
     // since both controls and matrix function require degrees, use degrees as unit instead of radians
     placementAreaDimensions: types.maybe(DimensionsModel),
     viewScale: types.maybe(types.number),
+    history: types.optional(UndoManager, {}),
   })
   .volatile(() => ({
     borderToInsetRatio: null,
@@ -108,12 +110,18 @@ export const TextureTransformEditorModel = types
     },
 
     setPlacementAreaDimensions(placementAreaDimensions) {
-      self.placementAreaDimensions = placementAreaDimensions;
+      self.history.withoutUndo(() => {
+        self.placementAreaDimensions = placementAreaDimensions;
+      });
     },
     setViewScaleDiff(mux) {
       if (inRange(mux * self.viewScale, self.MIN_VIEW_SCALE, self.MAX_VIEW_SCALE)) {
-        self.viewScaleDiff = mux;
+        self.history.withoutUndo(() => { self.viewScaleDiff = mux; });
       }
+    },
+    reconcileViewScaleDiff() {
+      self.viewScale = self.viewScaleDragged;
+      self.viewScaleDiff = 1;
     },
     setSelectedTextureNodeIndex(index) {
       self.selectedTextureNodeIndex = index;
@@ -127,10 +135,6 @@ export const TextureTransformEditorModel = types
     },
     setAutoRotatePreview(shouldRotate) {
       self.autoRotatePreview = shouldRotate;
-    },
-    reconcileViewScaleDiff() {
-      self.viewScale = self.viewScaleDragged;
-      self.viewScaleDiff = 1;
     },
     fitTextureToFace() {
       const { viewBoxAttrs } = self.decorationBoundary;
@@ -173,16 +177,27 @@ export const TextureTransformEditorModel = types
     // these seem like the domain of the texture model but setters for
     // textureScaleDiff (and more to follow) need boundary
     textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration) {
-      self.shapeName = shapeName;
-      // @ts-ignore
-      self.decorationBoundary = BoundaryModel.create({ vertices: decorationBoundaryVertices });
+      // eslint-disable-next-line no-shadow
+      const thisAction = () => {
+        self.shapeName = shapeName;
+        // @ts-ignore
+        self.decorationBoundary = BoundaryModel.create({ vertices: decorationBoundaryVertices });
 
-      if (faceDecoration) {
-        self.texture = TextureModel.create(faceDecoration);
+        if (faceDecoration) {
+          self.texture = TextureModel.create(faceDecoration);
+        } else {
+          self.texture = undefined;
+        }
+        self.viewScale = 0.8;
+      };
+
+      // if decoration boundary is currently set
+      // ensure undo history starts after first setting of boundary and texture
+      if (!self.decorationBoundary) {
+        self.history.withoutUndo(thisAction);
       } else {
-        self.texture = undefined;
+        thisAction();
       }
-      self.viewScale = 0.8;
     },
     absoluteMovementToSvg(absCoords) {
       return absCoords.map((coord) => coord / (self.viewScaleDragged * self.faceFittingScale.scale));

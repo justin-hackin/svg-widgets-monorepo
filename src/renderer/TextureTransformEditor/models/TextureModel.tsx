@@ -1,4 +1,4 @@
-import { Instance } from 'mobx-state-tree';
+import { Instance, getParentOfType } from 'mobx-state-tree';
 // @ts-ignore
 import { point } from '@flatten-js/core';
 
@@ -12,6 +12,8 @@ import {
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
 import { distanceBetweenPoints, PointTuple } from '../../common/util/geom';
+// eslint-disable-next-line import/no-cycle
+import { TextureTransformEditorModel } from './TextureTransformEditorModel';
 
 const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);
@@ -53,17 +55,24 @@ export const TextureModel = FaceDecorationModel
     get destinationPoints() {
       return PathData.fromDValue(self.pathD).getDestinationPoints();
     },
+    get parentHistoryManager() {
+      return getParentOfType(self, TextureTransformEditorModel).history;
+    },
   }))
   .actions((self) => ({
     setScaleDiff(mux) {
-      self.scaleDiff = mux;
+      self.parentHistoryManager.withoutUndo(() => {
+        self.scaleDiff = mux;
+      });
     },
     reconcileScaleDiff() {
       self.scale *= self.scaleDiff;
       self.scaleDiff = 1;
     },
     setTranslateDiff(delta) {
-      self.translateDiff = delta;
+      self.parentHistoryManager.withoutUndo(() => {
+        self.translateDiff = delta;
+      });
     },
     reconcileTranslateDiff() {
       self.translate = addTuple(self.translate, self.translateDiff);
@@ -73,14 +82,18 @@ export const TextureModel = FaceDecorationModel
       self.rotate = rotate;
     },
     setRotateDiff(delta) {
-      self.rotateDiff = delta;
+      self.parentHistoryManager.withoutUndo(() => {
+        self.rotateDiff = delta;
+      });
     },
     reconcileRotateDiff() {
       self.rotate = wrapDegrees(self.rotate + self.rotateDiff);
       self.rotateDiff = 0;
     },
     setTransformOriginDiff(delta) {
-      self.transformOriginDiff = delta;
+      self.parentHistoryManager.withoutUndo(() => {
+        self.transformOriginDiff = delta;
+      });
     },
     reconcileTransformOriginDiff() {
       const relativeDifference = calculateTransformOriginChangeOffset(

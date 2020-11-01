@@ -16,6 +16,7 @@ import { EVENTS } from '../../../main/ipc';
 import { useMst } from '../models';
 import { PanelSlider } from '../../common/components/PanelSlider';
 import { VERY_SMALL_NUMBER } from '../../common/util/geom';
+import { HistoryButtons } from '../../DielineViewer/components/ControlPanel/components/HistoryButtons';
 
 const VertDivider = () => (
   <Divider orientation="vertical" flexItem variant="middle" />
@@ -46,6 +47,7 @@ export const TextureControls = observer(({
     texture, sendTexture, setTextureFromFile, decorationBoundary, selectedTextureNodeIndex,
     showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
+    history,
   } = useMst();
   const faceSides = decorationBoundary.vertices.length;
 
@@ -99,7 +101,8 @@ export const TextureControls = observer(({
         >
           <FolderOpenIcon fontSize="large" />
         </IconButton>
-
+        <VertDivider />
+        <HistoryButtons history={history} />
         {texture && (
           <>
             <VertDivider />

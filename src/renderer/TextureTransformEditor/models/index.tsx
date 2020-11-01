@@ -19,7 +19,7 @@ const TextureTransformEditorStoreContext = createContext<ITextureTransformEditor
 
 export const { Provider } = TextureTransformEditorStoreContext;
 
-export function useMst() {
+export function useMst():ITextureTransformEditorModel {
   const store = useContext(TextureTransformEditorStoreContext);
   return store;
 }
