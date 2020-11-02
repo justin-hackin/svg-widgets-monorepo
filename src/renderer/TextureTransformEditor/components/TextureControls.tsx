@@ -18,6 +18,7 @@ import { useMst } from '../models';
 import { PanelSlider } from '../../common/components/PanelSlider';
 import { VERY_SMALL_NUMBER } from '../../common/util/geom';
 import { HistoryButtons } from '../../DielineViewer/components/ControlPanel/components/HistoryButtons';
+import { useStyles } from '../style';
 
 const VertDivider = () => (
   <Divider orientation="vertical" flexItem variant="middle" />
@@ -41,15 +42,14 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 );
 
 
-export const TextureControls = observer(({
-  classes, dragMode,
-}) => {
+export const TextureControls = observer(({ dragMode }) => {
   const {
     texture, sendTexture, setTextureFromFile, decorationBoundary, selectedTextureNodeIndex,
     showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, downloadShapeGLTF,
   } = useMst();
+  const classes = useStyles();
   const { isPositive, setIsPositive, rotate: textureRotate } = texture || {};
   const numFaceSides = decorationBoundary.vertices.length;
 
@@ -86,7 +86,6 @@ export const TextureControls = observer(({
   // TODO: add whitespace, improve button definition and input alignment
   return (
     <AppBar
-      classes={{ root: classes.darkAppBar }}
       color="inherit"
       position="fixed"
     >

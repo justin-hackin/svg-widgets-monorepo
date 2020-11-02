@@ -51,7 +51,9 @@ export const TextureTransformEditorModel = types
   .volatile(() => ({
     shapeObject: null,
     gltfExporter: new GLTFExporter(),
+    // amount of scaling required to make the decoration area match the size of the face boundary
     borderToInsetRatio: null,
+    // translation required to bring the decoration area first corner to the face boundary first corner
     insetToBorderOffset: null,
     viewScaleDiff: 1,
     autoRotatePreview: true,
@@ -273,12 +275,19 @@ export const TextureTransformEditorModel = types
     const updateBorderDataHandler = (e, borderToInsetRatio, insetToBorderOffset) => {
       self.setFaceBorderData(borderToInsetRatio, insetToBorderOffset);
     };
+    const shapeDecorationHandler = (_, decorationBoundaryVertices, shapeName, faceDecoration) => {
+      self.textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration);
+    };
+
+
     return {
       afterCreate() {
         globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, updateBorderDataHandler);
+        globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION, shapeDecorationHandler);
       },
       beforeDestroy() {
         globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, updateBorderDataHandler);
+        globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION, shapeDecorationHandler);
       },
     };
   });
