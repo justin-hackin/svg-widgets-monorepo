@@ -17,7 +17,6 @@ import {
 } from './models';
 import { useStyles } from './style';
 import { TextureArrangement } from './components/TextureArrangement';
-import { useDragMode } from './dragMode';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 // TODO: make router wrap with styles
@@ -26,7 +25,6 @@ export const theme = createMuiTheme(darkTheme);
 
 const TextureTransformEditorLOC = observer(() => {
   const classes = useStyles();
-  const dragMode = useDragMode();
   // ==================================================================================================================
   const {
     placementAreaDimensions, setPlacementAreaDimensions, decorationBoundary,
@@ -65,8 +63,8 @@ const TextureTransformEditorLOC = observer(() => {
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview />
         </div>
-        <TextureArrangement dragMode={dragMode} />
-        <TextureControls dragMode={dragMode} />
+        <TextureArrangement />
+        <TextureControls />
       </Box>
     </ThemeProvider>
   );

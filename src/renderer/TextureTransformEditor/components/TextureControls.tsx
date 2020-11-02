@@ -42,7 +42,7 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 );
 
 
-export const TextureControls = observer(({ dragMode }) => {
+export const TextureControls = observer(() => {
   const {
     texture, sendTexture, setTextureFromFile, decorationBoundary, selectedTextureNodeIndex,
     showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux, autoRotatePreview, setAutoRotatePreview,
@@ -241,7 +241,7 @@ export const TextureControls = observer(({ dragMode }) => {
               ))}
             </Menu>
             <VertDivider />
-            <DragModeOptionsGroup dragMode={dragMode} />
+            <DragModeOptionsGroup />
             <VertDivider />
             <FormControlLabel
               className={classes.checkboxControlLabel}

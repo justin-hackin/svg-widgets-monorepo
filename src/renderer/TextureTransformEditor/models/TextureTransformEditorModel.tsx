@@ -1,5 +1,5 @@
 import { inRange } from 'lodash';
-import { Instance, types, resolvePath } from 'mobx-state-tree';
+import { Instance, resolvePath, types } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
 import { UndoManager } from 'mst-middlewares';
@@ -17,6 +17,8 @@ import {
   matrixTupleTransformPoint,
   negateMap,
 } from '../../common/util/2d-transform';
+import { ModifierTrackingModel } from './ModifierTrackingModel';
+
 
 const getCoverScale = (bounds, image) => {
   const widthScale = bounds.width / image.width;
@@ -38,6 +40,7 @@ const getFitScale = (bounds, image) => {
   };
 };
 
+
 export const TextureTransformEditorModel = types
   .model('TextureTransformEditor', {
     shapeName: types.maybe(types.string),
@@ -47,6 +50,7 @@ export const TextureTransformEditorModel = types
     placementAreaDimensions: types.maybe(DimensionsModel),
     viewScale: types.maybe(types.number),
     history: types.optional(UndoManager, {}),
+    modifierTracking: types.optional(ModifierTrackingModel, {}),
   })
   .volatile(() => ({
     shapeObject: null,

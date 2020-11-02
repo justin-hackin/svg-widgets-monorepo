@@ -8,7 +8,7 @@ const debug = require('electron-debug');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const {
-  default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS, MOBX_DEVTOOLS,
+  default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS,
 } = require('electron-devtools-installer');
 const { setupIpc, EVENTS, EVENT_TARGET_DELIMITER } = require('./ipc');
 
@@ -21,7 +21,7 @@ app.on('ready', async () => {
   if (isDevelopment) {
     // this works but main process emits:  (node:42552) ExtensionLoadWarning...
     // see https://github.com/electron/electron/issues/23662
-    installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS, MOBX_DEVTOOLS]);
+    installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
   }
   setupIpc(ipcMain, app);
   const { width, height } = electronScreen.getPrimaryDisplay().workAreaSize;

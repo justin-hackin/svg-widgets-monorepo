@@ -7,9 +7,9 @@ import { observer } from 'mobx-react';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
 import { TextureSvg } from './TextureSvg';
 import { useMst } from '../models';
-import { DRAG_MODES } from '../dragMode';
+import { DRAG_MODES } from '../models/ModifierTrackingModel';
 
-export const TextureArrangement = observer(({ dragMode }) => {
+export const TextureArrangement = observer(() => {
   const {
     placementAreaDimensions,
     absoluteMovementToSvg, translateAbsoluteCoordsToRelative,
@@ -17,6 +17,7 @@ export const TextureArrangement = observer(({ dragMode }) => {
     viewScalePercentStr, viewScaleCenterPercentStr,
     minImageScale, maxImageScale,
     viewScaleDiff, setViewScaleDiff, reconcileViewScaleDiff,
+    modifierTracking: { dragMode = DRAG_MODES.TRANSLATE } = {},
   } = useMst() || {};
   const {
     setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
