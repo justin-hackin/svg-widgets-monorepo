@@ -6,7 +6,7 @@
   "main": "dist/main/main.js",
   "scripts": {
     "dev": "electron-webpack dev",
-    "run-mobx-devtools": "npx mobx-devtools",
+    "mobx-devtools": "npx mobx-devtools",
     "compile": "electron-webpack",
     "electron": "node node_modules/electron/cli.js .",
     "dist": "npm run compile && electron-builder",
