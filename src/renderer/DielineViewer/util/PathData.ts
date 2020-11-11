@@ -1,5 +1,5 @@
 import {
-  cloneDeep, isNaN, includes,
+  cloneDeep, isNaN, includes, last,
 } from 'lodash';
 // @ts-ignore
 import { Point } from '@flatten-js/core';
@@ -23,6 +23,8 @@ const castToArray = (pt: Coord):PointTuple => {
   return pt;
 };
 
+const BEZIER_COMMAND_CODES = ['Q', 'T', 'C', 'S'];
+
 const commandToString = (command) => {
   if (command.code === 'Z') { return command.code; }
   if (includes(['L', 'M', 'T'], command.code)) {
@@ -45,45 +47,46 @@ const commandToString = (command) => {
 };
 
 export const COMMAND_FACTORY = {
-  M: (to:Coord):Command => ({
+  M: (to:Coord) => ({
     code: 'M',
     to: castToArray(to),
   }),
-  L: (to:Coord):Command => ({
+  L: (to:Coord) => ({
     code: 'L',
     to: castToArray(to),
   }),
-  C: (ctrl1:Coord, ctrl2:Coord, to:Coord):Command => ({
+  C: (ctrl1:Coord, ctrl2:Coord, to:Coord) => ({
     code: 'C',
     to: castToArray(to),
     ctrl1: castToArray(ctrl1),
     ctrl2: castToArray(ctrl2),
   }),
-  S: (ctrl2, to):Command => ({
+  S: (ctrl2, to) => ({
     code: 'S',
     to: castToArray(to),
     ctrl2: castToArray(ctrl2),
   }),
-  Q: (ctrl1:Coord, to:Coord):Command => ({
+  Q: (ctrl1:Coord, to:Coord) => ({
     code: 'Q',
     to: castToArray(to),
     ctrl1: castToArray(ctrl1),
   }),
-  T: (to:Coord):Command => ({
+  T: (to:Coord) => ({
     code: 'T',
     to: castToArray(to),
   }),
   A: (
     radiusX: number, radiusY: number, xAxisRotation: number, sweepFlag: boolean, largeArcFlag: boolean, to:Coord,
-  ):Command => ({
+  ) => ({
     code: 'A',
-    radius: [radiusX, radiusY],
+    rx: radiusX,
+    ry: radiusY,
     flags: [sweepFlag, largeArcFlag],
     to: castToArray(to),
     xAxisRotation,
 
   }),
-  Z: ():Command => ({
+  Z: () => ({
     code: 'Z',
   }),
 };
@@ -125,68 +128,87 @@ const parseSVG = (d) => {
 
 const composeSVG = (commands) => commands.map((command) => commandToString(command)).join(' ');
 
-interface Command {
-  code: string,
-  to?: PointTuple,
-  ctrl1?: PointTuple,
-  ctrl2?: PointTuple,
-  radius?: PointTuple,
-  flags?: [boolean, boolean],
-  xAxisRotation?: number,
-  value?: number,
-}
 
 export class PathData {
-  commands: Command[];
+  private _commands;
 
-  constructor(param?: Command[] | Coord) {
+  constructor(d?: string) {
     // TODO: check instance type
-    if (!param) {
-      this.commands = [];
-      return this;
-    }
-    // @ts-ignore
-    this.commands = param instanceof Point ? [COMMAND_FACTORY.M(param)] : param;
+    this._commands = d ? parseSVG(d) : [];
     return this;
   }
 
-  static fromDValue(d):PathData {
-    return new PathData(parseSVG(d));
+  private get _lastCommandExists() {
+    return !!this.commands.length;
+  }
+
+  private _assertLastCommandExists() {
+    if (!this._lastCommandExists) {
+      throw new Error('expected last command to exist but instead found empty commands list');
+    }
+  }
+
+  private _assertLastCommandIsBezier() {
+    this._assertLastCommandExists();
+    // @ts-ignore
+    const lastCode = last(this._commands).code;
+
+    if (!includes(BEZIER_COMMAND_CODES, lastCode)) {
+      throw new Error(`expected last command to be a bezier (command code one of ${BEZIER_COMMAND_CODES
+      }) but instead saw ${lastCode}`);
+    }
+  }
+
+
+  get commands() {
+    return this._commands;
   }
 
   move(to):PathData {
     const command = COMMAND_FACTORY.M(to);
-    this.commands.push(command);
+    this._commands.push(command);
     return this;
   }
 
   line(to):PathData {
+    this._assertLastCommandExists();
     const command = COMMAND_FACTORY.L(to);
-    this.commands.push(command);
+    this._commands.push(command);
     return this;
   }
 
   close():PathData {
+    this._assertLastCommandExists();
     const command = COMMAND_FACTORY.Z();
-    this.commands.push(command);
+    this._commands.push(command);
     return this;
   }
 
   cubicBezier(ctrl1: Coord, ctrl2: Coord, to: Coord):PathData {
+    this._assertLastCommandExists();
     const command = COMMAND_FACTORY.C(ctrl1, ctrl2, to);
-    this.commands.push(command);
+    this._commands.push(command);
+    return this;
+  }
+
+  smoothCubicBezier(ctrl2: Coord, to: Coord):PathData {
+    this._assertLastCommandIsBezier();
+    const command = COMMAND_FACTORY.S(ctrl2, to);
+    this._commands.push(command);
     return this;
   }
 
   quadraticBezier(ctrl1: Coord, to: Coord):PathData {
+    this._assertLastCommandExists();
     const command = COMMAND_FACTORY.Q(ctrl1, to);
-    this.commands.push(command);
+    this._commands.push(command);
     return this;
   }
 
   smoothQuadraticBezier(to: Coord):PathData {
+    this._assertLastCommandIsBezier();
     const command = COMMAND_FACTORY.T(to);
-    this.commands.push(command);
+    this._commands.push(command);
     return this;
   }
 
@@ -194,46 +216,49 @@ export class PathData {
     radiusX:number, radiusY:number, xAxisRotation:number, sweepFlag:boolean, largeArcFlag:boolean, to: Coord,
   ):PathData {
     const command = COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, sweepFlag, largeArcFlag, to);
-    this.commands.push(command);
+    this._commands.push(command);
     return this;
   }
 
   getLastMoveIndex(index) {
     for (let i = index - 1; i >= 0; i -= 1) {
-      if (this.commands[i].code.toUpperCase() === 'M') {
+      if (this._commands[i].code.toUpperCase() === 'M') {
         return i;
       }
     }
     return null;
   }
 
-  concatCommands(commands):PathData {
-    this.commands = this.commands.concat(cloneDeep(commands));
+  concatCommands(_commands):PathData {
+    this._commands = this._commands.concat(cloneDeep(_commands));
     return this;
   }
 
   concatPath(path):PathData {
-    this.commands = this.commands.concat(cloneDeep(path.commands));
+    this._commands = this._commands.concat(cloneDeep(path._commands));
     return this;
   }
 
+  // TODO: make this weldPath, throws error if first command in param doesn't match last endpoint
   // this could lead to the rendering of invalid svg
   // meant to be used in conjunction with concatPath to fuse paths that start and end at same the point
   sliceCommandsDangerously(...params):PathData {
-    this.commands = this.commands.slice(...params);
+    this._commands = this._commands.slice(...params);
     return this;
   }
 
   getDestinationPoints() {
-    return this.commands.filter((cmd) => cmd.to !== undefined).map((cmd) => cmd.to);
+    return this._commands.filter((cmd) => cmd.to !== undefined).map((cmd) => cmd.to);
   }
 
+  // TODO: getControlPoints, getInferredControlPoints
+
   transform(matrix:string) {
-    this.commands = parseSVG(svgpath(this.getD()).transform(matrix).toString());
+    this._commands = parseSVG(svgpath(this.getD()).transform(matrix).toString());
     return this;
   }
 
   getD():string {
-    return composeSVG(this.commands);
+    return composeSVG(this._commands);
   }
 }

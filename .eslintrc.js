@@ -13,6 +13,7 @@ module.exports = {
     'no-param-reassign': 0,
     'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
     'no-continue': 0,
+    'no-underscore-dangle': 0,
   },
   settings: {
     'import/extensions': [".js",".jsx",".ts",".tsx"],

@@ -12,7 +12,7 @@ export const TexturePathNodes = observer(() => {
   const classes = useStyles();
 
   if (!texture.pathD || !showNodes) { return null; }
-  const points = PathData.fromDValue(texture.pathD).getDestinationPoints();
+  const points = (new PathData(texture.pathD)).getDestinationPoints();
   return (
     <>
       {

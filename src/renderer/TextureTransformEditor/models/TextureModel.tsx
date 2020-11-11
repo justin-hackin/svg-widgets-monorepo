@@ -53,7 +53,7 @@ export const TextureModel = FaceDecorationModel
       return this.transformMatrixDragged && this.transformMatrixDragged.toString();
     },
     get destinationPoints() {
-      return PathData.fromDValue(self.pathD).getDestinationPoints();
+      return (new PathData(self.pathD)).getDestinationPoints();
     },
     get parentHistoryManager() {
       return getParentOfType(self, TextureTransformEditorModel).history;
