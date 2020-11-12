@@ -21,7 +21,6 @@ const castToArray = (pt: Coord):PointTuple => {
   return pt;
 };
 
-
 enum CommandCodes { M='M', L='L', C='C', S='S', Q='Q', T='T', A='A', Z='Z' }
 
 interface DestinationCommand {
