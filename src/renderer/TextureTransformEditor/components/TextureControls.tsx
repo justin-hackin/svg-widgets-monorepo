@@ -11,6 +11,7 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
+import clsx from 'clsx';
 
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
 import { EVENTS } from '../../../main/ipc';
@@ -86,7 +87,13 @@ export const TextureControls = observer(() => {
       color="inherit"
       position="fixed"
     >
-      <Toolbar className={classes.textureToolbar} variant="dense">
+      <Toolbar
+        className={clsx({
+          [classes.textureToolbar]: true,
+          [classes.textureToolbarWithTexture]: !!texture,
+        })}
+        variant="dense"
+      >
         <IconButton
           onClick={async () => {
             const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_FILE_PATH, {

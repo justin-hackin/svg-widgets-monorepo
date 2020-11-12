@@ -54,4 +54,9 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexWrap: 'wrap',
   },
+  textureToolbarWithTexture: {
+    [theme.breakpoints.down('md')]: {
+      justifyContent: 'space-around',
+    },
+  },
 }));
