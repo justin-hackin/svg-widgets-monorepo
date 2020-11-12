@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file,no-param-reassign */
 import { set } from 'lodash';
-import { Instance, types, resolvePath } from 'mobx-state-tree';
+import { Instance, types, tryResolve } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { UndoManager } from 'mst-middlewares';
@@ -75,9 +75,9 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   },
   getFileBasename() {
     return `${
-      resolvePath(self, 'pyramidNetSpec/pyramid/shapeName') || 'shape'
+      tryResolve(self, '/pyramidNetSpec/pyramid/shapeName') || 'shape'
     }__${
-      resolvePath(self, 'texture/sourceFileName') || 'undecorated'
+      tryResolve(self, '/texture/sourceFileName') || 'undecorated'
     }`;
   },
 })).actions((self) => {
