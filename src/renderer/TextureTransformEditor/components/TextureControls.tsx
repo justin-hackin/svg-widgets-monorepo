@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   TextField, InputAdornment,
-  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar, Divider,
+  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
@@ -20,9 +20,6 @@ import { VERY_SMALL_NUMBER } from '../../common/util/geom';
 import { HistoryButtons } from '../../DielineViewer/components/ControlPanel/components/HistoryButtons';
 import { useStyles } from '../style';
 
-const VertDivider = () => (
-  <Divider orientation="vertical" flexItem variant="middle" />
-);
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -104,19 +101,15 @@ export const TextureControls = observer(() => {
         >
           <FolderOpenIcon fontSize="large" />
         </IconButton>
-        <VertDivider />
         <HistoryButtons history={history} />
         {texture && (
           <>
-            <VertDivider />
             <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
               <GetAppIcon />
             </IconButton>
-            <VertDivider />
             <IconButton onClick={() => { sendTexture(); }} aria-label="send texture" component="span">
               <TelegramIcon fontSize="large" />
             </IconButton>
-            <VertDivider />
             <FormControlLabel
               className={classes.checkboxControlLabel}
               labelPlacement="top"
@@ -131,7 +124,6 @@ export const TextureControls = observer(() => {
               )}
               label="Node selection"
             />
-            <VertDivider />
             <PanelSlider
               className={classes.nodeScaleMuxSlider}
               setter={(val) => {
@@ -144,7 +136,6 @@ export const TextureControls = observer(() => {
               max={10}
               step={VERY_SMALL_NUMBER}
             />
-            <VertDivider />
             <FormControlLabel
               className={classes.checkboxControlLabel}
               labelPlacement="top"
@@ -159,7 +150,6 @@ export const TextureControls = observer(() => {
               )}
               label="Fill is positive"
             />
-            <VertDivider />
             <TextField
               className={classes.rotationInput}
               label="Rotate"
@@ -183,7 +173,6 @@ export const TextureControls = observer(() => {
               }}
               variant="filled"
             />
-            <VertDivider />
             <Button
               startIcon={<TrackChangesIcon />}
               aria-controls="simple-menu"
@@ -240,9 +229,7 @@ export const TextureControls = observer(() => {
                 </MenuItem>
               ))}
             </Menu>
-            <VertDivider />
             <DragModeOptionsGroup />
-            <VertDivider />
             <FormControlLabel
               className={classes.checkboxControlLabel}
               labelPlacement="top"
