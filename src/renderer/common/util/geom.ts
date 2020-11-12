@@ -1,18 +1,36 @@
 // @ts-ignore
 import { Line, Point } from '@flatten-js/core';
-import { isNaN, range } from 'lodash';
+import { isNaN, range, isNumber } from 'lodash';
 
 import { circularSlice } from '../../../common/util/data';
 
-export interface PointLike {
+export interface RawPoint {
   x: number,
   y: number,
-  [x: string]: any,
 }
 
+export interface PointLike extends Point {
+  [x: string]: any
+}
 // TODO: too a loose definition but [number, number] causes issues with mapping coords
 export type PointTuple = Array<number>;
 export type Coord = PointTuple | PointLike;
+const isPointLike = (coord: Coord): coord is PointLike => isNumber((coord as PointLike).x)
+  && isNumber((coord as PointLike).y);
+
+export const castCoordToRawPoint = (coord: Coord): RawPoint => {
+  if (isPointLike(coord)) {
+    const { x, y } = coord as PointLike;
+    return { x, y };
+  }
+  if ((coord as PointTuple).length !== 2) {
+    throw new Error(`expected a PointLike object or an array of length 2 but instead saw ${coord}`);
+  }
+  const [x, y] = coord as PointTuple;
+  return { x, y };
+};
+
+export const rawPointToString = ({ x, y }: RawPoint) => `${x},${y}`;
 
 export const PHI:number = (1 + Math.sqrt(5)) / 2;
 export const CM_TO_PIXELS_RATIO = 37.7952755906;

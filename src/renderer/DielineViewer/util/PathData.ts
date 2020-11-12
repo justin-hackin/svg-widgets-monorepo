@@ -1,30 +1,16 @@
-import { cloneDeep, isNaN, includes } from 'lodash';
+import { cloneDeep, includes } from 'lodash';
 // @ts-ignore
-import { Point } from '@flatten-js/core';
 import svgpath from 'svgpath';
-
-import { PointTuple, Coord } from '../../common/util/geom';
+import {
+  castCoordToRawPoint, Coord, RawPoint, rawPointToString,
+} from '../../common/util/geom';
 
 /* eslint-disable no-param-reassign */
-
-const castToArray = (pt: Coord):PointTuple => {
-  if (pt instanceof Point) {
-    // @ts-ignore
-    const arrPt:PointTuple = [pt.x, pt.y];
-    // @ts-ignore
-    if (isNaN(pt.x) || isNaN(pt.y)) {
-      throw new Error(`point co-ordinates contain NaN: (${arrPt})`);
-    }
-    return arrPt;
-  }
-  // @ts-ignore
-  return pt;
-};
 
 enum CommandCodes { M='M', L='L', C='C', S='S', Q='Q', T='T', A='A', Z='Z' }
 
 interface DestinationCommand {
-  to: PointTuple
+  to: RawPoint
 }
 
 interface MoveCommand extends DestinationCommand {
@@ -37,18 +23,18 @@ interface LineCommand extends DestinationCommand {
 
 interface CubicBezierCommand extends DestinationCommand {
   code: CommandCodes.C
-  ctrl1: PointTuple
-  ctrl2: PointTuple
+  ctrl1: RawPoint
+  ctrl2: RawPoint
 }
 
 interface SymmetricCubicBezierCommand extends DestinationCommand{
   code: CommandCodes.S
-  ctrl2: PointTuple
+  ctrl2: RawPoint
 }
 
 interface QuadraticBezierCommand extends DestinationCommand {
   code: CommandCodes.Q
-  ctrl1: PointTuple
+  ctrl1: RawPoint
 }
 
 interface SymmetricQuadraticBezierCommand extends DestinationCommand {
@@ -93,53 +79,54 @@ const isDestinationCommand = (command: Command): boolean => !!((command as Desti
 const commandToString = (command) => {
   if (command.code === CommandCodes.Z) { return command.code; }
   if (hasOnlyToParam(command)) {
-    return `${command.code} ${command.to.join(',')}`;
+    return `${command.code} ${rawPointToString(command.to)}`;
   }
   if (command.code === CommandCodes.Q) {
-    return `${command.code} ${command.ctrl1.join(',')} ${command.to.join(',')}`;
+    return `${command.code} ${rawPointToString(command.ctrl1)} ${rawPointToString(command.to)}`;
   }
   if (command.code === CommandCodes.C) {
-    return `${command.code} ${command.ctrl1.join(',')} ${command.ctrl2.join(',')} ${command.to.join(',')}`;
+    return `${command.code} ${rawPointToString(command.ctrl1)} ${rawPointToString(command.ctrl2)} ${
+      rawPointToString(command.to)}`;
   }
   if (command.code === CommandCodes.S) {
-    return `${command.code} ${command.ctrl2.join(',')} ${command.to.join(',')}`;
+    return `${command.code} ${command.ctrl2} ${rawPointToString(command.to)}`;
   }
   if (command.code === CommandCodes.A) {
     const booleanToFlag = (flag) => (flag ? 1 : 0);
     return `${command.code} ${command.rx} ${command.ry} ${command.xAxisRotation} ${
-      booleanToFlag(command.sweepFlag)} ${booleanToFlag(command.largeArcFlag)} ${command.to.join(',')}`;
+      booleanToFlag(command.sweepFlag)} ${booleanToFlag(command.largeArcFlag)} ${rawPointToString(command.to)}`;
   }
   throw new Error('Unrecognized command code');
 };
 
-export const COMMAND_FACTORY: Record<CommandCodes, (...any)=> Command> = {
+export const COMMAND_FACTORY = {
   M: (to:Coord):MoveCommand => ({
     code: CommandCodes.M,
-    to: castToArray(to),
+    to: castCoordToRawPoint(to),
   }),
   L: (to:Coord):LineCommand => ({
     code: CommandCodes.L,
-    to: castToArray(to),
+    to: castCoordToRawPoint(to),
   }),
   C: (ctrl1:Coord, ctrl2:Coord, to:Coord):CubicBezierCommand => ({
     code: CommandCodes.C,
-    to: castToArray(to),
-    ctrl1: castToArray(ctrl1),
-    ctrl2: castToArray(ctrl2),
+    to: castCoordToRawPoint(to),
+    ctrl1: castCoordToRawPoint(ctrl1),
+    ctrl2: castCoordToRawPoint(ctrl2),
   }),
   S: (ctrl2, to):SymmetricCubicBezierCommand => ({
     code: CommandCodes.S,
-    to: castToArray(to),
-    ctrl2: castToArray(ctrl2),
+    to: castCoordToRawPoint(to),
+    ctrl2: castCoordToRawPoint(ctrl2),
   }),
   Q: (ctrl1:Coord, to:Coord): QuadraticBezierCommand => ({
     code: CommandCodes.Q,
-    to: castToArray(to),
-    ctrl1: castToArray(ctrl1),
+    to: castCoordToRawPoint(to),
+    ctrl1: castCoordToRawPoint(ctrl1),
   }),
   T: (to:Coord):SymmetricQuadraticBezierCommand => ({
     code: CommandCodes.T,
-    to: castToArray(to),
+    to: castCoordToRawPoint(to),
   }),
   A: (
     radiusX: number, radiusY: number, xAxisRotation: number, sweepFlag: boolean, largeArcFlag: boolean, to:Coord,
@@ -150,9 +137,9 @@ export const COMMAND_FACTORY: Record<CommandCodes, (...any)=> Command> = {
     sweepFlag,
     largeArcFlag,
     xAxisRotation,
-    to: castToArray(to),
+    to: castCoordToRawPoint(to),
   }),
-  Z: () => ({
+  Z: ():CloseCommand => ({
     code: CommandCodes.Z,
   }),
 };
@@ -224,64 +211,56 @@ export class PathData {
     }
   }
 
-
   get commands() {
     return this._commands;
   }
 
-  move(to):PathData {
-    const command = COMMAND_FACTORY.M(to);
-    this._commands.push(command);
+  move(to:Coord):PathData {
+    this._commands.push(COMMAND_FACTORY.M(to));
     return this;
   }
 
-  line(to):PathData {
+  line(to:Coord):PathData {
     this._assertLastCommandExists();
-    const command = COMMAND_FACTORY.L(to);
-    this._commands.push(command);
+    this._commands.push(COMMAND_FACTORY.L(to));
     return this;
   }
 
   close():PathData {
     this._assertLastCommandExists();
-    const command = COMMAND_FACTORY.Z();
-    this._commands.push(command);
+    this._commands.push(COMMAND_FACTORY.Z());
     return this;
   }
 
   cubicBezier(ctrl1: Coord, ctrl2: Coord, to: Coord):PathData {
     this._assertLastCommandExists();
-    const command = COMMAND_FACTORY.C(ctrl1, ctrl2, to);
-    this._commands.push(command);
+    this._commands.push(COMMAND_FACTORY.C(ctrl1, ctrl2, to));
     return this;
   }
 
   smoothCubicBezier(ctrl2: Coord, to: Coord):PathData {
     this._assertLastCommandIsBezier();
-    const command = COMMAND_FACTORY.S(ctrl2, to);
-    this._commands.push(command);
+    this._commands.push(COMMAND_FACTORY.S(ctrl2, to));
     return this;
   }
 
   quadraticBezier(ctrl1: Coord, to: Coord):PathData {
     this._assertLastCommandExists();
-    const command = COMMAND_FACTORY.Q(ctrl1, to);
-    this._commands.push(command);
+    this._commands.push(COMMAND_FACTORY.Q(ctrl1, to));
     return this;
   }
 
   smoothQuadraticBezier(to: Coord):PathData {
     this._assertLastCommandIsBezier();
-    const command = COMMAND_FACTORY.T(to);
-    this._commands.push(command);
+    this._commands.push(COMMAND_FACTORY.T(to));
     return this;
   }
 
   ellipticalArc(
     radiusX:number, radiusY:number, xAxisRotation:number, sweepFlag:boolean, largeArcFlag:boolean, to: Coord,
   ):PathData {
-    const command = COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, sweepFlag, largeArcFlag, to);
-    this._commands.push(command);
+    this._assertLastCommandExists();
+    this._commands.push(COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, sweepFlag, largeArcFlag, to));
     return this;
   }
 

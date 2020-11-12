@@ -1,6 +1,5 @@
 // @ts-ignore
-import { Point } from '@flatten-js/core';
-import { last, range } from 'lodash';
+import { range } from 'lodash';
 import { Instance, types } from 'mobx-state-tree';
 
 import { PathData } from '../PathData';
@@ -46,7 +45,6 @@ export const ascendantEdgeConnectionTabs = (
     lineLerp(start, end, tabIntervalRatios[tabNum][1]),
   ];
 
-  const maleScoreLineIntervals = [];
 
   const commands = {
     female: {
@@ -76,7 +74,6 @@ export const ascendantEdgeConnectionTabs = (
     );
 
     // @ts-ignore
-    maleScoreLineIntervals.push([new Point(...tabPath.commands[0].to), new Point(...last(tabPath.commands).to)]);
     tabPath.sliceCommandsDangerously(1);
     // roundedEdgePath assumes first point is move command but we needed and applied line
     commands.male.cut.concatPath(tabPath);
