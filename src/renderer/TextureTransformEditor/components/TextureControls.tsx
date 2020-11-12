@@ -89,7 +89,7 @@ export const TextureControls = observer(() => {
       color="inherit"
       position="fixed"
     >
-      <Toolbar variant="dense">
+      <Toolbar className={classes.textureToolbar} variant="dense">
         <IconButton
           onClick={async () => {
             const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_FILE_PATH, {

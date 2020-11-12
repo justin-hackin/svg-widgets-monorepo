@@ -50,4 +50,8 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   nodeScaleMuxSlider: {
     width: theme.spacing(10),
   },
+  textureToolbar: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
 }));
