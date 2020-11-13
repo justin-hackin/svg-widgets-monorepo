@@ -1,8 +1,9 @@
 import {
 // @ts-ignore
-  Line, point, Point, vector,
+  Line, point, Point, Polygon,
 } from '@flatten-js/core';
 import { isNaN, isNumber, range } from 'lodash';
+import { offset } from '@flatten-js/polygon-offset';
 
 import { circularSlice } from '../../../common/util/data';
 
@@ -39,9 +40,11 @@ export const CM_TO_PIXELS_RATIO = 37.7952755906;
 
 export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
 export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);
-export const pointFromPolar = (theta, length) => castCoordToRawPoint(Point.fromPolar([theta, length]));
-export const distanceFromOrigin = ({ x, y }) => vector(x, y).length;
-export const angleRelativeToOrigin = ({ x, y }) => vector(x, y).angle;
+export const pointFromPolar = (theta, length):RawPoint => ({
+  x: Math.cos(theta) * length, y: Math.sin(theta) * length,
+});
+export const distanceFromOrigin = ({ x, y }) => Math.sqrt(x ** 2 + y ** 2);
+export const angleRelativeToOrigin = ({ x, y }) => Math.atan2(y, x);
 
 export function triangleAnglesGivenSides(sideLengths) {
   if (sideLengths.length !== 3) {
@@ -186,3 +189,16 @@ export const distanceBetweenPoints = (pt1: PointLike, pt2: PointLike):number => 
 export const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
 export const VERY_SMALL_NUMBER = 0.00000001;
 export const VERY_LARGE_NUMBER = 1000000000000000;
+const polygonWithFace = (face: PointLike[]) => {
+  if (face.length < 2) {
+    throw new Error('polygonWithFace: face parameter must have 2 or more elements');
+  }
+  const theFace = face.map(({ x, y }) => (new Point(x, y)));
+  const poly = new Polygon();
+  poly.addFace(theFace);
+  return poly;
+};
+export const offsetPolygonPoints = (points: RawPoint[], offsetDistance) => {
+  const poly = polygonWithFace(points);
+  return offset(poly, offsetDistance).vertices.map(castCoordToRawPoint);
+};

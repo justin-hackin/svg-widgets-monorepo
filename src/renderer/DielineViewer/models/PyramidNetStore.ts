@@ -3,19 +3,13 @@ import { reaction } from 'mobx';
 import {
   Instance, types, resolveIdentifier, getParent,
 } from 'mobx-state-tree';
-// @ts-ignore
-import { Polygon } from '@flatten-js/core';
-// @ts-ignore
-import { offset } from '@flatten-js/polygon-offset';
-// @ts-ignore
-import { subtract } from '@flatten-js/boolean-op';
 import {
   chunk, debounce, flatten, range,
 } from 'lodash';
 
 import { polyhedra } from '../data/polyhedra';
 import {
-  CM_TO_PIXELS_RATIO, getTextureTransformMatrix,
+  CM_TO_PIXELS_RATIO, getTextureTransformMatrix, offsetPolygonPoints,
   polygonPointsGivenAnglesAndSides, RawPoint, scalePoint,
   triangleAnglesGivenSides,
 } from '../../common/util/geom';
@@ -24,7 +18,7 @@ import { closedPolygonPath } from '../util/shapes/generic';
 import { AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
 import { DashPatternModel } from '../util/shapes/strokeDashPath';
-import { polygonWithFace } from '../../../common/util/svg';
+import { pathDToViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
@@ -110,7 +104,7 @@ export const PyramidNetModel = types.model({
       return triangleAnglesGivenSides(this.normalizedFaceEdgeLengths);
     },
 
-    get decorationBoundaryPoints() {
+    get faceBoundaryPoints() {
       return polygonPointsGivenAnglesAndSides(this.faceInteriorAngles, this.actualFaceEdgeLengths);
     },
 
@@ -140,29 +134,18 @@ export const PyramidNetModel = types.model({
       return this.actualFaceEdgeLengths[0] * tabDepthToTraversalLength;
     },
 
-    get borderPolygon(): Polygon {
-      return this.decorationBoundaryPoints && polygonWithFace(this.decorationBoundaryPoints);
-    },
-
-    get insetPolygon(): Polygon {
-      return offset(this.borderPolygon, -this.ascendantEdgeTabDepth);
-    },
-    get normalizedInsetPolygon(): Polygon {
-      return offset(
-        polygonWithFace(this.normalizedDecorationBoundaryPoints),
-        -this.ascendantEdgeTabDepth / this.faceLengthAdjustRatio,
-      );
-    },
-    // TODO: make use of this by adding a toggle to render it to PyramidNet
-    get borderOverlay(): Polygon {
-      return subtract(this.borderPolygon, this.insetPolygon);
-    },
     get borderToInsetRatio() {
-      return (this.borderPolygon.box.width) / this.insetPolygon.box.width;
+      const insetPolygonPoints = offsetPolygonPoints(this.faceBoundaryPoints, -this.ascendantEdgeTabDepth);
+      return pathDToViewBoxAttrs(closedPolygonPath(this.faceBoundaryPoints).getD()).width
+        / pathDToViewBoxAttrs(closedPolygonPath(insetPolygonPoints).getD()).width;
     },
 
     get insetToBorderOffset() {
-      return scalePoint(this.normalizedInsetPolygon.vertices[0], -this.borderToInsetRatio);
+      const normalizedInsetPoints = offsetPolygonPoints(
+        this.normalizedDecorationBoundaryPoints,
+        -this.ascendantEdgeTabDepth / this.faceLengthAdjustRatio,
+      );
+      return scalePoint(normalizedInsetPoints[0], -this.borderToInsetRatio);
     },
     // get borderInsetFaceHoleTransform() {
     //   return `translate(${self.insetPolygon.vertices[0].x}, ${self.insetPolygon.vertices[0].y}) scale(${
@@ -171,7 +154,8 @@ export const PyramidNetModel = types.model({
 
     get borderInsetFaceHoleTransformMatrix(): DOMMatrixReadOnly {
       const scale = 1 / this.borderToInsetRatio;
-      const { x: inX, y: inY } = this.insetPolygon.vertices[0];
+      const insetPolygonPoints = offsetPolygonPoints(this.faceBoundaryPoints, -this.ascendantEdgeTabDepth);
+      const { x: inX, y: inY } = insetPolygonPoints[0];
       return (new DOMMatrixReadOnly()).translate(inX, inY).scale(scale, scale);
     },
 

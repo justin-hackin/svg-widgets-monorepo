@@ -19,7 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "@flatten-js/boolean-op": "^1.1.4",
-    "@flatten-js/core": "git+https://github.com/justin-hackin/flatten-js.git",
+    "@flatten-js/core": "^1.2.16",
     "@flatten-js/polygon-offset": "^1.0.5",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
