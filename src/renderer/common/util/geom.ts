@@ -12,7 +12,7 @@ export interface RawPoint {
   y: number,
 }
 
-export interface PointLike extends Point {
+export interface PointLike extends RawPoint {
   [x: string]: any
 }
 

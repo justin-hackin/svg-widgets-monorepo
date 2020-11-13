@@ -6,7 +6,7 @@ import { PathData } from '../PathData';
 import {
   distanceFromOrigin,
   lineLerp,
-  PointLike,
+  RawPoint,
   subtractPoints,
   symmetricHingePlotByProjectionDistance,
 } from '../../../common/util/geom';
@@ -32,7 +32,7 @@ export interface IAscendantEdgeTabsModel extends Instance<typeof AscendantEdgeTa
 }
 
 export const ascendantEdgeConnectionTabs = (
-  start: PointLike, end: PointLike,
+  start: RawPoint, end: RawPoint,
   tabSpec: IAscendantEdgeTabsModel, scoreDashSpec: IDashPatternModel, tabIntervalRatios, tabGapIntervalRatios,
 ): AscendantEdgeConnectionPaths => {
   const {

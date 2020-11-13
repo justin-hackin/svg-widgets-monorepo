@@ -1,4 +1,3 @@
-import { last } from 'lodash';
 import {
   hingedPlot, PointLike, RawPoint,
 } from '../../../common/util/geom';
@@ -9,26 +8,31 @@ interface RoundPoint {
   retractionDistance: number
 }
 
-// TODO: appears this is incoorect
 type RoundPointPointsItem = PointLike | RoundPoint;
-// https://github.com/alexbol99/flatten-js/issues/14
+const isPointLike = (item: RoundPointPointsItem): item is PointLike => {
+  const pt = (item as PointLike);
+  return pt.x !== undefined && pt.y !== undefined;
+};
+
 export const roundedEdgePath = (points: RoundPointPointsItem[], retractionDistance: number): PathData => {
   const path = new PathData();
-  points.slice(1, -1).reduce((acc: PathData, point, pointIndex) => {
-    const thisPoint = (point.point || point as PointLike);
-    const thisRetractionDistance = point.retractionDistance || retractionDistance;
-    const toward = (points[pointIndex + 2].point || points[pointIndex + 2] as PointLike);
-    const fromPoint = (points[pointIndex].point || points[pointIndex] as PointLike);
+  const pointOfRoundPoint = (roundPoint: RoundPointPointsItem):RawPoint => (isPointLike(roundPoint)
+    ? roundPoint : roundPoint.point);
+  points.slice(1, -1).reduce((acc: PathData, item, pointIndex) => {
+    const thisPoint = pointOfRoundPoint(item);
+    const thisRetractionDistance = (item as RoundPoint).retractionDistance || retractionDistance;
+    const toward = pointOfRoundPoint(points[pointIndex + 2]);
+    const fromPoint = pointOfRoundPoint(points[pointIndex]);
     const curveStart = hingedPlot(fromPoint, thisPoint, 0, thisRetractionDistance);
     const curveEnd = hingedPlot(toward, thisPoint, 0, thisRetractionDistance);
     if (pointIndex) { acc.line(curveStart); } else { acc.move(curveStart); }
     acc.quadraticBezier(thisPoint, curveEnd);
     return acc;
   }, path);
-  return path.line(last(points));
+  return path.line(pointOfRoundPoint(points[points.length - 1]));
 };
 
-export const connectedLineSegments = (points: RawPoint[]) => {
+export const connectedLineSegments = (points: PointLike[]) => {
   const path = new PathData();
   path.move(points[0]);
   for (const pt of points.slice(1)) {
@@ -37,4 +41,4 @@ export const connectedLineSegments = (points: RawPoint[]) => {
   return path;
 };
 
-export const closedPolygonPath = (points: RawPoint[]) => connectedLineSegments(points).close();
+export const closedPolygonPath = (points: PointLike[]) => connectedLineSegments(points).close();
