@@ -16,6 +16,16 @@ export interface PointLike extends Point {
   [x: string]: any
 }
 
+// NOTE: where possible, avoid direct use of flatten-js classes and instead use RawPoint or construct helper function
+// flatten-js is designed to conform to formal mathematical definitions and has an inconvenient interface
+// vectors have arithmetic operators but can't be used to construct polygons and lines.
+// Points can be used to construct polygons and lines, but don't have arithmetic operators
+// flatten-js is designed to directly render DOM strings and is ill-suited for use with React
+// e.g. if you construct a Polygon, there's no documented way to get a path d-attribute for that polygon,
+// there's only a way to render it to a DOM string containing a <path>
+// (blurs separation of concerns between data and view)
+// However, flatten-js features many valuable computations that are not present in other libraries
+
 export type PointTuple = [number, number];
 export type Coord = PointTuple | PointLike;
 const isPointLike = (coord: Coord): coord is PointLike => isNumber((coord as PointLike).x)

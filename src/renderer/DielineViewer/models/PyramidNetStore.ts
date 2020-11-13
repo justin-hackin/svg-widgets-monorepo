@@ -18,7 +18,7 @@ import { closedPolygonPath } from '../util/shapes/generic';
 import { AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
 import { DashPatternModel } from '../util/shapes/strokeDashPath';
-import { pathDToViewBoxAttrs } from '../../../common/util/svg';
+import { boundingViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
@@ -136,8 +136,8 @@ export const PyramidNetModel = types.model({
 
     get borderToInsetRatio() {
       const insetPolygonPoints = offsetPolygonPoints(this.faceBoundaryPoints, -this.ascendantEdgeTabDepth);
-      return pathDToViewBoxAttrs(closedPolygonPath(this.faceBoundaryPoints).getD()).width
-        / pathDToViewBoxAttrs(closedPolygonPath(insetPolygonPoints).getD()).width;
+      return boundingViewBoxAttrs(closedPolygonPath(this.faceBoundaryPoints).getD()).width
+        / boundingViewBoxAttrs(closedPolygonPath(insetPolygonPoints).getD()).width;
     },
 
     get insetToBorderOffset() {

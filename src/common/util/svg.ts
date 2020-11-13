@@ -33,13 +33,22 @@ export const getDimensionsFromPathD = (d) => {
   };
 };
 
-export const pathDToViewBoxAttrs = (d) => {
-  const [xmin, ymin, xmax, ymax] = svgPathBbox(d);
+interface ViewBoxAttrs {
+  xmin: number
+  ymin: number
+  xmax: number
+  ymax: number
+  width: number
+  height: number
+}
+
+export const boundingViewBoxAttrs = (pathD:string):ViewBoxAttrs => {
+  const [xmin, ymin, xmax, ymax] = svgPathBbox(pathD);
   return {
     xmin, ymin, xmax, ymax, width: xmax - xmin, height: ymax - ymin,
   };
 };
 
-export const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
+export const viewBoxAttrsToString = (vb:ViewBoxAttrs) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
 
-export const pathDToViewBoxStr = (d) => viewBoxAttrsToString(pathDToViewBoxAttrs(d));
+export const pathDToViewBoxStr = (d:string) => viewBoxAttrsToString(boundingViewBoxAttrs(d));
