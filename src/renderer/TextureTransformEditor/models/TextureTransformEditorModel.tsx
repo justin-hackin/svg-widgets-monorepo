@@ -19,7 +19,6 @@ import {
 } from '../../common/util/2d-transform';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 
-
 const getCoverScale = (bounds, image) => {
   const widthScale = bounds.width / image.width;
   const heightScale = bounds.height / image.height;
@@ -245,8 +244,9 @@ export const TextureTransformEditorModel = types
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
+      const { x, y } = self.selectedTextureNode;
       const svgTextureNode = matrixTupleTransformPoint(
-        self.texture.transformMatrixDragged, self.selectedTextureNode,
+        self.texture.transformMatrixDragged, [x, y],
       );
       const diff = addTuple(svgTextureNode, self.decorationBoundary.vertices[vertexIndex].map(negateMap));
       self.texture.translate = addTuple(diff.map(negateMap), self.texture.translate);

@@ -16,7 +16,7 @@ export const TexturePathNodes = observer(() => {
   return (
     <>
       {
-        points.map(([cx, cy], index) => {
+        points.map(({ x: cx, y: cy }, index) => {
           const longerTextureSideLength = imageCoverScale.widthIsClamp
             ? texture.dimensions.width : texture.dimensions.height;
           return (
