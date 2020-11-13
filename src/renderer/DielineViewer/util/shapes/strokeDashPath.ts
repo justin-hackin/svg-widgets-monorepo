@@ -1,7 +1,9 @@
 import { last, range, sum } from 'lodash';
 import { Instance, types } from 'mobx-state-tree';
 
-import { lineLerp, PointLike } from '../../../common/util/geom';
+import {
+  distanceFromOrigin, lineLerp, PointLike, subtractPoints,
+} from '../../../common/util/geom';
 import { PathData } from '../PathData';
 import { StrokeDashPathPatternModel } from '../../data/dash-patterns';
 
@@ -28,13 +30,13 @@ export function strokeDashPathRatios(
   start: PointLike, end: PointLike, dashSpec: IDashPatternModel,
 ) {
   if (!dashSpec) { return [[0, 1]]; }
-  const vector = end.subtract(start);
+  const vector = subtractPoints(end, start);
+  const vectorLength = distanceFromOrigin(vector);
   const {
     strokeDashPathPattern: { relativeStrokeDasharray },
     strokeDashLength,
     strokeDashOffsetRatio,
   } = dashSpec;
-  const vectorLength = vector.length;
   const strokeDashLengthToVectorLength = strokeDashLength / vectorLength;
 
   const dashArrayTotalLength = sum(relativeStrokeDasharray);

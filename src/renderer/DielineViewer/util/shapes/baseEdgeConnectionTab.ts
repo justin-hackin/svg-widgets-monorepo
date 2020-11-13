@@ -6,9 +6,8 @@ import {
   hingedPlot,
   hingedPlotByProjectionDistance,
   hingedPlotLerp,
-  intersectLineLine,
-  PointLike,
-  VERY_LARGE_NUMBER,
+  getLineLineIntersection,
+  VERY_LARGE_NUMBER, RawPoint,
 } from '../../../common/util/geom';
 import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
 import { connectedLineSegments } from './generic';
@@ -50,7 +49,7 @@ export interface IBaseEdgeTabsModel extends Instance<typeof BaseEdgeTabsModel> {
 }
 
 export function baseEdgeConnectionTab(
-  start: PointLike, end: PointLike,
+  start: RawPoint, end: RawPoint,
   ascendantEdgeTabDepth, tabSpec: IBaseEdgeTabsModel, scoreDashSpec: IDashPatternModel,
 ): BaseEdgeConnectionTab {
   const {
@@ -117,7 +116,7 @@ export function baseEdgeConnectionTab(
       hingedPlot(mid, handleValleyDip, Math.PI - valleyTheta, VERY_LARGE_NUMBER),
     ];
     const handleValleyEdges = handleValleyEdgeCasters.map(
-      (castPt) => intersectLineLine(handleEdges[0], handleEdges[1], handleValleyDip, castPt),
+      (castPt) => getLineLineIntersection(handleEdges[0], handleEdges[1], handleValleyDip, castPt),
     );
     handleCornerPoints.push(handleValleyEdges[0], handleValleyDip, handleValleyEdges[1]);
   }

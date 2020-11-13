@@ -3,7 +3,6 @@ import { Instance, resolvePath, types } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
 import { UndoManager } from 'mst-middlewares';
-import { PointTuple } from '../../common/util/geom';
 import { BoundaryModel } from './BoundaryModel';
 // eslint-disable-next-line import/no-cycle
 import { TextureModel } from './TextureModel';
@@ -11,13 +10,10 @@ import { TextureModel } from './TextureModel';
 import { DimensionsModel } from './DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
-import {
-  addTuple,
-  calculateTransformOriginChangeOffset,
-  matrixTupleTransformPoint,
-  negateMap,
-} from '../../common/util/2d-transform';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
+import {
+  calculateTransformOriginChangeOffset, getOriginPoint, scalePoint, sumPoints, transformPoint,
+} from '../../common/util/geom';
 
 const getCoverScale = (bounds, image) => {
   const widthScale = bounds.width / image.width;
@@ -101,9 +97,7 @@ export const TextureTransformEditorModel = types
     get faceBoundary() {
       if (!self.decorationBoundary || !self.borderToInsetRatio) { return undefined; }
       const vertices = self.decorationBoundary.vertices
-        .map(([x, y]) => [
-          (x * self.borderToInsetRatio) + self.insetToBorderOffset[0],
-          (y * self.borderToInsetRatio) + self.insetToBorderOffset[1]]);
+        .map((pt) => sumPoints(scalePoint(pt, self.borderToInsetRatio), self.insetToBorderOffset));
       return BoundaryModel.create({ vertices });
     },
   })).actions((self) => ({
@@ -148,15 +142,21 @@ export const TextureTransformEditorModel = types
       const { height, width, xmin } = viewBoxAttrs;
       const { scale, widthIsClamp } = self.imageCoverScale;
       self.texture.translate = widthIsClamp
-        ? [xmin, (height - (textureDimensions.height * scale)) / 2]
-        : [xmin + (width - (textureDimensions.width * scale)) / 2, 0];
+        ? { x: xmin, y: (height - (textureDimensions.height * scale)) / 2 }
+        : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 };
       self.texture.scale = self.imageCoverScale.scale;
     },
     setTextureInstance(pathD, sourceFileName) {
       self.showNodes = false;
       self.selectedTextureNodeIndex = null;
       self.texture = TextureModel.create({
-        pathD, sourceFileName, scale: 1, rotate: 0, translate: [0, 0], transformOrigin: [0, 0], isPositive: true,
+        pathD,
+        sourceFileName,
+        scale: 1,
+        rotate: 0,
+        translate: getOriginPoint(),
+        transformOrigin: getOriginPoint(),
+        isPositive: true,
       });
     },
     setTexturePath(pathD, sourceFileName, recenterPath = false) {
@@ -219,10 +219,10 @@ export const TextureTransformEditorModel = types
       }
     },
     absoluteMovementToSvg(absCoords) {
-      return absCoords.map((coord) => coord / (self.viewScaleDragged * self.faceFittingScale.scale));
+      return scalePoint(absCoords, 1 / (self.viewScaleDragged * self.faceFittingScale.scale));
     },
-    translateAbsoluteCoordsToRelative(absCoords: PointTuple) {
-      return matrixTupleTransformPoint(
+    translateAbsoluteCoordsToRelative(absCoords) {
+      return transformPoint(
         ((new DOMMatrixReadOnly())
           .scale(self.texture.scaleDragged, self.texture.scaleDragged)
           .rotate(self.texture.rotateDragged)
@@ -234,36 +234,38 @@ export const TextureTransformEditorModel = types
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
-      const originAbsolute = matrixTupleTransformPoint(
+      const originAbsolute = transformPoint(
         self.texture.transformMatrixDragged, self.texture.transformOrigin,
       );
-      const delta = addTuple(originAbsolute.map(negateMap), self.decorationBoundary.vertices[vertexIndex]);
-      self.texture.translate = addTuple(delta, self.texture.translate);
+      self.texture.translate = sumPoints(
+        self.texture.translate,
+        scalePoint(originAbsolute, -1),
+        self.decorationBoundary.vertices[vertexIndex],
+      );
     },
     repositionSelectedNodeOverCorner(vertexIndex) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
-      const { x, y } = self.selectedTextureNode;
-      const svgTextureNode = matrixTupleTransformPoint(
-        self.texture.transformMatrixDragged, [x, y],
+      const svgTextureNode = transformPoint(
+        self.texture.transformMatrixDragged, self.selectedTextureNode,
       );
-      const diff = addTuple(svgTextureNode, self.decorationBoundary.vertices[vertexIndex].map(negateMap));
-      self.texture.translate = addTuple(diff.map(negateMap), self.texture.translate);
+      const diff = sumPoints(svgTextureNode, scalePoint(self.decorationBoundary.vertices[vertexIndex], -1));
+      self.texture.translate = sumPoints(scalePoint(diff, -1), self.texture.translate);
     },
     repositionOriginOverCorner(vertexIndex) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
-      const relVertex = matrixTupleTransformPoint(
+      const relVertex = transformPoint(
         self.texture.transformMatrix.inverse(), self.decorationBoundary.vertices[vertexIndex],
       );
-      const delta = addTuple(relVertex.map(negateMap), self.texture.transformOrigin).map(negateMap);
-      const newTransformOrigin = addTuple(delta, self.texture.transformOrigin);
-      self.texture.translate = addTuple(
+      const delta = scalePoint(sumPoints(scalePoint(relVertex, -1), self.texture.transformOrigin), -1);
+      const newTransformOrigin = sumPoints(delta, self.texture.transformOrigin);
+      self.texture.translate = sumPoints(
         self.texture.translate,
-        calculateTransformOriginChangeOffset(self.texture.transformOrigin, newTransformOrigin,
-          self.texture.scale, self.texture.rotate, self.texture.translate).map(negateMap),
+        scalePoint(calculateTransformOriginChangeOffset(self.texture.transformOrigin, newTransformOrigin,
+          self.texture.scale, self.texture.rotate, self.texture.translate), -1),
       );
       self.texture.transformOrigin = newTransformOrigin;
     },

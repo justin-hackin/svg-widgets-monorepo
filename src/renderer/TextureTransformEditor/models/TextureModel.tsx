@@ -2,25 +2,25 @@ import { Instance, getParentOfType } from 'mobx-state-tree';
 // @ts-ignore
 
 import { FaceDecorationModel } from '../../DielineViewer/models/PyramidNetStore';
-import {
-  addTuple,
-  calculateTransformOriginChangeOffset,
-  getTextureTransformMatrix,
-  negateMap,
-} from '../../common/util/2d-transform';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
 // eslint-disable-next-line import/no-cycle
 import { TextureTransformEditorModel } from './TextureTransformEditorModel';
+import {
+  calculateTransformOriginChangeOffset, getOriginPoint,
+  getTextureTransformMatrix,
+  scalePoint,
+  sumPoints,
+} from '../../common/util/geom';
 
 const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);
 
 const transformDiffDefaults = {
-  translateDiff: [0, 0],
+  translateDiff: getOriginPoint(),
   rotateDiff: 0,
   scaleDiff: 1,
-  transformOriginDiff: [0, 0],
+  transformOriginDiff: getOriginPoint(),
 };
 
 export const TextureModel = FaceDecorationModel
@@ -30,10 +30,10 @@ export const TextureModel = FaceDecorationModel
       return getDimensionsFromPathD(self.pathD);
     },
     get transformOriginDragged() {
-      return addTuple(self.transformOrigin, self.transformOriginDiff);
+      return sumPoints(self.transformOrigin, self.transformOriginDiff);
     },
     get translateDragged() {
-      return addTuple(self.translate, self.translateDiff);
+      return sumPoints(self.translate, self.translateDiff);
     },
     get rotateDragged() {
       return wrapDegrees(self.rotate + self.rotateDiff);
@@ -73,8 +73,8 @@ export const TextureModel = FaceDecorationModel
       });
     },
     reconcileTranslateDiff() {
-      self.translate = addTuple(self.translate, self.translateDiff);
-      self.translateDiff = [0, 0];
+      self.translate = sumPoints(self.translate, self.translateDiff);
+      self.translateDiff = getOriginPoint();
     },
     setRotate(rotate) {
       self.rotate = rotate;
@@ -99,8 +99,8 @@ export const TextureModel = FaceDecorationModel
         self.scaleDragged, self.rotateDragged, self.translateDragged,
       );
       self.transformOrigin = self.transformOriginDragged;
-      self.translate = addTuple(self.translate, relativeDifference.map(negateMap));
-      self.transformOriginDiff = [0, 0];
+      self.translate = sumPoints(self.translate, scalePoint(relativeDifference, -1));
+      self.transformOriginDiff = getOriginPoint();
     },
     setIsPositive(isPositive) {
       self.isPositive = isPositive;

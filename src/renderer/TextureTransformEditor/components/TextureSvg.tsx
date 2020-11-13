@@ -1,11 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { PointTuple } from '../../common/util/geom';
+import { RawPoint, scalePoint } from '../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
 import { useMst } from '../models';
 
-const normalizedBoxCoords:PointTuple[] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#222';
 const MATERIAL_COLOR = '#ffaa00';
 
@@ -98,7 +98,7 @@ export const TextureSvg = observer(({
           {isOnScreen && (
           <g
             {...transformOriginUseDrag()}
-            transform={`translate(${transformOriginDragged[0]}, ${transformOriginDragged[1]})`}
+            transform={`translate(${transformOriginDragged.x}, ${transformOriginDragged.y})`}
           >
             <circle
               r={CENTER_MARKER_RADIUS}
@@ -111,14 +111,14 @@ export const TextureSvg = observer(({
               cy={0}
             />
             {normalizedBoxCoords.map((coords, index) => {
-              const end = coords.map((coord) => coord * CENTER_MARKER_RADIUS);
-              const start = coords.map((coord) => coord * CENTER_MARKER_RADIUS * CROSSHAIR_START_RATIO);
-              const lineProps = (([x1, y1]: PointTuple, [x2, y2]: PointTuple) => ({
-                x1, y1, x2, y2,
-              }))(start, end);
+              const end = scalePoint(coords, CENTER_MARKER_RADIUS);
+              const start = scalePoint(coords, CENTER_MARKER_RADIUS * CROSSHAIR_START_RATIO);
               return (
                 <line
-                  {...lineProps}
+                  x1={start.x}
+                  y1={start.y}
+                  x2={end.x}
+                  y2={end.y}
                   key={index}
                   stroke="#000"
                   opacity={OPACITY + 0.4}

@@ -3,7 +3,13 @@ import { range } from 'lodash';
 import { Instance, types } from 'mobx-state-tree';
 
 import { PathData } from '../PathData';
-import { lineLerp, PointLike, symmetricHingePlotByProjectionDistance } from '../../../common/util/geom';
+import {
+  distanceFromOrigin,
+  lineLerp,
+  PointLike,
+  subtractPoints,
+  symmetricHingePlotByProjectionDistance,
+} from '../../../common/util/geom';
 import { IDashPatternModel, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
@@ -56,9 +62,10 @@ export const ascendantEdgeConnectionTabs = (
       score: (new PathData()),
     },
   };
-  const vector = end.subtract(start);
-  const tabDepth = tabDepthToTraversalLength * vector.length;
-  const tabLength = (vector.length * holeWidthRatio) / tabsCount;
+  const vector = subtractPoints(end, start);
+  const vectorLength = distanceFromOrigin(vector);
+  const tabDepth = tabDepthToTraversalLength * vectorLength;
+  const tabLength = (vectorLength * holeWidthRatio) / tabsCount;
   const tabDepthToBaseLength = tabDepth / tabLength;
   range(0, tabsCount).forEach((tabNum) => {
     const [tabBaseStart, tabBaseEnd] = getTabBaseInterval(tabNum);

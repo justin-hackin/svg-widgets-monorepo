@@ -1,5 +1,9 @@
 import {
-  intersectLineLine, parallelLinePointsAtDistance, symmetricHingePlot, hingedPlotByProjectionDistance,
+  getLineLineIntersection,
+  parallelLinePointsAtDistance,
+  symmetricHingePlot,
+  hingedPlotByProjectionDistance,
+  distanceFromOrigin, subtractPoints,
 } from '../../../common/util/geom';
 import { connectedLineSegments, roundedEdgePath } from './generic';
 import { PathData } from '../PathData';
@@ -9,8 +13,8 @@ const ARBITRARY_LENGTH = 10;
 export const symmetricRoundedTab = (
   tabBaseStart, tabBaseEnd, midpointDepthToTabDepth, tabDepthToBaseLength, tabRoundingDistanceRatio, tabWideningAngle,
 ) => {
-  const vector = tabBaseEnd.subtract(tabBaseStart);
-  const tabDepth = tabDepthToBaseLength * vector.length;
+  const vector = subtractPoints(tabBaseStart, tabBaseEnd);
+  const tabDepth = tabDepthToBaseLength * distanceFromOrigin(vector);
   const [tabApexStart, tabApexEnd] = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
   const midpointDepth = tabDepth * midpointDepthToTabDepth;
   const [tabMidIntersectorStart, tabMidIntersectorEnd] = parallelLinePointsAtDistance(
@@ -19,18 +23,18 @@ export const symmetricRoundedTab = (
   const [tabStartDeparture, tabEndDeparture] = symmetricHingePlot(
     tabBaseStart, tabBaseEnd, Math.PI / 2 + tabWideningAngle, ARBITRARY_LENGTH,
   );
-  const tabMidpointStart = intersectLineLine(
+  const tabMidpointStart = getLineLineIntersection(
     tabMidIntersectorStart, tabMidIntersectorEnd, tabBaseStart, tabStartDeparture,
   );
-  const tabMidpointEnd = intersectLineLine(
+  const tabMidpointEnd = getLineLineIntersection(
     tabMidIntersectorStart, tabMidIntersectorEnd, tabBaseEnd, tabEndDeparture,
   );
 
   // don't let the retraction happen any more than half the length of shortest the non-rounded edge
   // otherwise the control points may criss-cross causing odd loops
   const tabRoundingDistance = tabRoundingDistanceRatio * 0.5 * Math.min(
-    tabBaseStart.subtract(tabMidpointStart).length,
-    tabMidpointStart.subtract(tabApexStart).length,
+    distanceFromOrigin(subtractPoints(tabBaseStart, tabMidpointStart)),
+    distanceFromOrigin(subtractPoints(tabMidpointStart, tabApexStart)),
   );
   return {
     points: {
@@ -48,8 +52,8 @@ export const symmetricRoundedTab = (
 export const arrowTab = (
   tabBaseStart, tabBaseEnd, midpointDepthToTabDepth, tabDepthToBaseLength, tabWideningAngle, scoreDashSpec,
 ) => {
-  const vector = tabBaseEnd.subtract(tabBaseStart);
-  const tabDepth = tabDepthToBaseLength * vector.length;
+  const vector = subtractPoints(tabBaseEnd, tabBaseStart);
+  const tabDepth = tabDepthToBaseLength * distanceFromOrigin(vector);
   const tabApexes = parallelLinePointsAtDistance(tabBaseStart, tabBaseEnd, tabDepth);
   const midpointDepth = tabDepth * midpointDepthToTabDepth;
 

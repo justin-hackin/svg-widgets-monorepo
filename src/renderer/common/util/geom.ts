@@ -1,6 +1,8 @@
+import {
 // @ts-ignore
-import { Line, Point } from '@flatten-js/core';
-import { isNaN, range, isNumber } from 'lodash';
+  Line, point, Point, vector,
+} from '@flatten-js/core';
+import { isNaN, isNumber, range } from 'lodash';
 
 import { circularSlice } from '../../../common/util/data';
 
@@ -12,8 +14,8 @@ export interface RawPoint {
 export interface PointLike extends Point {
   [x: string]: any
 }
-// TODO: too a loose definition but [number, number] causes issues with mapping coords
-export type PointTuple = Array<number>;
+
+export type PointTuple = [number, number];
 export type Coord = PointTuple | PointLike;
 const isPointLike = (coord: Coord): coord is PointLike => isNumber((coord as PointLike).x)
   && isNumber((coord as PointLike).y);
@@ -37,8 +39,9 @@ export const CM_TO_PIXELS_RATIO = 37.7952755906;
 
 export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
 export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);
-
-export const line = (p1, p2) => new Line(new Point(...p1), new Point(...p2));
+export const pointFromPolar = (theta, length) => castCoordToRawPoint(Point.fromPolar([theta, length]));
+export const distanceFromOrigin = ({ x, y }) => vector(x, y).length;
+export const angleRelativeToOrigin = ({ x, y }) => vector(x, y).angle;
 
 export function triangleAnglesGivenSides(sideLengths) {
   if (sideLengths.length !== 3) {
@@ -50,31 +53,80 @@ export function triangleAnglesGivenSides(sideLengths) {
   });
 }
 
+export const pointLikeToTuple = ({ x, y }) => [x, y];
+export const pointTupleToRawPoint = ([x, y]) => ({ x, y });
+export const transformPoint = (matrix: DOMMatrixReadOnly, pt: PointLike): RawPoint => {
+  const domPoint = matrix.transformPoint(new DOMPoint(pt.x, pt.y));
+  return castCoordToRawPoint(domPoint);
+};
+export const getOriginPoint = (): RawPoint => ({ x: 0, y: 0 });
+
+export const sumPoints = (...points: PointLike[]): RawPoint => (points as RawPoint[])
+  .reduce((acc, pt) => {
+    acc.x += pt.x;
+    acc.y += pt.y;
+    return acc;
+  }, getOriginPoint());
+
+export const scalePoint = (pt: PointLike, scale: number): RawPoint => ({ x: pt.x * scale, y: pt.y * scale });
+
+export const subtractPoints = (p1, p2) => sumPoints(p1, scalePoint(p2, -1));
+
+const matrixWithTransformOrigin = (origin: RawPoint, scale: number, rotation: number) => {
+  const negatedOrigin = scalePoint(origin, -1);
+  return (new DOMMatrixReadOnly())
+    .translate(origin.x, origin.y)
+    .scale(scale, scale)
+    .rotate(rotation)
+    .translate(negatedOrigin.x, negatedOrigin.y);
+};
+export const calculateTransformOriginChangeOffset = (
+  oldTransformOrigin, newTransformOrigin,
+  scale, rotation, translation,
+) => {
+  const newMatrix = matrixWithTransformOrigin(newTransformOrigin, scale, rotation);
+  const oldMatrix = matrixWithTransformOrigin(oldTransformOrigin, scale, rotation);
+  return sumPoints(
+    transformPoint(newMatrix, translation),
+    scalePoint(transformPoint(oldMatrix, translation), -1),
+  );
+};
+export const getTextureTransformMatrix = (origin: RawPoint, scale, rotation, translation) => (new DOMMatrixReadOnly())
+  .translate(translation.x, translation.y)
+  .multiply(matrixWithTransformOrigin(origin, scale, rotation));
 
 // positive distance is to the right moving from pt1 to pt2
-export function hingedPlot(p1:PointLike, p2:PointLike, theta, length) {
-  return Point.fromPolar([p1.subtract(p2).angle + theta, length]).add(p2);
+export function hingedPlot(p1:PointLike, p2:PointLike, theta, length):RawPoint {
+  return sumPoints(
+    pointFromPolar(angleRelativeToOrigin(subtractPoints(p1, p2)) + theta, length),
+    p2,
+  );
 }
 
-export const polygonPointsGivenAnglesAndSides = (angles, sides) => {
+export const polygonPointsGivenAnglesAndSides = (angles, sides): RawPoint[] => {
   if (sides.length !== angles.length) {
     throw new Error('polygonPointsGivenSidesAndAngles: length of sides is not equal to length of angles');
   }
   return range(2, sides.length).reduce((acc, i) => {
     acc.push(hingedPlot(acc[i - 2], acc[i - 1], angles[i - 2], sides[i - 1]));
     return acc;
-  }, [new Point(0, 0), Point.fromPolar([Math.PI - angles[0], sides[0]])]);
+  }, [getOriginPoint(), pointFromPolar(Math.PI - angles[0], sides[0])]);
 };
 
 // positive distance is to the right moving from pt1 to pt2
 export function hingedPlotLerp(p1:PointLike, p2:PointLike, theta, lengthRatio) {
-  const difference = p1.subtract(p2);
-  return Point.fromPolar([difference.angle + theta, difference.length * lengthRatio]).add(p2);
+  const difference = subtractPoints(p1, p2);
+
+  return sumPoints(p2,
+    pointFromPolar(angleRelativeToOrigin(difference) + theta,
+      distanceFromOrigin(difference) * lengthRatio));
 }
 
 export function lineLerp(start, end, lerp) {
-  const difference = end.subtract(start);
-  return start.add(Point.fromPolar([difference.angle, difference.length * lerp]));
+  const difference = subtractPoints(end, start);
+  return sumPoints(
+    start, pointFromPolar(angleRelativeToOrigin(difference), distanceFromOrigin(difference) * lerp),
+  );
 }
 
 export function parallelLineAtDistance(pt1, pt2, distance) {
@@ -102,12 +154,18 @@ export function parallelLinePointsAtDistance(pt1, pt2, distance) {
   ];
 }
 
+const rawToFlattenPoint = ({ x, y }) => point(x, y);
+
+export const getLineLineIntersection = (l1p1, l1p2, l2p1, l2p2) => {
+  const l1 = new Line(rawToFlattenPoint(l1p1), rawToFlattenPoint(l1p2));
+  const intersections = l1.intersect(new Line(rawToFlattenPoint(l2p1), rawToFlattenPoint(l2p2)));
+  return intersections.length === 1 ? castCoordToRawPoint(intersections[0]) : null;
+};
+
 export function hingedPlotByProjectionDistance(pt1, pt2, angle, projectionDistance) {
-  const l1 = new Line(...parallelLinePointsAtDistance(pt1, pt2, projectionDistance));
   const hinge = hingedPlot(pt1, pt2, angle, Math.abs(projectionDistance));
-  const l2 = new Line(pt2, hinge);
-  const intersections = l2.intersect(l1);
-  return intersections.length === 1 ? intersections[0] : null;
+  const [l1p1, l1p2] = parallelLinePointsAtDistance(pt1, pt2, projectionDistance);
+  return getLineLineIntersection(l1p1, l1p2, pt2, hinge);
 }
 
 export function symmetricHingePlotByProjectionDistance(p1, p2, theta, distance) {
@@ -117,21 +175,14 @@ export function symmetricHingePlotByProjectionDistance(p1, p2, theta, distance) 
   ];
 }
 
-
-export function intersectLineLine(l1p1, l1p2, l2p1, l2p2) {
-  const l1 = new Line(l1p1, l1p2);
-  const l2 = new Line(l2p1, l2p2);
-  const intersections = l2.intersect(l1);
-  return intersections.length === 1 ? intersections[0] : null;
-}
-
-
 export function symmetricHingePlotIntersection(p1, p2, theta, length) {
   const [pp1, pp2] = symmetricHingePlot(p1, p2, theta, length);
-  return intersectLineLine(p1, pp1, p2, pp2);
+  return getLineLineIntersection(p1, pp1, p2, pp2);
 }
 
-export const distanceBetweenPoints = (pt1, pt2) => pt1.subtract(pt2).length;
+export const distanceBetweenPoints = (pt1: PointLike, pt2: PointLike):number => distanceFromOrigin(
+  subtractPoints(pt2, pt1),
+);
 export const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
 export const VERY_SMALL_NUMBER = 0.00000001;
 export const VERY_LARGE_NUMBER = 1000000000000000;

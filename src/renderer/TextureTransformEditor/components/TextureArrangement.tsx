@@ -8,6 +8,7 @@ import { viewBoxAttrsToString } from '../../../common/util/svg';
 import { TextureSvg } from './TextureSvg';
 import { useMst } from '../models';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
+import { castCoordToRawPoint } from '../../common/util/geom';
 
 export const TextureArrangement = observer(() => {
   const {
@@ -27,21 +28,22 @@ export const TextureArrangement = observer(() => {
   // Init
   const textureTranslationUseDrag = useDrag(({ movement, down }) => {
     // early exit not possible before hooks
+    const movementPt = castCoordToRawPoint(movement);
     if (dragMode === DRAG_MODES.TRANSLATE) {
       if (down) {
-        setTranslateDiff(absoluteMovementToSvg(movement));
+        setTranslateDiff(absoluteMovementToSvg(movementPt));
       } else {
         reconcileTranslateDiff();
       }
     } else if (dragMode === DRAG_MODES.ROTATE) {
       if (down) {
-        setRotateDiff((movement[1] / placementAreaDimensions.height) * 360);
+        setRotateDiff((movementPt.y / placementAreaDimensions.height) * 360);
       } else {
         reconcileRotateDiff();
       }
     } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
       if (down) {
-        setScaleDiff((movement[1] / placementAreaDimensions.height) + 1);
+        setScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
       } else {
         reconcileScaleDiff();
       }
@@ -51,9 +53,9 @@ export const TextureArrangement = observer(() => {
   // ORIGIN
   const transformOriginUseDrag = useDrag(({ movement, down }) => {
     // accommodates the scale of svg so that the texture stays under the mouse
-    const relDelta = translateAbsoluteCoordsToRelative(movement);
+    const relDelta = translateAbsoluteCoordsToRelative(castCoordToRawPoint(movement));
     if (down) {
-      setTransformOriginDiff(relDelta);
+      setTransformOriginDiff(castCoordToRawPoint(relDelta));
     } else {
       reconcileTransformOriginDiff();
     }

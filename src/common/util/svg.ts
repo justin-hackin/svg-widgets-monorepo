@@ -2,7 +2,7 @@ import React from 'react';
 import { svgPathBbox } from 'svg-path-bbox';
 // @ts-ignore
 import { Polygon, Point } from '@flatten-js/core';
-import { PointTuple } from '../../renderer/common/util/geom';
+import { PointLike } from '../../renderer/common/util/geom';
 
 const parseString = (str) => {
   const parser = new window.DOMParser();
@@ -45,12 +45,11 @@ export const viewBoxAttrsToString = (vb) => `${vb.xmin} ${vb.ymin} ${vb.width} $
 
 export const pathDToViewBoxStr = (d) => viewBoxAttrsToString(pathDToViewBoxAttrs(d));
 
-export const polygonWithFace = (face: (PointTuple[] | Point)) => {
-  if (!face.length) {
-    throw new Error('polygonWithFace: face parameter must have one or more elements');
+export const polygonWithFace = (face: PointLike[]) => {
+  if (face.length < 2) {
+    throw new Error('polygonWithFace: face parameter must have 2 or more elements');
   }
-  const theFace = (!(face[0] instanceof Point))
-    ? face.map(([x, y]) => (new Point(x, y))) : face;
+  const theFace = face.map(({ x, y }) => (new Point(x, y)));
   const poly = new Polygon();
   poly.addFace(theFace);
   return poly;

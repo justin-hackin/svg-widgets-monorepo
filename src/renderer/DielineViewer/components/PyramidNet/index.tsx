@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import { range } from 'lodash';
 import {
-  degToRad, hingedPlot, hingedPlotByProjectionDistance, radToDeg,
+  degToRad, distanceFromOrigin, hingedPlot, hingedPlotByProjectionDistance, radToDeg, subtractPoints,
 } from '../../../common/util/geom';
 import { PathData } from '../../util/PathData';
 import { strokeDashPath } from '../../util/shapes/strokeDashPath';
@@ -64,7 +64,8 @@ export const PyramidNet = observer(() => {
     decorationBoundaryPoints[0], decorationBoundaryPoints[1], -FLAP_BASE_ANGLE, ascendantEdgeTabDepth,
   );
   const maxRoundingDistance = Math.min(
-    decorationBoundaryPoints[0].subtract(outerPt1).length, decorationBoundaryPoints[1].subtract(outerPt2).length,
+    distanceFromOrigin(subtractPoints(decorationBoundaryPoints[0], outerPt1)),
+    distanceFromOrigin(subtractPoints(decorationBoundaryPoints[1], outerPt2)),
   );
   cutPathAggregate.concatPath(
     roundedEdgePath(

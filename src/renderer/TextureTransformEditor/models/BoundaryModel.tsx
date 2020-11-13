@@ -1,10 +1,10 @@
 import { Instance, types } from 'mobx-state-tree';
 
 import { closedPolygonPath } from '../../DielineViewer/util/shapes/generic';
-import { PointTuple } from '../../common/util/geom';
+import { RawPoint } from '../../common/util/geom';
 import { pathDToViewBoxAttrs } from '../../../common/util/svg';
 
-const frozenPoint = types.frozen<PointTuple>();
+const frozenPoint = types.frozen<RawPoint>();
 export const BoundaryModel = types.model({
   vertices: types.frozen(types.array(frozenPoint)),
 }).views((self) => ({

@@ -15,14 +15,11 @@ import {
 
 import { polyhedra } from '../data/polyhedra';
 import {
-  CM_TO_PIXELS_RATIO,
-  PointLike,
-  PointTuple,
-  polygonPointsGivenAnglesAndSides,
+  CM_TO_PIXELS_RATIO, getTextureTransformMatrix,
+  polygonPointsGivenAnglesAndSides, RawPoint, scalePoint,
   triangleAnglesGivenSides,
 } from '../../common/util/geom';
 import { EVENTS } from '../../../main/ipc';
-import { getTextureTransformMatrix } from '../../common/util/2d-transform';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
@@ -34,8 +31,8 @@ const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
 export const FaceDecorationModel = types.model({
   pathD: types.string,
-  transformOrigin: types.frozen<PointTuple>(),
-  translate: types.frozen<PointTuple>(),
+  transformOrigin: types.frozen<RawPoint>(),
+  translate: types.frozen<RawPoint>(),
   rotate: types.number,
   scale: types.number,
   isPositive: types.boolean,
@@ -117,7 +114,7 @@ export const PyramidNetModel = types.model({
       return polygonPointsGivenAnglesAndSides(this.faceInteriorAngles, this.actualFaceEdgeLengths);
     },
 
-    get normalizedDecorationBoundaryPoints():PointLike[] {
+    get normalizedDecorationBoundaryPoints():RawPoint[] {
       return polygonPointsGivenAnglesAndSides(
         this.faceInteriorAngles,
         this.normalizedFaceEdgeLengths,
@@ -165,8 +162,7 @@ export const PyramidNetModel = types.model({
     },
 
     get insetToBorderOffset() {
-      const { x, y } = this.normalizedInsetPolygon.vertices[0];
-      return [x, y].map((value) => -value * this.borderToInsetRatio);
+      return scalePoint(this.normalizedInsetPolygon.vertices[0], -this.borderToInsetRatio);
     },
     // get borderInsetFaceHoleTransform() {
     //   return `translate(${self.insetPolygon.vertices[0].x}, ${self.insetPolygon.vertices[0].y}) scale(${
@@ -265,7 +261,7 @@ export const PyramidNetModel = types.model({
     sendTextureUpdate() {
       // @ts-ignore
       globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION,
-        self.normalizedDecorationBoundaryPoints.map((pt) => ([pt.x, pt.y])),
+        self.normalizedDecorationBoundaryPoints,
         self.pyramid.shapeName,
         self.faceDecoration);
     },
