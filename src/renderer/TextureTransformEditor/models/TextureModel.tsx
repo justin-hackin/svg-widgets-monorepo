@@ -1,6 +1,5 @@
 import { Instance, getParentOfType } from 'mobx-state-tree';
 // @ts-ignore
-import { point } from '@flatten-js/core';
 
 import { FaceDecorationModel } from '../../DielineViewer/models/PyramidNetStore';
 import {
@@ -11,7 +10,6 @@ import {
 } from '../../common/util/2d-transform';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
-import { distanceBetweenPoints, PointTuple } from '../../common/util/geom';
 // eslint-disable-next-line import/no-cycle
 import { TextureTransformEditorModel } from './TextureTransformEditorModel';
 
@@ -109,16 +107,6 @@ export const TextureModel = FaceDecorationModel
     },
     resetTransformDiff() {
       Object.assign(self, transformDiffDefaults);
-    },
-    getClosestDestinationPoint(target: PointTuple, cutoff = Infinity) {
-      return self.destinationPoints.reduce((acc, candidate, index) => {
-        const distanceToTarget = distanceBetweenPoints(point(...candidate), point(...target));
-        if (distanceToTarget < acc.closestDistance && distanceToTarget < cutoff) {
-          acc.closestDistance = distanceToTarget;
-          acc.closestIndex = index;
-        }
-        return acc;
-      }, { closestDistance: Infinity, closestIndex: null }).closestIndex;
     },
   }));
 
