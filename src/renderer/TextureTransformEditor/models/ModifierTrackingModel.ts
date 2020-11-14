@@ -1,5 +1,6 @@
 import { types } from 'mobx-state-tree';
 import { includes, flatten } from 'lodash';
+import { EVENTS } from '../../../main/ipc';
 
 export const DRAG_MODES = {
   ROTATE: 'rotate',
@@ -43,10 +44,16 @@ const keyTrackingModelFactory = (keysToTrack, target = window) => {
           self.target.removeEventListener('keyup', keyupHandler);
           self.target.removeEventListener('keydown', keydownHandler);
         },
+        releaseHeldKeys() {
+          self.keysTracked.forEach((keyHeld) => {
+            self.keysHeld.set(keyHeld, false);
+          });
+        },
       };
     });
 };
 
+// sorted in order of precedence, first match becomes mode
 const modeDefs = [
   { mode: DRAG_MODES.SCALE_VIEW, keyOrKeysHeld: 'Alt' },
   { mode: DRAG_MODES.SCALE_TEXTURE, keyOrKeysHeld: 'Control' },
@@ -72,5 +79,11 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
         if (areKeysHeld(self.keysHeld, modeDef.keyOrKeysHeld)) { return modeDef.mode; }
       }
       return defaultMode;
+    },
+  })).actions((self) => ({
+    afterCreate() {
+      globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, () => {
+        self.releaseHeldKeys();
+      });
     },
   }));
