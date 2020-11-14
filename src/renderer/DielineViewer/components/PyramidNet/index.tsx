@@ -11,11 +11,10 @@ import { baseEdgeConnectionTab } from '../../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs } from '../../util/shapes/ascendantEdgeConnectionTabs';
 import { closedPolygonPath, roundedEdgePath } from '../../util/shapes/generic';
 // eslint-disable-next-line import/no-cycle
-import { useMst } from '../../models';
+import { usePreferencesMst, usePyramidNetFactoryMst } from '../../models';
 
 export const PyramidNet = observer(() => {
   const {
-    styleSpec,
     pyramidNetSpec: {
       pyramid: {
         geometry: { faceCount },
@@ -27,8 +26,8 @@ export const PyramidNet = observer(() => {
       actualFaceEdgeLengths, ascendantEdgeTabDepth,
       activeCutHolePatternD, borderInsetFaceHoleTransformMatrix,
     },
-  } = useMst();
-
+  } = usePyramidNetFactoryMst();
+  const styleSpec = usePreferencesMst();
 
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
   const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };

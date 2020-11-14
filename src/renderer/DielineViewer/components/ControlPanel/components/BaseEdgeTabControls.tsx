@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { PanelSlider } from '../../../../common/components/PanelSlider';
 import { VERY_SMALL_NUMBER } from '../../../../common/util/geom';
 import { ratioSliderProps } from './constants';
-import { useMst } from '../../../models';
+import { usePyramidNetFactoryMst } from '../../../models';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 
 export const BaseEdgeTabControls = observer(() => {
@@ -12,7 +12,7 @@ export const BaseEdgeTabControls = observer(() => {
     pyramidNetSpec: {
       baseEdgeTabsSpec,
     } = {},
-  } = useMst();
+  } = usePyramidNetFactoryMst();
   const {
     bendGuideValley,
     unsetBendGuideValley,

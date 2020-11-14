@@ -4,7 +4,11 @@ import { observer } from 'mobx-react';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core';
 
-import { netFactoryStore, Provider, useMst } from './models';
+import {
+  PreferencesStoreProvider,
+  PyramidNetFactoryStoreProvider,
+  usePyramidNetFactoryMst,
+} from './models';
 import darkTheme from './data/material-ui-dark-theme.json';
 import { PyramidNet } from './components/PyramidNet';
 import { ControlPanel } from './components/ControlPanel';
@@ -15,22 +19,24 @@ const patternId = 'grid-pattern';
 // @ts-ignore
 const theme = createMuiTheme(darkTheme);
 export const DielineViewer = observer(() => {
-  const { svgDimensions } = useMst();
+  const { svgDimensions } = usePyramidNetFactoryMst();
   return (
-    <Provider value={netFactoryStore}>
-      <ThemeProvider theme={theme}>
-        <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
-          <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
-            <svg {...svgDimensions}>
-              <GridPattern patternId={patternId} />
-              <g transform="translate(300, 300)">
-                <PyramidNet />
-              </g>
-            </svg>
-          </ResizableZoomPan>
-          <ControlPanel />
-        </div>
-      </ThemeProvider>
-    </Provider>
+    <PreferencesStoreProvider>
+      <PyramidNetFactoryStoreProvider>
+        <ThemeProvider theme={theme}>
+          <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
+            <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
+              <svg {...svgDimensions}>
+                <GridPattern patternId={patternId} />
+                <g transform="translate(300, 300)">
+                  <PyramidNet />
+                </g>
+              </svg>
+            </ResizableZoomPan>
+            <ControlPanel />
+          </div>
+        </ThemeProvider>
+      </PyramidNetFactoryStoreProvider>
+    </PreferencesStoreProvider>
   );
 });

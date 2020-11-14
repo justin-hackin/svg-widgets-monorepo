@@ -6,7 +6,7 @@ import { PanelSelect } from '../../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../../common/components/PanelSlider';
 import { ratioSliderProps } from './constants';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
-import { useMst } from '../../../models';
+import { usePyramidNetFactoryMst } from '../../../models';
 
 const strokeLengthProps = { min: 1, max: 3000, step: VERY_SMALL_NUMBER };
 
@@ -16,7 +16,7 @@ export const ScoreControls = observer(() => {
       useDottedStroke, setUseDottedStroke,
       interFaceScoreDashSpec, baseScoreDashSpec, setInterFaceScoreDashSpecPattern, setBaseScoreDashSpecPattern,
     } = {}, dashPatterns,
-  } = useMst();
+  } = usePyramidNetFactoryMst();
   const dashPatternOptions = dashPatterns.map(({ label, id }) => ({ value: id, label }));
   return (
     <>

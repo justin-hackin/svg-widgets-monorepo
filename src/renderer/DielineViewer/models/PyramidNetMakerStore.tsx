@@ -36,22 +36,6 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   dashPatterns: DashPatternsModel,
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
   history: types.optional(UndoManager, {}),
-  styleSpec: types.model({
-    dieLineProps: types.model({
-      fill: types.string,
-      strokeWidth: types.number,
-    }),
-    cutLineProps: types.model({
-      stroke: types.string,
-    }),
-    scoreLineProps: types.model({
-      stroke: types.string,
-    }),
-    designBoundaryProps: types.model({
-      stroke: types.string,
-      fill: types.string,
-    }),
-  }),
 }).actions((self) => ({
   sendShapeUpdate() {
     // @ts-ignore

@@ -22,7 +22,7 @@ import { useStyles } from '../../style';
 import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { EVENTS } from '../../../../main/ipc';
 import { extractCutHolesFromSvgString } from '../../../../common/util/svg';
-import { useMst } from '../../models';
+import { usePyramidNetFactoryMst } from '../../models';
 import { StyleControls } from './components/StyleControls';
 import { BaseEdgeTabControls } from './components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './components/AscendantEdgeTabsControls';
@@ -57,7 +57,7 @@ export const ControlPanel = observer(() => {
   const classes = useStyles();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme = useTheme();
-  const store = useMst();
+  const store = usePyramidNetFactoryMst();
   const { pyramidNetSpec: { pyramid } } = store;
   const polyhedronOptions = Object.keys(store.polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));

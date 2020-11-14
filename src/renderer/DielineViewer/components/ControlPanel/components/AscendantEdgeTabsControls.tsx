@@ -4,10 +4,10 @@ import { observer } from 'mobx-react';
 import { PanelSlider } from '../../../../common/components/PanelSlider';
 import { VERY_SMALL_NUMBER } from '../../../../common/util/geom';
 import { ratioSliderProps } from './constants';
-import { useMst } from '../../../models';
+import { usePyramidNetFactoryMst } from '../../../models';
 
 export const AscendantEdgeTabsControls = observer(() => {
-  const store = useMst();
+  const store = usePyramidNetFactoryMst();
   const { pyramidNetSpec: { ascendantEdgeTabsSpec } = {} } = store;
   return (
     <>
