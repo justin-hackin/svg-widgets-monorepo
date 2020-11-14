@@ -4,11 +4,13 @@ import CachedIcon from '@material-ui/icons/Cached';
 import OpenWithIcon from '@material-ui/icons/OpenWith';
 import AspectRatioIcon from '@material-ui/icons/AspectRatio';
 import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
+import HeightIcon from '@material-ui/icons/Height';
 
 import React from 'react';
 import { observer } from 'mobx-react';
 import { useMst } from '../models';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
+import { useStyles } from '../style';
 
 // TODO: remove hover effects
 const extraButtonProps = {
@@ -22,6 +24,7 @@ export const DragModeOptionsGroup = observer(() => {
     // @ts-ignore
     modifierTracking: { dragMode } = {},
   } = useMst();
+  const classes = useStyles();
   return (
     <ToggleButtonGroup
       value={dragMode}
@@ -36,6 +39,22 @@ export const DragModeOptionsGroup = observer(() => {
         {...extraButtonProps}
       >
         <OpenWithIcon />
+      </ToggleButton>
+      <ToggleButton
+        title="drag"
+        value={DRAG_MODES.TRANSLATE_VERTICAL}
+        aria-label={DRAG_MODES.TRANSLATE_VERTICAL}
+        {...extraButtonProps}
+      >
+        <HeightIcon />
+      </ToggleButton>
+      <ToggleButton
+        title="drag"
+        value={DRAG_MODES.TRANSLATE_HORIZONTAL}
+        aria-label={DRAG_MODES.TRANSLATE_HORIZONTAL}
+        {...extraButtonProps}
+      >
+        <HeightIcon classes={{ root: classes.rotateButton }} />
       </ToggleButton>
       <ToggleButton
         title="shift + drag/wheel"

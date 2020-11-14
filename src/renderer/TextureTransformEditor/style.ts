@@ -17,6 +17,9 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   rotationInput: {
     width: '6.5em',
   },
+  rotateButton: {
+    transform: 'rotate(90deg)',
+  },
   loadingContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     display: 'flex',

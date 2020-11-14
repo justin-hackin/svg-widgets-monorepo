@@ -29,9 +29,20 @@ export const TextureArrangement = observer(() => {
   const textureTranslationUseDrag = useDrag(({ movement, down }) => {
     // early exit not possible before hooks
     const movementPt = castCoordToRawPoint(movement);
-    if (dragMode === DRAG_MODES.TRANSLATE) {
+    if (
+      dragMode === DRAG_MODES.TRANSLATE
+      || dragMode === DRAG_MODES.TRANSLATE_HORIZONTAL
+      || DRAG_MODES.TRANSLATE_VERTICAL
+    ) {
       if (down) {
-        setTranslateDiff(absoluteMovementToSvg(movementPt));
+        const svgMovement = absoluteMovementToSvg(movementPt);
+        if (dragMode === DRAG_MODES.TRANSLATE) {
+          setTranslateDiff(svgMovement);
+        } else if (dragMode === DRAG_MODES.TRANSLATE_VERTICAL) {
+          setTranslateDiff({ x: 0, y: svgMovement.y });
+        } else if (dragMode === DRAG_MODES.TRANSLATE_HORIZONTAL) {
+          setTranslateDiff({ x: svgMovement.x, y: 0 });
+        }
       } else {
         reconcileTranslateDiff();
       }

@@ -3,8 +3,10 @@ import { includes, flatten } from 'lodash';
 import { EVENTS } from '../../../main/ipc';
 
 export const DRAG_MODES = {
-  ROTATE: 'rotate',
   TRANSLATE: 'translate',
+  TRANSLATE_VERTICAL: 'translate-vertical',
+  TRANSLATE_HORIZONTAL: 'translate-horizontal',
+  ROTATE: 'rotate',
   SCALE_TEXTURE: 'scale texture',
   SCALE_VIEW: 'scale view',
 };
@@ -54,13 +56,15 @@ const keyTrackingModelFactory = (keysToTrack, target = window) => {
 };
 
 // sorted in order of precedence, first match becomes mode
+const defaultMode = DRAG_MODES.TRANSLATE;
 const modeDefs = [
+  { mode: DRAG_MODES.TRANSLATE_HORIZONTAL, keyOrKeysHeld: ['Alt', 'Control'] },
+  { mode: DRAG_MODES.TRANSLATE_VERTICAL, keyOrKeysHeld: ['Control', 'Shift'] },
   { mode: DRAG_MODES.SCALE_VIEW, keyOrKeysHeld: 'Alt' },
   { mode: DRAG_MODES.SCALE_TEXTURE, keyOrKeysHeld: 'Control' },
   { mode: DRAG_MODES.ROTATE, keyOrKeysHeld: 'Shift' },
 ];
 
-const defaultMode = DRAG_MODES.TRANSLATE;
 const allTrue = (array: boolean[]) => {
   for (const val of array) {
     if (val === false) { return false; }
