@@ -23,7 +23,6 @@ import { VERY_SMALL_NUMBER } from '../../../common/util/geom';
 import { EVENTS } from '../../../../main/ipc';
 import { extractCutHolesFromSvgString } from '../../../../common/util/svg';
 import { useMst } from '../../models';
-import { ControlElement } from './components/ControlElement';
 import { StyleControls } from './components/StyleControls';
 import { BaseEdgeTabControls } from './components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './components/AscendantEdgeTabsControls';
@@ -59,8 +58,8 @@ export const ControlPanel = observer(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const theme = useTheme();
   const store = useMst();
-  const { polyhedraPyramidGeometries, history } = store;
-  const polyhedronOptions = Object.keys(polyhedraPyramidGeometries)
+  const { pyramidNetSpec: { pyramid } } = store;
+  const polyhedronOptions = Object.keys(store.polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
@@ -123,7 +122,7 @@ export const ControlPanel = observer(() => {
                thus span wrapping required by tooltip for disabled buttons
             */}
             <HistoryButtons
-              history={history}
+              history={store.history}
             />
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={async () => {
@@ -185,15 +184,17 @@ export const ControlPanel = observer(() => {
 
         <div className={classes.shapeSection}>
           <h3>Shape</h3>
-          <ControlElement
-            component={PanelSelect}
+          <PanelSelect
             valuePath="pyramidNetSpec.pyramid.shapeName"
+            value={pyramid.shapeName}
+            setter={(val) => { pyramid.shapeName = val; }}
             label="Polyhedron"
             options={polyhedronOptions}
           />
-          <ControlElement
-            component={PanelSlider}
+          <PanelSlider
             valuePath="pyramidNetSpec.shapeHeightInCm"
+            value={store.pyramidNetSpec.shapeHeightInCm}
+            setter={(val) => { store.pyramidNetSpec.shapeHeightInCm = val; }}
             min={20}
             max={60}
             step={VERY_SMALL_NUMBER}

@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { VERY_SMALL_NUMBER } from '../../../../common/util/geom';
 import { PanelSelect } from '../../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../../common/components/PanelSlider';
-import { ControlElement } from './ControlElement';
 import { ratioSliderProps } from './constants';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 import { useMst } from '../../../models';
@@ -31,6 +30,7 @@ export const ScoreControls = observer(() => {
         <>
 
           <PanelSelect
+            valuePath="pyramidNetSpec.interFaceScoreDashSpec.strokeDashPathPattern.id"
             value={interFaceScoreDashSpec.strokeDashPathPattern.id}
             label="Inter-face stroke dash pattern"
             setter={(id) => {
@@ -38,19 +38,26 @@ export const ScoreControls = observer(() => {
             }}
             options={dashPatternOptions}
           />
-          <ControlElement
-            component={PanelSlider}
+          <PanelSlider
             valuePath="pyramidNetSpec.interFaceScoreDashSpec.strokeDashLength"
             label="Inter-face Stroke Dash Length"
+            value={interFaceScoreDashSpec.strokeDashLength}
+            setter={(val) => {
+              interFaceScoreDashSpec.strokeDashLength = val;
+            }}
             {...strokeLengthProps}
           />
-          <ControlElement
-            component={PanelSlider}
+          <PanelSlider
             valuePath="pyramidNetSpec.interFaceScoreDashSpec.strokeDashOffsetRatio"
             label="Inter-face Stroke Dash Offset Ratio"
+            value={interFaceScoreDashSpec.strokeDashOffsetRatio}
+            setter={(val) => {
+              interFaceScoreDashSpec.strokeDashOffsetRatio = val;
+            }}
             {...ratioSliderProps}
           />
           <PanelSelect
+            valuePath="baseScoreDashSpec.strokeDashPathPattern.id"
             value={baseScoreDashSpec.strokeDashPathPattern.id}
             label="Base Stroke Dash Pattern"
             setter={(id) => {
@@ -58,16 +65,22 @@ export const ScoreControls = observer(() => {
             }}
             options={dashPatternOptions}
           />
-          <ControlElement
-            component={PanelSlider}
+          <PanelSlider
             valuePath="pyramidNetSpec.baseScoreDashSpec.strokeDashLength"
             label="Base Stroke Dash Length"
+            value={baseScoreDashSpec.strokeDashLength}
+            setter={(val) => {
+              baseScoreDashSpec.strokeDashLength = val;
+            }}
             {...strokeLengthProps}
           />
-          <ControlElement
-            component={PanelSlider}
+          <PanelSlider
             valuePath="pyramidNetSpec.baseScoreDashSpec.strokeDashOffsetRatio"
             label="Base Stroke Dash Offset Ratio"
+            value={baseScoreDashSpec.strokeDashOffsetRatio}
+            setter={(val) => {
+              baseScoreDashSpec.strokeDashOffsetRatio = val;
+            }}
             {...ratioSliderProps}
           />
         </>

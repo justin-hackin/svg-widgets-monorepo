@@ -6,6 +6,7 @@ import makeInspectable from 'mobx-devtools-mst';
 import remotedev from 'remotedev';
 
 // eslint-disable-next-line import/no-cycle
+import { unprotect } from 'mobx-state-tree';
 import { IPyramidNetFactoryModel, PyramidNetFactoryModel } from './PyramidNetMakerStore';
 import { dashPatterns } from '../data/dash-patterns';
 
@@ -53,6 +54,7 @@ export const netFactoryStore = PyramidNetFactoryModel.create(defaultModelData);
 if (process.env.NODE_ENV !== 'production') {
   connectReduxDevtools(remotedev, netFactoryStore);
   makeInspectable(netFactoryStore);
+  unprotect(netFactoryStore);
 }
 const NetFactoryStoreContext = createContext<IPyramidNetFactoryModel>(netFactoryStore);
 
