@@ -14,8 +14,7 @@ export const PreferencesModel = types.model({
     stroke: '#BDFF48',
   }),
   designBoundaryProps: optionalModel({
-    stroke: 'none',
-    fill: 'rgb(68,154,255)',
+    stroke: 'rgb(68,154,255)',
   }),
 });
 

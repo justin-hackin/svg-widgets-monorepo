@@ -31,7 +31,7 @@ export const PyramidNet = observer(() => {
 
   const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
   const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
-  const insetProps = { ...styleSpec.dieLineProps, stroke: '#00BBFF' };
+  const designBoundaryProps = { ...styleSpec.dieLineProps, ...styleSpec.designBoundaryProps };
 
   const cutPathAggregate = new PathData();
   const scorePathAggregate = new PathData();
@@ -113,7 +113,7 @@ export const PyramidNet = observer(() => {
           return index === 0
             ? (
               <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
-                <path d={closedPolygonPath(faceBoundaryPoints).getD()} {...insetProps} />
+                <path d={closedPolygonPath(faceBoundaryPoints).getD()} {...designBoundaryProps} />
                 { activeCutHolePatternD && (
                   <path d={activeCutHolePatternD} transform={pathScaleMatrix.toString()} {...cutProps} />
                 ) }
