@@ -86,7 +86,7 @@ app.on('ready', async () => {
     y: 0,
     height,
     show: false,
-    title: 'SpaceCraft Net Factory - Dieline Viewer',
+    title: 'Polyhedral Net Factory - Dieline Viewer',
     icon,
     webPreferences,
   }, 'die-line-viewer');
@@ -102,7 +102,7 @@ app.on('ready', async () => {
       y: 0,
       height,
       show: false,
-      title: 'SpaceCraft Net Factory - Texture Fitting',
+      title: 'Polyhedral Net Factory - Texture Fitting',
       icon,
       webPreferences,
     }, 'texture-transform-editor');
