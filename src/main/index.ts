@@ -10,7 +10,9 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 const {
   default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS,
 } = require('electron-devtools-installer');
-const { setupIpc, EVENTS, EVENT_TARGET_DELIMITER } = require('./ipc');
+const {
+  setupIpc, EVENTS, WINDOWS, ROUTED_EVENT_MAP,
+} = require('./ipc');
 
 // for debugging build, add isEnabled: true
 debug({ showDevTools: false });
@@ -60,15 +62,10 @@ app.on('ready', async () => {
   const browserWindows:windowMappingObject = {};
   const routedEventListeners = {};
 
-  const getRoutedEventsByPrefix = (windowPrefix:string):string[] => Object.values(EVENTS)
-  // @ts-ignore
-    .filter((eventName:string) => eventName.startsWith(`${windowPrefix}${EVENT_TARGET_DELIMITER}`));
-
-  const addEventListenersForWindow = (windowPrefix) => {
-    getRoutedEventsByPrefix(windowPrefix).forEach((eventName:string) => {
+  const addEventListenersForWindow = (windowKey) => {
+    ROUTED_EVENT_MAP[windowKey].forEach((eventName:string) => {
       routedEventListeners[eventName] = (e, ...params) => {
-        const targetWindowKey = eventName.split(EVENT_TARGET_DELIMITER)[0];
-        const targetWindow:(typeof BrowserWindow) = browserWindows[targetWindowKey];
+        const targetWindow:(typeof BrowserWindow) = browserWindows[windowKey];
         if (targetWindow) {
           targetWindow.webContents.send(eventName, ...params);
         }
@@ -77,13 +74,13 @@ app.on('ready', async () => {
     });
   };
 
-  const removeEventListenersForWindow = (windowPrefix) => {
-    getRoutedEventsByPrefix(windowPrefix).forEach((eventName:string) => {
+  const removeEventListenersForWindow = (windowKey) => {
+    ROUTED_EVENT_MAP[windowKey].forEach((eventName:string) => {
       ipcMain.removeListener(eventName, routedEventListeners[eventName]);
     });
   };
 
-  browserWindows.die = await promisifyWindow({
+  browserWindows[WINDOWS.DIELINE_EDITOR] = await promisifyWindow({
     width: width / 2,
     x: 0,
     y: 0,
@@ -93,13 +90,13 @@ app.on('ready', async () => {
     icon,
     webPreferences,
   }, 'die-line-viewer');
-  addEventListenersForWindow('die');
+  addEventListenersForWindow(WINDOWS.DIELINE_EDITOR);
 
   const assignTextureWindow = async () => {
-    if (browserWindows.tex) {
+    if (browserWindows[WINDOWS.TEXTURE_EDITOR]) {
       removeEventListenersForWindow('tex');
     }
-    browserWindows.tex = await promisifyWindow({
+    browserWindows[WINDOWS.TEXTURE_EDITOR] = await promisifyWindow({
       width: width / 2,
       x: width / 2,
       y: 0,
@@ -109,37 +106,37 @@ app.on('ready', async () => {
       icon,
       webPreferences,
     }, 'texture-transform-editor');
-    addEventListenersForWindow('tex');
+    addEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
   };
   await assignTextureWindow();
 
   ipcMain.on(EVENTS.OPEN_TEXTURE_WINDOW, () => {
-    if (!browserWindows.tex) {
+    if (!browserWindows[WINDOWS.TEXTURE_EDITOR]) {
       assignTextureWindow();
     } else {
-      browserWindows.tex.show();
+      browserWindows[WINDOWS.TEXTURE_EDITOR].show();
     }
   });
 
-  browserWindows.die.on('close', () => {
-    removeEventListenersForWindow('die');
-    if (browserWindows.tex) {
-      browserWindows.tex.close();
+  browserWindows[WINDOWS.DIELINE_EDITOR].on('close', () => {
+    removeEventListenersForWindow(WINDOWS.DIELINE_EDITOR);
+    if (browserWindows[WINDOWS.TEXTURE_EDITOR]) {
+      browserWindows[WINDOWS.TEXTURE_EDITOR].close();
     }
-    removeEventListenersForWindow('tex');
+    removeEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
   });
 
-  browserWindows.tex.on('close', () => {
-    browserWindows.tex = undefined;
+  browserWindows[WINDOWS.TEXTURE_EDITOR].on('close', () => {
+    browserWindows[WINDOWS.TEXTURE_EDITOR] = undefined;
   });
 
 
   const sendResetDragMode = () => {
-    browserWindows.tex.webContents.send(EVENTS.RESET_DRAG_MODE);
+    browserWindows[WINDOWS.TEXTURE_EDITOR].webContents.send(EVENTS.RESET_DRAG_MODE);
   };
-  browserWindows.tex.on('blur', sendResetDragMode);
-  browserWindows.tex.on('minimize', sendResetDragMode);
-  browserWindows.tex.on('hide', sendResetDragMode);
+  browserWindows[WINDOWS.TEXTURE_EDITOR].on('blur', sendResetDragMode);
+  browserWindows[WINDOWS.TEXTURE_EDITOR].on('minimize', sendResetDragMode);
+  browserWindows[WINDOWS.TEXTURE_EDITOR].on('hide', sendResetDragMode);
 });
 
 app.on('window-all-closed', app.quit);

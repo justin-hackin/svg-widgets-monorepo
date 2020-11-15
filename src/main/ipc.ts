@@ -2,36 +2,57 @@ const { dialog } = require('electron');
 const svgpath = require('svgpath');
 const path = require('path');
 const fsPromises = require('fs').promises;
-const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean-addon');
+const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean');
 const { VERY_LARGE_NUMBER } = require('../renderer/common/util/geom');
 const { PathData } = require('../renderer/DielineViewer/util/PathData');
 
-interface Events {
-  [key: string]: string,
-}
 
 const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
 
 export const EVENT_TARGET_DELIMITER = '<=';
 
+export enum WINDOWS {
+  TEXTURE_EDITOR = 'texture-editor',
+  DIELINE_EDITOR = 'dieline-editor'
+}
+
 // TODO: use enum if event names allow
-export const EVENTS:Events = {
-  SAVE_SVG: 'save-svg',
-  SAVE_GLTF: 'save-gltf',
-  SAVE_NET_SVG_AND_SPEC: 'save-net-svg-and-spec',
-  INTERSECT_SVG: 'intersect-svg',
-  LOAD_NET_SPEC: 'load-net-spec',
-  OPEN_SVG: 'open-svg',
-  OPEN_TEXTURE_WINDOW: 'open-texture-window',
-  RESET_DRAG_MODE: 'reset-drag-mode',
-  GET_SVG_STRING_BY_PATH: 'get-svg-string-by-path',
-  GET_SVG_FILE_PATH: 'get-svg-path',
-  GET_PATH_BASENAME: 'get-path-basename',
-  REQUEST_SHAPE_UPDATE: `die${EVENT_TARGET_DELIMITER}request-shape-update`,
-  UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION: `tex${EVENT_TARGET_DELIMITER}update-texture-editor-texture`,
-  UPDATE_TEXTURE_EDITOR_BORDER_DATA: `tex${EVENT_TARGET_DELIMITER}update-texture-editor-matrix`,
-  UPDATE_DIELINE_VIEWER: `die${EVENT_TARGET_DELIMITER}update-dieline-viewer`,
+enum MAIN_EVENTS {
+  SAVE_SVG = 'save-svg',
+  SAVE_GLTF = 'save-gltf',
+  SAVE_NET_SVG_AND_SPEC = 'save-net-svg-and-spec',
+  INTERSECT_SVG = 'intersect-svg',
+  LOAD_NET_SPEC = 'load-net-spec',
+  OPEN_SVG = 'open-svg',
+  OPEN_TEXTURE_WINDOW = 'open-texture-window',
+  RESET_DRAG_MODE = 'reset-drag-mode',
+  GET_SVG_STRING_BY_PATH = 'get-svg-string-by-path',
+  GET_SVG_FILE_PATH = 'get-svg-path',
+  GET_PATH_BASENAME = 'get-path-basename',
+}
+
+enum ROUTED_EVENTS {
+  REQUEST_SHAPE_UPDATE = 'request-shape-update',
+  UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION = 'update-texture-editor-texture',
+  UPDATE_TEXTURE_EDITOR_BORDER_DATA = 'update-texture-editor-border-data',
+  UPDATE_DIELINE_VIEWER = 'update-dieline-viewer',
+}
+
+export const ROUTED_EVENT_MAP: Record<WINDOWS, ROUTED_EVENTS[]> = {
+  [WINDOWS.DIELINE_EDITOR]: [
+    ROUTED_EVENTS.REQUEST_SHAPE_UPDATE,
+    ROUTED_EVENTS.UPDATE_DIELINE_VIEWER,
+  ],
+  [WINDOWS.TEXTURE_EDITOR]: [
+    ROUTED_EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION,
+    ROUTED_EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA,
+  ],
 };
+
+export const EVENTS = {
+  ...MAIN_EVENTS, ...ROUTED_EVENTS,
+};
+
 
 const svgFilters = [{ name: 'SVG - Scalable Vector Graphics', extensions: ['svg'] }];
 const jsonFilters = [{ name: 'JSON', extensions: ['json'] }];
