@@ -22,6 +22,25 @@ matrix:
       services: docker
       language: generic
 
+addons:
+  homebrew:
+    packages:
+      - gsl
+      - gcc@7
+      - double-conversion
+      - boost
+      - glib
+      - cairo
+
+  apt:
+    update: true
+    packages:
+      - g++
+      - cmake
+      - libdouble-conversion-dev
+      - libgsl-dev
+      - libcairo2-dev
+
 notifications:
   email: false
 
