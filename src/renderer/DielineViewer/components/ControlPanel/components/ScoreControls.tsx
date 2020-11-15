@@ -1,12 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { VERY_SMALL_NUMBER } from '../../../../common/util/geom';
 import { PanelSelect } from '../../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../../common/components/PanelSlider';
 import { ratioSliderProps } from './constants';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 import { usePyramidNetFactoryMst } from '../../../models';
+import { VERY_SMALL_NUMBER } from '../../../../common/constants';
 
 const strokeLengthProps = { min: 1, max: 3000, step: VERY_SMALL_NUMBER };
 

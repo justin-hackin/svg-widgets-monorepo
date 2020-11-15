@@ -2,9 +2,9 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { PanelSlider } from '../../../../common/components/PanelSlider';
-import { VERY_SMALL_NUMBER } from '../../../../common/util/geom';
 import { ratioSliderProps } from './constants';
 import { usePyramidNetFactoryMst } from '../../../models';
+import { VERY_SMALL_NUMBER } from '../../../../common/constants';
 
 export const AscendantEdgeTabsControls = observer(() => {
   const store = usePyramidNetFactoryMst();

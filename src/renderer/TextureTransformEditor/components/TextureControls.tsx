@@ -17,9 +17,9 @@ import { DragModeOptionsGroup } from './DragModeOptionGroup';
 import { EVENTS } from '../../../main/ipc';
 import { useMst } from '../models';
 import { PanelSlider } from '../../common/components/PanelSlider';
-import { VERY_SMALL_NUMBER } from '../../common/util/geom';
 import { HistoryButtons } from '../../DielineViewer/components/ControlPanel/components/HistoryButtons';
 import { useStyles } from '../style';
+import { VERY_SMALL_NUMBER } from '../../common/constants';
 
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (

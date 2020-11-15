@@ -7,11 +7,12 @@ import {
   hingedPlotByProjectionDistance,
   hingedPlotLerp,
   getLineLineIntersection,
-  VERY_LARGE_NUMBER, RawPoint,
+  RawPoint,
 } from '../../../common/util/geom';
 import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
 import { connectedLineSegments } from './generic';
 import { arrowTab } from './symmetricRoundedTab';
+import { VERY_LARGE_NUMBER } from '../../../common/constants';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,

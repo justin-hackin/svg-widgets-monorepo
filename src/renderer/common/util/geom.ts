@@ -93,6 +93,7 @@ const matrixWithTransformOrigin = (origin: RawPoint, scale: number, rotation: nu
     .rotate(rotation)
     .translate(negatedOrigin.x, negatedOrigin.y);
 };
+
 export const calculateTransformOriginChangeOffset = (
   oldTransformOrigin, newTransformOrigin,
   scale, rotation, translation,
@@ -104,6 +105,7 @@ export const calculateTransformOriginChangeOffset = (
     scalePoint(transformPoint(oldMatrix, translation), -1),
   );
 };
+
 export const getTextureTransformMatrix = (origin: RawPoint, scale, rotation, translation) => (new DOMMatrixReadOnly())
   .translate(translation.x, translation.y)
   .multiply(matrixWithTransformOrigin(origin, scale, rotation));
@@ -192,8 +194,6 @@ export const distanceBetweenPoints = (pt1: PointLike, pt2: PointLike):number => 
   subtractPoints(pt2, pt1),
 );
 export const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
-export const VERY_SMALL_NUMBER = 0.00000001;
-export const VERY_LARGE_NUMBER = 1000000000000000;
 const polygonWithFace = (face: PointLike[]) => {
   if (face.length < 2) {
     throw new Error('polygonWithFace: face parameter must have 2 or more elements');
