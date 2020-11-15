@@ -10,7 +10,10 @@
     "compile": "electron-webpack",
     "electron": "node node_modules/electron/cli.js .",
     "dist": "npm run compile && electron-builder",
-    "lint": "eslint src/**/*.ts{,x}"
+    "lint": "eslint src/**/*.ts{,x}",
+    "start": "electron .",
+    "release": "electron-builder",
+    "test": "echo success"
   },
   "keywords": [
     "react"

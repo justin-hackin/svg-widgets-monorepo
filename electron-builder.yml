@@ -1,12 +1,25 @@
 ---
-appId: com.playful.geometer.spacecraft-net-factory
+appId: com.electron.polyhedral-net-factory
+publish: github
 linux:
   icon: icons/256x256.png
   target:
     - deb
-snap:
-  stagePackages:
-    - default
+appImage:
+  license: LICENSE
+dmg:
+  contents:
+    - x: 110
+      y: 150
+    - x: 240
+      y: 150
+      type: link
+      path: "/Applications"
+
 files:
   - dist/**/*
   - build/icons/*
+
+nsis:
+  createDesktopShortcut: always
+  license: LICENSE
