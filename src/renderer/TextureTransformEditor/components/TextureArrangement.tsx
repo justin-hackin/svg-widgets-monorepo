@@ -18,7 +18,7 @@ export const TextureArrangement = observer(() => {
     viewScalePercentStr, viewScaleCenterPercentStr,
     minImageScale, maxImageScale,
     viewScaleDiff, setViewScaleDiff, reconcileViewScaleDiff,
-    modifierTracking: { dragMode = DRAG_MODES.TRANSLATE } = {},
+    modifierTracking: { dragMode = undefined } = {},
   } = useMst() || {};
   const {
     setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
