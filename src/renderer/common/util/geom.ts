@@ -188,11 +188,6 @@ export function symmetricHingePlotByProjectionDistance(p1, p2, theta, distance) 
   ];
 }
 
-export function symmetricHingePlotIntersection(p1, p2, theta, length) {
-  const [pp1, pp2] = symmetricHingePlot(p1, p2, theta, length);
-  return getLineLineIntersection(p1, pp1, p2, pp2);
-}
-
 export const distanceBetweenPoints = (pt1: PointLike, pt2: PointLike):number => distanceFromOrigin(
   subtractPoints(pt2, pt1),
 );
