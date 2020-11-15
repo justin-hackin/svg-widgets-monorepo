@@ -73,11 +73,13 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   formControl: {
     margin: theme.spacing(1),
-  },
-  colorPickerInputPaper: {
-    width: '100%',
     display: 'flex',
-    justifyContent: 'flex-end',
+    flexDirection: 'column',
+  },
+  panelChromePicker: {
+    alignSelf: 'flex-end',
+    // yes its dirty but component uses style attributes, forcing the dreaded!
+    background: `${theme.palette.grey['800']} !important`,
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),

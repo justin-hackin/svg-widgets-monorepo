@@ -9,7 +9,7 @@ import {
   PyramidNetFactoryStoreProvider,
   usePyramidNetFactoryMst,
 } from './models';
-import darkTheme from './data/material-ui-dark-theme.json';
+import darkTheme from './data/material-ui-dark-theme';
 import { PyramidNet } from './components/PyramidNet';
 import { ControlPanel } from './components/ControlPanel';
 import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';

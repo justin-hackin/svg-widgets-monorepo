@@ -7,7 +7,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
 
 // @ts-ignore
-import darkTheme from '../DielineViewer/data/material-ui-dark-theme.json';
+import darkTheme from '../DielineViewer/data/material-ui-dark-theme';
 // eslint-disable-next-line import/no-cycle
 import { ShapePreview } from './components/ShapePreview';
 import { TextureControls } from './components/TextureControls';
