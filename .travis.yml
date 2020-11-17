@@ -17,10 +17,31 @@ matrix:
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
     - os: linux
-      dist: trusty
+      dist: focal
       sudo: required
       services: docker
       language: generic
+
+addons:
+  homebrew:
+    packages:
+      - gsl
+      - gcc@7
+      - double-conversion
+      - boost
+      - glib
+      - cairo
+
+  apt:
+    update: true
+    sources:
+      - universe
+    packages:
+      - g++
+      - cmake
+      - libdouble-conversion-dev
+      - libgsl-dev
+      - libcairo2-dev
 
 notifications:
   email: false

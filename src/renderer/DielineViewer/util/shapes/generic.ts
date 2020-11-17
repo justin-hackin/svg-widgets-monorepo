@@ -18,6 +18,7 @@ export const roundedEdgePath = (points: RoundPointPointsItem[], retractionDistan
   const path = new PathData();
   const pointOfRoundPoint = (roundPoint: RoundPointPointsItem):RawPoint => (isPointLike(roundPoint)
     ? roundPoint : roundPoint.point);
+  path.move(pointOfRoundPoint(points[0]));
   points.slice(1, -1).reduce((acc: PathData, item, pointIndex) => {
     const thisPoint = pointOfRoundPoint(item);
     const thisRetractionDistance = (item as RoundPoint).retractionDistance || retractionDistance;
@@ -25,7 +26,7 @@ export const roundedEdgePath = (points: RoundPointPointsItem[], retractionDistan
     const fromPoint = pointOfRoundPoint(points[pointIndex]);
     const curveStart = hingedPlot(fromPoint, thisPoint, 0, thisRetractionDistance);
     const curveEnd = hingedPlot(toward, thisPoint, 0, thisRetractionDistance);
-    if (pointIndex) { acc.line(curveStart); } else { acc.move(curveStart); }
+    acc.line(curveStart);
     acc.quadraticBezier(thisPoint, curveEnd);
     return acc;
   }, path);
