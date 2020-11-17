@@ -52,7 +52,6 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
-    # from https://stackoverflow.com/a/31386598/2780052, adapted to yarn
 before_install:
   # add git lfs for large file support
   - |
