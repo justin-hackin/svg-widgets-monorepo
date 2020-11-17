@@ -52,11 +52,6 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
-    # from https://stackoverflow.com/a/31386598/2780052, adapted to yarn
-install:
-  #  global installs aren't found, following advice here https://stackoverflow.com/a/51536388/2780052
-  - yarn global add cmake-js
-  - yarn
 before_install:
   # add git lfs for large file support
   - |
@@ -76,7 +71,7 @@ script:
         -v ~/.cache/electron:/root/.cache/electron \
         -v ~/.cache/electron-builder:/root/.cache/electron-builder \
         electronuserland/builder:wine \
-        /bin/bash -c "yarn --link-duplicates --pure-lockfile && yarn test"
+        /bin/bash -c "yarn global add cmake-js && yarn --link-duplicates --pure-lockfile && yarn test"
     else
       yarn test
     fi
