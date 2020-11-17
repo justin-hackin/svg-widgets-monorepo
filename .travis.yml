@@ -39,6 +39,7 @@ addons:
     packages:
       - g++
       - cmake
+      - libboost-dev
       - libdouble-conversion-dev
       - libgsl-dev
       - libcairo2-dev
