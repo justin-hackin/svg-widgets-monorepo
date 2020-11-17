@@ -54,7 +54,8 @@ cache:
     # from https://stackoverflow.com/a/31386598/2780052, adapted to yarn
 install:
   #  global installs aren't found, following advice here https://stackoverflow.com/a/51536388/2780052
-  - yarn add cmake-js
+  - yarn global add cmake-js
+  - yarn
 before_install:
   # add git lfs for large file support
   - |
