@@ -6,13 +6,11 @@
   "main": "dist/main/main.js",
   "scripts": {
     "dev": "electron-webpack dev",
-    "mobx-devtools": "npx mobx-devtools",
+    "mobx-devtools": "mobx-devtools",
     "compile": "electron-webpack",
-    "electron": "node node_modules/electron/cli.js .",
-    "dist": "npm run compile && electron-builder",
     "lint": "eslint src/**/*.ts{,x}",
-    "start": "electron .",
-    "release": "electron-builder",
+    "start": "node node_modules/electron/cli.js .",
+    "release": "npm run compile && electron-builder",
     "test": "echo success"
   },
   "keywords": [

@@ -1,3 +1,5 @@
+# Adapted from https://qvault.io/2019/08/08/automatic-cross-platform-deployments-with-electron-on-a-ci-server-travis/
+
 language: node_js
 
 node_js:
