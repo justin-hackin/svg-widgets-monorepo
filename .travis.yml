@@ -50,9 +50,10 @@ cache:
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
     # from https://stackoverflow.com/a/31386598/2780052, adapted to yarn
-before_install:
+install:
   #  global installs aren't found, following advice here https://stackoverflow.com/a/51536388/2780052
   - yarn add cmake-js
+before_install:
   # add git lfs for large file support
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
