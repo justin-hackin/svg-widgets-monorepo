@@ -83,7 +83,8 @@ deploy:
   script: bash deploy.travis.sh
   skip_cleanup: true
   on:
-    branch: prod
+    # TODO: all merges to master shouldn't trigger release, use prod branch as advised in tutorial and include in only
+    branch: master
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
@@ -93,4 +94,3 @@ before_cache:
 branches:
   only:
     - master
-    - prod
