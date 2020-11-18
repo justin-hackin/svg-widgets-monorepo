@@ -52,6 +52,8 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
+    - $(yarn global bin)
+    - $(yarn global dir)
 before_install:
   # add git lfs for large file support
   - |
@@ -70,7 +72,7 @@ script:
         -v ${PWD}:/project \
         -v ~/.cache/electron:/root/.cache/electron \
         -v ~/.cache/electron-builder:/root/.cache/electron-builder \
-        electronuserland/builder:wine \
+        justinbarca/electron-builder-wine-lib2geom \
         /bin/bash -c "yarn global add cmake-js && yarn --link-duplicates --pure-lockfile && yarn test"
     else
       yarn test
