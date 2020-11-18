@@ -4,5 +4,5 @@ if [ "$TRAVIS_OS_NAME" == osx ]; then
     yarn release
 else
     # deploy on windows and linux
-    docker run --rm -e GH_TOKEN -v "${PWD}":/project -v ~/.cache/electron:/root/.cache/electron -v ~/.cache/electron-builder:/root/.cache/electron-builder justinbarca/electron-builder-wine-lib2geom /bin/bash -c "yarn global add cmake-js && yarn --link-duplicates --pure-lockfile && yarn release --linux AppImage --win"
+    docker run --rm -e GH_TOKEN -v "${PWD}":/project -v ~/.cache/electron:/root/.cache/electron -v ~/.cache/electron-builder:/root/.cache/electron-builder justinbarca/electron-builder-wine-lib2geom:1 /bin/bash -c "yarn global add cmake-js && yarn --link-duplicates --pure-lockfile && yarn release --linux AppImage --win"
 fi
