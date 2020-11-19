@@ -12,7 +12,7 @@ const {
 } = require('./ipc');
 
 // for debugging build, add isEnabled: true
-debug({ showDevTools: false });
+debug({ showDevTools: false, isEnabled: true });
 
 // @ts-ignore
 const icon = nativeImage.createFromPath(`${path.resolve(__static, '..')}/build/icons/256x256.png`);
