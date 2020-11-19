@@ -8,19 +8,21 @@ const debug = require('electron-debug');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const {
-  default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS,
-} = require('electron-devtools-installer');
-const {
   setupIpc, EVENTS, WINDOWS, ROUTED_EVENT_MAP,
 } = require('./ipc');
 
 // for debugging build, add isEnabled: true
-debug({ showDevTools: false });
+debug({ showDevTools: false, isEnabled: true });
 
 // @ts-ignore
 const icon = nativeImage.createFromPath(`${path.resolve(__static, '..')}/build/icons/256x256.png`);
 app.on('ready', async () => {
   if (isDevelopment) {
+    // electron-devtools-installer is a devDependency so don't import at top
+    const {
+      default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS,
+      // eslint-disable-next-line global-require
+    } = require('electron-devtools-installer');
     // this works but main process emits:  (node:42552) ExtensionLoadWarning...
     // see https://github.com/electron/electron/issues/23662
     installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
@@ -129,7 +131,6 @@ app.on('ready', async () => {
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('close', () => {
     browserWindows[WINDOWS.TEXTURE_EDITOR] = undefined;
   });
-
 
   const sendResetDragMode = () => {
     browserWindows[WINDOWS.TEXTURE_EDITOR].webContents.send(EVENTS.RESET_DRAG_MODE);

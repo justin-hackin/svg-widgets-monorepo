@@ -1,12 +1,19 @@
 ---
 appId: com.electron.polyhedral-net-factory
 publish: github
+
+files:
+  - dist/**/*
+  - build/icons/*
+
 linux:
   icon: icons/256x256.png
   target:
-    - deb
+    - AppImage
+
 appImage:
   license: LICENSE
+
 dmg:
   contents:
     - x: 110
@@ -15,10 +22,6 @@ dmg:
       y: 150
       type: link
       path: "/Applications"
-
-files:
-  - dist/**/*
-  - build/icons/*
 
 nsis:
   createDesktopShortcut: always

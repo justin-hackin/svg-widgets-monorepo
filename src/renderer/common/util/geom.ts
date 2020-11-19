@@ -1,9 +1,9 @@
 import {
 // @ts-ignore
-  Line, point, Point, Polygon,
+  Line, point, segment, Polygon,
 } from '@flatten-js/core';
 import { isNaN, isNumber, range } from 'lodash';
-import { offset } from '@flatten-js/polygon-offset';
+import offset from '@flatten-js/polygon-offset';
 
 import { circularSlice } from '../../../common/util/data';
 
@@ -194,16 +194,21 @@ export const distanceBetweenPoints = (pt1: PointLike, pt2: PointLike):number => 
   subtractPoints(pt2, pt1),
 );
 export const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
-const polygonWithFace = (face: PointLike[]) => {
-  if (face.length < 2) {
-    throw new Error('polygonWithFace: face parameter must have 2 or more elements');
+const polygonWithFace = (faceVertices: PointLike[]) => {
+  if (faceVertices.length < 3) {
+    throw new Error('polygonWithFace: face parameter must have 3 or more elements');
   }
-  const theFace = face.map(({ x, y }) => (new Point(x, y)));
+  const theFace = faceVertices.map((pt1, index) => {
+    const pt2 = faceVertices[(index + 1) % faceVertices.length];
+    return segment(point(pt1.x, pt1.y), point(pt2.x, pt2.y));
+  });
   const poly = new Polygon();
   poly.addFace(theFace);
   return poly;
 };
+
 export const offsetPolygonPoints = (points: RawPoint[], offsetDistance) => {
   const poly = polygonWithFace(points);
-  return offset(poly, offsetDistance).vertices.map(castCoordToRawPoint);
+  const offsetPoly = offset(poly, offsetDistance);
+  return offsetPoly.vertices.map(castCoordToRawPoint);
 };
