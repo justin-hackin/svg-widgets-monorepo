@@ -32,7 +32,7 @@ export const TextureArrangement = observer(() => {
     if (
       dragMode === DRAG_MODES.TRANSLATE
       || dragMode === DRAG_MODES.TRANSLATE_HORIZONTAL
-      || DRAG_MODES.TRANSLATE_VERTICAL
+      || dragMode === DRAG_MODES.TRANSLATE_VERTICAL
     ) {
       if (down) {
         const svgMovement = absoluteMovementToSvg(movementPt);
@@ -71,7 +71,6 @@ export const TextureArrangement = observer(() => {
       reconcileTransformOriginDiff();
     }
   });
-
 
   // mouse wheel scale/rotate/zoom
   const viewUseWheel = useGesture({
