@@ -3,19 +3,29 @@ import { types, Instance } from 'mobx-state-tree';
 const optionalModel = (modelDef) => types.optional(types.model(modelDef), {});
 
 export const PreferencesModel = types.model({
-  dieLineProps: optionalModel({
+  dieLineSettings: optionalModel({
     fill: 'none',
     strokeWidth: 1,
   }),
-  cutLineProps: optionalModel({
+  cutSettings: optionalModel({
     stroke: '#FF3A5E',
   }),
-  scoreLineProps: optionalModel({
+  scoreSettings: optionalModel({
     stroke: '#BDFF48',
   }),
-  designBoundaryProps: optionalModel({
+  designBoundarySettings: optionalModel({
     stroke: 'rgb(68,154,255)',
   }),
-});
+}).views((self) => ({
+  get scoreProps() {
+    return { ...self.dieLineSettings, ...self.scoreSettings };
+  },
+  get cutProps() {
+    return { ...self.dieLineSettings, ...self.cutSettings };
+  },
+  get designBoundaryProps() {
+    return { ...self.dieLineSettings, ...self.designBoundarySettings };
+  },
+}));
 
 export interface IPreferencesModel extends Instance<typeof PreferencesModel> {}

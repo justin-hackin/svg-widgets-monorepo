@@ -6,24 +6,26 @@ import { radToDeg } from '../../../common/util/geom';
 import { closedPolygonPath } from '../../util/shapes/generic';
 // eslint-disable-next-line import/no-cycle
 import { usePreferencesMst, usePyramidNetFactoryMst } from '../../models';
+import { IPreferencesModel } from '../../models/PreferencesModel';
+// eslint-disable-next-line import/no-cycle
+import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 
-export const PyramidNet = observer(() => {
+export const PyramidNet = observer(({
+  pyramidNetFactoryStore, preferencesStore,
+}:{
+  preferencesStore: IPreferencesModel, pyramidNetFactoryStore: IPyramidNetFactoryModel
+}) => {
   const {
-    makePaths: { cut, score },
     pyramidNetSpec: {
-      pyramid: {
-        geometry: { faceCount },
-      },
-      faceBoundaryPoints, pathScaleMatrix, faceInteriorAngles,
-      activeCutHolePatternD, borderInsetFaceHoleTransformMatrix,
+      pyramid: { geometry: { faceCount } },
+      faceBoundaryPoints, faceInteriorAngles,
+      activeCutHolePatternD,
+      borderInsetFaceHoleTransformMatrix,
+      pathScaleMatrix,
     },
-  } = usePyramidNetFactoryMst();
-  const styleSpec = usePreferencesMst();
-
-  const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
-  const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
-  const designBoundaryProps = { ...styleSpec.dieLineProps, ...styleSpec.designBoundaryProps };
-
+    makePaths: { cut, score },
+  } = pyramidNetFactoryStore;
+  const { cutProps, scoreProps, designBoundaryProps } = preferencesStore;
   const CUT_HOLES_ID = 'cut-holes';
   return (
     <g>
@@ -59,5 +61,14 @@ export const PyramidNet = observer(() => {
         })}
       </g>
     </g>
+  );
+});
+
+export const PyramidNetStoreContainer = observer(() => {
+  const pyramidNetFactoryStore = usePyramidNetFactoryMst();
+  const preferencesStore = usePreferencesMst();
+
+  return (
+    <PyramidNet preferencesStore={preferencesStore} pyramidNetFactoryStore={pyramidNetFactoryStore} />
   );
 });

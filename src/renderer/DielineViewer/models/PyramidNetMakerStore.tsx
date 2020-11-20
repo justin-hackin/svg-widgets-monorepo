@@ -25,6 +25,7 @@ import { PathData } from '../util/PathData';
 import { strokeDashPath } from '../util/shapes/strokeDashPath';
 import { baseEdgeConnectionTab } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs } from '../util/shapes/ascendantEdgeConnectionTabs';
+import { preferencesStore } from './index';
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
@@ -138,7 +139,10 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   renderPyramidNetToString() {
     return ReactDOMServer.renderToString(React.createElement(
       // @ts-ignore
-      SVGWrapper, self.svgDimensions, React.createElement(PyramidNet, { store: self }),
+      SVGWrapper, self.svgDimensions, (<PyramidNet
+        preferencesStore={preferencesStore}
+        pyramidNetFactoryStore={self as IPyramidNetFactoryModel}
+      />),
     ));
   },
 
