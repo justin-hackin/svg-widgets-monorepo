@@ -64,7 +64,8 @@ before_script:
 # on PRs and merges to master and prod run tests and build the app
 script:
   - node --version
-  - yarn test
+  - yarn add global cmake-js
+    yarn test
 # only deploy to github on a merge to the prod branch
 deploy:
   provider: script
