@@ -17,6 +17,7 @@ install:
   - vcpkg install gsl:x64-windows
   - vcpkg install double-conversion:x64-windows
   - vcpkg install cairo:x64-windows
+  - yarn add global cmake-js
   - yarn
 
 build_script:
