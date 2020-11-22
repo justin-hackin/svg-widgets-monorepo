@@ -1,0 +1,23 @@
+image: Visual Studio 2017
+
+platform:
+  - x64
+
+cache:
+  - node_modules
+  - '%USERPROFILE%\.electron'
+
+init:
+  - git config --global core.autocrlf input
+
+install:
+  - ps: Install-Product node 14.15.1 x64
+  - vcpkg install gsl:x64-windows
+  - vcpkg install double-conversion:x64-windows
+  - vcpkg install cairo:x64-windows
+  - yarn
+
+build_script:
+  - yarn release --win
+
+test: off
