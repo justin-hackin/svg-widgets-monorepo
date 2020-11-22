@@ -16,8 +16,12 @@
   "keywords": [
     "react"
   ],
-  "author": "“Robin <“wrobin@gmx.net”> (https://www.robinwieruch.de)",
+  "author": "“Justin Barca <“justinbarca@gmail.com”>",
   "license": "MIT",
+  "cmake-js": {
+    "runtime": "electron",
+    "runtimeVersion": "6.1.0"
+  },
   "dependencies": {
     "@flatten-js/boolean-op": "^1.1.4",
     "@flatten-js/core": "^1.2.16",

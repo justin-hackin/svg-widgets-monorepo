@@ -2,107 +2,35 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 import { range } from 'lodash';
-import {
-  degToRad, distanceFromOrigin, hingedPlot, hingedPlotByProjectionDistance, radToDeg, subtractPoints,
-} from '../../../common/util/geom';
-import { PathData } from '../../util/PathData';
-import { strokeDashPath } from '../../util/shapes/strokeDashPath';
-import { baseEdgeConnectionTab } from '../../util/shapes/baseEdgeConnectionTab';
-import { ascendantEdgeConnectionTabs } from '../../util/shapes/ascendantEdgeConnectionTabs';
-import { closedPolygonPath, roundedEdgePath } from '../../util/shapes/generic';
+import { radToDeg } from '../../../common/util/geom';
+import { closedPolygonPath } from '../../util/shapes/generic';
 // eslint-disable-next-line import/no-cycle
 import { usePreferencesMst, usePyramidNetFactoryMst } from '../../models';
+import { IPreferencesModel } from '../../models/PreferencesModel';
+// eslint-disable-next-line import/no-cycle
+import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 
-export const PyramidNet = observer(() => {
+export const PyramidNet = observer(({
+  pyramidNetFactoryStore, preferencesStore,
+}:{
+  preferencesStore: IPreferencesModel, pyramidNetFactoryStore: IPyramidNetFactoryModel
+}) => {
   const {
     pyramidNetSpec: {
-      pyramid: {
-        geometry: { faceCount },
-      },
-      interFaceScoreDashSpec, baseScoreDashSpec,
-      ascendantEdgeTabsSpec, baseEdgeTabsSpec,
-      tabIntervalRatios, tabGapIntervalRatios,
-      faceBoundaryPoints, pathScaleMatrix, faceInteriorAngles,
-      actualFaceEdgeLengths, ascendantEdgeTabDepth,
-      activeCutHolePatternD, borderInsetFaceHoleTransformMatrix,
+      pyramid: { geometry: { faceCount } },
+      faceBoundaryPoints, faceInteriorAngles,
+      activeCutHolePatternD,
+      borderInsetFaceHoleTransformMatrix,
+      pathScaleMatrix,
     },
-  } = usePyramidNetFactoryMst();
-  const styleSpec = usePreferencesMst();
-
-  const scoreProps = { ...styleSpec.dieLineProps, ...styleSpec.scoreLineProps };
-  const cutProps = { ...styleSpec.dieLineProps, ...styleSpec.cutLineProps };
-  const designBoundaryProps = { ...styleSpec.dieLineProps, ...styleSpec.designBoundaryProps };
-
-  const cutPathAggregate = new PathData();
-  const scorePathAggregate = new PathData();
-  // inter-face scoring
-  const faceTabFenceposts = range(faceCount + 1).map(
-    (index) => hingedPlot(
-      faceBoundaryPoints[1], faceBoundaryPoints[0], Math.PI * 2 - index * faceInteriorAngles[2],
-      index % 2 ? actualFaceEdgeLengths[2] : actualFaceEdgeLengths[0],
-    ),
-  );
-  faceTabFenceposts.slice(1, -1).forEach((endPt) => {
-    const pathData = strokeDashPath(faceBoundaryPoints[0], endPt, interFaceScoreDashSpec);
-    scorePathAggregate.concatPath(pathData);
-  });
-
-  // female tab outer flap
-  const remainderGapAngle = 2 * Math.PI - faceInteriorAngles[2] * faceCount;
-  if (remainderGapAngle < 0) {
-    throw new Error('too many faces: the sum of angles at apex is greater than 360 degrees');
-  }
-  const FLAP_APEX_IMPINGE_MARGIN = Math.PI / 12;
-  const FLAP_BASE_ANGLE = degToRad(60);
-
-  const flapApexAngle = Math.min(remainderGapAngle - FLAP_APEX_IMPINGE_MARGIN, faceInteriorAngles[2]);
-  const outerPt1 = hingedPlotByProjectionDistance(
-    faceBoundaryPoints[1], faceBoundaryPoints[0], flapApexAngle, -ascendantEdgeTabDepth,
-  );
-  const outerPt2 = hingedPlotByProjectionDistance(
-    faceBoundaryPoints[0], faceBoundaryPoints[1], -FLAP_BASE_ANGLE, ascendantEdgeTabDepth,
-  );
-  const maxRoundingDistance = Math.min(
-    distanceFromOrigin(subtractPoints(faceBoundaryPoints[0], outerPt1)),
-    distanceFromOrigin(subtractPoints(faceBoundaryPoints[1], outerPt2)),
-  );
-  cutPathAggregate.concatPath(
-    roundedEdgePath(
-      [faceBoundaryPoints[0], outerPt1, outerPt2, faceBoundaryPoints[1]],
-      ascendantEdgeTabsSpec.flapRoundingDistanceRatio * maxRoundingDistance,
-    ),
-  );
-
-  // base edge tabs
-  faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
-    const edgePt2 = faceTabFenceposts[index + 1];
-    const baseEdgeTab = baseEdgeConnectionTab(
-      edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabsSpec, baseScoreDashSpec,
-    );
-    cutPathAggregate.concatPath(baseEdgeTab.cut);
-    scorePathAggregate.concatPath(baseEdgeTab.score);
-  });
-
-  // male tabs
-  const ascendantTabs = ascendantEdgeConnectionTabs(
-    faceBoundaryPoints[1], faceBoundaryPoints[0],
-    ascendantEdgeTabsSpec, interFaceScoreDashSpec, tabIntervalRatios, tabGapIntervalRatios,
-  );
-  const rotationMatrix = `rotate(${radToDeg(-faceCount * faceInteriorAngles[2])})`;
-  ascendantTabs.male.cut.transform(rotationMatrix);
-  ascendantTabs.male.score.transform(rotationMatrix);
-  cutPathAggregate.concatPath(ascendantTabs.male.cut);
-  scorePathAggregate.concatPath(ascendantTabs.male.score);
-
-  // female inner
-  cutPathAggregate.concatPath(ascendantTabs.female.cut);
-  scorePathAggregate.concatPath(ascendantTabs.female.score);
-
+    makePaths: { cut, score },
+  } = pyramidNetFactoryStore;
+  const { cutProps, scoreProps, designBoundaryProps } = preferencesStore;
   const CUT_HOLES_ID = 'cut-holes';
   return (
     <g>
-      <path className="score" {...scoreProps} d={scorePathAggregate.getD()} />
-      <path className="cut" {...cutProps} d={cutPathAggregate.getD()} />
+      <path className="score" {...scoreProps} d={score.getD()} />
+      <path className="cut" {...cutProps} d={cut.getD()} />
       <g>
         {range(faceCount).map((index) => {
           const isOdd = !!(index % 2);
@@ -133,5 +61,14 @@ export const PyramidNet = observer(() => {
         })}
       </g>
     </g>
+  );
+});
+
+export const PyramidNetStoreContainer = observer(() => {
+  const pyramidNetFactoryStore = usePyramidNetFactoryMst();
+  const preferencesStore = usePreferencesMst();
+
+  return (
+    <PyramidNet preferencesStore={preferencesStore} pyramidNetFactoryStore={pyramidNetFactoryStore} />
   );
 });

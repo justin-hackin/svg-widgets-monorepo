@@ -6,22 +6,19 @@ node_js:
   - '14.15.1'
 
 # Always run two parallel builds: one on mac and one on linux
-# the linux build will use wine to be able to build windows and
-# linux apps
 matrix:
   include:
-#    - os: osx
-#      osx_image: xcode10.2
-#      language: node_js
-#      node_js: "11.6.0"
-#      env:
-#        - ELECTRON_CACHE=$HOME/.cache/electron
-#        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+    - os: osx
+      osx_image: xcode10.2
+      language: node_js
+      node_js: "14.15.1"
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
     - os: linux
       dist: focal
       sudo: required
-      services: docker
       language: generic
 
 addons:
@@ -66,17 +63,9 @@ before_script:
 
 # on PRs and merges to master and prod run tests and build the app
 script:
-  - |
-    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      docker run --rm \
-        -v ${PWD}:/project \
-        -v ~/.cache/electron:/root/.cache/electron \
-        -v ~/.cache/electron-builder:/root/.cache/electron-builder \
-        justinbarca/electron-builder-wine-lib2geom:1 \
-        /bin/bash -c "yarn global add cmake-js && yarn --link-duplicates --pure-lockfile && yarn test"
-    else
-      yarn test
-    fi
+  - node --version
+  - yarn add global cmake-js
+    yarn test
 # only deploy to github on a merge to the prod branch
 deploy:
   provider: script
@@ -86,8 +75,6 @@ deploy:
     # TODO: all merges to master shouldn't trigger release, use prod branch as advised in tutorial and include in only
     branch: master
 
-before_cache:
-  - rm -rf $HOME/.cache/electron-builder/wine
 
 # only run this script on pull requests and merges into
 # the 'master' and 'prod' branches

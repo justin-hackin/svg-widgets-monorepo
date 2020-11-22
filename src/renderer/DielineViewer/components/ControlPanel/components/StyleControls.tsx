@@ -9,9 +9,9 @@ export const StyleControls = observer(() => {
   return (
     <>
       <PanelSlider
-        value={preferences.dieLineProps.strokeWidth}
-        setter={(val) => { preferences.dieLineProps.strokeWidth = val; }}
-        valuePath="preferences.dieLineProps.strokeWidth"
+        value={preferences.dieLineSettings.strokeWidth}
+        setter={(val) => { preferences.dieLineSettings.strokeWidth = val; }}
+        valuePath="preferences.dieLineSettings.strokeWidth"
         label="Dieline Stroke"
         min={0}
         max={3}
@@ -19,21 +19,21 @@ export const StyleControls = observer(() => {
       />
       <PanelColorPicker
         label="Cut Stroke Color"
-        valuePath="preferences.cutLineProps.stroke"
-        value={preferences.cutLineProps.stroke}
-        setter={(val) => { preferences.cutLineProps.stroke = val; }}
+        valuePath="preferences.cutSettings.stroke"
+        value={preferences.cutSettings.stroke}
+        setter={(val) => { preferences.cutSettings.stroke = val; }}
       />
       <PanelColorPicker
         label="Score Stroke Color"
-        valuePath="preferences.scoreLineProps.stroke"
-        value={preferences.scoreLineProps.stroke}
-        setter={(val) => { preferences.scoreLineProps.stroke = val; }}
+        valuePath="preferences.scoreSettings.stroke"
+        value={preferences.scoreSettings.stroke}
+        setter={(val) => { preferences.scoreSettings.stroke = val; }}
       />
       <PanelColorPicker
         label="Design Boundary Stroke Color"
-        valuePath="preferences.designBoundaryProps.stroke"
-        value={preferences.designBoundaryProps.stroke}
-        setter={(val) => { preferences.designBoundaryProps.stroke = val; }}
+        valuePath="preferences.designBoundarySettings.stroke"
+        value={preferences.designBoundarySettings.stroke}
+        setter={(val) => { preferences.designBoundarySettings.stroke = val; }}
       />
     </>
   );
