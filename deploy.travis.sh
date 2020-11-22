@@ -1,5 +1,5 @@
 #! /bin/bash
-yarn add global cmake-js
+yarn global add cmake-js
 if [ "$TRAVIS_OS_NAME" == osx ]; then
     # deploy on mac
     yarn release
