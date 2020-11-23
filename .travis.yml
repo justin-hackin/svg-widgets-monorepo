@@ -61,10 +61,10 @@ before_script:
   - git lfs pull
 
 # on PRs and merges to master and prod run tests and build the app
-#script:
-#  - node --version
-#  - yarn
-#  - yarn add cmake-js
+script:
+  - node --version
+  - yarn add cmake-js
+  - yarn
 #    yarn test
 # only deploy to github on a merge to the prod branch
 deploy:
@@ -73,7 +73,7 @@ deploy:
   skip_cleanup: true
   on:
     # TODO: all merges to master shouldn't trigger release, use prod branch as advised in tutorial and include in only
-    branch: master
+    branch: master #prod
 
 
 # only run this script on pull requests and merges into
@@ -81,3 +81,4 @@ deploy:
 branches:
   only:
     - master
+#    - prod
