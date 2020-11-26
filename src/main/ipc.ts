@@ -3,9 +3,8 @@ const svgpath = require('svgpath');
 const path = require('path');
 const fsPromises = require('fs').promises;
 const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean');
-const { VERY_LARGE_NUMBER } = require('../renderer/common/util/geom');
 const { PathData } = require('../renderer/DielineViewer/util/PathData');
-
+const { VERY_LARGE_NUMBER } = require('../renderer/common/constants');
 
 const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
 
@@ -53,7 +52,6 @@ export const EVENTS = {
   ...MAIN_EVENTS, ...ROUTED_EVENTS,
 };
 
-
 const svgFilters = [{ name: 'SVG - Scalable Vector Graphics', extensions: ['svg'] }];
 const jsonFilters = [{ name: 'JSON', extensions: ['json'] }];
 const gltfFilters = [{ name: 'GLTF 3D model', extensions: ['gltf'] }];
@@ -78,7 +76,6 @@ export const setupIpc = (ipcMain) => {
       }
       return intersectPathData(texturePathTransformedD, decorationBoundaryPathD);
     });
-
 
   ipcMain.handle(EVENTS.SAVE_SVG, (e, fileContent, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,
@@ -119,7 +116,6 @@ export const setupIpc = (ipcMain) => {
   ipcMain.handle(EVENTS.LOAD_NET_SPEC, () => resolveStringDataFromDialog(
     { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },
   ).then((jsonString) => JSON.parse(jsonString)));
-
 
   ipcMain.handle(EVENTS.OPEN_SVG, async (e, message) => resolveStringDataFromDialog({
     message,

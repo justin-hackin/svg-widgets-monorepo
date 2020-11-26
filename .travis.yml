@@ -22,6 +22,9 @@ matrix:
 
 addons:
   homebrew:
+    # Fixes issues described in:
+    # https://travis-ci.community/t/macos-build-fails-because-of-homebrew-bundle-unknown-command/7296/14
+    update: true
     packages:
       - gsl
       - gcc@7
@@ -48,8 +51,6 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
-    - $(yarn global bin)
-    - $(yarn global dir)
 before_install:
   # add git lfs for large file support
   - |
@@ -61,11 +62,12 @@ before_script:
   - git lfs pull
 
 # on PRs and merges to master and prod run tests and build the app
-#script:
-#  - node --version
-#  - yarn
-#  - yarn add cmake-js
-#    yarn test
+script:
+  - node --version
+  # addon requires cmake-js, uses npm not yarn
+  - npm list -g cmake-js --depth=0 || npm install -g cmake-js
+  - yarn
+  - yarn test
 # only deploy to github on a merge to the prod branch
 deploy:
   provider: script
@@ -73,7 +75,7 @@ deploy:
   skip_cleanup: true
   on:
     # TODO: all merges to master shouldn't trigger release, use prod branch as advised in tutorial and include in only
-    branch: master
+    branch: master #prod
 
 
 # only run this script on pull requests and merges into
@@ -81,3 +83,4 @@ deploy:
 branches:
   only:
     - master
+#    - prod
