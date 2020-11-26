@@ -64,7 +64,9 @@ before_script:
 # on PRs and merges to master and prod run tests and build the app
 script:
   - node --version
-  - yarn add cmake-js
+  # addon requires cmake-js, uses npm not yarn
+  - npm list -g cmake-js --depth=0 || npm install -g cmake-js
+  - yarn
   - yarn test
 # only deploy to github on a merge to the prod branch
 deploy:
