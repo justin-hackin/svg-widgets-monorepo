@@ -48,8 +48,6 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
-    - $(yarn global bin)
-    - $(yarn global dir)
 before_install:
   # add git lfs for large file support
   - |
@@ -59,7 +57,6 @@ before_install:
     fi
 before_script:
   - git lfs pull
-  - yarn global add cmake-js
 
 # on PRs and merges to master and prod run tests and build the app
 script:
