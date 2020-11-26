@@ -22,6 +22,9 @@ matrix:
 
 addons:
   homebrew:
+    # Fixes issues described in:
+    # https://travis-ci.community/t/macos-build-fails-because-of-homebrew-bundle-unknown-command/7296/14
+    update: true
     packages:
       - gsl
       - gcc@7
