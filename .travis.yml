@@ -59,7 +59,7 @@ before_install:
     fi
 before_script:
   - git lfs pull
-  - yarn add cmake-js
+  - yarn global add cmake-js
 
 # on PRs and merges to master and prod run tests and build the app
 script:
