@@ -19,8 +19,7 @@ install:
   - vcpkg install cairo:x64-windows
   # https://www.appveyor.com/docs/windows-images-software/#boost
   - yarn config set cmake_BOOST_ROOT C:\Libraries\boost_1_69_0
-  - yarn global add cmake-js
-  - yarn
+  - yarn add cmake-js
 
 build_script:
   - yarn release --win
