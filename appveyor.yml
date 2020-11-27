@@ -1,7 +1,7 @@
-image: Visual Studio 2017
+image: Visual Studio 2015
 environment:
   nodejs_version: "14"
-  Path: $(yarn global bin);$(Path)
+  Path: $(yarn global bin);C:\MinGW\bin;$(Path)
   VCPKG_DEFAULT_TRIPLET: x86-windows
 
 platform:
