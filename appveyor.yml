@@ -2,8 +2,6 @@ image: Visual Studio 2017
 environment:
   nodejs_version: "14"
   Path: $(yarn global bin);$(Path)
-  BOOST_ROOT: C:\Libraries\boost_1_59_0
-  BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib64-msvc-14.0
 
 platform:
   - x64
@@ -22,6 +20,7 @@ install:
   - vcpkg install gsl:x64-windows
   - vcpkg install double-conversion:x64-windows
   - vcpkg install cairo:x64-windows
+  - yarn config set cmake_BOOST_ROOT "C:\Libraries\boost_1_69_0"
   # https://www.appveyor.com/docs/windows-images-software/#boost
   - yarn global add cmake-js
   - yarn
