@@ -19,7 +19,6 @@ init:
 
 install:
   - ps: Install-Product node $env:nodejs_version
-  - make --version
   # https://github.com/microsoft/vcpkg/issues/14815
   - choco install pkgconfiglite
   - vcpkg install gsl
