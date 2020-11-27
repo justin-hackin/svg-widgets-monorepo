@@ -8,6 +8,8 @@ platform:
 cache:
   - node_modules
   - '%USERPROFILE%\.electron'
+  - $(yarn global bin)
+  - $(yarn global dir)
 
 init:
   - git config --global core.autocrlf input
@@ -19,7 +21,9 @@ install:
   - vcpkg install cairo:x64-windows
   # https://www.appveyor.com/docs/windows-images-software/#boost
   - yarn config set cmake_BOOST_ROOT C:\Libraries\boost_1_69_0
-  - yarn add cmake-js
+  - ps: $env:Path += ";$(yarn global bin)"
+  - yarn global add cmake-js
+  - yarn
 
 build_script:
   - yarn release --win
