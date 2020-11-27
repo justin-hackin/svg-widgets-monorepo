@@ -21,10 +21,10 @@ install:
   - vcpkg install gsl:x64-windows
   - vcpkg install double-conversion:x64-windows
   - vcpkg install cairo:x64-windows
-  - npm config set cmake_BOOST_ROOT "C:\Libraries\boost_1_69_0" --global
-  - npm config set cmake_CMAKE_TOOLCHAIN_FILE "c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake" --global
-  # https://www.appveyor.com/docs/windows-images-software/#boost
   - yarn global add cmake-js
+  # https://www.appveyor.com/docs/windows-images-software/#boost
+  - npm config set cmake_BOOST_ROOT "C:\Libraries\boost_1_69_0"
+  - npm config set cmake_CMAKE_TOOLCHAIN_FILE "c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake"
   - yarn
 
 build_script:
