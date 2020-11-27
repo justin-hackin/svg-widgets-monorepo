@@ -9,6 +9,7 @@ platform:
 cache:
   - node_modules
   - '%USERPROFILE%\.electron'
+  - c:\tools\vcpkg\installed\
   - $(yarn global bin)
   - $(yarn global dir)
 
@@ -21,6 +22,7 @@ install:
   - vcpkg install double-conversion:x64-windows
   - vcpkg install cairo:x64-windows
   - npm config set cmake_BOOST_ROOT "C:\Libraries\boost_1_69_0" --global
+  - npm config set cmake_CMAKE_TOOLCHAIN_FILE "c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake" --global
   # https://www.appveyor.com/docs/windows-images-software/#boost
   - yarn global add cmake-js
   - yarn
