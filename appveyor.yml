@@ -31,6 +31,8 @@ install:
   - npm config set cmake_CMAKE_SH "CMAKE_SH-NOTFOUND"
   - npm config set cmake_VCPKG_TARGET_TRIPLET x86-windows
   - npm config set cmake_CMAKE_MAKE_PROGRAM "C:\MinGW\bin\make.exe"
+  - npm config set cmake_CMAKE_C_COMPILER "C:\MinGW\bin\gcc.exe"
+  - npm config set cmake_CMAKE_CXX_COMPILER "C:\MinGW\bin\g++.exe"
   - npm config set cmake_js_G "MinGW Makefiles"
   - yarn
 
