@@ -22,6 +22,7 @@ install:
   # https://github.com/microsoft/vcpkg/issues/14815
   - choco install pkgconfiglite
   - vcpkg install gsl
+  - vcpkg install boost
   - vcpkg install double-conversion
   - vcpkg install cairo
   - yarn global add cmake-js
