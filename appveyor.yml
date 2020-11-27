@@ -21,7 +21,7 @@ install:
   - vcpkg install double-conversion:x64-windows
   - vcpkg install cairo:x64-windows
   # https://www.appveyor.com/docs/windows-images-software/#boost
-  - yarn config set cmake_BOOST_ROOT C:\Libraries\boost_1_69_0
+  - yarn config set cmake_Boost_INCLUDE_DIR C:\Libraries\boost_1_69_0
   - yarn global add cmake-js
   - yarn
 
