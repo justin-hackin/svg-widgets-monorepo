@@ -20,7 +20,8 @@
   "license": "MIT",
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "6.1.0"
+    "runtimeVersion": "6.1.0",
+    "arch": "ia32"
   },
   "dependencies": {
     "@flatten-js/boolean-op": "^1.1.4",
