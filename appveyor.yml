@@ -19,6 +19,8 @@ init:
 
 install:
   - ps: Install-Product node $env:nodejs_version
+  # https://github.com/microsoft/vcpkg/issues/14815
+  - choco install pkgconfiglite
   - vcpkg install gsl:x64-windows
   - vcpkg install double-conversion:x64-windows
   - vcpkg install cairo:x64-windows
