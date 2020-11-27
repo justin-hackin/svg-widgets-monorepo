@@ -51,6 +51,8 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
+    - $(yarn global bin)
+    - $(yarn global dir)
 before_install:
   # add git lfs for large file support
   - |
@@ -65,7 +67,8 @@ before_script:
 script:
   - node --version
   # addon requires cmake-js, uses npm not yarn
-  - npm list -g cmake-js --depth=0 || npm install -g cmake-js
+  - export PATH=
+  - yarn global add cmake-js
   - yarn
   - yarn test
 # only deploy to github on a merge to the prod branch
