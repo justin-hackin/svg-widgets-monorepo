@@ -29,6 +29,7 @@ install:
   - npm config set cmake_BOOST_ROOT "C:\Libraries\boost_1_69_0"
   - npm config set cmake_CMAKE_TOOLCHAIN_FILE "c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake"
   - npm config set cmake_js_G "MinGW Makefiles"
+  - npm config set cmake_CMAKE_SH "CMAKE_SH-NOTFOUND"
   - yarn
 
 build_script:
