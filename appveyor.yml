@@ -27,7 +27,6 @@ install:
   - vcpkg install cairo
   - yarn global add cmake-js
   # https://www.appveyor.com/docs/windows-images-software/#boost
-  - npm config set cmake_BOOST_ROOT "C:\Libraries\boost_1_69_0"
   - npm config set cmake_CMAKE_TOOLCHAIN_FILE "c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake"
   - npm config set cmake_CMAKE_SH "CMAKE_SH-NOTFOUND"
   - npm config set cmake_VCPKG_TARGET_TRIPLET x86-windows
