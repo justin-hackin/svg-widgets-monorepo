@@ -3,6 +3,7 @@ environment:
   nodejs_version: "14"
   Path: $(yarn global bin);C:\MinGW\bin;$(Path)
   VCPKG_DEFAULT_TRIPLET: x86-windows
+  MAKEFLAGS: "SHELL=cmd"
 
 platform:
   - x64
@@ -28,7 +29,6 @@ install:
   - yarn global add cmake-js
   # https://www.appveyor.com/docs/windows-images-software/#boost
   - npm config set cmake_CMAKE_TOOLCHAIN_FILE "c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake"
-  - npm config set cmake_CMAKE_SH "CMAKE_SH-NOTFOUND"
   - npm config set cmake_VCPKG_TARGET_TRIPLET x86-windows
   - npm config set "cmake_CMAKE_MAKE_PROGRAM:FILEPATH" "C:\MinGW\bin\make.exe"
   - npm config set "cmake_CMAKE_C_COMPILER:FILEPATH" "C:\MinGW\bin\gcc.exe"
