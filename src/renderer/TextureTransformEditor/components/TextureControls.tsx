@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   TextField, InputAdornment,
-  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar,
+  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar, Tooltip,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
@@ -21,7 +21,6 @@ import { HistoryButtons } from '../../DielineViewer/components/ControlPanel/comp
 import { useStyles } from '../style';
 import { VERY_SMALL_NUMBER } from '../../common/constants';
 
-
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
     {...other}
@@ -38,7 +37,6 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
     suffix="°"
   />
 );
-
 
 export const TextureControls = observer(() => {
   const {
@@ -109,14 +107,22 @@ export const TextureControls = observer(() => {
           <FolderOpenIcon fontSize="large" />
         </IconButton>
         <HistoryButtons history={history} />
+        <FormControlLabel
+          className={classes.checkboxControlLabel}
+          labelPlacement="top"
+          control={(
+            <Switch
+              checked={autoRotatePreview}
+              onChange={(e) => {
+                setAutoRotatePreview(e.target.checked);
+              }}
+              color="primary"
+            />
+          )}
+          label="Auto-rotate preview"
+        />
         {texture && (
           <>
-            <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
-              <GetAppIcon />
-            </IconButton>
-            <IconButton onClick={() => { sendTexture(); }} aria-label="send texture" component="span">
-              <TelegramIcon fontSize="large" />
-            </IconButton>
             <FormControlLabel
               className={classes.checkboxControlLabel}
               labelPlacement="top"
@@ -237,20 +243,20 @@ export const TextureControls = observer(() => {
               ))}
             </Menu>
             <DragModeOptionsGroup />
-            <FormControlLabel
-              className={classes.checkboxControlLabel}
-              labelPlacement="top"
-              control={(
-                <Switch
-                  checked={autoRotatePreview}
-                  onChange={(e) => {
-                    setAutoRotatePreview(e.target.checked);
-                  }}
-                  color="primary"
-                />
-              )}
-              label="Auto-rotate preview"
-            />
+            <Tooltip title="Download 3D model GLTF" arrow>
+              <span>
+                <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
+                  <GetAppIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Send shape decoration to Dieline Editor" arrow>
+              <span>
+                <IconButton onClick={() => { sendTexture(); }} aria-label="send texture" component="span">
+                  <TelegramIcon fontSize="large" />
+                </IconButton>
+              </span>
+            </Tooltip>
           </>
         )}
       </Toolbar>
