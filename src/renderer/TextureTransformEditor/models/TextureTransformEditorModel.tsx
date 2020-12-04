@@ -35,7 +35,6 @@ const getFitScale = (bounds, image) => {
   };
 };
 
-
 export const TextureTransformEditorModel = types
   .model('TextureTransformEditor', {
     shapeName: types.maybe(types.string),
@@ -55,7 +54,7 @@ export const TextureTransformEditorModel = types
     // translation required to bring the decoration area first corner to the face boundary first corner
     insetToBorderOffset: null,
     viewScaleDiff: 1,
-    autoRotatePreview: true,
+    autoRotatePreview: false,
     showNodes: false,
     nodeScaleMux: 1,
     selectedTextureNodeIndex: null,
@@ -284,7 +283,6 @@ export const TextureTransformEditorModel = types
     const shapeDecorationHandler = (_, decorationBoundaryVertices, shapeName, faceDecoration) => {
       self.textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration);
     };
-
 
     return {
       afterCreate() {
