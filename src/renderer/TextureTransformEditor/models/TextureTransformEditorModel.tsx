@@ -9,11 +9,16 @@ import { TextureModel } from './TextureModel';
 
 import { DimensionsModel } from './DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
-import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset, getOriginPoint, scalePoint, sumPoints, transformPoint,
 } from '../../common/util/geom';
+import {
+  ImageFaceDecorationPatternModel,
+  PathFaceDecorationPatternModel,
+} from '../../DielineViewer/models/PyramidNetStore';
+
+const DEFAULT_IS_POSITIVE = true;
 
 const getCoverScale = (bounds, image) => {
   const widthScale = bounds.width / image.width;
@@ -145,32 +150,40 @@ export const TextureTransformEditorModel = types
         : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 };
       self.texture.scale = self.imageCoverScale.scale;
     },
-    setTextureInstance(pathD, sourceFileName) {
+    resetNodesEditor() {
       self.showNodes = false;
       self.selectedTextureNodeIndex = null;
+    },
+    setTexture(pattern) {
+      this.resetNodesEditor();
+
       self.texture = TextureModel.create({
-        pathD,
-        sourceFileName,
+        pattern,
         scale: 1,
         rotate: 0,
         translate: getOriginPoint(),
         transformOrigin: getOriginPoint(),
-        isPositive: true,
       });
+      this.fitTextureToFace();
+      this.repositionOriginOverCorner(0);
     },
-    setTexturePath(pathD, sourceFileName, recenterPath = false) {
-      this.setTextureInstance(pathD, sourceFileName);
-      if (recenterPath) {
-        this.fitTextureToFace();
-        this.repositionOriginOverCorner(0);
-      }
+
+    setTexturePath(pathD, sourceFileName) {
+      this.setTexture(PathFaceDecorationPatternModel.create({
+        pathD, sourceFileName, isPositive: DEFAULT_IS_POSITIVE,
+      }));
+    },
+    setTextureImage(imageData, dimensions, sourceFileName) {
+      this.setTexture(ImageFaceDecorationPatternModel.create({
+        imageData, dimensions, sourceFileName,
+      }));
     },
     setShapeObject(shape) {
       self.shapeObject = shape;
     },
     // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
     getFileBasename() {
-      return `${self.shapeName || 'shape'}__${resolvePath(self, '/texture/sourceFileName') || 'undecorated'}`;
+      return `${self.shapeName || 'shape'}__${resolvePath(self, '/texture/pattern/sourceFileName') || 'undecorated'}`;
     },
     async downloadShapeGLTF() {
       return self.gltfExporter
@@ -180,16 +193,6 @@ export const TextureTransformEditorModel = types
             defaultPath: `${this.getFileBasename()}.gltf`,
           });
         }, {});
-    },
-    async setTextureFromFile(url) {
-      const d = await globalThis.ipcRenderer
-        .invoke(EVENTS.GET_SVG_STRING_BY_PATH, url)
-        .then((svgString) => extractCutHolesFromSvgString(svgString));
-      const fileNameWithExtension = await globalThis.ipcRenderer.invoke(EVENTS.GET_PATH_BASENAME, url);
-      // TODO: error handling
-      // @ts-ignore
-      // file dialog filters only svg files thus slice is safe to trim extension
-      this.setTexturePath(d, fileNameWithExtension.slice(0, -4), true);
     },
     // TODO: add limits for view scale and
     // these seem like the domain of the texture model but setters for

@@ -1,7 +1,12 @@
-import { Instance, getParentOfType } from 'mobx-state-tree';
+import { Instance, getParentOfType, getType } from 'mobx-state-tree';
 // @ts-ignore
 
-import { FaceDecorationModel } from '../../DielineViewer/models/PyramidNetStore';
+import {
+  FaceDecorationModel,
+  IImageFaceDecorationPatternModel,
+  IPathFaceDecorationPatternModel,
+  PathFaceDecorationPatternModel,
+} from '../../DielineViewer/models/PyramidNetStore';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
 // eslint-disable-next-line import/no-cycle
@@ -16,7 +21,7 @@ import {
 const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);
 
-const transformDiffDefaults = {
+export const transformDiffDefaults = {
   translateDiff: getOriginPoint(),
   rotateDiff: 0,
   scaleDiff: 1,
@@ -26,8 +31,16 @@ const transformDiffDefaults = {
 export const TextureModel = FaceDecorationModel
   .volatile(() => ({ ...transformDiffDefaults }))
   .views((self) => ({
+    get hasPathPattern() {
+      return getType(self.pattern) === PathFaceDecorationPatternModel;
+    },
     get dimensions() {
-      return getDimensionsFromPathD(self.pathD);
+      if (this.hasPathPattern) {
+        const { pathD } = self.pattern as IPathFaceDecorationPatternModel;
+        return getDimensionsFromPathD(pathD);
+      }
+      const { dimensions } = self.pattern as IImageFaceDecorationPatternModel;
+      return dimensions;
     },
     get transformOriginDragged() {
       return sumPoints(self.transformOrigin, self.transformOriginDiff);
@@ -51,7 +64,11 @@ export const TextureModel = FaceDecorationModel
       return this.transformMatrixDragged && this.transformMatrixDragged.toString();
     },
     get destinationPoints() {
-      return (new PathData(self.pathD)).getDestinationPoints();
+      if (!this.hasPathPattern) {
+        return null;
+      }
+      const { pathD } = self.pattern as IPathFaceDecorationPatternModel;
+      return (new PathData(pathD)).getDestinationPoints();
     },
     get parentHistoryManager() {
       return getParentOfType(self, TextureTransformEditorModel).history;
@@ -103,7 +120,8 @@ export const TextureModel = FaceDecorationModel
       self.transformOriginDiff = getOriginPoint();
     },
     setIsPositive(isPositive) {
-      self.isPositive = isPositive;
+      if (!self.hasPathPattern) { throw new Error('invalid call to setIsPositive: texture must be path'); }
+      (self.pattern as IPathFaceDecorationPatternModel).isPositive = isPositive;
     },
     resetTransformDiff() {
       Object.assign(self, transformDiffDefaults);

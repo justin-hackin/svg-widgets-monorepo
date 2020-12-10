@@ -51,7 +51,6 @@ export const ascendantEdgeConnectionTabs = (
     lineLerp(start, end, tabIntervalRatios[tabNum][1]),
   ];
 
-
   const commands = {
     female: {
       cut: (new PathData()),

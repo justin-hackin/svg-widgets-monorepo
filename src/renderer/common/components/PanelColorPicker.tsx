@@ -5,7 +5,6 @@ import Typography from '@material-ui/core/Typography';
 import { ChromePicker } from 'react-color';
 import { useStyles } from '../../DielineViewer/style';
 
-
 export const PanelColorPicker = ({
   label, setter, value, valuePath, ...rest
 }) => {

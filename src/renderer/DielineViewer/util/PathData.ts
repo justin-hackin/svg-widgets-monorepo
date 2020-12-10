@@ -181,7 +181,6 @@ const parseSVG = (d) => {
 
 const composeSVG = (commands) => commands.map((command) => commandToString(command)).join(' ');
 
-
 export class PathData {
   private _commands: Command[];
 

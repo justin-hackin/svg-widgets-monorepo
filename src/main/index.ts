@@ -27,7 +27,7 @@ app.on('ready', async () => {
     // see https://github.com/electron/electron/issues/23662
     installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]);
   }
-  setupIpc(ipcMain, app);
+  setupIpc(ipcMain);
   const { width, height } = electronScreen.getPrimaryDisplay().workAreaSize;
 
   const promisifyWindow = (

@@ -54,7 +54,6 @@ const TextureTransformEditorLOC = observer(() => {
   // TODO: drag and drop functionality, removed in fd71f4aba9dd4a698e5a2667595cff82c8fb5cf5
   // see commit message for rationale
 
-
   if (!placementAreaDimensions || !decorationBoundary) { return null; }
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 

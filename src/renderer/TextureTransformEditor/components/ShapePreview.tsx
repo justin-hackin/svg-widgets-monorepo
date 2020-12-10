@@ -12,7 +12,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import OrbitControls from 'threejs-orbit-controls';
 import '../style.css';
 import requireStatic from '../../requireStatic';
-import { TextureSvg } from './TextureSvg';
+import { TextureSvgUnobserved } from './TextureSvg';
 // eslint-disable-next-line import/no-cycle
 import { useMst } from '../models';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
@@ -34,6 +34,7 @@ export const ShapePreview = observer(() => {
   const [camera, setCamera] = useState<PerspectiveCamera>();
   const [controls, setControls] = useState<OrbitControls>();
   const [scene, setScene] = useState<Scene>();
+  const [readyForCanvasRender, setReadyForCanvasRender] = useState<boolean>(true);
   // TODO: use this or loose it
   const [offsetY] = useState(85);
 
@@ -42,11 +43,12 @@ export const ShapePreview = observer(() => {
   const requestRef = React.useRef<number>(0);
 
   const { viewBoxAttrs } = faceBoundary || {};
-  const { transformMatrixDraggedStr, isPositive } = texture || {};
+  const { transformMatrixDraggedStr, pattern: { isPositive = undefined } = {} } = texture || {};
 
   // update shape texture
   useEffect(() => {
-    if (shapeObject && viewBoxAttrs) {
+    if (shapeObject && viewBoxAttrs && readyForCanvasRender) {
+      setReadyForCanvasRender(false);
       const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
       // TODO: throw if material not MeshPhong
       // @ts-ignore
@@ -54,7 +56,7 @@ export const ShapePreview = observer(() => {
       const ctx = textureCanvas.getContext('2d');
       // @ts-ignore
       const svgStr = ReactDOMServer.renderToString(
-        React.createElement(TextureSvg, { viewBox: viewBoxAttrsToString(viewBoxAttrs) }),
+        React.createElement(TextureSvgUnobserved, { viewBox: viewBoxAttrsToString(viewBoxAttrs), store }),
       );
       // @ts-ignore
       Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
@@ -63,6 +65,7 @@ export const ShapePreview = observer(() => {
         material.map.image = textureCanvas.transferToImageBitmap();
         // @ts-ignore
         material.map.needsUpdate = true;
+        setReadyForCanvasRender(true);
       });
     }
   }, [shapeObject, transformMatrixDraggedStr, isPositive, viewBoxAttrs]);
@@ -146,7 +149,6 @@ export const ShapePreview = observer(() => {
       },
     );
   }, [shapeName, camera, scene]);
-
 
   // @ts-ignore
   return (<div ref={threeContainerRef} id="3d-preview-container" />);

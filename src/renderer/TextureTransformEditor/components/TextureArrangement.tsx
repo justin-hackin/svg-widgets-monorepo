@@ -123,7 +123,6 @@ export const TextureArrangement = observer(() => {
         viewBox={viewBoxAttrsToString(decorationBoundary.viewBoxAttrs)}
       >
         <TextureSvg
-          isOnScreen
           {...{
             textureTranslationUseDrag,
             transformOriginUseDrag,

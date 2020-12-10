@@ -1,14 +1,15 @@
 const { dialog } = require('electron');
 const svgpath = require('svgpath');
+const datauri = require('datauri');
+const sizeOfImage = require('image-size');
 const path = require('path');
 const fsPromises = require('fs').promises;
 const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean');
+
 const { PathData } = require('../renderer/DielineViewer/util/PathData');
 const { VERY_LARGE_NUMBER } = require('../renderer/common/constants');
 
 const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
-
-export const EVENT_TARGET_DELIMITER = '<=';
 
 export enum WINDOWS {
   TEXTURE_EDITOR = 'texture-editor',
@@ -25,9 +26,8 @@ enum MAIN_EVENTS {
   OPEN_SVG = 'open-svg',
   OPEN_TEXTURE_WINDOW = 'open-texture-window',
   RESET_DRAG_MODE = 'reset-drag-mode',
-  GET_SVG_STRING_BY_PATH = 'get-svg-string-by-path',
-  GET_SVG_FILE_PATH = 'get-svg-path',
-  GET_PATH_BASENAME = 'get-path-basename',
+  GET_TEXTURE_FILE_PATH = 'get-texture-file-path',
+  SELECT_TEXTURE = 'select-texture',
 }
 
 enum ROUTED_EVENTS {
@@ -53,6 +53,8 @@ export const EVENTS = {
 };
 
 const svgFilters = [{ name: 'SVG - Scalable Vector Graphics', extensions: ['svg'] }];
+const textureFilters = [{ name: 'Vector/bitmap file', extensions: ['svg', 'jpg', 'png'] }];
+
 const jsonFilters = [{ name: 'JSON', extensions: ['json'] }];
 const gltfFilters = [{ name: 'GLTF 3D model', extensions: ['gltf'] }];
 
@@ -93,8 +95,6 @@ export const setupIpc = (ipcMain) => {
     return fsPromises.writeFile(filePath, formattedJSONStringify(gltfObj));
   }));
 
-  ipcMain.handle(EVENTS.GET_PATH_BASENAME, (e, pathName) => path.basename(pathName));
-
   const resolveStringDataFromDialog = async (dialogOptions) => {
     const { canceled, filePaths } = await dialog.showOpenDialog(dialogOptions);
     if (canceled) { return null; }
@@ -122,15 +122,38 @@ export const setupIpc = (ipcMain) => {
     filters: svgFilters,
   }));
 
-  ipcMain.handle(EVENTS.GET_SVG_FILE_PATH, async (_, dialogOptions) => {
+  ipcMain.handle(EVENTS.GET_TEXTURE_FILE_PATH, async (_, dialogOptions) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       ...dialogOptions,
-      filters: svgFilters,
+      filters: textureFilters,
     });
     return canceled ? null : filePaths[0];
   });
 
-  ipcMain.handle(EVENTS.GET_SVG_STRING_BY_PATH, (e, absolutePath) => fsPromises.readFile(
-    absolutePath, 'utf8',
-  ));
+  ipcMain.handle(EVENTS.SELECT_TEXTURE, async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      message: 'Open texture path',
+      filters: textureFilters,
+    });
+
+    const texturePath = !canceled && filePaths[0];
+    if (!texturePath) { return null; }
+    const extName = path.extname(texturePath);
+    const sourceFileName = path.basename(texturePath, extName);
+
+    if (extName === '.svg') {
+      return fsPromises.readFile(texturePath, 'utf8')
+        .then((svgString) => ({ isPath: true, svgString, sourceFileName }));
+    }
+    const imageData = await datauri(texturePath);
+    const { width, height } = sizeOfImage(texturePath);
+    return {
+      isPath: false,
+      pattern: {
+        imageData,
+        dimensions: { width, height },
+        sourceFileName,
+      },
+    };
+  });
 };

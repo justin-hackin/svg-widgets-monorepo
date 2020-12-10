@@ -1,14 +1,14 @@
 {
   "name": "polyhedral-net-factory",
   "version": "1.0.0",
-  "description": "A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra",
+  "description": "A desktop application for the fabrication of flat-pack interlocking pyramids that form 3D stars and domes (geometric polyhedra)",
   "homepage": "http://example.com",
   "main": "dist/main/main.js",
   "scripts": {
     "dev": "electron-webpack dev",
     "mobx-devtools": "mobx-devtools",
     "compile": "electron-webpack",
-    "lint": "eslint src/**/*.ts{,x}",
+    "lint": "eslint src/**/*.ts{,x} --fix",
     "start": "node node_modules/electron/cli.js .",
     "release": "yarn compile && electron-builder",
     "test": "echo success"
@@ -16,7 +16,7 @@
   "keywords": [
     "react"
   ],
-  "author": "“Justin Barca <“justinbarca@gmail.com”>",
+  "author": "“Justin Barca <“justin.barca@protonmail.com”>",
   "license": "MIT",
   "cmake-js": {
     "runtime": "electron",
@@ -35,8 +35,10 @@
     "@types/react-dom": "^16.9.8",
     "canvg": "^3.0.6",
     "clsx": "^1.1.1",
+    "datauri": "^3.0.0",
     "electron-debug": "^3.1.0",
-    "lib2geom-path-boolean": "0.0.3-napi",
+    "image-size": "^0.9.3",
+    "lib2geom-path-boolean": "^0.0.2",
     "lodash": "^4.17.19",
     "mobx": "^5.15.4",
     "mobx-devtools-mst": "^0.9.22",

@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
 import {
-  Instance, types, resolveIdentifier, getParent,
+  Instance, types, resolveIdentifier, getParent, getType,
 } from 'mobx-state-tree';
 import {
   chunk, debounce, flatten, range,
@@ -20,17 +20,31 @@ import { BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
 import { DashPatternModel } from '../util/shapes/strokeDashPath';
 import { boundingViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
+import { DimensionsModel } from '../../TextureTransformEditor/models/DimensionsModel';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
-export const FaceDecorationModel = types.model({
+export const PathFaceDecorationPatternModel = types.model({
   pathD: types.string,
+  sourceFileName: types.string,
+  isPositive: types.boolean,
+});
+
+export interface IPathFaceDecorationPatternModel extends Instance<typeof PathFaceDecorationPatternModel> {}
+
+export const ImageFaceDecorationPatternModel = types.model({
+  imageData: types.string,
+  dimensions: DimensionsModel,
+  sourceFileName: types.string,
+});
+export interface IImageFaceDecorationPatternModel extends Instance<typeof ImageFaceDecorationPatternModel> {}
+
+export const FaceDecorationModel = types.model({
+  pattern: types.union(PathFaceDecorationPatternModel, ImageFaceDecorationPatternModel),
   transformOrigin: types.frozen<RawPoint>(),
   translate: types.frozen<RawPoint>(),
   rotate: types.number,
   scale: types.number,
-  isPositive: types.boolean,
-  sourceFileName: types.string,
 }).views((self) => ({
   get transformMatrix() {
     const {
@@ -201,22 +215,27 @@ export const PyramidNetModel = types.model({
 
     // eslint-disable-next-line func-names
     async setFaceDecoration(faceDecoration) {
-      self.faceDecoration = FaceDecorationModel.create(faceDecoration);
       if (faceDecoration) {
-        const { pathD, transformMatrix, isPositive } = self.faceDecoration as IFaceDecorationModel;
-        // @ts-ignore
-        const croppedD = await globalThis.ipcRenderer.invoke(
-          // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
-          EVENTS.INTERSECT_SVG,
-          closedPolygonPath(self.normalizedDecorationBoundaryPoints).getD(),
-          pathD,
-          transformMatrix.toString(),
-          isPositive,
-        );
-        this.setActiveCutHolePatternD(croppedD);
-      } else {
-        this.setActiveCutHolePatternD(undefined);
+        self.faceDecoration = FaceDecorationModel.create(faceDecoration);
+        const { pattern, transformMatrix } = self.faceDecoration as IFaceDecorationModel;
+        if (getType(pattern) === PathFaceDecorationPatternModel) {
+          const { pathD, isPositive } = pattern as IPathFaceDecorationPatternModel;
+          // @ts-ignore
+          const croppedD = await globalThis.ipcRenderer.invoke(
+            // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
+            EVENTS.INTERSECT_SVG,
+            closedPolygonPath(self.normalizedDecorationBoundaryPoints).getD(),
+            pathD,
+            transformMatrix.toString(),
+            isPositive,
+          );
+          this.setActiveCutHolePatternD(croppedD);
+        } else {
+          this.setActiveCutHolePatternD(undefined);
+        }
+        return;
       }
+      self.faceDecoration = undefined;
     },
 
     setUseDottedStroke(useDotted) {

@@ -3504,6 +3504,14 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
+datauri@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/datauri/-/datauri-3.0.0.tgz#6196997e9a7bbbee81b60e8c8acb1a2c871e2349"
+  integrity sha512-NeDFuUPV1YCpCn8MUIcDk1QnuyenUHs7f4Q5P0n9FFA0neKFrfEH9esR+YMW95BplbYfdmjbs0Pl/ZGAaM2QHQ==
+  dependencies:
+    image-size "0.8.3"
+    mimer "1.1.0"
+
 debounce@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/debounce/-/debounce-1.2.0.tgz#44a540abc0ea9943018dc0eaa95cce87f65cd131"
@@ -5578,6 +5586,20 @@ ignore@^5.1.4:
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.1.8.tgz#f150a8b50a34289b33e22f5889abd4d8016f0e57"
   integrity sha512-BMpfD7PpiETpBl/A6S498BaIJ6Y/ABT93ETbby2fP00v4EbvPBXWEoaR1UBPKs3iR53pJY7EtZk5KACI57i1Uw==
 
+image-size@0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.8.3.tgz#f0b568857e034f29baffd37013587f2c0cad8b46"
+  integrity sha512-SMtq1AJ+aqHB45c3FsB4ERK0UCiA2d3H1uq8s+8T0Pf8A3W4teyBQyaFaktH6xvZqh+npwlKU7i4fJo0r7TYTg==
+  dependencies:
+    queue "6.0.1"
+
+image-size@^0.9.3:
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.9.3.tgz#f7efce6b0a1649b44b9bc43b9d9a5acf272264b6"
+  integrity sha512-5SakFa79uhUVSjKeQE30GVzzLJ0QNzB53+I+/VD1vIesD6GP6uatWIlgU0uisFNLt1u0d6kBydp7yfk+lLJhLQ==
+  dependencies:
+    queue "6.0.1"
+
 immediate@~3.0.5:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
@@ -6361,10 +6383,10 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-lib2geom-path-boolean@0.0.3-napi:
-  version "0.0.3-napi"
-  resolved "https://registry.yarnpkg.com/lib2geom-path-boolean/-/lib2geom-path-boolean-0.0.3-napi.tgz#756375c474d11a5d63767219746c2fa4f14898f5"
-  integrity sha512-YS20Tim+VeN9jqK8w0CIkQ6Q98urEsx4ZVHG9sN/GOC35VF4oaUs7rUdYEl+Kb/Wyi13zc8mgDguFnkp+Og9XA==
+lib2geom-path-boolean@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/lib2geom-path-boolean/-/lib2geom-path-boolean-0.0.2.tgz#d65d93228688155ef45bb78277196f716b00e383"
+  integrity sha512-tl33q8UnhPyCIleHV7dfb71QrCxmskkf0mEkSmrKMMC6DOfOjAybOidTGZ2OYuD0cYua1nlD8fXVLhtznZCoFA==
   dependencies:
     bindings "^1.5.0"
     node-addon-api "^3.0.0"
@@ -6708,6 +6730,11 @@ mime@^2.4.4, mime@^2.4.6:
   version "2.4.6"
   resolved "https://registry.yarnpkg.com/mime/-/mime-2.4.6.tgz#e5b407c90db442f2beb5b162373d07b69affa4d1"
   integrity sha512-RZKhC3EmpBchfTGBVb8fb+RL2cWyw/32lshnsETttkBAyAUXSGHxbEJWWRXc751DrIxG1q04b8QwMbAwkRPpUA==
+
+mimer@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/mimer/-/mimer-1.1.0.tgz#2cb67f7093998e772a0e62c090f77daa1b8a2dbe"
+  integrity sha512-y9dVfy2uiycQvDNiAYW6zp49ZhFlXDMr5wfdOiMbdzGM/0N5LNR6HTUn3un+WUQcM0koaw8FMTG1bt5EnHJdvQ==
 
 mimic-fn@^2.1.0:
   version "2.1.0"
@@ -7967,6 +7994,13 @@ querystringify@^2.1.1:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.2.0.tgz#3345941b4153cb9d082d8eee4cda2016a9aef7f6"
   integrity sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==
+
+queue@6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/queue/-/queue-6.0.1.tgz#abd5a5b0376912f070a25729e0b6a7d565683791"
+  integrity sha512-AJBQabRCCNr9ANq8v77RJEv73DPbn55cdTb+Giq4X0AVnNVZvMHlYp7XlQiN+1npCZj1DuSmaA2hYVUUDgxFDg==
+  dependencies:
+    inherits "~2.0.3"
 
 raf-schd@^4.0.2:
   version "4.0.2"

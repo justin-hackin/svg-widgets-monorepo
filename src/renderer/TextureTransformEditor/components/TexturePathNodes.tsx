@@ -11,8 +11,8 @@ export const TexturePathNodes = observer(() => {
   } = useMst();
   const classes = useStyles();
 
-  if (!texture.pathD || !showNodes) { return null; }
-  const points = (new PathData(texture.pathD)).getDestinationPoints();
+  if (!texture || !texture.hasPathPattern || !showNodes) { return null; }
+  const points = (new PathData(texture.pattern.pathD)).getDestinationPoints();
   return (
     <>
       {

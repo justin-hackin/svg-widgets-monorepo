@@ -20,6 +20,7 @@ import { PanelSlider } from '../../common/components/PanelSlider';
 import { HistoryButtons } from '../../DielineViewer/components/ControlPanel/components/HistoryButtons';
 import { useStyles } from '../style';
 import { VERY_SMALL_NUMBER } from '../../common/constants';
+import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -40,13 +41,16 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 
 export const TextureControls = observer(() => {
   const {
-    texture, sendTexture, setTextureFromFile, decorationBoundary, selectedTextureNodeIndex,
+    texture, sendTexture, decorationBoundary, selectedTextureNodeIndex,
     showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, downloadShapeGLTF,
+    setTexturePath, setTextureImage,
   } = useMst();
   const classes = useStyles();
-  const { isPositive, setIsPositive, rotate: textureRotate } = texture || {};
+  const {
+    pattern: { isPositive = undefined } = {}, setIsPositive, rotate: textureRotate, hasPathPattern,
+  } = texture || {};
   const numFaceSides = decorationBoundary.vertices.length;
 
   // when truthy, snap menu is open
@@ -94,11 +98,16 @@ export const TextureControls = observer(() => {
       >
         <IconButton
           onClick={async () => {
-            const texturePath = await globalThis.ipcRenderer.invoke(EVENTS.GET_SVG_FILE_PATH, {
-              message: 'Open texture path',
-            });
-            if (texturePath) {
-              setTextureFromFile(texturePath);
+            const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.SELECT_TEXTURE);
+            if (patternInfo) {
+              if (patternInfo.isPath) {
+                const { svgString, sourceFileName } = patternInfo;
+                const pathD = extractCutHolesFromSvgString(svgString);
+                setTexturePath(pathD, sourceFileName);
+              } else {
+                const { imageData, dimensions, sourceFileName } = patternInfo.pattern;
+                setTextureImage(imageData, dimensions, sourceFileName);
+              }
             }
           }}
           aria-label="send texture"
@@ -129,6 +138,7 @@ export const TextureControls = observer(() => {
               control={(
                 <Switch
                   checked={showNodes}
+                  disabled={!hasPathPattern}
                   onChange={(e) => {
                     setShowNodes(e.target.checked);
                   }}
@@ -143,6 +153,7 @@ export const TextureControls = observer(() => {
                 setNodeScaleMux(val);
               }}
               value={nodeScaleMux}
+              disabled={!hasPathPattern}
               valuePath="nodeScaleMux"
               label="Node size"
               min={0.1}
@@ -155,6 +166,7 @@ export const TextureControls = observer(() => {
               control={(
                 <Switch
                   checked={isPositive}
+                  disabled={!hasPathPattern}
                   onChange={(e) => {
                     setIsPositive(e.target.checked);
                   }}

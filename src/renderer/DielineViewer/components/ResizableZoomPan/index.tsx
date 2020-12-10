@@ -2,8 +2,8 @@ import React from 'react';
 import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
 import { ResizeDetector } from './components/ResizeDetector';
 
+const BACKGROUND_COLOR = '#454545';
 const { useState } = React;
-
 
 export const ResizableZoomPan = ({ children, onChange = null, ...props }) => {
   const [viewValue, setValue] = useState(INITIAL_VALUE);
@@ -14,7 +14,7 @@ export const ResizableZoomPan = ({ children, onChange = null, ...props }) => {
         {(dimensions) => (
           <ReactSVGPanZoom
             value={viewValue}
-            background="#454545"
+            background={BACKGROUND_COLOR}
             tool={tool}
             customMiniature={() => null}
             onChangeValue={(val) => {

@@ -25,6 +25,7 @@ import { PathData } from '../util/PathData';
 import { strokeDashPath } from '../util/shapes/strokeDashPath';
 import { baseEdgeConnectionTab } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs } from '../util/shapes/ascendantEdgeConnectionTabs';
+// eslint-disable-next-line import/no-cycle
 import { preferencesStore } from './index';
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
@@ -153,7 +154,7 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     return `${
       tryResolve(self, '/pyramidNetSpec/pyramid/shapeName') || 'shape'
     }__${
-      tryResolve(self, '/texture/sourceFileName') || 'undecorated'
+      tryResolve(self, '/texture/pattern/sourceFileName') || 'undecorated'
     }`;
   },
 })).actions((self) => {
