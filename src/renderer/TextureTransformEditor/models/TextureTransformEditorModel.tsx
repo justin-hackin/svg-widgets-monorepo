@@ -18,7 +18,9 @@ import {
   PathFaceDecorationPatternModel,
 } from '../../DielineViewer/models/PyramidNetStore';
 
+// TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
+const DEFAULT_VIEW_SCALE = 0.8;
 
 const getCoverScale = (bounds, image) => {
   const widthScale = bounds.width / image.width;
@@ -47,7 +49,7 @@ export const TextureTransformEditorModel = types
     texture: types.maybe(TextureModel),
     // since both controls and matrix function require degrees, use degrees as unit instead of radians
     placementAreaDimensions: types.maybe(DimensionsModel),
-    viewScale: types.maybe(types.number),
+    viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
     history: types.optional(UndoManager, {}),
     modifierTracking: types.optional(ModifierTrackingModel, {}),
   })
@@ -209,7 +211,6 @@ export const TextureTransformEditorModel = types
         } else {
           self.texture = undefined;
         }
-        self.viewScale = 0.8;
       };
 
       // if decoration boundary is currently set
