@@ -56,7 +56,7 @@ const svgFilters = [{ name: 'SVG - Scalable Vector Graphics', extensions: ['svg'
 const textureFilters = [{ name: 'Vector/bitmap file', extensions: ['svg', 'jpg', 'png'] }];
 
 const jsonFilters = [{ name: 'JSON', extensions: ['json'] }];
-const gltfFilters = [{ name: 'GLTF 3D model', extensions: ['gltf'] }];
+const glbFilters = [{ name: 'GLB 3D model', extensions: ['glb'] }];
 
 export const setupIpc = (ipcMain) => {
   ipcMain.handle(EVENTS.INTERSECT_SVG,
@@ -87,12 +87,12 @@ export const setupIpc = (ipcMain) => {
     return fsPromises.writeFile(filePath, fileContent);
   }));
 
-  ipcMain.handle(EVENTS.SAVE_GLTF, (e, gltfObj, dialogOptions) => dialog.showSaveDialog({
+  ipcMain.handle(EVENTS.SAVE_GLTF, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,
-    filters: gltfFilters,
+    filters: glbFilters,
   }).then(({ canceled, filePath }) => {
     if (canceled) { return null; }
-    return fsPromises.writeFile(filePath, formattedJSONStringify(gltfObj));
+    return fsPromises.writeFile(filePath, Buffer.from(glbArrayBuffer));
   }));
 
   const resolveStringDataFromDialog = async (dialogOptions) => {

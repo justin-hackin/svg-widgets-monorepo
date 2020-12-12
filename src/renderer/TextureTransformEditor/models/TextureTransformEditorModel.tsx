@@ -31,6 +31,7 @@ const getCoverScale = (bounds, image) => {
     scale: widthIsClamp ? widthScale : heightScale,
   };
 };
+
 const getFitScale = (bounds, image) => {
   if (!bounds || !image) {
     return null;
@@ -192,9 +193,9 @@ export const TextureTransformEditorModel = types
         .parse(self.shapeObject, (shapeGLTF) => {
           globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLTF, shapeGLTF, {
             message: 'Save shape preview',
-            defaultPath: `${this.getFileBasename()}.gltf`,
+            defaultPath: `${this.getFileBasename()}.glb`,
           });
-        }, {});
+        }, { binary: true });
     },
     // TODO: add limits for view scale and
     // these seem like the domain of the texture model but setters for
