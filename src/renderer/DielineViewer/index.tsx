@@ -28,9 +28,7 @@ export const DielineViewer = observer(() => {
             <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
               <svg {...svgDimensions}>
                 <GridPattern patternId={patternId} />
-                <g transform="translate(300, 300)">
-                  <PyramidNetStoreContainer />
-                </g>
+                <PyramidNetStoreContainer />
               </svg>
             </ResizableZoomPan>
             <ControlPanel />

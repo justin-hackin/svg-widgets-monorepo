@@ -18,7 +18,7 @@ import { polyhedra } from '../data/polyhedra';
 import { SVGWrapper } from '../data/SVGWrapper';
 import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
-import { pathDToViewBoxStr } from '../../../common/util/svg';
+import { boundingViewBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
 import { DashPatternsModel } from '../data/dash-patterns';
 import { EVENTS } from '../../../main/ipc';
 import { PathData } from '../util/PathData';
@@ -125,6 +125,10 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     cut.concatPath(ascendantTabs.female.cut);
     score.concatPath(ascendantTabs.female.score);
     return { cut, score };
+  },
+  get fitToCanvasTranslation() {
+    const { xmin, ymin } = boundingViewBoxAttrs(this.makePaths.cut.getD());
+    return { x: -xmin, y: -ymin };
   },
 })).actions((self) => ({
   sendShapeUpdate() {

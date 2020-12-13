@@ -43,7 +43,7 @@ export const defaultModelData = {
     },
     // @ts-ignore
     useDottedStroke: false,
-    shapeHeightInCm: 40,
+    shapeHeightInCm: 20,
   },
 };
 const pyramidNetFactoryStore = PyramidNetFactoryModel.create(defaultModelData);

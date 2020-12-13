@@ -24,11 +24,12 @@ export const PyramidNet = observer(({
       pathScaleMatrix,
     },
     makePaths: { cut, score },
+    fitToCanvasTranslation,
   } = pyramidNetFactoryStore;
   const { cutProps, scoreProps, designBoundaryProps } = preferencesStore;
   const CUT_HOLES_ID = 'cut-holes';
   return (
-    <g>
+    <g transform={`translate(${fitToCanvasTranslation.x}, ${fitToCanvasTranslation.y})`}>
       <path className="score" {...scoreProps} d={score.getD()} />
       <path className="cut" {...cutProps} d={cut.getD()} />
       <g>
