@@ -89,7 +89,7 @@ export const ControlPanel = observer(() => {
       <Drawer
         className={classes.drawer}
         variant="persistent"
-        anchor="left"
+        anchor="right"
         open={open}
         classes={{
           paper: classes.drawerPaper,

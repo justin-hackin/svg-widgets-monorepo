@@ -1,5 +1,7 @@
 import React from 'react';
-import { ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN } from 'react-svg-pan-zoom';
+import {
+  ReactSVGPanZoom, INITIAL_VALUE, TOOL_PAN, POSITION_LEFT,
+} from 'react-svg-pan-zoom';
 import { ResizeDetector } from './components/ResizeDetector';
 
 const BACKGROUND_COLOR = '#454545';
@@ -16,6 +18,7 @@ export const ResizableZoomPan = ({ children, onChange = null, ...props }) => {
             value={viewValue}
             background={BACKGROUND_COLOR}
             tool={tool}
+            toolbarProps={{ position: POSITION_LEFT }}
             customMiniature={() => null}
             onChangeValue={(val) => {
               if (onChange) {

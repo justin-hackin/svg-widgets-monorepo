@@ -31,7 +31,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   menuButton: {
     top: theme.spacing(1),
-    left: theme.spacing(1),
+    right: theme.spacing(1),
     position: 'fixed',
   },
   openTextureButton: {
