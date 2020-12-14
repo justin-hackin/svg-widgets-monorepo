@@ -1,8 +1,7 @@
-import { inRange } from 'lodash';
+import { inRange, set } from 'lodash';
 import { Instance, resolvePath, types } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
-import { UndoManager } from 'mst-middlewares';
 import { BoundaryModel } from './BoundaryModel';
 // eslint-disable-next-line import/no-cycle
 import { TextureModel } from './TextureModel';
@@ -17,6 +16,7 @@ import {
   ImageFaceDecorationPatternModel,
   PathFaceDecorationPatternModel,
 } from '../../DielineViewer/models/PyramidNetStore';
+import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -51,7 +51,7 @@ export const TextureTransformEditorModel = types
     // since both controls and matrix function require degrees, use degrees as unit instead of radians
     placementAreaDimensions: types.maybe(DimensionsModel),
     viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
-    history: types.optional(UndoManager, {}),
+    history: types.optional(UndoManagerWithGroupState, {}),
     modifierTracking: types.optional(ModifierTrackingModel, {}),
   })
   .volatile(() => ({
@@ -279,6 +279,9 @@ export const TextureTransformEditorModel = types
         return;
       }
       globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, self.texture);
+    },
+    setValueAtPath(path: string, value: any) {
+      set(self, path, value);
     },
   }))
   .actions((self) => {

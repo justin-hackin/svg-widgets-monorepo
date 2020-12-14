@@ -10,7 +10,7 @@ import { useStyles } from '../../DielineViewer/style';
 export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
 
 export const PanelSlider = ({
-  setter, value, valuePath, label = undefined, ...rest
+  value, onChange, onChangeCommitted, valuePath, label = undefined, ...rest
 }) => {
   const classes = useStyles();
   const labelId = uuid();
@@ -26,10 +26,7 @@ export const PanelSlider = ({
         aria-labelledby={labelId}
         valueLabelDisplay="auto"
         valueLabelFormat={(val) => val && val.toFixed(2)}
-        // @ts-ignore
-        onChange={(e:any, val:number) => {
-          setter(val);
-        }}
+        {...{ onChange, onChangeCommitted }}
         {...rest}
       />
     </FormControl>

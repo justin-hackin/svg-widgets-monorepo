@@ -6,6 +6,7 @@ import { ratioSliderProps } from './constants';
 import { usePyramidNetFactoryMst } from '../../../models';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 import { VERY_SMALL_NUMBER } from '../../../../common/constants';
+import { ControlElement } from '../../../../common/components/ControlElement';
 
 export const BaseEdgeTabControls = observer(() => {
   const {
@@ -21,42 +22,42 @@ export const BaseEdgeTabControls = observer(() => {
 
   return (
     <>
-      <PanelSlider
-        valuePath="pyramidNetSpec.baseEdgeTabsSpec.finDepthToTabDepth"
-        value={baseEdgeTabsSpec.finDepthToTabDepth}
-        setter={(value) => { baseEdgeTabsSpec.finDepthToTabDepth = value; }}
+      <ControlElement
+        component={PanelSlider}
+        node={baseEdgeTabsSpec}
+        property="finDepthToTabDepth"
         {...{ ...ratioSliderProps, min: 0.05 }}
       />
-      <PanelSlider
-        valuePath="pyramidNetSpec.baseEdgeTabsSpec.tabDepthToAscendantTabDepth"
-        value={baseEdgeTabsSpec.tabDepthToAscendantTabDepth}
-        setter={(value) => { baseEdgeTabsSpec.tabDepthToAscendantTabDepth = value; }}
+      <ControlElement
+        component={PanelSlider}
+        node={baseEdgeTabsSpec}
+        property="tabDepthToAscendantTabDepth"
         min={0.6}
         max={2}
         step={VERY_SMALL_NUMBER}
       />
-      <PanelSlider
-        valuePath="pyramidNetSpec.baseEdgeTabsSpec.holeDepthToTabDepth"
-        value={baseEdgeTabsSpec.holeDepthToTabDepth}
-        setter={(value) => { baseEdgeTabsSpec.holeDepthToTabDepth = value; }}
+      <ControlElement
+        component={PanelSlider}
+        node={baseEdgeTabsSpec}
+        property="holeDepthToTabDepth"
         {...{ ...ratioSliderProps, min: 0.05 }}
       />
-      <PanelSlider
-        valuePath="pyramidNetSpec.baseEdgeTabsSpec.finOffsetRatio"
-        value={baseEdgeTabsSpec.finOffsetRatio}
-        setter={(value) => { baseEdgeTabsSpec.finOffsetRatio = value; }}
+      <ControlElement
+        component={PanelSlider}
+        node={baseEdgeTabsSpec}
+        property="finOffsetRatio"
         {...ratioSliderProps}
       />
-      <PanelSlider
-        valuePath="pyramidNetSpec.baseEdgeTabsSpec.holeBreadthToHalfWidth"
-        value={baseEdgeTabsSpec.holeBreadthToHalfWidth}
-        setter={(value) => { baseEdgeTabsSpec.holeBreadthToHalfWidth = value; }}
+      <ControlElement
+        component={PanelSlider}
+        node={baseEdgeTabsSpec}
+        property="holeBreadthToHalfWidth"
         {...{ ...ratioSliderProps, min: 0.05 }}
       />
-      <PanelSlider
-        valuePath="pyramidNetSpec.baseEdgeTabsSpec.holeTaper"
-        value={baseEdgeTabsSpec.holeTaper}
-        setter={(value) => { baseEdgeTabsSpec.holeTaper = value; }}
+      <ControlElement
+        component={PanelSlider}
+        node={baseEdgeTabsSpec}
+        property="holeTaper"
         min={Math.PI / 8}
         max={Math.PI / 3}
         step={VERY_SMALL_NUMBER}
@@ -65,8 +66,8 @@ export const BaseEdgeTabControls = observer(() => {
         label="Use Bend Guide Valley"
         valuePath="BaseEdgeTabControls__useBendGuideValley"
         value={!!bendGuideValley}
-        setter={(useBendGuideValleyOn) => {
-          if (useBendGuideValleyOn) {
+        onChange={(e) => {
+          if (e.target.checked) {
             resetBendGuideValleyToDefault();
           } else {
             unsetBendGuideValley();
@@ -75,16 +76,16 @@ export const BaseEdgeTabControls = observer(() => {
       />
       {baseEdgeTabsSpec.bendGuideValley && (
         <>
-          <PanelSlider
-            valuePath="pyramidNetSpec.baseEdgeTabsSpec.bendGuideValley.depthRatio"
-            value={baseEdgeTabsSpec.bendGuideValley.depthRatio}
-            setter={(value) => { baseEdgeTabsSpec.bendGuideValley.depthRatio = value; }}
+          <ControlElement
+            component={PanelSlider}
+            node={bendGuideValley}
+            property="depthRatio"
             {...ratioSliderProps}
           />
-          <PanelSlider
-            valuePath="pyramidNetSpec.baseEdgeTabsSpec.bendGuideValley.theta"
-            value={baseEdgeTabsSpec.bendGuideValley.theta}
-            setter={(value) => { baseEdgeTabsSpec.bendGuideValley.theta = value; }}
+          <ControlElement
+            component={PanelSlider}
+            node={bendGuideValley}
+            property="theta"
             min={Math.PI / 16}
             max={Math.PI / 3}
             step={VERY_SMALL_NUMBER}

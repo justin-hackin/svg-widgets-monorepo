@@ -3,7 +3,6 @@ import { set, range } from 'lodash';
 import { Instance, types, tryResolve } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
-import { UndoManager } from 'mst-middlewares';
 
 // eslint-disable-next-line import/no-cycle
 import { PyramidNet } from '../components/PyramidNet';
@@ -27,6 +26,7 @@ import { baseEdgeConnectionTab } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs } from '../util/shapes/ascendantEdgeConnectionTabs';
 // eslint-disable-next-line import/no-cycle
 import { preferencesStore } from './index';
+import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
@@ -47,7 +47,7 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   dashPatterns: DashPatternsModel,
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
-  history: types.optional(UndoManager, {}),
+  history: types.optional(UndoManagerWithGroupState, {}),
 }).views((self) => ({
   get makePaths() {
     const {
@@ -158,7 +158,7 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     return `${
       tryResolve(self, '/pyramidNetSpec/pyramid/shapeName') || 'shape'
     }__${
-      tryResolve(self, '/texture/pattern/sourceFileName') || 'undecorated'
+      tryResolve(self, '/pyramidNetSpec/faceDecoration/pattern/sourceFileName') || 'undecorated'
     }`;
   },
 })).actions((self) => {

@@ -28,6 +28,7 @@ import { AscendantEdgeTabsControls } from './components/AscendantEdgeTabsControl
 import { ScoreControls } from './components/ScoreControls';
 import { HistoryButtons } from './components/HistoryButtons';
 import { VERY_SMALL_NUMBER } from '../../../common/constants';
+import { ControlElement } from '../../../common/components/ControlElement';
 
 const controlsTabs = [
   {
@@ -55,10 +56,9 @@ const controlsTabs = [
 export const ControlPanel = observer(() => {
   // @ts-ignore
   const classes = useStyles();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const theme = useTheme();
+  useTheme();
   const store = usePyramidNetFactoryMst();
-  const { pyramidNetSpec: { pyramid } } = store;
+  const { pyramidNetSpec } = store;
   const polyhedronOptions = Object.keys(store.polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
 
@@ -184,17 +184,17 @@ export const ControlPanel = observer(() => {
 
         <div className={classes.shapeSection}>
           <h3>Shape</h3>
-          <PanelSelect
-            valuePath="pyramidNetSpec.pyramid.shapeName"
-            value={pyramid.shapeName}
-            setter={(val) => { pyramid.shapeName = val; }}
+          <ControlElement
+            component={PanelSelect}
+            node={pyramidNetSpec.pyramid}
+            property="shapeName"
             label="Polyhedron"
             options={polyhedronOptions}
           />
-          <PanelSlider
-            valuePath="pyramidNetSpec.shapeHeightInCm"
-            value={store.pyramidNetSpec.shapeHeightInCm}
-            setter={(val) => { store.pyramidNetSpec.shapeHeightInCm = val; }}
+          <ControlElement
+            component={PanelSlider}
+            node={pyramidNetSpec}
+            property="shapeHeightInCm"
             min={20}
             max={60}
             step={VERY_SMALL_NUMBER}

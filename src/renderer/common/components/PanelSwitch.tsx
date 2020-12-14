@@ -7,7 +7,7 @@ import { Switch } from '@material-ui/core';
 import { useStyles } from '../../DielineViewer/style';
 
 export const PanelSwitch = ({
-  label, setter, value = undefined, defaultValue = undefined, valuePath, ...rest
+  label, onChange, value = undefined, defaultValue = undefined, valuePath, ...rest
 }) => {
   const classes = useStyles();
   const labelId = uuid();
@@ -23,10 +23,7 @@ export const PanelSwitch = ({
         name={valuePath}
         aria-labelledby={labelId}
         color="primary"
-        // @ts-ignore
-        onChange={(e:any) => {
-          setter(e.target.checked);
-        }}
+        onChange={onChange}
         {...rest}
       />
     </FormControl>

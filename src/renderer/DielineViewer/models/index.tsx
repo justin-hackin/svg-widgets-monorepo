@@ -6,7 +6,6 @@ import makeInspectable from 'mobx-devtools-mst';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
 
-import { unprotect } from 'mobx-state-tree';
 // eslint-disable-next-line import/no-cycle
 import { IPyramidNetFactoryModel, PyramidNetFactoryModel } from './PyramidNetMakerStore';
 import { dashPatterns } from '../data/dash-patterns';
@@ -77,6 +76,5 @@ if (process.env.NODE_ENV !== 'production') {
   makeInspectable(preferencesStore);
   makeInspectable(pyramidNetFactoryStore);
 }
-unprotect(pyramidNetFactoryStore);
-unprotect(preferencesStore);
+
 persist('preferencesStoreLocal', preferencesStore);

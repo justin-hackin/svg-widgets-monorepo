@@ -1,4 +1,5 @@
 import { types, Instance } from 'mobx-state-tree';
+import { set } from 'lodash';
 
 const optionalModel = (modelDef) => types.optional(types.model(modelDef), {});
 
@@ -25,6 +26,10 @@ export const PreferencesModel = types.model({
   },
   get designBoundaryProps() {
     return { ...self.dieLineSettings, ...self.designBoundarySettings };
+  },
+})).actions((self) => ({
+  setValueAtPath(path: string, value: any) {
+    set(self, path, value);
   },
 }));
 

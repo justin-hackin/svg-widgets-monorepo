@@ -8,7 +8,7 @@ import { useStyles } from '../../DielineViewer/style';
 import { getLabelFromValuePath } from './PanelSlider';
 
 export const PanelSelect = ({
-  options, setter, value, valuePath, displayEmpty = undefined, label = undefined, className = '',
+  options, onChange, value, valuePath, displayEmpty = undefined, label = undefined, className = '',
 }) => {
   const displayedLabel = label || getLabelFromValuePath(valuePath);
   const classes = useStyles();
@@ -18,9 +18,7 @@ export const PanelSelect = ({
     value,
     name: valuePath,
     displayEmpty,
-    onChange: (e) => {
-      setter(e.target.value);
-    },
+    onChange,
   };
   return (
     <FormControl className={`${classes.formControl} ${className}`}>

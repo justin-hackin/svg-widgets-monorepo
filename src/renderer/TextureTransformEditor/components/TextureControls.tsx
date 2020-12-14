@@ -21,6 +21,7 @@ import { HistoryButtons } from '../../DielineViewer/components/ControlPanel/comp
 import { useStyles } from '../style';
 import { VERY_SMALL_NUMBER } from '../../common/constants';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
+import { ControlElement } from '../../common/components/ControlElement';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -40,13 +41,14 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 );
 
 export const TextureControls = observer(() => {
+  const store = useMst();
   const {
     texture, sendTexture, decorationBoundary, selectedTextureNodeIndex,
-    showNodes, setShowNodes, nodeScaleMux, setNodeScaleMux, autoRotatePreview, setAutoRotatePreview,
+    showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, downloadShapeGLTF,
     setTexturePath, setTextureImage,
-  } = useMst();
+  } = store;
   const classes = useStyles();
   const {
     pattern: { isPositive = undefined } = {}, setIsPositive, rotate: textureRotate, hasPathPattern,
@@ -147,14 +149,12 @@ export const TextureControls = observer(() => {
               )}
               label="Node selection"
             />
-            <PanelSlider
+            <ControlElement
+              component={PanelSlider}
+              node={store}
+              property="nodeScaleMux"
               className={classes.nodeScaleMuxSlider}
-              setter={(val) => {
-                setNodeScaleMux(val);
-              }}
-              value={nodeScaleMux}
               disabled={!hasPathPattern}
-              valuePath="nodeScaleMux"
               label="Node size"
               min={0.1}
               max={10}

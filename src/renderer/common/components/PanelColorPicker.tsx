@@ -6,7 +6,7 @@ import { ChromePicker } from 'react-color';
 import { useStyles } from '../../DielineViewer/style';
 
 export const PanelColorPicker = ({
-  label, setter, value, valuePath, ...rest
+  label, onChangeComplete, value, valuePath, ...rest
 }) => {
   const classes = useStyles();
   const labelId = uuid();
@@ -20,9 +20,7 @@ export const PanelColorPicker = ({
         className={classes.panelChromePicker}
         name={labelId}
         color={value}
-        onChangeComplete={(color) => {
-          setter(color.hex);
-        }}
+        onChangeComplete={onChangeComplete}
         {...rest}
       />
     </FormControl>
