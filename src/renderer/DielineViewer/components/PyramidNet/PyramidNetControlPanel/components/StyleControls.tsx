@@ -1,12 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { PanelSlider } from '../../../../common/components/PanelSlider';
-import { PanelColorPicker } from '../../../../common/components/PanelColorPicker';
-import { usePreferencesMst } from '../../../models';
-import { ControlElement } from '../../../../common/components/ControlElement';
+import { PanelSlider } from '../../../../../common/components/PanelSlider';
+import { PanelColorPicker } from '../../../../../common/components/PanelColorPicker';
+import { ControlElement } from '../../../../../common/components/ControlElement';
+import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 
 export const StyleControls = observer(() => {
-  const preferences = usePreferencesMst();
+  const { preferences } = useWorkspaceMst();
   return (
     <>
       <ControlElement

@@ -3,7 +3,6 @@ import { Instance, resolvePath, types } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
 import { BoundaryModel } from './BoundaryModel';
-// eslint-disable-next-line import/no-cycle
 import { TextureModel } from './TextureModel';
 
 import { DimensionsModel } from './DimensionsModel';

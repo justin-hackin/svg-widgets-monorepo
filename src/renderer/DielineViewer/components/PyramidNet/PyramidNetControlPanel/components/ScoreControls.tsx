@@ -1,23 +1,25 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { PanelSelect } from '../../../../common/components/PanelSelect';
-import { PanelSlider } from '../../../../common/components/PanelSlider';
+import { PanelSelect } from '../../../../../common/components/PanelSelect';
+import { PanelSlider } from '../../../../../common/components/PanelSlider';
 import { ratioSliderProps } from './constants';
-import { PanelSwitch } from '../../../../common/components/PanelSwitch';
-import { usePyramidNetFactoryMst } from '../../../models';
-import { VERY_SMALL_NUMBER } from '../../../../common/constants';
-import { ControlElement } from '../../../../common/components/ControlElement';
+import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
+import { VERY_SMALL_NUMBER } from '../../../../../common/constants';
+import { ControlElement } from '../../../../../common/components/ControlElement';
+import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
+import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
 
 const strokeLengthProps = { min: 1, max: 100, step: VERY_SMALL_NUMBER };
 
 export const ScoreControls = observer(() => {
+  const workspaceStore = useWorkspaceMst();
   const {
     pyramidNetSpec: {
       useDottedStroke, setUseDottedStroke,
       interFaceScoreDashSpec, baseScoreDashSpec, setInterFaceScoreDashSpecPattern, setBaseScoreDashSpecPattern,
     } = {}, dashPatterns,
-  } = usePyramidNetFactoryMst();
+  } = workspaceStore.selectedStore as IPyramidNetFactoryModel;
   const dashPatternOptions = dashPatterns.map(({ label, id }) => ({ value: id, label }));
   return (
     <>

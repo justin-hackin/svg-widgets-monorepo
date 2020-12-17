@@ -9,7 +9,6 @@ import {
 } from '../../DielineViewer/models/PyramidNetStore';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
-// eslint-disable-next-line import/no-cycle
 import { TextureTransformEditorModel } from './TextureTransformEditorModel';
 import {
   calculateTransformOriginChangeOffset, getOriginPoint,

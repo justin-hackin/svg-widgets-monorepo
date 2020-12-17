@@ -1,14 +1,16 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { PanelSlider } from '../../../../common/components/PanelSlider';
+import { PanelSlider } from '../../../../../common/components/PanelSlider';
 import { ratioSliderProps } from './constants';
-import { usePyramidNetFactoryMst } from '../../../models';
-import { VERY_SMALL_NUMBER } from '../../../../common/constants';
-import { ControlElement } from '../../../../common/components/ControlElement';
+import { VERY_SMALL_NUMBER } from '../../../../../common/constants';
+import { ControlElement } from '../../../../../common/components/ControlElement';
+import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
+import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
 
 export const AscendantEdgeTabsControls = observer(() => {
-  const store = usePyramidNetFactoryMst();
+  const workspaceStore = useWorkspaceMst();
+  const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
   const { pyramidNetSpec: { ascendantEdgeTabsSpec } = {} } = store;
   return (
     <>

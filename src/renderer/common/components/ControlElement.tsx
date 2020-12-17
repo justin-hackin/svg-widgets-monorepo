@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { startCase } from 'lodash';
 import {
-  applyPatch, getPath, getRoot, joinJsonPath,
+  applyPatch, getPath, getRoot, joinJsonPath, tryResolve,
 } from 'mobx-state-tree';
 import { PanelSlider } from './PanelSlider';
 import { PanelSelect } from './PanelSelect';
@@ -18,7 +18,7 @@ export const ControlElement = observer(({
   const root = getRoot(node);
 
   // @ts-ignore
-  const history = root.history as IUndoManagerWithGroupState;
+  const history = tryResolve(root, '/selectedStore/history') as IUndoManagerWithGroupState;
   const valuePath = joinJsonPath([getPath(node), property]);
   const setValue = (val) => {
     applyPatch(node, {

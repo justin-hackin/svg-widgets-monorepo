@@ -13,7 +13,6 @@ import OrbitControls from 'threejs-orbit-controls';
 import '../style.css';
 import requireStatic from '../../requireStatic';
 import { TextureSvgUnobserved } from './TextureSvg';
-// eslint-disable-next-line import/no-cycle
 import { useMst } from '../models';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
 import { ITextureTransformEditorModel } from '../models/TextureTransformEditorModel';

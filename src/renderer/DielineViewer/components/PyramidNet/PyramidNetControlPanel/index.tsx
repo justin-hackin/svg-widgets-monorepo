@@ -16,19 +16,20 @@ import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import {
   AppBar, Button, Menu, MenuItem, Paper, Tab, Tabs, Tooltip,
 } from '@material-ui/core';
-import { PanelSelect } from '../../../common/components/PanelSelect';
-import { PanelSlider } from '../../../common/components/PanelSlider';
-import { useStyles } from '../../style';
-import { EVENTS } from '../../../../main/ipc';
-import { extractCutHolesFromSvgString } from '../../../../common/util/svg';
-import { usePyramidNetFactoryMst } from '../../models';
+import { PanelSelect } from '../../../../common/components/PanelSelect';
+import { PanelSlider } from '../../../../common/components/PanelSlider';
+import { useStyles } from '../../../style';
+import { EVENTS } from '../../../../../main/ipc';
+import { extractCutHolesFromSvgString } from '../../../../../common/util/svg';
 import { StyleControls } from './components/StyleControls';
 import { BaseEdgeTabControls } from './components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './components/AscendantEdgeTabsControls';
 import { ScoreControls } from './components/ScoreControls';
 import { HistoryButtons } from './components/HistoryButtons';
-import { VERY_SMALL_NUMBER } from '../../../common/constants';
-import { ControlElement } from '../../../common/components/ControlElement';
+import { VERY_SMALL_NUMBER } from '../../../../common/constants';
+import { ControlElement } from '../../../../common/components/ControlElement';
+import { useWorkspaceMst } from '../../../models/WorkspaceModel';
+import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
 
 const controlsTabs = [
   {
@@ -53,11 +54,12 @@ const controlsTabs = [
   },
 ];
 
-export const ControlPanel = observer(() => {
+export const PyramidNetControlPanel = observer(() => {
   // @ts-ignore
   const classes = useStyles();
   useTheme();
-  const store = usePyramidNetFactoryMst();
+  const workspaceStore = useWorkspaceMst();
+  const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
   const { pyramidNetSpec } = store;
   const polyhedronOptions = Object.keys(store.polyhedraPyramidGeometries)
     .map((polyKey) => ({ value: polyKey, label: startCase(polyKey) }));
@@ -141,7 +143,7 @@ export const ControlPanel = observer(() => {
                 onClick={async () => {
                   await globalThis.ipcRenderer.invoke(
                     EVENTS.SAVE_NET_SVG_AND_SPEC,
-                    store.renderPyramidNetToString(),
+                    workspaceStore.renderWidgetToString(),
                     store.pyramidNetSpec,
                     { message: 'Save pyramid net dielines and model', defaultPath: store.getFileBasename() },
                   );

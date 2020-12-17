@@ -1,15 +1,4 @@
-import React, { createContext, useContext } from 'react';
-import { connectReduxDevtools } from 'mst-middlewares';
-import { persist } from 'mst-persist';
-import makeInspectable from 'mobx-devtools-mst';
-// only used in dev build hence lint squelch
-// eslint-disable-next-line import/no-extraneous-dependencies
-import remotedev from 'remotedev';
-
-// eslint-disable-next-line import/no-cycle
-import { IPyramidNetFactoryModel, PyramidNetFactoryModel } from './PyramidNetMakerStore';
 import { dashPatterns } from '../data/dash-patterns';
-import { IPreferencesModel, PreferencesModel } from './PreferencesModel';
 
 export const defaultModelData = {
   dashPatterns,
@@ -45,36 +34,3 @@ export const defaultModelData = {
     shapeHeightInCm: 20,
   },
 };
-const pyramidNetFactoryStore = PyramidNetFactoryModel.create(defaultModelData);
-const NetFactoryStoreContext = createContext<IPyramidNetFactoryModel>(pyramidNetFactoryStore);
-
-export const { Provider: PyramidNetFactoryProvider } = NetFactoryStoreContext;
-
-export const PyramidNetFactoryStoreProvider = ({ children }) => (
-  <PyramidNetFactoryProvider value={pyramidNetFactoryStore}>{children}</PyramidNetFactoryProvider>
-);
-
-export function usePyramidNetFactoryMst() {
-  return useContext(NetFactoryStoreContext);
-}
-
-export const preferencesStore = PreferencesModel.create();
-const PreferencesStoreContext = createContext<IPreferencesModel>(preferencesStore);
-export const { Provider: PreferencesProvider } = PreferencesStoreContext;
-
-export const PreferencesStoreProvider = ({ children }) => (
-  <PreferencesProvider value={preferencesStore}>{children}</PreferencesProvider>
-);
-
-export function usePreferencesMst() {
-  return useContext(PreferencesStoreContext);
-}
-
-if (process.env.NODE_ENV !== 'production') {
-  connectReduxDevtools(remotedev, preferencesStore);
-  connectReduxDevtools(remotedev, pyramidNetFactoryStore);
-  makeInspectable(preferencesStore);
-  makeInspectable(pyramidNetFactoryStore);
-}
-
-persist('preferencesStoreLocal', preferencesStore);

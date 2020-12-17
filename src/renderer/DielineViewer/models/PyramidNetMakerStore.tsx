@@ -4,17 +4,13 @@ import { Instance, types, tryResolve } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
-// eslint-disable-next-line import/no-cycle
-import { PyramidNetUnobserved } from '../components/PyramidNet';
 import {
-  CM_TO_PIXELS_RATIO,
   degToRad,
   distanceFromOrigin,
   hingedPlot,
   hingedPlotByProjectionDistance, radToDeg, subtractPoints,
 } from '../../common/util/geom';
 import { polyhedra } from '../data/polyhedra';
-import { SVGWrapper } from '../data/SVGWrapper';
 import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
 import { boundingViewBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
@@ -24,8 +20,6 @@ import { PathData } from '../util/PathData';
 import { strokeDashPath } from '../util/shapes/strokeDashPath';
 import { baseEdgeConnectionTab } from '../util/shapes/baseEdgeConnectionTab';
 import { ascendantEdgeConnectionTabs } from '../util/shapes/ascendantEdgeConnectionTabs';
-// eslint-disable-next-line import/no-cycle
-import { preferencesStore } from './index';
 import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
@@ -46,7 +40,7 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   pyramidNetSpec: types.maybe(types.late(() => PyramidNetModel)),
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   dashPatterns: DashPatternsModel,
-  svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
+  // TODO: make a prototype with history as property and use on all undoable models
   history: types.optional(UndoManagerWithGroupState, {}),
 }).views((self) => ({
   get makePaths() {
@@ -139,17 +133,6 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   renderDecorationBoundaryToString():string {
     // @ts-ignore
     return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: self }));
-  },
-
-  renderPyramidNetToString() {
-    return ReactDOMServer.renderToString(
-      <SVGWrapper {...self.svgDimensions}>
-        <PyramidNetUnobserved
-          preferencesStore={preferencesStore}
-          pyramidNetFactoryStore={self as IPyramidNetFactoryModel}
-        />
-      </SVGWrapper>,
-    );
   },
 
   setValueAtPath(path: string, value: any) {

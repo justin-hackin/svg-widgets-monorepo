@@ -1,19 +1,21 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { PanelSlider } from '../../../../common/components/PanelSlider';
+import { PanelSlider } from '../../../../../common/components/PanelSlider';
 import { ratioSliderProps } from './constants';
-import { usePyramidNetFactoryMst } from '../../../models';
-import { PanelSwitch } from '../../../../common/components/PanelSwitch';
-import { VERY_SMALL_NUMBER } from '../../../../common/constants';
-import { ControlElement } from '../../../../common/components/ControlElement';
+import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
+import { VERY_SMALL_NUMBER } from '../../../../../common/constants';
+import { ControlElement } from '../../../../../common/components/ControlElement';
+import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
+import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
 
 export const BaseEdgeTabControls = observer(() => {
+  const workspaceStore = useWorkspaceMst();
   const {
     pyramidNetSpec: {
       baseEdgeTabsSpec,
     } = {},
-  } = usePyramidNetFactoryMst();
+  } = workspaceStore.selectedStore as IPyramidNetFactoryModel;
   const {
     bendGuideValley,
     unsetBendGuideValley,

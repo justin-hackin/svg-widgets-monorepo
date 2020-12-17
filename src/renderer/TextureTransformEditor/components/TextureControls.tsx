@@ -17,7 +17,8 @@ import { DragModeOptionsGroup } from './DragModeOptionGroup';
 import { EVENTS } from '../../../main/ipc';
 import { useMst } from '../models';
 import { PanelSlider } from '../../common/components/PanelSlider';
-import { HistoryButtons } from '../../DielineViewer/components/ControlPanel/components/HistoryButtons';
+import { HistoryButtons } from
+  '../../DielineViewer/components/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useStyles } from '../style';
 import { VERY_SMALL_NUMBER } from '../../common/constants';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
