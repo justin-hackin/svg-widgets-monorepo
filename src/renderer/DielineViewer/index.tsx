@@ -10,8 +10,6 @@ import { ResizableZoomPan } from './components/ResizableZoomPan';
 import {
   IWorkspaceModel, useWorkspaceMst, WorkspaceStoreProvider,
 } from './models/WorkspaceModel';
-import { PyramidNetControlPanel } from './components/PyramidNet/PyramidNetControlPanel';
-import { PyramidNet } from './components/PyramidNet/PyramidNetSvg';
 
 const patternId = 'grid-pattern';
 // @ts-ignore
@@ -19,7 +17,7 @@ const theme = createMuiTheme(darkTheme);
 
 export const DielineViewerLOC = () => {
   const {
-    svgDimensions,
+    svgDimensions, SelectedControlledSvgComponent, SelectedControlPanelComponent,
   } = useWorkspaceMst() as IWorkspaceModel;
   return (
     <ThemeProvider theme={theme}>
@@ -27,10 +25,10 @@ export const DielineViewerLOC = () => {
         <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
           <svg {...svgDimensions}>
             <GridPattern patternId={patternId} />
-            <PyramidNet />
+            <SelectedControlledSvgComponent />
           </svg>
         </ResizableZoomPan>
-        <PyramidNetControlPanel />
+        <SelectedControlPanelComponent />
       </div>
     </ThemeProvider>
   );

@@ -1,14 +1,12 @@
 // @ts-ignore
 import React from 'react';
 import { range } from 'lodash';
-import { observer } from 'mobx-react';
 import { radToDeg } from '../../../../common/util/geom';
 import { closedPolygonPath } from '../../../util/shapes/generic';
 import { IPreferencesModel } from '../../../models/PreferencesModel';
 import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
-import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 
-export const PyramidNetUnobserved = ({
+export const PyramidNet = ({
   widgetStore, preferencesStore,
 }:{
   preferencesStore: IPreferencesModel, widgetStore: IPyramidNetFactoryModel
@@ -63,11 +61,3 @@ export const PyramidNetUnobserved = ({
     </g>
   );
 };
-
-const PyramidNetObserved = observer(PyramidNetUnobserved);
-export const PyramidNet = observer(() => {
-  const {
-    selectedStore, preferences,
-  } = useWorkspaceMst();
-  return (<PyramidNetObserved widgetStore={selectedStore} preferencesStore={preferences} />);
-});

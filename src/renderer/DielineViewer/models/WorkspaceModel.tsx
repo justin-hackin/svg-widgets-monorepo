@@ -1,24 +1,56 @@
 import { Instance, types } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React, { createContext, useContext } from 'react';
+import persist from 'mst-persist';
+import { connectReduxDevtools } from 'mst-middlewares';
+import makeInspectable from 'mobx-devtools-mst';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import remotedev from 'remotedev';
 
+import { observer } from 'mobx-react';
 import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { SVGWrapper } from '../data/SVGWrapper';
 import { PreferencesModel } from './PreferencesModel';
-import { PyramidNetFactoryModel } from './PyramidNetMakerStore';
-import { defaultModelData } from './index';
-import { PyramidNetUnobserved } from '../components/PyramidNet/PyramidNetSvg';
+import { PyramidNetOptionsInfo } from '../components/PyramidNet';
 
 export const WorkspaceModel = types.model({
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
-  selectedStore: types.optional(PyramidNetFactoryModel, defaultModelData),
-  preferences: types.optional(PreferencesModel, {}),
+  widgetOptions: types.frozen({
+    'pyramid-net': PyramidNetOptionsInfo,
+  }),
+  selectedWidgetName: 'pyramid-net',
 })
+  .views((self) => ({
+    get selectedWidgetInfo() {
+      return self.widgetOptions[self.selectedWidgetName];
+    },
+    get SelectedRawSvgComponent() {
+      return this.selectedWidgetInfo.RawSvgComponent;
+    },
+    get selectedStore() {
+      return this.selectedWidgetInfo.WidgetModel.create(this.selectedWidgetInfo.defaultSnapshot);
+    },
+    get preferences() {
+      const preferencesStore = PreferencesModel.create({});
+      persist('preferencesStoreLocal', preferencesStore);
+      return preferencesStore;
+    },
+    get SelectedControlPanelComponent() {
+      return this.selectedWidgetInfo.ControlPanelComponent;
+    },
+    get SelectedControlledSvgComponent() {
+      const ObservedSvgComponent = observer(this.SelectedRawSvgComponent);
+
+      return observer(() => (
+        <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={this.preferences} />));
+    },
+  }))
   .actions((self) => ({
     renderWidgetToString() {
+      const { SelectedRawSvgComponent } = self;
       return ReactDOMServer.renderToString(
         <SVGWrapper {...self.svgDimensions}>
-          <PyramidNetUnobserved
+          <SelectedRawSvgComponent
             preferencesStore={self.preferences}
             widgetStore={self.selectedStore}
           />
@@ -40,4 +72,9 @@ export const WorkspaceStoreProvider = ({ children }) => (
 
 export function useWorkspaceMst() {
   return useContext(WorkspaceStoreContext);
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  connectReduxDevtools(remotedev, workspaceStore);
+  makeInspectable(workspaceStore);
 }
