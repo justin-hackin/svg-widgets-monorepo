@@ -10,7 +10,7 @@ import { IPreferencesModel } from '../../models/PreferencesModel';
 // eslint-disable-next-line import/no-cycle
 import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 
-export const PyramidNet = observer(({
+export const PyramidNetUnobserved = ({
   pyramidNetFactoryStore, preferencesStore,
 }:{
   preferencesStore: IPreferencesModel, pyramidNetFactoryStore: IPyramidNetFactoryModel
@@ -63,13 +63,15 @@ export const PyramidNet = observer(({
       </g>
     </g>
   );
-});
+};
 
-export const PyramidNetStoreContainer = observer(() => {
+const PyramidNedObserved = observer(PyramidNetUnobserved);
+
+export const PyramidNet = observer(() => {
   const pyramidNetFactoryStore = usePyramidNetFactoryMst();
   const preferencesStore = usePreferencesMst();
 
   return (
-    <PyramidNet preferencesStore={preferencesStore} pyramidNetFactoryStore={pyramidNetFactoryStore} />
+    <PyramidNedObserved preferencesStore={preferencesStore} pyramidNetFactoryStore={pyramidNetFactoryStore} />
   );
 });

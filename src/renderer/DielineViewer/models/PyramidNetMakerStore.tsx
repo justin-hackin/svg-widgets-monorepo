@@ -5,7 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 // eslint-disable-next-line import/no-cycle
-import { PyramidNet } from '../components/PyramidNet';
+import { PyramidNetUnobserved } from '../components/PyramidNet';
 import {
   CM_TO_PIXELS_RATIO,
   degToRad,
@@ -142,13 +142,14 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   },
 
   renderPyramidNetToString() {
-    return ReactDOMServer.renderToString(React.createElement(
-      // @ts-ignore
-      SVGWrapper, self.svgDimensions, (<PyramidNet
-        preferencesStore={preferencesStore}
-        pyramidNetFactoryStore={self as IPyramidNetFactoryModel}
-      />),
-    ));
+    return ReactDOMServer.renderToString(
+      <SVGWrapper {...self.svgDimensions}>
+        <PyramidNetUnobserved
+          preferencesStore={preferencesStore}
+          pyramidNetFactoryStore={self as IPyramidNetFactoryModel}
+        />
+      </SVGWrapper>,
+    );
   },
 
   setValueAtPath(path: string, value: any) {
