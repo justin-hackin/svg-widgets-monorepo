@@ -39,15 +39,15 @@ export const ControlElement = observer(({
     return (
       <PanelSlider
         onChange={(_, val) => {
-          if (!history.groupActive) {
+          if (history && !history.groupActive) {
             history.startGroup(() => {
             });
           }
           setValue(val);
         }}
-        onChangeCommitted={() => {
+        onChangeCommitted={history ? () => {
           history.stopGroup();
-        }}
+        } : undefined}
         {...allProps}
       />
     );
