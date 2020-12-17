@@ -9,7 +9,7 @@ import { usePyramidNetFactoryMst } from '../../../models';
 import { VERY_SMALL_NUMBER } from '../../../../common/constants';
 import { ControlElement } from '../../../../common/components/ControlElement';
 
-const strokeLengthProps = { min: 1, max: 3000, step: VERY_SMALL_NUMBER };
+const strokeLengthProps = { min: 1, max: 100, step: VERY_SMALL_NUMBER };
 
 export const ScoreControls = observer(() => {
   const {
