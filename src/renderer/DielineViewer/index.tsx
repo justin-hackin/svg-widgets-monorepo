@@ -10,7 +10,7 @@ import {
   usePyramidNetFactoryMst,
 } from './models';
 import darkTheme from './data/material-ui-dark-theme';
-import { PyramidNetStoreContainer } from './components/PyramidNet';
+import { PyramidNet } from './components/PyramidNet';
 import { ControlPanel } from './components/ControlPanel';
 import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
@@ -28,7 +28,7 @@ export const DielineViewer = observer(() => {
             <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
               <svg {...svgDimensions}>
                 <GridPattern patternId={patternId} />
-                <PyramidNetStoreContainer />
+                <PyramidNet />
               </svg>
             </ResizableZoomPan>
             <ControlPanel />
