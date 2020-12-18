@@ -10,6 +10,7 @@ import { ResizableZoomPan } from './components/ResizableZoomPan';
 import {
   IWorkspaceModel, useWorkspaceMst, WorkspaceStoreProvider,
 } from './models/WorkspaceModel';
+import { WidgetControlPanel } from './components/WidgetControlPanel';
 
 const patternId = 'grid-pattern';
 // @ts-ignore
@@ -17,7 +18,7 @@ const theme = createMuiTheme(darkTheme);
 
 export const DielineViewerLOC = () => {
   const {
-    svgDimensions, SelectedControlledSvgComponent, SelectedControlPanelComponent,
+    svgDimensions, SelectedControlledSvgComponent, selectedControlPanelProps,
   } = useWorkspaceMst() as IWorkspaceModel;
   return (
     <ThemeProvider theme={theme}>
@@ -28,7 +29,7 @@ export const DielineViewerLOC = () => {
             <SelectedControlledSvgComponent />
           </svg>
         </ResizableZoomPan>
-        <SelectedControlPanelComponent />
+        <WidgetControlPanel {...selectedControlPanelProps} />
       </div>
     </ThemeProvider>
   );

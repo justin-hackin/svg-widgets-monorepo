@@ -30,6 +30,9 @@ export const WorkspaceModel = types.model({
     get selectedStore() {
       return this.selectedWidgetInfo.WidgetModel.create(this.selectedWidgetInfo.defaultSnapshot);
     },
+    get selectedControlPanelProps() {
+      return this.selectedWidgetInfo.controlPanelProps;
+    },
     get preferences() {
       const preferencesStore = PreferencesModel.create({});
       persist('preferencesStoreLocal', preferencesStore);

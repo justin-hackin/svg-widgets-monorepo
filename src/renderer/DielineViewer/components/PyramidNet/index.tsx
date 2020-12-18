@@ -1,11 +1,17 @@
 import { PyramidNet } from './PyramidNetSvg';
-import { PyramidNetControlPanel } from './PyramidNetControlPanel';
 import { defaultModelData } from '../../models';
 import { PyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
+import { AdditionalToolbarContent } from './components/AdditionalToolbarContent';
+import { AdditionalFileMenuItems } from './components/AdditionalFileMenuItems';
+import { PanelContent } from './components/PanelContent';
 
 export const PyramidNetOptionsInfo = {
   RawSvgComponent: PyramidNet,
-  ControlPanelComponent: PyramidNetControlPanel,
+  controlPanelProps: {
+    AdditionalToolbarContent,
+    AdditionalFileMenuItems,
+    PanelContent,
+  },
   WidgetModel: PyramidNetFactoryModel,
   defaultSnapshot: defaultModelData,
 };
