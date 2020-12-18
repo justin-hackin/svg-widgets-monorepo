@@ -1,4 +1,4 @@
-import { inRange, set } from 'lodash';
+import { inRange } from 'lodash';
 import { Instance, resolvePath, types } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
@@ -278,9 +278,6 @@ export const TextureTransformEditorModel = types
         return;
       }
       globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, self.texture);
-    },
-    setValueAtPath(path: string, value: any) {
-      set(self, path, value);
     },
   }))
   .actions((self) => {

@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file,no-param-reassign */
-import { set, range } from 'lodash';
+import { range } from 'lodash';
 import { Instance, types, tryResolve } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
@@ -43,6 +43,9 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   // TODO: make a prototype with history as property and use on all undoable models
   history: types.optional(UndoManagerWithGroupState, {}),
 }).views((self) => ({
+  get shapeDefinition() {
+    return self.pyramidNetSpec;
+  },
   get makePaths() {
     const {
       pyramid: {
@@ -135,9 +138,6 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: self }));
   },
 
-  setValueAtPath(path: string, value: any) {
-    set(self, path, value);
-  },
   getFileBasename() {
     return `${
       tryResolve(self, '/pyramidNetSpec/pyramid/shapeName') || 'shape'
