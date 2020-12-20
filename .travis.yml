@@ -46,13 +46,11 @@ addons:
 notifications:
   email: false
 cache:
-  yarn: true
+  npm: true
   directories:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
-    - $(yarn global bin)
-    - $(yarn global dir)
 before_install:
   # add git lfs for large file support
   - |
@@ -66,11 +64,9 @@ before_script:
 # on PRs and merges to master and prod run tests and build the app
 script:
   - node --version
-  # addon requires cmake-js, uses npm not yarn
-  - export PATH=
-  - yarn global add cmake-js
-  - yarn
-  - yarn test
+  - npm i -g cmake-js
+  - npm i
+  - npm run test
 # only deploy to github on a merge to the prod branch
 deploy:
   provider: script

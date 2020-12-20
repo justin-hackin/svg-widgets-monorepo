@@ -1,7 +1,7 @@
 #! /bin/bash
 if [ "$TRAVIS_OS_NAME" == osx ]; then
     # deploy on mac
-    yarn release
+    npm run release
 else
-   yarn release --linux AppImage
+   npm run release --linux AppImage
 fi

@@ -10,7 +10,7 @@
     "compile": "electron-webpack",
     "lint": "eslint src/**/*.ts{,x} --fix",
     "start": "node node_modules/electron/cli.js .",
-    "release": "yarn compile && electron-builder",
+    "release": "npm run compile && electron-builder",
     "test": "echo success"
   },
   "keywords": [
