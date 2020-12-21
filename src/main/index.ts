@@ -83,9 +83,9 @@ app.on('ready', async () => {
   };
 
   browserWindows[WINDOWS.DIELINE_EDITOR] = await promisifyWindow({
-    width: width / 2,
     x: 0,
     y: 0,
+    width,
     height,
     show: false,
     title: 'Polyhedral Net Factory - Dieline Viewer',
@@ -99,9 +99,9 @@ app.on('ready', async () => {
       removeEventListenersForWindow('tex');
     }
     browserWindows[WINDOWS.TEXTURE_EDITOR] = await promisifyWindow({
-      width: width / 2,
-      x: width / 2,
+      x: 0,
       y: 0,
+      width,
       height,
       show: false,
       title: 'Polyhedral Net Factory - Texture Fitting',
@@ -110,7 +110,6 @@ app.on('ready', async () => {
     }, 'texture-transform-editor');
     addEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
   };
-  await assignTextureWindow();
 
   ipcMain.on(EVENTS.OPEN_TEXTURE_WINDOW, () => {
     if (!browserWindows[WINDOWS.TEXTURE_EDITOR]) {

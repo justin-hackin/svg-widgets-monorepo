@@ -223,7 +223,7 @@ export const PyramidNetModel = types.model({
           // @ts-ignore
           const croppedD = await globalThis.ipcRenderer.invoke(
             // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
-            EVENTS.INTERSECT_SVG,
+            EVENTS.RESOLVE_BOUNDED_TEXTURE_PATH,
             closedPolygonPath(self.normalizedDecorationBoundaryPoints).getD(),
             pathD,
             transformMatrix.toString(),

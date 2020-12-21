@@ -32,19 +32,14 @@ export const symmetricRoundedTab = (
 
   // don't let the retraction happen any more than half the length of shortest the non-rounded edge
   // otherwise the control points may criss-cross causing odd loops
-  const tabRoundingDistance = tabRoundingDistanceRatio * 0.5 * Math.min(
-    distanceFromOrigin(subtractPoints(tabBaseStart, tabMidpointStart)),
-    distanceFromOrigin(subtractPoints(tabMidpointStart, tabApexStart)),
-  );
   return {
     points: {
       center: [tabMidpointStart, tabMidpointEnd],
       apex: [tabApexStart, tabApexEnd],
     },
-    tabRoundingDistance,
     path: roundedEdgePath(
       [tabBaseStart, tabMidpointStart, tabApexStart, tabApexEnd, tabMidpointEnd, tabBaseEnd],
-      tabRoundingDistance,
+      tabRoundingDistanceRatio,
     ),
   };
 };

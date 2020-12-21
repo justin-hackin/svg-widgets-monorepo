@@ -4,12 +4,13 @@ import svgpath from 'svgpath';
 import {
   castCoordToRawPoint, Coord, RawPoint, rawPointToString,
 } from '../../common/util/geom';
+import { roundedEdgePath } from './shapes/generic';
 
 /* eslint-disable no-param-reassign */
 
 enum CommandCodes { M='M', L='L', C='C', S='S', Q='Q', T='T', A='A', Z='Z' }
 
-interface DestinationCommand {
+export interface DestinationCommand {
   to: RawPoint
 }
 
@@ -129,13 +130,13 @@ export const COMMAND_FACTORY = {
     to: castCoordToRawPoint(to),
   }),
   A: (
-    radiusX: number, radiusY: number, xAxisRotation: number, sweepFlag: boolean, largeArcFlag: boolean, to:Coord,
+    radiusX: number, radiusY: number, xAxisRotation: number, largeArcFlag: boolean, sweepFlag: boolean, to:Coord,
   ):ArcCommand => ({
     code: CommandCodes.A,
     rx: radiusX,
     ry: radiusY,
-    sweepFlag,
     largeArcFlag,
+    sweepFlag,
     xAxisRotation,
     to: castCoordToRawPoint(to),
   }),
@@ -256,10 +257,10 @@ export class PathData {
   }
 
   ellipticalArc(
-    radiusX:number, radiusY:number, xAxisRotation:number, sweepFlag:boolean, largeArcFlag:boolean, to: Coord,
+    radiusX:number, radiusY:number, xAxisRotation:number, largeArcFlag:boolean, sweepFlag:boolean, to: Coord,
   ):PathData {
     this._assertLastCommandExists();
-    this._commands.push(COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, sweepFlag, largeArcFlag, to));
+    this._commands.push(COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, largeArcFlag, sweepFlag, to));
     return this;
   }
 
@@ -279,6 +280,21 @@ export class PathData {
 
   concatPath(path):PathData {
     this._commands = this._commands.concat(cloneDeep(path._commands));
+    return this;
+  }
+
+  get lastCommand(): Command {
+    return this._commands[this._commands.length - 1];
+  }
+
+  curvedLineSegments(toPoints, roundingRatio) {
+    // TODO: handle last command is close
+    this._assertLastCommandExists();
+    const toAppendCommands = roundedEdgePath(
+      // @ts-ignore
+      [this.lastCommand.to, ...toPoints], roundingRatio,
+    )._commands.slice(1);
+    this._commands = this._commands.concat(toAppendCommands);
     return this;
   }
 

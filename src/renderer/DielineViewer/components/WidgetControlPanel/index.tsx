@@ -68,7 +68,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
               By default disabled elements like Button do not trigger user interactions
                thus span wrapping required by tooltip for disabled buttons
             */}
-            <AdditionalToolbarContent />
+            {AdditionalToolbarContent && <AdditionalToolbarContent />}
             <HistoryButtons
               history={store.history}
             />
@@ -98,7 +98,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
               >
                 Save to SVG w/ JSON
               </MenuItem>
-              <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />
+              { AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
             </Menu>
             <IconButton
               color="inherit"

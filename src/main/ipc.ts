@@ -4,7 +4,7 @@ const datauri = require('datauri');
 const sizeOfImage = require('image-size');
 const path = require('path');
 const fsPromises = require('fs').promises;
-const { intersectPathData, subtractPathData } = require('lib2geom-path-boolean');
+const { intersectPathData, subtractPathData, unifyPathData } = require('lib2geom-path-boolean-addon');
 
 const { PathData } = require('../renderer/DielineViewer/util/PathData');
 const { VERY_LARGE_NUMBER } = require('../renderer/common/constants');
@@ -21,13 +21,16 @@ enum MAIN_EVENTS {
   SAVE_SVG = 'save-svg',
   SAVE_GLTF = 'save-gltf',
   SAVE_NET_SVG_AND_SPEC = 'save-net-svg-and-spec',
-  INTERSECT_SVG = 'intersect-svg',
+  RESOLVE_BOUNDED_TEXTURE_PATH = 'resolve-bounded-texture-path',
   LOAD_NET_SPEC = 'load-net-spec',
   OPEN_SVG = 'open-svg',
   OPEN_TEXTURE_WINDOW = 'open-texture-window',
   RESET_DRAG_MODE = 'reset-drag-mode',
   GET_TEXTURE_FILE_PATH = 'get-texture-file-path',
   SELECT_TEXTURE = 'select-texture',
+  INTERSECT_PATHS = 'intersect-paths',
+  SUBTRACT_PATHS = 'subtract-paths',
+  UNIFY_PATHS = 'unify-paths',
 }
 
 enum ROUTED_EVENTS {
@@ -59,7 +62,13 @@ const jsonFilters = [{ name: 'JSON', extensions: ['json'] }];
 const glbFilters = [{ name: 'GLB 3D model', extensions: ['glb'] }];
 
 export const setupIpc = (ipcMain) => {
-  ipcMain.handle(EVENTS.INTERSECT_SVG,
+  ipcMain.handle(EVENTS.INTERSECT_PATHS, (e, path1D, path2D) => intersectPathData(path1D, path2D));
+
+  ipcMain.handle(EVENTS.UNIFY_PATHS, (e, path1D, path2D) => unifyPathData(path1D, path2D));
+
+  ipcMain.handle(EVENTS.SUBTRACT_PATHS, (e, path1D, path2D) => subtractPathData(path1D, path2D));
+
+  ipcMain.handle(EVENTS.RESOLVE_BOUNDED_TEXTURE_PATH,
     (e, decorationBoundaryPathD, texturePathD, textureTransformMatrixStr, isPositive) => {
       const texturePathTransformedD = svgpath.from(texturePathD).transform(textureTransformMatrixStr).toString();
       if (isPositive) {

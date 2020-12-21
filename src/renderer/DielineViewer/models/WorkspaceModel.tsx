@@ -12,13 +12,15 @@ import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { SVGWrapper } from '../data/SVGWrapper';
 import { PreferencesModel } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../components/PyramidNet';
+import { CylinderLightboxWidgetOptionsInfo } from '../CylinderLightbox';
 
 export const WorkspaceModel = types.model({
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
   widgetOptions: types.frozen({
     'pyramid-net': PyramidNetOptionsInfo,
+    'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
   }),
-  selectedWidgetName: 'pyramid-net',
+  selectedWidgetName: 'cylinder-lightbox',
 })
   .views((self) => ({
     get selectedWidgetInfo() {
@@ -65,6 +67,8 @@ export const WorkspaceModel = types.model({
 export interface IWorkspaceModel extends Instance<typeof WorkspaceModel> {}
 
 export const workspaceStore = WorkspaceModel.create({});
+// @ts-ignore
+window.workspaceStore = workspaceStore;
 const WorkspaceStoreContext = createContext<IWorkspaceModel>(workspaceStore);
 
 export const { Provider: WorkspaceProvider } = WorkspaceStoreContext;

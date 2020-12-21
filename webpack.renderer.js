@@ -22,16 +22,5 @@ module.exports = function (config) {
     }, templateParameters(...params),
   );
 
-  return merge(config, {
-    module: {
-      rules: [
-        {
-          test: /\.jsx?$/,
-          include: /node_modules/,
-          // TODO: switch to https://github.com/pmmmwh/react-refresh-webpack-plugin/ when stable
-          use: ['react-hot-loader/webpack'],
-        },
-      ],
-    },
-  });
+  return config;
 };
