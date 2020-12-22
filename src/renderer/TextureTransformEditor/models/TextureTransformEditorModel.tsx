@@ -1,5 +1,7 @@
 import { inRange } from 'lodash';
-import { Instance, resolvePath, types } from 'mobx-state-tree';
+import {
+  getSnapshot, Instance, resolvePath, types,
+} from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
 import { BoundaryModel } from './BoundaryModel';
@@ -277,7 +279,7 @@ export const TextureTransformEditorModel = types
       if (!self.texture) {
         return;
       }
-      globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, self.texture);
+      globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, getSnapshot(self.texture));
     },
   }))
   .actions((self) => {

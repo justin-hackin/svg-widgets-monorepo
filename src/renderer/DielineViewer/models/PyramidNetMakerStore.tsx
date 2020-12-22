@@ -1,20 +1,21 @@
 /* eslint-disable max-classes-per-file,no-param-reassign */
 import { range } from 'lodash';
-import { Instance, types, tryResolve } from 'mobx-state-tree';
+import {
+  Instance, types, tryResolve,
+} from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import {
   degToRad,
-  distanceFromOrigin,
   hingedPlot,
-  hingedPlotByProjectionDistance, radToDeg, subtractPoints,
+  hingedPlotByProjectionDistance, radToDeg,
 } from '../../common/util/geom';
 import { polyhedra } from '../data/polyhedra';
-import { PyramidNetModel } from './PyramidNetStore';
+import { defaultModelData, PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
 import { boundingViewBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
-import { DashPatternsModel } from '../data/dash-patterns';
+import { dashPatterns, DashPatternsModel } from '../data/dash-patterns';
 import { EVENTS } from '../../../main/ipc';
 import { PathData } from '../util/PathData';
 import { strokeDashPath } from '../util/shapes/strokeDashPath';
@@ -37,9 +38,9 @@ export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryMode
 };
 
 export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
-  pyramidNetSpec: types.maybe(types.late(() => PyramidNetModel)),
+  pyramidNetSpec: types.optional(PyramidNetModel, defaultModelData),
   polyhedraPyramidGeometries: types.frozen(polyhedra),
-  dashPatterns: DashPatternsModel,
+  dashPatterns: types.optional(DashPatternsModel, dashPatterns),
   // TODO: make a prototype with history as property and use on all undoable models
   history: types.optional(UndoManagerWithGroupState, {}),
 }).views((self) => ({
@@ -86,14 +87,11 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     const outerPt2 = hingedPlotByProjectionDistance(
       faceBoundaryPoints[0], faceBoundaryPoints[1], -FLAP_BASE_ANGLE, ascendantEdgeTabDepth,
     );
-    const maxRoundingDistance = Math.min(
-      distanceFromOrigin(subtractPoints(faceBoundaryPoints[0], outerPt1)),
-      distanceFromOrigin(subtractPoints(faceBoundaryPoints[1], outerPt2)),
-    );
+
     cut.concatPath(
       roundedEdgePath(
         [faceBoundaryPoints[0], outerPt1, outerPt2, faceBoundaryPoints[1]],
-        ascendantEdgeTabsSpec.flapRoundingDistanceRatio * maxRoundingDistance,
+        ascendantEdgeTabsSpec.flapRoundingDistanceRatio,
       ),
     );
 
@@ -146,7 +144,9 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     }`;
   },
 })).actions((self) => {
-  const updateDielineHandler = (e, faceDecoration) => { self.pyramidNetSpec.setFaceDecoration(faceDecoration); };
+  const updateDielineHandler = (e, faceDecoration) => {
+    self.pyramidNetSpec.setFaceDecoration(faceDecoration);
+  };
   const sendShapeUpdateHandler = () => { self.sendShapeUpdate(); };
 
   return {

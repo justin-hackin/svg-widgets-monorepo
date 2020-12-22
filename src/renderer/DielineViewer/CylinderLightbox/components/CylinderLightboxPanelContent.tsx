@@ -6,6 +6,7 @@ import { ControlElement } from '../../../common/components/ControlElement';
 import { CM_TO_PIXELS_RATIO } from '../../../common/util/geom';
 import { PanelSlider } from '../../../common/components/PanelSlider';
 import { VERY_SMALL_NUMBER } from '../../../common/constants';
+import { PanelSliderUnitView, UNITS } from '../../../common/components/PanelSliderUnitView';
 
 export const CylinderLightboxPanelContent = () => {
   const workspaceStore = useWorkspaceMst();
@@ -14,26 +15,28 @@ export const CylinderLightboxPanelContent = () => {
   return (
     <>
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderUnitView}
         node={shapeDefinition}
         property="materialThickness"
+        unit={UNITS.cm}
         min={CM_TO_PIXELS_RATIO * 0.1}
         max={CM_TO_PIXELS_RATIO}
-        step={0.1 * CM_TO_PIXELS_RATIO}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderUnitView}
         node={shapeDefinition}
         property="ringRadius"
+        unit={UNITS.cm}
         min={CM_TO_PIXELS_RATIO * 10}
         max={CM_TO_PIXELS_RATIO * 60}
         step={0.25 * CM_TO_PIXELS_RATIO}
       />
 
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderUnitView}
         node={shapeDefinition}
         property="cylinderHeight"
+        unit={UNITS.cm}
         min={CM_TO_PIXELS_RATIO}
         max={CM_TO_PIXELS_RATIO * 30}
         step={0.1 * CM_TO_PIXELS_RATIO}

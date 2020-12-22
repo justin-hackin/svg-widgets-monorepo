@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
 import {
-  Instance, types, resolveIdentifier, getParent, getType,
+  getParent, getType, Instance, resolveIdentifier, SnapshotIn, types,
 } from 'mobx-state-tree';
 import {
   chunk, debounce, flatten, range,
@@ -9,8 +9,12 @@ import {
 
 import { polyhedra } from '../data/polyhedra';
 import {
-  CM_TO_PIXELS_RATIO, getTextureTransformMatrix, offsetPolygonPoints,
-  polygonPointsGivenAnglesAndSides, RawPoint, scalePoint,
+  CM_TO_PIXELS_RATIO,
+  getTextureTransformMatrix,
+  offsetPolygonPoints,
+  polygonPointsGivenAnglesAndSides,
+  RawPoint,
+  scalePoint,
   triangleAnglesGivenSides,
 } from '../../common/util/geom';
 import { EVENTS } from '../../../main/ipc';
@@ -195,6 +199,24 @@ export const PyramidNetModel = types.model({
       reaction(() => self.textureBorderWidth, () => {
         this.sendTextureBorderData();
       });
+      reaction(() => self.faceDecoration, async () => {
+        if (self.faceDecoration) {
+          const { pattern, transformMatrix } = self.faceDecoration;
+          if (getType(pattern) === PathFaceDecorationPatternModel) {
+            const { pathD, isPositive } = pattern as IPathFaceDecorationPatternModel;
+            // @ts-ignore
+            const croppedD = await globalThis.ipcRenderer.invoke(
+              // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
+              EVENTS.RESOLVE_BOUNDED_TEXTURE_PATH,
+              closedPolygonPath(self.normalizedDecorationBoundaryPoints).getD(),
+              pathD,
+              transformMatrix.toString(),
+              isPositive,
+            );
+            this.setActiveCutHolePatternD(croppedD);
+          }
+        }
+      });
     },
 
     sendTextureBorderData: debounce(() => {
@@ -205,7 +227,7 @@ export const PyramidNetModel = types.model({
 
     setPyramidShapeName(name: string) {
       self.pyramid.shapeName = name;
-      this.setFaceDecoration(undefined);
+      self.faceDecoration = undefined;
       this.setActiveCutHolePatternD(undefined);
     },
 
@@ -213,29 +235,8 @@ export const PyramidNetModel = types.model({
       self.activeCutHolePatternD = d;
     },
 
-    // eslint-disable-next-line func-names
-    async setFaceDecoration(faceDecoration) {
-      if (faceDecoration) {
-        self.faceDecoration = FaceDecorationModel.create(faceDecoration);
-        const { pattern, transformMatrix } = self.faceDecoration as IFaceDecorationModel;
-        if (getType(pattern) === PathFaceDecorationPatternModel) {
-          const { pathD, isPositive } = pattern as IPathFaceDecorationPatternModel;
-          // @ts-ignore
-          const croppedD = await globalThis.ipcRenderer.invoke(
-            // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
-            EVENTS.RESOLVE_BOUNDED_TEXTURE_PATH,
-            closedPolygonPath(self.normalizedDecorationBoundaryPoints).getD(),
-            pathD,
-            transformMatrix.toString(),
-            isPositive,
-          );
-          this.setActiveCutHolePatternD(croppedD);
-        } else {
-          this.setActiveCutHolePatternD(undefined);
-        }
-        return;
-      }
-      self.faceDecoration = undefined;
+    setFaceDecoration(snapshot) {
+      self.faceDecoration = FaceDecorationModel.create(snapshot);
     },
 
     setUseDottedStroke(useDotted) {
@@ -268,12 +269,38 @@ export const PyramidNetModel = types.model({
         self.pyramid.shapeName,
         self.faceDecoration);
     },
-
-    loadSpec(specData: IPyramidNetModel) {
-      const { faceDecoration, ...rest } = specData;
-      Object.assign(self, rest);
-      this.setFaceDecoration(faceDecoration);
-    },
   }));
 
 export interface IPyramidNetModel extends Instance<typeof PyramidNetModel> {}
+
+export const defaultModelData:SnapshotIn<typeof PyramidNetModel> = {
+  // @ts-ignore
+  pyramid: { shapeName: 'small-triambic-icosahedron' },
+  ascendantEdgeTabsSpec: {
+    flapRoundingDistanceRatio: 1,
+    holeFlapTaperAngle: 0.3141592653589793,
+    holeReachToTabDepth: 0.1,
+    holeWidthRatio: 0.4,
+    midpointDepthToTabDepth: 0.5,
+    tabDepthToTraversalLength: 0.04810606060599847,
+    tabRoundingDistanceRatio: 0.75,
+    tabStartGapToTabDepth: 1,
+    tabWideningAngle: 0.19634954084936207,
+    tabsCount: 3,
+  },
+  baseEdgeTabsSpec: {
+    finDepthToTabDepth: 1.1,
+    finOffsetRatio: 0.75,
+    holeBreadthToHalfWidth: 0.25,
+    holeDepthToTabDepth: 0.5,
+    holeTaper: 0.6981317007977318,
+    tabDepthToAscendantTabDepth: 1.5,
+    bendGuideValley: {
+      depthRatio: 0.5,
+      theta: Math.PI / 4,
+    },
+  },
+  // @ts-ignore
+  useDottedStroke: false,
+  shapeHeightInCm: 20,
+};

@@ -8,8 +8,11 @@ import { PanelSlider } from './PanelSlider';
 import { PanelSelect } from './PanelSelect';
 import { PanelSwitch } from './PanelSwitch';
 import { PanelColorPicker } from './PanelColorPicker';
+import { PanelSliderUnitView } from './PanelSliderUnitView';
 
-// in order to use this component, the root of the passed node must contain history
+// TODO: make this component enclose the Panel* component instead of being passed its element
+// eslint-disable-next-line max-len
+// consider https://medium.com/@justynazet/passing-props-to-props-children-using-react-cloneelement-and-render-props-pattern-896da70b24f6
 
 export const ControlElement = observer(({
   component, node, property, label = undefined, ...props
@@ -35,9 +38,11 @@ export const ControlElement = observer(({
     label: label || startCase(property),
     ...props,
   };
-  if (component === PanelSlider) {
+  if (component === PanelSlider || component === PanelSliderUnitView) {
+    const SliderComponent = component as (typeof PanelSlider | typeof PanelSliderUnitView);
     return (
-      <PanelSlider
+      // @ts-ignore
+      <SliderComponent
         onChange={(_, val) => {
           if (history && !history.groupActive) {
             history.startGroup(() => {

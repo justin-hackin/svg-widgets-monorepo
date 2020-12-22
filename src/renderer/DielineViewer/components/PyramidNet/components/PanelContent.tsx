@@ -43,6 +43,7 @@ export const PanelContent = () => {
   const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
   const classes = useStyles();
   const { pyramidNetSpec } = store;
+  if (!pyramidNetSpec) { return null; }
   const polyhedronOptions = Object.keys(store.polyhedraPyramidGeometries)
     .map((polyKey) => ({
       value: polyKey,

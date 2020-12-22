@@ -12,6 +12,7 @@ import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import {
   AppBar, Button, Menu, MenuItem, Tooltip,
 } from '@material-ui/core';
+import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 import { useStyles } from '../../style';
 import { EVENTS } from '../../../../main/ipc';
 import { HistoryButtons } from '../PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
@@ -74,10 +75,10 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
             />
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={async () => {
-                await globalThis.ipcRenderer.invoke(EVENTS.LOAD_NET_SPEC).then((specData) => {
+                await globalThis.ipcRenderer.invoke(EVENTS.LOAD_SNAPSHOT).then((snapshot) => {
                   // falsy if file dialog cancelled
-                  if (specData) {
-                    store.shapeDefinition.loadSpec(specData);
+                  if (snapshot) {
+                    applySnapshot(store.shapeDefinition, snapshot);
                   }
                 });
                 resetFileMenuRef();
@@ -90,8 +91,8 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
                   await globalThis.ipcRenderer.invoke(
                     EVENTS.SAVE_NET_SVG_AND_SPEC,
                     workspaceStore.renderWidgetToString(),
-                    store.shapeDefinition,
-                    { message: 'Save widget svg with json data', defaultPath: store.getFileBasename() },
+                    getSnapshot(store.shapeDefinition),
+                    { message: 'Save widget svg with json data', defaultPath: `${store.getFileBasename()}.svg` },
                   );
                   resetFileMenuRef();
                 }}

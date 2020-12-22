@@ -1,15 +1,15 @@
-import { Instance, types } from 'mobx-state-tree';
+import { Instance, SnapshotIn, types } from 'mobx-state-tree';
 import { chunk, uniq } from 'lodash';
 
-import { convertMessageToMorseBooleanString } from './morse';
-import { PHI } from '../../common/util/geom';
+// import { convertMessageToMorseBooleanString } from './morse';
+// import { PHI } from '../../common/util/geom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const scoreMessage:number[] = convertMessageToMorseBooleanString('playful geometer is symmetrically excellent')
-  .reduce((acc:number[], isLong) => {
-    acc.push(isLong ? PHI ** 2 : 1 / PHI, 1);
-    return acc;
-  }, []);
+// const scoreMessage:number[] = convertMessageToMorseBooleanString('playful geometer is symmetrically excellent')
+//   .reduce((acc:number[], isLong) => {
+//     acc.push(isLong ? PHI ** 2 : 1 / PHI, 1);
+//     return acc;
+//   }, []);
 
 const dasharrayLabelMap = (dasharray) => chunk(dasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
 
@@ -32,9 +32,7 @@ if (!uniq(dasharrays)) {
   throw new Error('dasharrays contents are not unique');
 }
 
-export const dashPatterns = DashPatternsModel.create(
-  dasharrays.map((relativeStrokeDasharray) => ({
-    relativeStrokeDasharray,
-    id: dasharrayLabelMap(relativeStrokeDasharray),
-  })),
-);
+export const dashPatterns:SnapshotIn<typeof DashPatternsModel> = dasharrays.map((relativeStrokeDasharray) => ({
+  relativeStrokeDasharray,
+  id: dasharrayLabelMap(relativeStrokeDasharray),
+}));

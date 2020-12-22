@@ -17,7 +17,7 @@ import { CylinderLightboxWidgetOptionsInfo } from '../CylinderLightbox';
 export const WorkspaceModel = types.model({
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
   widgetOptions: types.frozen({
-    'pyramid-net': PyramidNetOptionsInfo,
+    'polyhedral-net': PyramidNetOptionsInfo,
     'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
   }),
   selectedWidgetName: 'cylinder-lightbox',
@@ -51,6 +51,9 @@ export const WorkspaceModel = types.model({
     },
   }))
   .actions((self) => ({
+    setSelectedWidgetName(name) {
+      self.selectedWidgetName = name;
+    },
     renderWidgetToString() {
       const { SelectedRawSvgComponent } = self;
       return ReactDOMServer.renderToString(

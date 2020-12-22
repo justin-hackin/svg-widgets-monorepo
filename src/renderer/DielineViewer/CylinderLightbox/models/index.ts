@@ -1,4 +1,6 @@
-import { flow, Instance, types } from 'mobx-state-tree';
+import {
+  flow, Instance, SnapshotIn, types,
+} from 'mobx-state-tree';
 import { reaction } from 'mobx';
 import {
   angleRelativeToOrigin,
@@ -10,22 +12,6 @@ import { DestinationCommand, PathData } from '../../util/PathData';
 import { UndoManagerWithGroupState } from '../../../common/components/UndoManagerWithGroupState';
 import { closedPolygonPath } from '../../util/shapes/generic';
 import { EVENTS } from '../../../../main/ipc';
-
-export const defaultCylinderLightboxSnapshot = {
-  shapeDefinition: {
-    wallsPerArc: 4,
-    holeWidthRatio: 0.5,
-    arcsPerRing: 4,
-    ringRadius: CM_TO_PIXELS_RATIO * 11.25,
-    ringThicknessRatio: 0.2,
-    materialThickness: CM_TO_PIXELS_RATIO * 0.3,
-    dovetailIngressRatio: 0.5,
-    dovetailSizeRatio: 0.5,
-    cylinderHeight: CM_TO_PIXELS_RATIO * 2,
-    holderTabsPerArc: 2,
-    holderTabsFeetLengthRatio: 0.5,
-  },
-};
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -229,9 +215,27 @@ const CylinderLightboxDataModel = types.model({
 
 export interface ICylinderLightboxDataModel extends Instance<typeof CylinderLightboxDataModel> {}
 
+export const defaultCylinderLightboxSnapshot:SnapshotIn<typeof CylinderLightboxDataModel> = {
+  wallsPerArc: 4,
+  holeWidthRatio: 0.5,
+  arcsPerRing: 4,
+  ringRadius: CM_TO_PIXELS_RATIO * 11.25,
+  ringThicknessRatio: 0.2,
+  materialThickness: CM_TO_PIXELS_RATIO * 0.3,
+  dovetailIngressRatio: 0.5,
+  dovetailSizeRatio: 0.5,
+  cylinderHeight: CM_TO_PIXELS_RATIO * 2,
+  holderTabsPerArc: 2,
+  holderTabsFeetLengthRatio: 0.5,
+};
+
 export const CylinderLightBoxModel = types.model({
   history: types.optional(UndoManagerWithGroupState, {}),
-  shapeDefinition: CylinderLightboxDataModel,
-});
+  shapeDefinition: types.optional(CylinderLightboxDataModel, defaultCylinderLightboxSnapshot),
+}).actions(() => ({
+  getFileBasename() {
+    return 'cylinder_lightbox';
+  },
+}));
 
 export interface ICylinderLightBoxModel extends Instance<typeof CylinderLightBoxModel> {}

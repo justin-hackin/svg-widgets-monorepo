@@ -15,6 +15,7 @@ module.exports = {
     'no-underscore-dangle': 0,
     // TODO: remove dep cycles
     'import/no-cycle': 0,
+    'func-names': 0,
   },
   settings: {
     'import/extensions': [".js",".jsx",".ts",".tsx"],

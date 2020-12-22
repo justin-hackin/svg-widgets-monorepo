@@ -9,8 +9,11 @@ import { useStyles } from '../../DielineViewer/style';
 
 export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
 
+// TODO: fix value label cut off and wrong color
+// convert to slider with text input? could allow escaping bounds
 export const PanelSlider = ({
-  value, onChange, onChangeCommitted, valuePath, label = undefined, ...rest
+  value, onChange, onChangeCommitted, valuePath,
+  min, max, step, label = undefined, valueLabelFormat = undefined,
 }) => {
   const classes = useStyles();
   const labelId = uuid();
@@ -25,9 +28,12 @@ export const PanelSlider = ({
         value={value}
         aria-labelledby={labelId}
         valueLabelDisplay="auto"
-        valueLabelFormat={(val) => val && val.toFixed(2)}
-        {...{ onChange, onChangeCommitted }}
-        {...rest}
+        valueLabelFormat={
+          valueLabelFormat || ((val) => val && val.toFixed(2))
+        }
+        {...{
+          onChange, onChangeCommitted, min, max, step,
+        }}
       />
     </FormControl>
   );

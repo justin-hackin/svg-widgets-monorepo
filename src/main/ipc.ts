@@ -22,7 +22,7 @@ enum MAIN_EVENTS {
   SAVE_GLTF = 'save-gltf',
   SAVE_NET_SVG_AND_SPEC = 'save-net-svg-and-spec',
   RESOLVE_BOUNDED_TEXTURE_PATH = 'resolve-bounded-texture-path',
-  LOAD_NET_SPEC = 'load-net-spec',
+  LOAD_SNAPSHOT = 'load-snapshot',
   OPEN_SVG = 'open-svg',
   OPEN_TEXTURE_WINDOW = 'open-texture-window',
   RESET_DRAG_MODE = 'reset-drag-mode',
@@ -122,7 +122,7 @@ export const setupIpc = (ipcMain) => {
       fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, formattedJSONStringify(pyramidNetSpec))]);
   }));
 
-  ipcMain.handle(EVENTS.LOAD_NET_SPEC, () => resolveStringDataFromDialog(
+  ipcMain.handle(EVENTS.LOAD_SNAPSHOT, () => resolveStringDataFromDialog(
     { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },
   ).then((jsonString) => JSON.parse(jsonString)));
 
