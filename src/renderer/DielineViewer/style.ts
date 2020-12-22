@@ -101,4 +101,10 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   controlPaper: {
     display: 'grid',
   },
+  zoomPanToolbar: {
+    backgroundColor: theme.palette.grey.A700,
+    display: 'flex',
+    flexDirection: 'row',
+    padding: '2px 1px',
+  }
 }));
