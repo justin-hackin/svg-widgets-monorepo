@@ -119,6 +119,22 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     // female inner
     cut.concatPath(ascendantTabs.female.cut);
     score.concatPath(ascendantTabs.female.score);
+    const { activeCutHolePatternD } = self.pyramidNetSpec;
+    if (activeCutHolePatternD) {
+      const insetDecorationPath = (new PathData(activeCutHolePatternD))
+        .transform(`${
+          self.pyramidNetSpec.borderInsetFaceHoleTransformMatrix.toString()} ${
+          self.pyramidNetSpec.pathScaleMatrix.toString()}`);
+      range(faceCount).forEach((index) => {
+        const isOdd = !!(index % 2);
+        const xScale = isOdd ? -1 : 1;
+        const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+        const rotationRad = -1 * xScale * index * faceInteriorAngles[2] + asymetryNudge;
+        const tiledDecorationPath = (new PathData()).concatPath(insetDecorationPath)
+          .transform(`scale(${xScale}, 1) rotate(${radToDeg(rotationRad)})`);
+        cut.concatPath(tiledDecorationPath);
+      });
+    }
     return { cut, score };
   },
   get fitToCanvasTranslation() {

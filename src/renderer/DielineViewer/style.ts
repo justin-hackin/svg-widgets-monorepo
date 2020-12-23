@@ -106,5 +106,5 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexDirection: 'row',
     padding: '2px 1px',
-  }
+  },
 }));
