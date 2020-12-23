@@ -13,18 +13,12 @@ export const PreferencesModel = types.model({
   scoreSettings: optionalModel({
     stroke: '#BDFF48',
   }),
-  designBoundarySettings: optionalModel({
-    stroke: 'rgb(68,154,255)',
-  }),
 }).views((self) => ({
   get scoreProps() {
     return { ...self.dieLineSettings, ...self.scoreSettings };
   },
   get cutProps() {
     return { ...self.dieLineSettings, ...self.cutSettings };
-  },
-  get designBoundaryProps() {
-    return { ...self.dieLineSettings, ...self.designBoundarySettings };
   },
 }));
 

@@ -2,20 +2,19 @@
 import React from 'react';
 import { range } from 'lodash';
 import { radToDeg } from '../../../../common/util/geom';
-import { closedPolygonPath } from '../../../util/shapes/generic';
 import { IPreferencesModel } from '../../../models/PreferencesModel';
 import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
 
 export const PyramidNet = ({
   widgetStore, preferencesStore,
 }:{
-  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetFactoryModel
+  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetFactoryModel,
 }) => {
   if (!preferencesStore || !widgetStore) { return null; }
   const {
     pyramidNetSpec: {
       pyramid: { geometry: { faceCount } },
-      faceBoundaryPoints, faceInteriorAngles,
+      faceInteriorAngles,
       activeCutHolePatternD,
       borderInsetFaceHoleTransformMatrix,
       pathScaleMatrix,
@@ -23,7 +22,7 @@ export const PyramidNet = ({
     makePaths: { cut, score },
     fitToCanvasTranslation,
   } = widgetStore;
-  const { cutProps, scoreProps, designBoundaryProps } = preferencesStore;
+  const { cutProps, scoreProps } = preferencesStore;
   const CUT_HOLES_ID = 'cut-holes';
   return (
     <g transform={`translate(${fitToCanvasTranslation.x}, ${fitToCanvasTranslation.y})`}>
@@ -39,7 +38,6 @@ export const PyramidNet = ({
           return index === 0
             ? (
               <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
-                <path d={closedPolygonPath(faceBoundaryPoints).getD()} {...designBoundaryProps} />
                 { activeCutHolePatternD && (
                   <path d={activeCutHolePatternD} transform={pathScaleMatrix.toString()} {...cutProps} />
                 ) }
