@@ -20,7 +20,7 @@ export const WorkspaceModel = types.model({
     'polyhedral-net': PyramidNetOptionsInfo,
     'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
   }),
-  selectedWidgetName: 'cylinder-lightbox',
+  selectedWidgetName: 'polyhedral-net',
 })
   .views((self) => ({
     get selectedWidgetInfo() {

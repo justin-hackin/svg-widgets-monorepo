@@ -30,12 +30,6 @@ export const StyleControls = observer(() => {
         property="stroke"
         label="Score Stroke Color"
       />
-      <ControlElement
-        component={PanelColorPicker}
-        node={preferences.designBoundarySettings}
-        property="stroke"
-        label="Design Boundary Stroke Color"
-      />
     </>
   );
 });
