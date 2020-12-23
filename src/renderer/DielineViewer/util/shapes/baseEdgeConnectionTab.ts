@@ -7,7 +7,7 @@ import {
   hingedPlotByProjectionDistance,
   hingedPlotLerp,
   getLineLineIntersection,
-  RawPoint,
+  RawPoint, symmetricHingePlotByProjectionDistance,
 } from '../../../common/util/geom';
 import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
 import { connectedLineSegments } from './generic';
@@ -76,14 +76,9 @@ export function baseEdgeConnectionTab(
     hingedPlotLerp(start, mid, 0, inLengthRatio),
   ];
   const holeTheta = -holeTaper + Math.PI / 2;
-  const holeEdges = [
-    hingedPlotByProjectionDistance(
-      holeBases[1], holeBases[0], holeTheta, -tabDepth * holeDepthToTabDepth,
-    ),
-    hingedPlotByProjectionDistance(
-      holeBases[0], holeBases[1], Math.PI / 2, tabDepth * holeDepthToTabDepth,
-    ),
-  ];
+  const holeEdges = symmetricHingePlotByProjectionDistance(
+    holeBases[0], holeBases[1], holeTheta, tabDepth * holeDepthToTabDepth,
+  );
 
   const finBases = [
     hingedPlotLerp(end, mid, 0, inLengthRatio),
