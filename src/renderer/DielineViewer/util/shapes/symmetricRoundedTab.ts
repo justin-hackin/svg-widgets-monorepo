@@ -44,8 +44,9 @@ export const symmetricRoundedTab = (
   };
 };
 
-export const arrowTab = (
-  tabBaseStart, tabBaseEnd, midpointDepthToTabDepth, tabDepthToBaseLength, tabWideningAngle, scoreDashSpec,
+export const arrowTabPlots = (
+  tabBaseStart, tabBaseEnd,
+  midpointDepthToTabDepth, tabDepthToBaseLength, tabWideningAngle,
 ) => {
   const vector = subtractPoints(tabBaseEnd, tabBaseStart);
   const tabDepth = tabDepthToBaseLength * distanceFromOrigin(vector);
@@ -61,14 +62,8 @@ export const arrowTab = (
     ),
   ];
 
-  const scorePath = new PathData();
-  scorePath.concatPath(strokeDashPath(tabBaseStart, tabBaseEnd, scoreDashSpec));
-  scorePath.concatPath(strokeDashPath(tabMidpoints[0], tabMidpoints[1], scoreDashSpec));
-
   return {
-    cutPath: connectedLineSegments(
-      [tabBaseStart, tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], tabBaseEnd],
-    ),
-    scorePath,
+    tabMidpoints,
+    tabApexes,
   };
 };

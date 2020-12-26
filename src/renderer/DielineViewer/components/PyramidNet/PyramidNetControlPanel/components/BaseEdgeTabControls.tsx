@@ -27,6 +27,17 @@ export const BaseEdgeTabControls = observer(() => {
       <ControlElement
         component={PanelSlider}
         node={baseEdgeTabsSpec}
+        property="roundingDistanceRatio"
+        {...ratioSliderProps}
+      />
+      <ControlElement
+        component={PanelSwitch}
+        node={baseEdgeTabsSpec}
+        property="scoreTabMidline"
+      />
+      <ControlElement
+        component={PanelSlider}
+        node={baseEdgeTabsSpec}
         property="finDepthToTabDepth"
         {...{ ...ratioSliderProps, min: 0.05 }}
       />

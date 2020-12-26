@@ -295,6 +295,8 @@ export const defaultModelData:SnapshotIn<typeof PyramidNetModel> = {
     holeDepthToTabDepth: 0.5,
     holeTaper: 0.6981317007977318,
     tabDepthToAscendantTabDepth: 1.5,
+    scoreTabMidline: false,
+    roundingDistanceRatio: 0.1,
     bendGuideValley: {
       depthRatio: 0.5,
       theta: Math.PI / 4,

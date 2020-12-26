@@ -10,8 +10,7 @@ import {
   RawPoint, symmetricHingePlotByProjectionDistance,
 } from '../../../common/util/geom';
 import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
-import { connectedLineSegments } from './generic';
-import { arrowTab } from './symmetricRoundedTab';
+import { arrowTabPlots } from './symmetricRoundedTab';
 import { VERY_LARGE_NUMBER } from '../../../common/constants';
 
 export interface BaseEdgeConnectionTab {
@@ -32,6 +31,8 @@ export const BaseEdgeTabsModel = types.model({
   holeBreadthToHalfWidth: types.number,
   holeDepthToTabDepth: types.number,
   holeTaper: types.number,
+  scoreTabMidline: types.boolean,
+  roundingDistanceRatio: types.number,
   tabDepthToAscendantTabDepth: types.number,
   bendGuideValley: types.maybe(types.model({
     depthRatio: types.number,
@@ -61,10 +62,14 @@ export function baseEdgeConnectionTab(
     finDepthToTabDepth,
     finOffsetRatio,
     bendGuideValley,
+    scoreTabMidline,
+    roundingDistanceRatio,
   } = tabSpec;
 
   const tabDepth = tabDepthToAscendantTabDepth * ascendantEdgeTabDepth;
   const cutPath = new PathData();
+  const scorePath = new PathData();
+
   const mid = hingedPlotLerp(start, end, 0, 0.5);
   const holeHandleThicknessRatio = (1 - holeBreadthToHalfWidth) / 2;
   const offsetHoleHandle = finOffsetRatio * holeHandleThicknessRatio;
@@ -88,21 +93,23 @@ export function baseEdgeConnectionTab(
   const finDepth = finDepthToTabDepth * tabDepth;
   const finTraversal = distanceBetweenPoints(finBases[0], finBases[1]);
   // for plotting points only, need rounding clamp based on all roundings
-  const { cutPath: finCutPath, scorePath: finScorePath } = arrowTab(
+  const { tabMidpoints, tabApexes } = arrowTabPlots(
     finBases[0], finBases[1], 0.5,
-    finDepth / finTraversal, holeTheta, scoreDashSpec,
+    finDepth / finTraversal, holeTheta,
   );
 
-  const holePath = connectedLineSegments([holeBases[0], holeEdges[0], holeEdges[1], holeBases[1]]);
-  cutPath.concatPath(holePath);
-  cutPath.close();
+  cutPath
+    .move(holeBases[0])
+    .line(holeBases[1])
+    .curvedLineSegments([holeEdges[1], holeEdges[0], holeBases[0]], roundingDistanceRatio)
+    .close();
 
   const handleEdges = [
     hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
     // TODO: should this go back to symmetric?
     hingedPlotByProjectionDistance(start, finBases[0], Math.PI * 0.6, tabDepth),
   ];
-  const handleCornerPoints = [start, handleEdges[0]];
+  const handleCornerPoints = [handleEdges[0]];
 
   if (bendGuideValley) {
     const { depthRatio: valleyDepthRatio, theta: valleyTheta } = bendGuideValley;
@@ -117,15 +124,19 @@ export function baseEdgeConnectionTab(
     handleCornerPoints.push(handleValleyEdges[0], handleValleyDip, handleValleyEdges[1]);
   }
   handleCornerPoints.push(handleEdges[1], finBases[0]);
-  // cutPath.concatPath(roundedEdgePath(handleCornerPoints, roundingDistance));
-  cutPath.concatPath(connectedLineSegments(handleCornerPoints));
-  cutPath.line(finBases[0]).concatPath(finCutPath.sliceCommandsDangerously(1));
-  cutPath.line(finBases[1]);
-  cutPath.line(end);
-  const scorePath = new PathData();
+  cutPath.move(start).curvedLineSegments(handleCornerPoints, roundingDistanceRatio)
+    .curvedLineSegments(
+      [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBases[1]], roundingDistanceRatio,
+    )
+    .line(end);
+
+  scorePath.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));
+  if (scoreTabMidline) {
+    // TODO: this score doesn't meet with rounded tab edges, use bezier formula to find match
+    scorePath.concatPath(strokeDashPath(tabMidpoints[0], tabMidpoints[1], scoreDashSpec));
+  }
   scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
   scorePath.concatPath(strokeDashPath(holeBases[1], finBases[0], scoreDashSpec));
-  scorePath.concatPath(finScorePath);
 
   return { cut: cutPath, score: scorePath };
 }
