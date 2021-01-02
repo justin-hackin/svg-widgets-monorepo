@@ -1,13 +1,8 @@
 const { dialog } = require('electron');
-const svgpath = require('svgpath');
 const datauri = require('datauri');
 const sizeOfImage = require('image-size');
 const path = require('path');
 const fsPromises = require('fs').promises;
-const { intersectPathData, subtractPathData, unifyPathData } = require('lib2geom-path-boolean-addon');
-
-const { PathData } = require('../renderer/DielineViewer/util/PathData');
-const { VERY_LARGE_NUMBER } = require('../renderer/common/constants');
 
 const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
 
@@ -28,9 +23,6 @@ enum MAIN_EVENTS {
   RESET_DRAG_MODE = 'reset-drag-mode',
   GET_TEXTURE_FILE_PATH = 'get-texture-file-path',
   SELECT_TEXTURE = 'select-texture',
-  INTERSECT_PATHS = 'intersect-paths',
-  SUBTRACT_PATHS = 'subtract-paths',
-  UNIFY_PATHS = 'unify-paths',
 }
 
 enum ROUTED_EVENTS {
@@ -62,32 +54,6 @@ const jsonFilters = [{ name: 'JSON', extensions: ['json'] }];
 const glbFilters = [{ name: 'GLB 3D model', extensions: ['glb'] }];
 
 export const setupIpc = (ipcMain) => {
-  ipcMain.handle(EVENTS.INTERSECT_PATHS, (e, path1D, path2D) => intersectPathData(path1D, path2D));
-
-  ipcMain.handle(EVENTS.UNIFY_PATHS, (e, path1D, path2D) => unifyPathData(path1D, path2D));
-
-  ipcMain.handle(EVENTS.SUBTRACT_PATHS, (e, path1D, path2D) => subtractPathData(path1D, path2D));
-
-  ipcMain.handle(EVENTS.RESOLVE_BOUNDED_TEXTURE_PATH,
-    (e, decorationBoundaryPathD, texturePathD, textureTransformMatrixStr, isPositive) => {
-      const texturePathTransformedD = svgpath.from(texturePathD).transform(textureTransformMatrixStr).toString();
-      if (isPositive) {
-        const punchoutPath = new PathData();
-        punchoutPath
-          .move([-VERY_LARGE_NUMBER, -VERY_LARGE_NUMBER])
-          .line([VERY_LARGE_NUMBER, -VERY_LARGE_NUMBER])
-          .line([VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
-          .line([-VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
-          .close();
-        const punchoutPathTransformedD = svgpath.from(
-          punchoutPath.getD(),
-        ).transform(textureTransformMatrixStr).toString();
-        const punchedPathD = subtractPathData(punchoutPathTransformedD, texturePathTransformedD);
-        return intersectPathData(punchedPathD, decorationBoundaryPathD);
-      }
-      return intersectPathData(texturePathTransformedD, decorationBoundaryPathD);
-    });
-
   ipcMain.handle(EVENTS.SAVE_SVG, (e, fileContent, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,
     filters: svgFilters,

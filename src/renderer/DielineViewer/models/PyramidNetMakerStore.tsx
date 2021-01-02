@@ -119,9 +119,9 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     // female inner
     cut.concatPath(ascendantTabs.female.cut);
     score.concatPath(ascendantTabs.female.score);
-    const { activeCutHolePatternD } = self.pyramidNetSpec;
-    if (activeCutHolePatternD) {
-      const insetDecorationPath = (new PathData(activeCutHolePatternD))
+    const { texturePathD } = self.pyramidNetSpec;
+    if (texturePathD) {
+      const insetDecorationPath = (new PathData(texturePathD))
         .transform(`${
           self.pyramidNetSpec.borderInsetFaceHoleTransformMatrix.toString()} ${
           self.pyramidNetSpec.pathScaleMatrix.toString()}`);
@@ -161,7 +161,7 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   },
 })).actions((self) => {
   const updateDielineHandler = (e, faceDecoration) => {
-    self.pyramidNetSpec.setFaceDecoration(faceDecoration);
+    self.pyramidNetSpec.setTextureFaceDecoration(faceDecoration);
   };
   const sendShapeUpdateHandler = () => { self.sendShapeUpdate(); };
 

@@ -2,10 +2,10 @@ import { Instance, getParentOfType, getType } from 'mobx-state-tree';
 // @ts-ignore
 
 import {
-  FaceDecorationModel,
   IImageFaceDecorationPatternModel,
   IPathFaceDecorationPatternModel,
   PathFaceDecorationPatternModel,
+  TextureFaceDecorationModel,
 } from '../../DielineViewer/models/PyramidNetStore';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
@@ -27,7 +27,7 @@ export const transformDiffDefaults = {
   transformOriginDiff: getOriginPoint(),
 };
 
-export const TextureModel = FaceDecorationModel
+export const TextureModel = TextureFaceDecorationModel
   .volatile(() => ({ ...transformDiffDefaults }))
   .views((self) => ({
     get hasPathPattern() {

@@ -18,30 +18,8 @@ matrix:
     - os: linux
       dist: focal
       sudo: required
+      services: docker
       language: generic
-
-addons:
-  homebrew:
-    # Fixes issues described in:
-    # https://travis-ci.community/t/macos-build-fails-because-of-homebrew-bundle-unknown-command/7296/14
-    update: true
-    packages:
-      - gsl
-      - gcc@7
-      - double-conversion
-      - boost
-      - glib
-      - cairo
-
-  apt:
-    update: true
-    packages:
-      - g++
-      - cmake
-      - libboost-dev
-      - libdouble-conversion-dev
-      - libgsl-dev
-      - libcairo2-dev
 
 notifications:
   email: false
@@ -63,10 +41,17 @@ before_script:
 
 # on PRs and merges to master and prod run tests and build the app
 script:
-  - node --version
-  - npm i -g cmake-js
-  - npm i
-  - npm run test
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      docker run --rm \
+        -v ${PWD}:/project \
+        -v ~/.cache/electron:/root/.cache/electron \
+        -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+        electronuserland/builder:wine \
+        /bin/bash -c "npm i && npm run test"
+    else
+      npm run test
+    fi
 # only deploy to github on a merge to the prod branch
 deploy:
   provider: script

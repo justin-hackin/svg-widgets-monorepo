@@ -25,7 +25,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         await globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, 'Upload face cut pattern')
           .then((svgString) => {
             const d = extractCutHolesFromSvgString(svgString);
-            store.pyramidNetSpec.setActiveCutHolePatternD(d);
+            store.pyramidNetSpec.setRawFaceDecoration(d);
           });
         resetFileMenuRef();
       }}

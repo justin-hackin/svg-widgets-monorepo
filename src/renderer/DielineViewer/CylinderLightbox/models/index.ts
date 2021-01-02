@@ -1,5 +1,5 @@
 import {
-  flow, Instance, SnapshotIn, types,
+  Instance, SnapshotIn, types,
 } from 'mobx-state-tree';
 import { reaction } from 'mobx';
 import {
@@ -11,7 +11,7 @@ import {
 import { DestinationCommand, PathData } from '../../util/PathData';
 import { UndoManagerWithGroupState } from '../../../common/components/UndoManagerWithGroupState';
 import { closedPolygonPath } from '../../util/shapes/generic';
-import { EVENTS } from '../../../../main/ipc';
+import { subtractDValues, unifyDValues } from '../../../common/util/path-boolean';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -196,21 +196,17 @@ const CylinderLightboxDataModel = types.model({
         },
       );
     },
-    setSectionPathD: flow(function* () {
+    setSectionPathD() {
       const subtractionContent = (new PathData())
         .concatPath(self.dovetailNotch)
         .concatPath(self.wallHoles)
         .concatPath(self.holderTabHoles);
-      const notchedPathD = yield globalThis.ipcRenderer
-        .invoke(EVENTS.SUBTRACT_PATHS, self.sectionArcPath.getD(), subtractionContent.getD());
-      self.sectionPathD = yield globalThis.ipcRenderer
-        .invoke(EVENTS.UNIFY_PATHS, self.dovetailTab.getD(), notchedPathD);
-    }),
-    setWallPathD: flow(function* () {
-      self.wallPathD = yield globalThis.ipcRenderer.invoke(
-        EVENTS.UNIFY_PATHS, self.wallVerticalRect.getD(), self.wallHorizontalRect.getD(),
-      );
-    }),
+      const notchedPathD = subtractDValues(self.sectionArcPath.getD(), subtractionContent.getD());
+      self.sectionPathD = unifyDValues(self.dovetailTab.getD(), notchedPathD);
+    },
+    setWallPathD() {
+      self.wallPathD = unifyDValues(self.wallVerticalRect.getD(), self.wallHorizontalRect.getD());
+    },
   }));
 
 export interface ICylinderLightboxDataModel extends Instance<typeof CylinderLightboxDataModel> {}

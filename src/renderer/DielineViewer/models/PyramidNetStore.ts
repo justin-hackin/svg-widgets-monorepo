@@ -25,6 +25,7 @@ import { DashPatternModel } from '../util/shapes/strokeDashPath';
 import { boundingViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 import { DimensionsModel } from '../../TextureTransformEditor/models/DimensionsModel';
+import { getBoundedTexturePathD } from '../../common/util/path-boolean';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
@@ -43,7 +44,8 @@ export const ImageFaceDecorationPatternModel = types.model({
 });
 export interface IImageFaceDecorationPatternModel extends Instance<typeof ImageFaceDecorationPatternModel> {}
 
-export const FaceDecorationModel = types.model({
+// from texture editor
+export const TextureFaceDecorationModel = types.model({
   pattern: types.union(PathFaceDecorationPatternModel, ImageFaceDecorationPatternModel),
   transformOrigin: types.frozen<RawPoint>(),
   translate: types.frozen<RawPoint>(),
@@ -57,8 +59,15 @@ export const FaceDecorationModel = types.model({
     return getTextureTransformMatrix(transformOrigin, scale, rotate, translate);
   },
 }));
+export interface ITextureFaceDecorationModel extends Instance<typeof TextureFaceDecorationModel> {}
 
-export interface IFaceDecorationModel extends Instance<typeof FaceDecorationModel> {}
+// from file menu template upload
+const RawFaceDecorationModel = types.model({
+  dValue: types.string,
+});
+export interface IRawFaceDecorationModel extends Instance<typeof RawFaceDecorationModel> {}
+
+export const FaceDecorationModel = types.union(TextureFaceDecorationModel, RawFaceDecorationModel);
 
 export const PyramidModel = types.model({
   shapeName: types.string,
@@ -86,7 +95,6 @@ export const PyramidNetModel = types.model({
   // in this case of faceDecoration being defined, this is a derived value thus could be made volatile
   // however, it needs to be persisted in the model because
   // it can also be defined by cut hole path import via templated svg file
-  activeCutHolePatternD: types.maybe(types.string),
 })
   .views((self) => ({
     get tabIntervalRatios() {
@@ -185,37 +193,49 @@ export const PyramidNetModel = types.model({
     get pathScaleMatrix(): DOMMatrixReadOnly {
       return (new DOMMatrixReadOnly()).scale(this.faceLengthAdjustRatio, this.faceLengthAdjustRatio);
     },
+    get texturePathD() {
+      if (!self.faceDecoration) { return null; }
+
+      if (getType(self.faceDecoration) === TextureFaceDecorationModel) {
+        const { pattern, transformMatrix } = self.faceDecoration as ITextureFaceDecorationModel;
+        if (getType(pattern) === PathFaceDecorationPatternModel) {
+          const { pathD, isPositive } = pattern as IPathFaceDecorationPatternModel;
+          return getBoundedTexturePathD(
+            closedPolygonPath(this.normalizedDecorationBoundaryPoints).getD(),
+            pathD,
+            transformMatrix.toString(),
+            isPositive,
+          );
+        }
+      } else if (getType(self.faceDecoration) === RawFaceDecorationModel) {
+        const { dValue } = self.faceDecoration as IRawFaceDecorationModel;
+        return dValue;
+      }
+      // invalid types caught by runtime mst type checking, for linting only
+      return null;
+    },
   //  =========================================================
   }))
   .actions((self) => ({
     afterCreate() {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       reaction(
-        () => [self.normalizedDecorationBoundaryPoints, self.pyramid, self.faceDecoration],
+        () => [self.normalizedDecorationBoundaryPoints, self.faceDecoration],
         () => {
           this.sendTextureUpdate();
         },
       );
+
+      reaction(
+        () => [self.pyramid.shapeName],
+        () => {
+          self.faceDecoration = undefined;
+          this.sendTextureUpdate();
+        },
+      );
+
       reaction(() => self.textureBorderWidth, () => {
         this.sendTextureBorderData();
-      });
-      reaction(() => self.faceDecoration, async () => {
-        if (self.faceDecoration) {
-          const { pattern, transformMatrix } = self.faceDecoration;
-          if (getType(pattern) === PathFaceDecorationPatternModel) {
-            const { pathD, isPositive } = pattern as IPathFaceDecorationPatternModel;
-            // @ts-ignore
-            const croppedD = await globalThis.ipcRenderer.invoke(
-              // boundaryPathD, texturePathD, textureTransformMatrixStr, isPositive
-              EVENTS.RESOLVE_BOUNDED_TEXTURE_PATH,
-              closedPolygonPath(self.normalizedDecorationBoundaryPoints).getD(),
-              pathD,
-              transformMatrix.toString(),
-              isPositive,
-            );
-            this.setActiveCutHolePatternD(croppedD);
-          }
-        }
       });
     },
 
@@ -227,16 +247,14 @@ export const PyramidNetModel = types.model({
 
     setPyramidShapeName(name: string) {
       self.pyramid.shapeName = name;
-      self.faceDecoration = undefined;
-      this.setActiveCutHolePatternD(undefined);
     },
 
-    setActiveCutHolePatternD(d) {
-      self.activeCutHolePatternD = d;
+    setRawFaceDecoration(d) {
+      self.faceDecoration = RawFaceDecorationModel.create({ dValue: d });
     },
 
-    setFaceDecoration(snapshot) {
-      self.faceDecoration = FaceDecorationModel.create(snapshot);
+    setTextureFaceDecoration(snapshot) {
+      self.faceDecoration = TextureFaceDecorationModel.create(snapshot);
     },
 
     setUseDottedStroke(useDotted) {
