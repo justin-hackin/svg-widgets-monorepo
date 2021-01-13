@@ -76,8 +76,8 @@ export const polyhedra:PolyhedraDefs = {
   'great-disdyakis-dodecahedron': {
     relativeFaceEdgeLengths: [12.5898, 6.05025, 15.442],
     diameter: 36.8901,
-    faceCount: 4,
-    copiesNeeded: 6,
+    faceCount: 6,
+    copiesNeeded: 8,
   },
   'small-icosacronic-hexecontahedron': {
     relativeFaceEdgeLengths: [5.42583, 7.0255, 9.11151],
