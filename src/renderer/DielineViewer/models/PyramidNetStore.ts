@@ -229,7 +229,6 @@ export const PyramidNetModel = types.model({
       reaction(
         () => [self.pyramid.shapeName],
         () => {
-          self.faceDecoration = undefined;
           this.sendTextureUpdate();
         },
       );
@@ -246,6 +245,7 @@ export const PyramidNetModel = types.model({
     }, 250),
 
     setPyramidShapeName(name: string) {
+      self.faceDecoration = undefined;
       self.pyramid.shapeName = name;
     },
 

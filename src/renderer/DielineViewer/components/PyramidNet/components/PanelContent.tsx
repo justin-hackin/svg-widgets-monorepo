@@ -64,6 +64,9 @@ export const PanelContent = () => {
           component={PanelSelect}
           node={pyramidNetSpec.pyramid}
           property="shapeName"
+          onChange={(e) => {
+            pyramidNetSpec.setPyramidShapeName(e.target.value);
+          }}
           label="Polyhedron"
           options={polyhedronOptions}
         />

@@ -15,7 +15,7 @@ import { PanelSliderUnitView } from './PanelSliderUnitView';
 // consider https://medium.com/@justynazet/passing-props-to-props-children-using-react-cloneelement-and-render-props-pattern-896da70b24f6
 
 export const ControlElement = observer(({
-  component, node, property, label = undefined, ...props
+  component, node, property, onChange = undefined, label = undefined, ...props
 }) => {
   const value = node[property];
   const root = getRoot(node);
@@ -43,13 +43,13 @@ export const ControlElement = observer(({
     return (
       // @ts-ignore
       <SliderComponent
-        onChange={(_, val) => {
+        onChange={onChange || ((_, val) => {
           if (history && !history.groupActive) {
             history.startGroup(() => {
             });
           }
           setValue(val);
-        }}
+        })}
         onChangeCommitted={history ? () => {
           history.stopGroup();
         } : undefined}
@@ -61,9 +61,9 @@ export const ControlElement = observer(({
     return (
       // @ts-ignore
       <PanelSelect
-        onChange={(e) => {
+        onChange={onChange || ((e) => {
           setValue(e.target.value);
-        }}
+        })}
         {...allProps}
       />
     );
@@ -71,14 +71,15 @@ export const ControlElement = observer(({
   if (component === PanelSwitch) {
     return (
       <PanelSwitch
-        onChange={(e) => {
+        onChange={onChange || ((e) => {
           setValue(e.target.checked);
-        }}
+        })}
         {...allProps}
       />
     );
   }
   if (component === PanelColorPicker) {
+    // TODO: PanelColorPicker can't follow same onChange override pattern, no event as 1st param
     return (
       <PanelColorPicker
         onChangeComplete={(color) => {
