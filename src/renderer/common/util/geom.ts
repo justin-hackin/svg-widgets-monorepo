@@ -86,12 +86,11 @@ export const scalePoint = (pt: PointLike, scale: number): RawPoint => ({ x: pt.x
 
 export const subtractPoints = (p1, p2) => sumPoints(p1, scalePoint(p2, -1));
 
-const matrixWithTransformOrigin = (origin: RawPoint, scale: number, rotation: number) => {
+export const matrixWithTransformOrigin = (origin: RawPoint, matrix) => {
   const negatedOrigin = scalePoint(origin, -1);
   return (new DOMMatrixReadOnly())
     .translate(origin.x, origin.y)
-    .scale(scale, scale)
-    .rotate(rotation)
+    .multiply(matrix)
     .translate(negatedOrigin.x, negatedOrigin.y);
 };
 
@@ -99,8 +98,9 @@ export const calculateTransformOriginChangeOffset = (
   oldTransformOrigin, newTransformOrigin,
   scale, rotation, translation,
 ) => {
-  const newMatrix = matrixWithTransformOrigin(newTransformOrigin, scale, rotation);
-  const oldMatrix = matrixWithTransformOrigin(oldTransformOrigin, scale, rotation);
+  const uncenteredMatrix = (new DOMMatrixReadOnly()).scale(scale, scale).rotate(rotation);
+  const newMatrix = matrixWithTransformOrigin(newTransformOrigin, uncenteredMatrix);
+  const oldMatrix = matrixWithTransformOrigin(oldTransformOrigin, uncenteredMatrix);
   return sumPoints(
     transformPoint(newMatrix, translation),
     scalePoint(transformPoint(oldMatrix, translation), -1),
@@ -109,7 +109,7 @@ export const calculateTransformOriginChangeOffset = (
 
 export const getTextureTransformMatrix = (origin: RawPoint, scale, rotation, translation) => (new DOMMatrixReadOnly())
   .translate(translation.x, translation.y)
-  .multiply(matrixWithTransformOrigin(origin, scale, rotation));
+  .multiply(matrixWithTransformOrigin(origin, (new DOMMatrixReadOnly()).scale(scale, scale).rotate(rotation)));
 
 // positive distance is to the right moving from pt1 to pt2
 export function hingedPlot(p1:PointLike, p2:PointLike, theta, length):RawPoint {

@@ -9,23 +9,24 @@ import {
 
 import { polyhedra } from '../data/polyhedra';
 import {
-  CM_TO_PIXELS_RATIO,
-  getTextureTransformMatrix,
+  CM_TO_PIXELS_RATIO, degToRad,
+  getTextureTransformMatrix, hingedPlot, hingedPlotByProjectionDistance,
   offsetPolygonPoints,
-  polygonPointsGivenAnglesAndSides,
+  polygonPointsGivenAnglesAndSides, radToDeg,
   RawPoint,
   scalePoint,
   triangleAnglesGivenSides,
 } from '../../common/util/geom';
 import { EVENTS } from '../../../main/ipc';
-import { closedPolygonPath } from '../util/shapes/generic';
-import { AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
-import { BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
-import { DashPatternModel } from '../util/shapes/strokeDashPath';
+import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
+import { ascendantEdgeConnectionTabs, AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
+import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
+import { DashPatternModel, strokeDashPath } from '../util/shapes/strokeDashPath';
 import { boundingViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 import { DimensionsModel } from '../../TextureTransformEditor/models/DimensionsModel';
 import { getBoundedTexturePathD } from '../../common/util/path-boolean';
+import { PathData } from '../util/PathData';
 
 const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
@@ -90,6 +91,7 @@ export const PyramidNetModel = types.model({
   shapeHeightInCm: types.number,
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
   useDottedStroke: types.boolean,
+  useClones: types.optional(types.boolean, false),
   baseScoreDashSpec: types.maybe(types.late(() => DashPatternModel)),
   interFaceScoreDashSpec: types.maybe(types.late(() => DashPatternModel)),
   // in this case of faceDecoration being defined, this is a derived value thus could be made volatile
@@ -172,6 +174,120 @@ export const PyramidNetModel = types.model({
         -this.ascendantEdgeTabDepth / this.faceLengthAdjustRatio,
       );
       return scalePoint(normalizedInsetPoints[0], -this.borderToInsetRatio);
+    },
+
+    get faceTabFenceposts() {
+      const {
+        pyramid: {
+          geometry: { faceCount },
+        },
+      } = self;
+      const { faceBoundaryPoints, faceInteriorAngles, actualFaceEdgeLengths } = this;
+      return range(faceCount + 1).map(
+        (index) => hingedPlot(
+          faceBoundaryPoints[1], faceBoundaryPoints[0], Math.PI * 2 - index * faceInteriorAngles[2],
+          index % 2 ? actualFaceEdgeLengths[2] : actualFaceEdgeLengths[0],
+        ),
+      );
+    },
+    get masterBaseTab() {
+      return baseEdgeConnectionTab(
+        this.faceBoundaryPoints[1], this.faceBoundaryPoints[2],
+        this.ascendantEdgeTabDepth, self.baseEdgeTabsSpec, self.baseScoreDashSpec,
+      );
+    },
+
+    get femaleAscendantFlap() {
+      // female tab outer flap
+      const remainderGapAngle = 2 * Math.PI - this.faceInteriorAngles[2] * self.pyramid.geometry.faceCount;
+      if (remainderGapAngle < 0) {
+        throw new Error('too many faces: the sum of angles at apex is greater than 360 degrees');
+      }
+      const FLAP_APEX_IMPINGE_MARGIN = Math.PI / 12;
+      const FLAP_BASE_ANGLE = degToRad(60);
+
+      const flapApexAngle = Math.min(remainderGapAngle - FLAP_APEX_IMPINGE_MARGIN, this.faceInteriorAngles[2]);
+      const outerPt1 = hingedPlotByProjectionDistance(
+        this.faceBoundaryPoints[1], this.faceBoundaryPoints[0], flapApexAngle, -this.ascendantEdgeTabDepth,
+      );
+      const outerPt2 = hingedPlotByProjectionDistance(
+        this.faceBoundaryPoints[0], this.faceBoundaryPoints[1], -FLAP_BASE_ANGLE, this.ascendantEdgeTabDepth,
+      );
+
+      return roundedEdgePath(
+        [this.faceBoundaryPoints[0], outerPt1, outerPt2, this.faceBoundaryPoints[1]],
+        self.ascendantEdgeTabsSpec.flapRoundingDistanceRatio,
+      );
+    },
+    get nonTabbedAscendantScores() {
+      // inter-face scoring
+      return this.faceTabFenceposts.slice(1, -1).reduce((path, endPt) => {
+        const pathData = strokeDashPath(this.faceBoundaryPoints[0], endPt, self.interFaceScoreDashSpec);
+        return path.concatPath(pathData);
+      }, (new PathData()));
+    },
+
+    get ascendantEdgeTabs() {
+      const ascendantTabs = ascendantEdgeConnectionTabs(
+        this.faceBoundaryPoints[1], this.faceBoundaryPoints[0],
+        self.ascendantEdgeTabsSpec, self.interFaceScoreDashSpec, this.tabIntervalRatios, this.tabGapIntervalRatios,
+      );
+      const rotationMatrix = `rotate(${radToDeg(-self.pyramid.geometry.faceCount * this.faceInteriorAngles[2])})`;
+      ascendantTabs.male.cut.transform(rotationMatrix);
+      ascendantTabs.male.score.transform(rotationMatrix);
+      return ascendantTabs;
+    },
+
+    get makePaths() {
+      const {
+        pyramid: {
+          geometry: { faceCount },
+        },
+        baseScoreDashSpec,
+        baseEdgeTabsSpec,
+      } = self;
+      const {
+        faceInteriorAngles, ascendantEdgeTabDepth, faceTabFenceposts,
+      } = this;
+      const cut = new PathData();
+      const score = new PathData();
+      score.concatPath(this.nonTabbedAscendantScores);
+      cut.concatPath(this.femaleAscendantFlap);
+
+      // base edge tabs
+      faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
+        const edgePt2 = faceTabFenceposts[index + 1];
+        const baseEdgeTab = baseEdgeConnectionTab(
+          edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabsSpec, baseScoreDashSpec,
+        );
+        cut.concatPath(baseEdgeTab.cut);
+        score.concatPath(baseEdgeTab.score);
+      });
+
+      // male tabs
+      cut.concatPath(this.ascendantEdgeTabs.male.cut);
+      score.concatPath(this.ascendantEdgeTabs.male.score);
+
+      // female inner
+      cut.concatPath(this.ascendantEdgeTabs.female.cut);
+      score.concatPath(this.ascendantEdgeTabs.female.score);
+
+      if (this.texturePathD) {
+        const insetDecorationPath = (new PathData(this.texturePathD))
+          .transform(`${
+            this.borderInsetFaceHoleTransformMatrix.toString()} ${
+            this.pathScaleMatrix.toString()}`);
+        range(faceCount).forEach((index) => {
+          const isOdd = !!(index % 2);
+          const xScale = isOdd ? -1 : 1;
+          const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+          const rotationRad = -1 * xScale * index * faceInteriorAngles[2] + asymetryNudge;
+          const tiledDecorationPath = (new PathData()).concatPath(insetDecorationPath)
+            .transform(`scale(${xScale}, 1) rotate(${radToDeg(rotationRad)})`);
+          cut.concatPath(tiledDecorationPath);
+        });
+      }
+      return { cut, score };
     },
     // get borderInsetFaceHoleTransform() {
     //   return `translate(${self.insetPolygon.vertices[0].x}, ${self.insetPolygon.vertices[0].y}) scale(${

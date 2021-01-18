@@ -14,6 +14,7 @@ import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEd
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { StyleControls } from '../PyramidNetControlPanel/components/StyleControls';
+import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 
 const controlsTabs = [
   {
@@ -69,6 +70,11 @@ export const PanelContent = () => {
           }}
           label="Polyhedron"
           options={polyhedronOptions}
+        />
+        <ControlElement
+          component={PanelSwitch}
+          node={pyramidNetSpec}
+          property="useClones"
         />
         <ControlElement
           component={PanelSlider}
