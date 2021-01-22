@@ -41,13 +41,27 @@ export const AscendantEdgeTabsControls = observer(() => {
       <ControlElement
         component={PanelSlider}
         node={ascendantEdgeTabsSpec}
-        property="tabRoundingDistanceRatio"
+        property="tabEdgeEndpointsIndentation"
+        min={0}
+        max={2}
+        step={VERY_SMALL_NUMBER}
+      />
+      <ControlElement
+        component={PanelSlider}
+        node={ascendantEdgeTabsSpec}
+        property="tabControlPointsAngle"
         {...ratioSliderProps}
       />
       <ControlElement
         component={PanelSlider}
         node={ascendantEdgeTabsSpec}
-        property="midpointDepthToTabDepth"
+        property="tabControlPointsProtrusion"
+        {...ratioSliderProps}
+      />
+      <ControlElement
+        component={PanelSlider}
+        node={ascendantEdgeTabsSpec}
+        property="tabControlPointsAngle"
         {...ratioSliderProps}
       />
       <ControlElement
@@ -61,25 +75,9 @@ export const AscendantEdgeTabsControls = observer(() => {
       <ControlElement
         component={PanelSlider}
         node={ascendantEdgeTabsSpec}
-        property="tabWideningAngle"
-        min={0}
-        max={Math.PI / 8}
-        step={VERY_SMALL_NUMBER}
-      />
-      <ControlElement
-        component={PanelSlider}
-        node={ascendantEdgeTabsSpec}
         property="holeWidthRatio"
         min={0.1}
         max={0.9}
-        step={VERY_SMALL_NUMBER}
-      />
-      <ControlElement
-        component={PanelSlider}
-        node={ascendantEdgeTabsSpec}
-        property="holeFlapTaperAngle"
-        min={Math.PI / 16}
-        max={Math.PI / 4}
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement

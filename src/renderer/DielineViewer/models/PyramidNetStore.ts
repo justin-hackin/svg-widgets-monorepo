@@ -417,9 +417,10 @@ export const defaultModelData:SnapshotIn<typeof PyramidNetModel> = {
     holeWidthRatio: 0.4,
     midpointDepthToTabDepth: 0.5,
     tabDepthToTraversalLength: 0.04810606060599847,
-    tabRoundingDistanceRatio: 0.75,
     tabStartGapToTabDepth: 1,
-    tabWideningAngle: 0.19634954084936207,
+    tabEdgeEndpointsIndentation: 1,
+    tabControlPointsProtrusion: 0.6,
+    tabControlPointsAngle: 0.5,
     tabsCount: 3,
   },
   baseEdgeTabsSpec: {
@@ -431,10 +432,6 @@ export const defaultModelData:SnapshotIn<typeof PyramidNetModel> = {
     tabDepthToAscendantTabDepth: 1.5,
     scoreTabMidline: false,
     roundingDistanceRatio: 0.1,
-    bendGuideValley: {
-      depthRatio: 0.5,
-      theta: Math.PI / 4,
-    },
   },
   // @ts-ignore
   useDottedStroke: false,

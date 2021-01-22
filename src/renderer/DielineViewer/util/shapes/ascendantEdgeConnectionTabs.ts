@@ -4,7 +4,7 @@ import { Instance, types } from 'mobx-state-tree';
 
 import { PathData } from '../PathData';
 import {
-  distanceFromOrigin,
+  distanceFromOrigin, hingedPlot,
   lineLerp,
   RawPoint,
   subtractPoints,
@@ -13,7 +13,6 @@ import {
 import { IDashPatternModel, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
-import { symmetricRoundedTab } from './symmetricRoundedTab';
 
 export const AscendantEdgeTabsModel = types.model({
   flapRoundingDistanceRatio: types.number,
@@ -22,9 +21,10 @@ export const AscendantEdgeTabsModel = types.model({
   holeWidthRatio: types.number,
   midpointDepthToTabDepth: types.number,
   tabDepthToTraversalLength: types.number,
-  tabRoundingDistanceRatio: types.number,
   tabStartGapToTabDepth: types.number,
-  tabWideningAngle: types.number,
+  tabControlPointsProtrusion: types.number,
+  tabControlPointsAngle: types.number,
+  tabEdgeEndpointsIndentation: types.number,
   tabsCount: types.integer,
 });
 
@@ -38,12 +38,11 @@ export const ascendantEdgeConnectionTabs = (
   const {
     holeFlapTaperAngle,
     holeReachToTabDepth,
-    holeWidthRatio,
-    midpointDepthToTabDepth,
     tabDepthToTraversalLength,
-    tabRoundingDistanceRatio,
     tabsCount,
-    tabWideningAngle,
+    tabControlPointsProtrusion,
+    tabControlPointsAngle,
+    tabEdgeEndpointsIndentation,
   } = tabSpec;
 
   const getTabBaseInterval = (tabNum) => [
@@ -64,25 +63,33 @@ export const ascendantEdgeConnectionTabs = (
   const vector = subtractPoints(end, start);
   const vectorLength = distanceFromOrigin(vector);
   const tabDepth = tabDepthToTraversalLength * vectorLength;
-  const tabLength = (vectorLength * holeWidthRatio) / tabsCount;
-  const tabDepthToBaseLength = tabDepth / tabLength;
   range(0, tabsCount).forEach((tabNum) => {
     const [tabBaseStart, tabBaseEnd] = getTabBaseInterval(tabNum);
     const [holeEdgeStart, holeEdgeEnd] = symmetricHingePlotByProjectionDistance(
       tabBaseStart, tabBaseEnd, -Math.PI / 2 + holeFlapTaperAngle, holeReachToTabDepth * -tabDepth,
     );
-
-    commands.male.cut.line(tabBaseStart);
-
-    const { path: tabPath } = symmetricRoundedTab(
-      tabBaseStart, tabBaseEnd,
-      midpointDepthToTabDepth, tabDepthToBaseLength, tabRoundingDistanceRatio, tabWideningAngle,
+    const [tabEdgeStartUnindented, tabEdgeEndUnindented] = symmetricHingePlotByProjectionDistance(
+      tabBaseStart, tabBaseEnd, Math.PI / 2, tabDepth,
     );
+    const controlPointDistance = tabDepth * tabControlPointsProtrusion;
+    const edgeInsetDistance = tabEdgeEndpointsIndentation * tabDepth;
+    const baseControlAngleMux = tabControlPointsAngle * (Math.PI / 2);
+    const tabEdgeStart = hingedPlot(tabEdgeEndUnindented, tabEdgeStartUnindented, 0, edgeInsetDistance);
+    const tabEdgeEnd = hingedPlot(tabEdgeStartUnindented, tabEdgeEndUnindented, 0, edgeInsetDistance);
+    const baseControlPointStart = hingedPlot(
+      tabBaseEnd, tabBaseStart, Math.PI - baseControlAngleMux, controlPointDistance,
+    );
+    const baseControlPointEnd = hingedPlot(
+      tabBaseStart, tabBaseEnd, Math.PI + baseControlAngleMux, controlPointDistance,
+    );
+    const edgeControlPointStart = hingedPlot(tabEdgeEnd, tabEdgeStart, Math.PI, controlPointDistance);
+    const edgeControlPointEnd = hingedPlot(tabEdgeStart, tabEdgeEnd, Math.PI, controlPointDistance);
 
-    // @ts-ignore
-    tabPath.sliceCommandsDangerously(1);
-    // roundedEdgePath assumes first point is move command but we needed and applied line
-    commands.male.cut.concatPath(tabPath);
+    commands.male.cut.line(tabBaseStart)
+      .cubicBezier(baseControlPointStart, edgeControlPointStart, tabEdgeStart)
+      .line(tabEdgeEnd)
+      .cubicBezier(edgeControlPointEnd, baseControlPointEnd, tabBaseEnd);
+
     commands.female.cut.concatPath(connectedLineSegments(
       [tabBaseStart, holeEdgeStart, holeEdgeEnd, tabBaseEnd],
     ));
@@ -101,19 +108,6 @@ export const ascendantEdgeConnectionTabs = (
   }
   return commands;
 };
-
-export interface AscendantEdgeTabsSpec {
-  tabDepthToTraversalLength: number,
-  tabRoundingDistanceRatio: number,
-  flapRoundingDistanceRatio: number,
-  tabsCount: number,
-  midpointDepthToTabDepth: number,
-  tabStartGapToTabDepth: number,
-  holeReachToTabDepth: number,
-  holeWidthRatio: number,
-  holeFlapTaperAngle: number,
-  tabWideningAngle: number,
-}
 
 interface AscendantEdgeConnectionPaths {
   female: {
