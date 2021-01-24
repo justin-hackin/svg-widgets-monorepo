@@ -1,5 +1,4 @@
 import React from 'react';
-import { startCase } from 'lodash';
 import Divider from '@material-ui/core/Divider';
 import { Paper, Tab, Tabs } from '@material-ui/core';
 
@@ -7,7 +6,6 @@ import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
 import { useStyles } from '../../../style';
 import { ControlElement } from '../../../../common/components/ControlElement';
-import { PanelSelect } from '../../../../common/components/PanelSelect';
 import { PanelSlider } from '../../../../common/components/PanelSlider';
 import { VERY_SMALL_NUMBER } from '../../../../common/constants';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
@@ -15,6 +13,7 @@ import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { StyleControls } from '../PyramidNetControlPanel/components/StyleControls';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
+import { ShapeSelect } from '../../../../common/components/ShapeSelect';
 
 const controlsTabs = [
   {
@@ -45,11 +44,6 @@ export const PanelContent = () => {
   const classes = useStyles();
   const { pyramidNetSpec } = store;
   if (!pyramidNetSpec) { return null; }
-  const polyhedronOptions = Object.keys(store.polyhedraPyramidGeometries)
-    .map((polyKey) => ({
-      value: polyKey,
-      label: startCase(polyKey),
-    }));
 
   const [activeControlsIndex, setActiveControlsIndex] = React.useState(0);
 
@@ -60,16 +54,14 @@ export const PanelContent = () => {
   return (
     <>
       <div className={classes.shapeSection}>
-        <h3>Shape</h3>
         <ControlElement
-          component={PanelSelect}
+          component={ShapeSelect}
           node={pyramidNetSpec.pyramid}
           property="shapeName"
           onChange={(e) => {
             pyramidNetSpec.setPyramidShapeName(e.target.value);
           }}
           label="Polyhedron"
-          options={polyhedronOptions}
         />
         <ControlElement
           component={PanelSwitch}

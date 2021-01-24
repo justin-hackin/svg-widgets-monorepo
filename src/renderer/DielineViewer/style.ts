@@ -47,6 +47,14 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     marginLeft: theme.spacing(3),
     fontSize: '2em',
   },
+  shapeAvatar: {
+    width: 100,
+    height: 'auto',
+  },
+  shapeName: {
+    marginLeft: theme.spacing(2),
+    fontSize: '1.5em',
+  },
   openTextureButton: {
     bottom: theme.spacing(1),
     right: theme.spacing(1),

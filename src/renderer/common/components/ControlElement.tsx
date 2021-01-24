@@ -9,6 +9,7 @@ import { PanelSelect } from './PanelSelect';
 import { PanelSwitch } from './PanelSwitch';
 import { PanelColorPicker } from './PanelColorPicker';
 import { PanelSliderUnitView } from './PanelSliderUnitView';
+import { ShapeSelect } from './ShapeSelect';
 
 // TODO: make this component enclose the Panel* component instead of being passed its element
 // eslint-disable-next-line max-len
@@ -57,10 +58,11 @@ export const ControlElement = observer(({
       />
     );
   }
-  if (component === PanelSelect) {
+  if (component === PanelSelect || component === ShapeSelect) {
+    const SelectComponent = component as (typeof PanelSelect | typeof ShapeSelect);
     return (
       // @ts-ignore
-      <PanelSelect
+      <SelectComponent
         onChange={onChange || ((e) => {
           setValue(e.target.value);
         })}
