@@ -131,6 +131,7 @@ export const PyramidNet = ({
     const CLIP_PATH_ID = 'clip-path';
     const BLUR_ID = 'blur-filter';
     const FACE_BOUNDARY_PATH_ID = 'face-boundary-path';
+    const borderFill = theme.palette.grey['900'];
     const faceBoundaryPath = closedPolygonPath(faceBoundaryPoints);
     const faceBoundaryPathD = faceBoundaryPath.getD();
     const decorationBoundaryPathD = faceBoundaryPath.transform(borderInsetFaceHoleTransformMatrix.toString()).getD();
@@ -138,7 +139,7 @@ export const PyramidNet = ({
     return (
       <PrintGroup>
         <defs>
-          <path id={FACE_BOUNDARY_PATH_ID} d={faceBoundaryPathD} fill={theme.palette.grey['900']} />
+          <path id={FACE_BOUNDARY_PATH_ID} d={faceBoundaryPathD} fill={borderFill} />
           <clipPath id={CLIP_PATH_ID}>
             <use xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />
           </clipPath>
@@ -159,8 +160,17 @@ export const PyramidNet = ({
               return index === 0
                 ? (
                   <g key={index} id={PRINT_IMAGE_ID}>
-                    <use xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />
+                    <use id="border-fill" xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />
                     <use
+                      id="bleed-stroke"
+                      xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
+                      fill="none"
+                      stroke={borderFill}
+                      strokeWidth={faceLengthAdjustRatio * 20}
+                      strokeLinejoin="round"
+                    />
+                    <use
+                      id="outer-glow"
                       xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
                       fill="none"
                       stroke={theme.palette.grey['50']}
@@ -169,12 +179,11 @@ export const PyramidNet = ({
                       clipPath={`url(#${CLIP_PATH_ID})`}
                     />
                     <path
+                      id="inner-glow"
                       d={decorationBoundaryPathD}
                       fill="none"
                       stroke={theme.palette.grey['50']}
-                      strokeWidth={
-                        faceLengthAdjustRatio
-                      }
+                      strokeWidth={faceLengthAdjustRatio}
                       filter={`url(#${BLUR_ID})`}
                     />
 
