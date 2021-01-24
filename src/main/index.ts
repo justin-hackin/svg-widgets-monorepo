@@ -36,7 +36,6 @@ app.on('ready', async () => {
     const mainWindow = new BrowserWindow(config);
 
     mainWindow.once('ready-to-show', () => {
-      mainWindow.show();
       resolveFn(mainWindow);
     });
 
@@ -88,6 +87,7 @@ app.on('ready', async () => {
     width,
     height,
     show: false,
+    darkTheme: true,
     title: 'Polyhedral Net Factory - Dieline Viewer',
     icon,
     webPreferences,
@@ -104,18 +104,23 @@ app.on('ready', async () => {
       width,
       height,
       show: false,
+      darkTheme: true,
+      closable: false,
       title: 'Polyhedral Net Factory - Texture Fitting',
       icon,
       webPreferences,
     }, 'texture-transform-editor');
     addEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
   };
+  await assignTextureWindow();
 
   ipcMain.on(EVENTS.OPEN_TEXTURE_WINDOW, () => {
-    if (!browserWindows[WINDOWS.TEXTURE_EDITOR]) {
-      assignTextureWindow();
-    } else {
+    if (browserWindows[WINDOWS.TEXTURE_EDITOR].isMinimized()) {
+      browserWindows[WINDOWS.TEXTURE_EDITOR].restore();
+    } else if (!browserWindows[WINDOWS.TEXTURE_EDITOR].isVisible()) {
       browserWindows[WINDOWS.TEXTURE_EDITOR].show();
+    } else {
+      browserWindows[WINDOWS.TEXTURE_EDITOR].focus();
     }
   });
 
@@ -137,6 +142,8 @@ app.on('ready', async () => {
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('blur', sendResetDragMode);
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('minimize', sendResetDragMode);
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('hide', sendResetDragMode);
+
+  browserWindows[WINDOWS.DIELINE_EDITOR].show();
 });
 
 app.on('window-all-closed', app.quit);

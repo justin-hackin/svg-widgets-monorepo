@@ -41,9 +41,8 @@ const TextureTransformEditorLOC = observer(() => {
     // suggesting handler was applied too early
     setTimeout(() => {
       resizeHandler();
+      globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_UPDATE);
     }, 100);
-
-    globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_UPDATE);
 
     return () => {
       window.removeEventListener('resize', resizeHandler);
