@@ -18,12 +18,13 @@ const UNIT_STEP = {
 const UNIT_LABEL_FORMAT = {
   [UNITS.cm]: (val) => `  ${(val / CM_TO_PIXELS_RATIO).toFixed(2)}cm  `,
   [UNITS.in]: (val) => {
-    const abs = Math.abs(val);
-    const remainder = val - abs;
+    const valIn = val / INCHES_TO_PIXELS_RATIO;
+    const abs = Math.floor(valIn);
+    const remainder = valIn - abs;
     const numerator = Math.round(remainder * IN_DENOMINATOR);
     const gcdVal = gcd(numerator, IN_DENOMINATOR);
-    const fractionStr = numerator ? `${numerator / gcdVal} / ${IN_DENOMINATOR / gcdVal}` : '';
-    return `${abs} ${fractionStr}"`;
+    const fractionStr = numerator ? `${numerator / gcdVal}/${IN_DENOMINATOR / gcdVal}` : '';
+    return `     ${abs} ${fractionStr}"      `;
   },
 };
 
