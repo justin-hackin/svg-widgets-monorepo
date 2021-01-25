@@ -9,7 +9,8 @@ import {
 
 import { polyhedra } from '../data/polyhedra';
 import {
-  CM_TO_PIXELS_RATIO, degToRad,
+  CM_TO_PIXELS_RATIO,
+  degToRad,
   getTextureTransformMatrix, hingedPlot, hingedPlotByProjectionDistance,
   offsetPolygonPoints,
   polygonPointsGivenAnglesAndSides, radToDeg,
@@ -88,7 +89,7 @@ export const PyramidNetModel = types.model({
   pyramid: PyramidModel,
   ascendantEdgeTabsSpec: types.late(() => AscendantEdgeTabsModel),
   baseEdgeTabsSpec: types.late(() => BaseEdgeTabsModel),
-  shapeHeightInCm: types.number,
+  shapeHeight__PX: types.number,
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
   useDottedStroke: types.boolean,
   useClones: types.optional(types.boolean, false),
@@ -145,9 +146,9 @@ export const PyramidNetModel = types.model({
 
     // factor to scale face lengths such that the first edge will be equal to 1
     get faceLengthAdjustRatio() {
-      const { shapeHeightInCm } = self;
+      const { shapeHeight__PX } = self;
       const { relativeFaceEdgeLengths, diameter } = self.pyramid.geometry;
-      const firstSideLengthInPx = CM_TO_PIXELS_RATIO * ((shapeHeightInCm * relativeFaceEdgeLengths[0]) / diameter);
+      const firstSideLengthInPx = ((shapeHeight__PX * relativeFaceEdgeLengths[0]) / diameter);
       return firstSideLengthInPx / FACE_FIRST_EDGE_NORMALIZED_SIZE;
     },
 
@@ -433,5 +434,5 @@ export const defaultModelData:SnapshotIn<typeof PyramidNetModel> = {
   },
   // @ts-ignore
   useDottedStroke: false,
-  shapeHeightInCm: 20,
+  shapeHeight__PX: 20 * CM_TO_PIXELS_RATIO,
 };

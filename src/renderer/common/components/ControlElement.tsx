@@ -10,6 +10,11 @@ import { PanelSwitch } from './PanelSwitch';
 import { PanelColorPicker } from './PanelColorPicker';
 import { PanelSliderUnitView } from './PanelSliderUnitView';
 import { ShapeSelect } from './ShapeSelect';
+import { CURRENT_UNIT } from '../util/geom';
+
+const pxAtEndRegex = new RegExp('__PX$');
+const convertPropertyToLabel = (prop: string) => (pxAtEndRegex.test(prop)
+  ? `${startCase(prop.replace(pxAtEndRegex, ''))} (${CURRENT_UNIT})` : startCase(prop));
 
 // TODO: make this component enclose the Panel* component instead of being passed its element
 // eslint-disable-next-line max-len
@@ -36,7 +41,7 @@ export const ControlElement = observer(({
     value,
     valuePath,
     key: valuePath,
-    label: label || startCase(property),
+    label: label || convertPropertyToLabel(property),
     ...props,
   };
   if (component === PanelSlider || component === PanelSliderUnitView) {

@@ -214,3 +214,9 @@ export const offsetPolygonPoints = (points: RawPoint[], offsetDistance) => {
   const offsetPoly = offset(poly, offsetDistance);
   return offsetPoly.vertices.map(castCoordToRawPoint);
 };
+
+export enum UNITS {
+  cm = 'cm', in = 'in',
+}
+
+export const CURRENT_UNIT = UNITS.in;

@@ -6,14 +6,14 @@ import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
 import { useStyles } from '../../../style';
 import { ControlElement } from '../../../../common/components/ControlElement';
-import { PanelSlider } from '../../../../common/components/PanelSlider';
-import { VERY_SMALL_NUMBER } from '../../../../common/constants';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { StyleControls } from '../PyramidNetControlPanel/components/StyleControls';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 import { ShapeSelect } from '../../../../common/components/ShapeSelect';
+import { CM_TO_PIXELS_RATIO } from '../../../../common/util/geom';
+import { PanelSliderUnitView } from '../../../../common/components/PanelSliderUnitView';
 
 const controlsTabs = [
   {
@@ -69,12 +69,11 @@ export const PanelContent = () => {
           property="useClones"
         />
         <ControlElement
-          component={PanelSlider}
+          component={PanelSliderUnitView}
           node={pyramidNetSpec}
-          property="shapeHeightInCm"
-          min={20}
-          max={60}
-          step={VERY_SMALL_NUMBER}
+          property="shapeHeight__PX"
+          min={20 * CM_TO_PIXELS_RATIO}
+          max={60 * CM_TO_PIXELS_RATIO}
         />
       </div>
       <Divider />
