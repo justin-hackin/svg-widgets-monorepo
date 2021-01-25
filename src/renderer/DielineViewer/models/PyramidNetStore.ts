@@ -28,7 +28,7 @@ import { DimensionsModel } from '../../TextureTransformEditor/models/DimensionsM
 import { getBoundedTexturePathD } from '../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
 
-const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
+export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
 export const PathFaceDecorationPatternModel = types.model({
   pathD: types.string,
@@ -147,10 +147,8 @@ export const PyramidNetModel = types.model({
     get faceLengthAdjustRatio() {
       const { shapeHeightInCm } = self;
       const { relativeFaceEdgeLengths, diameter } = self.pyramid.geometry;
-      const baseEdgeLengthToShapeHeight = diameter / relativeFaceEdgeLengths[1];
-      const heightInPixels = CM_TO_PIXELS_RATIO * shapeHeightInCm;
-      const desiredFirstLength = heightInPixels / baseEdgeLengthToShapeHeight;
-      return desiredFirstLength / this.normalizedFaceEdgeLengths[0];
+      const firstSideLengthInPx = CM_TO_PIXELS_RATIO * ((shapeHeightInCm * relativeFaceEdgeLengths[0]) / diameter);
+      return firstSideLengthInPx / FACE_FIRST_EDGE_NORMALIZED_SIZE;
     },
 
     get actualFaceEdgeLengths() {

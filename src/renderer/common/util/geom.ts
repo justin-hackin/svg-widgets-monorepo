@@ -46,8 +46,9 @@ export const castCoordToRawPoint = (coord: Coord): RawPoint => {
 export const rawPointToString = ({ x, y }: RawPoint) => `${x},${y}`;
 
 export const PHI:number = (1 + Math.sqrt(5)) / 2;
-export const CM_TO_PIXELS_RATIO = 37.7952755906;
+const INCHES_TO_CM_RATIO = 1.0 / 2.54;
 export const INCHES_TO_PIXELS_RATIO = 96;
+export const CM_TO_PIXELS_RATIO = INCHES_TO_CM_RATIO * INCHES_TO_PIXELS_RATIO;
 
 export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
 export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);
