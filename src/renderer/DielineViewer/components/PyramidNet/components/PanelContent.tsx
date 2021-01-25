@@ -54,6 +54,7 @@ export const PanelContent = () => {
   return (
     <>
       <div className={classes.shapeSection}>
+        test
         <ControlElement
           component={ShapeSelect}
           node={pyramidNetSpec.pyramid}
