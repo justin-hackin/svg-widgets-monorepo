@@ -15,3 +15,8 @@ render(
   React.createElement(routes[route]),
   document.getElementById('app'),
 );
+
+//fast refresh
+if (module.hot) {
+  module.hot.accept();
+}

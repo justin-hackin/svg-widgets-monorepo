@@ -1,5 +1,8 @@
 module.exports = {
   extends: 'airbnb-typescript',
+  // the following packages are required as peer dependencies for this config:
+  // eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-react-hooks @typescript-eslint/eslint-plugin
+  // see https://github.com/iamturns/eslint-config-airbnb-typescript
   plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',
   rules: {
