@@ -1,26 +1,20 @@
-/* eslint-env node */
 // eslint-disable-next-line import/no-extraneous-dependencies
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { merge } = require('webpack-merge');
+// const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
-module.exports = function (config) {
-  const htmlPlugin = config.plugins.find((plugin) => plugin instanceof HtmlWebpackPlugin);
-  htmlPlugin.options.template = 'src/renderer/index.ejs';
-  const { templateParameters } = htmlPlugin.options;
+module.exports = (config) => {
+  const isDevelopment = process.env.NODE_ENV !== 'production';
 
-  htmlPlugin.options.templateParameters = (...params) => merge(
-    {
-      isDev: process.env.NODE_ENV !== 'production',
-      electronHeadScript: `<script>
-      ${htmlPlugin.nodeModules == null
-    ? ''
-    : `require("module").globalPaths.push("${htmlPlugin.nodeModules.replace(/\\/g, '/')}")`}
-      require("source-map-support/source-map-support.js").install()
-    </script>`,
-    }, templateParameters(...params),
-  );
-
+  if (isDevelopment) {
+    const babelLoader = config.module.rules[0];
+    if (!babelLoader) {
+      throw new Error('could not find babel loader rule based on test is .js');
+    }
+    babelLoader.use.options.plugins.push([require.resolve('react-refresh/babel'), {
+      skipEnvCheck: true,
+    }]);
+    config.plugins.push(new ReactRefreshWebpackPlugin());
+  }
   return config;
 };

@@ -83,6 +83,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexDirection: 'column',
   },
+  shapeSelectDisplay: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+  },
   toolbar: {
     padding: `0 ${theme.spacing(1)}px`,
   },

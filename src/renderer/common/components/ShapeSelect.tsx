@@ -27,15 +27,14 @@ export const ShapeSelect = ({
     displayEmpty,
     onChange,
   };
-  // TODO: display image beside text on selected view, not above as appears
   return (
     <FormControl className={`${classes.formControl} ${className}`}>
       <InputLabel id={labelId}>{ displayedLabel }</InputLabel>
-      <Select {...selectProps}>
+      <Select {...selectProps} SelectDisplayProps={{ className: classes.shapeSelectDisplay }}>
         {Object.keys(polyhedra).map((shapeName, i) => (
           <MenuItem key={i} value={shapeName}>
+            {/* preview images generated with https://codesandbox.io/s/youthful-joliot-uxiy */}
             <ListItemAvatar>
-              {/* preview images generated with https://codesandbox.io/s/youthful-joliot-uxiy */}
               <Avatar
                 alt={startCase(shapeName)}
                 className={classes.shapeAvatar}
