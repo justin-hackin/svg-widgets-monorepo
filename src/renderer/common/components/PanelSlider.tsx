@@ -1,13 +1,19 @@
 import { startCase, last } from 'lodash';
 import uuid from 'uuid/v1';
-import FormControl from '@material-ui/core/FormControl';
 import React from 'react';
-import Slider from '@material-ui/core/Slider';
-import Typography from '@material-ui/core/Typography';
+import {
+  Tooltip, Typography, Slider, FormControl,
+} from '@material-ui/core';
 
 import { useStyles } from '../../DielineViewer/style';
 
 export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
+
+const ValueLabelComponent = ({ children, open, value }) => (
+  <Tooltip open={open} enterTouchDelay={0} placement="top" title={value} arrow>
+    {children}
+  </Tooltip>
+);
 
 // TODO: fix value label cut off and wrong color
 // convert to slider with text input? could allow escaping bounds
@@ -28,6 +34,7 @@ export const PanelSlider = ({
         value={value}
         aria-labelledby={labelId}
         valueLabelDisplay="auto"
+        ValueLabelComponent={ValueLabelComponent}
         valueLabelFormat={
           valueLabelFormat || ((val) => val && val.toFixed(2))
         }
