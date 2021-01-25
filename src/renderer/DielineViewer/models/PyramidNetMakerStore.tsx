@@ -38,9 +38,9 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     return self.pyramidNetSpec;
   },
 
-  get fitToCanvasTranslation() {
+  get fitToCanvasTranslationStr() {
     const { xmin, ymin } = boundingViewBoxAttrs(self.pyramidNetSpec.makePaths.cut.getD());
-    return { x: -xmin, y: -ymin };
+    return `translate(${-xmin}, ${-ymin})`;
   },
 })).actions((self) => ({
   sendShapeUpdate() {
