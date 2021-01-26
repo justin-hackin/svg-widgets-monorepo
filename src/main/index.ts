@@ -87,9 +87,10 @@ app.on('ready', async () => {
     width,
     height,
     show: false,
-    darkTheme: true,
     title: 'Polyhedral Net Factory - Dieline Viewer',
     icon,
+    titleBarStyle: 'hidden',
+    frame: false,
     webPreferences,
   }, 'die-line-viewer');
   addEventListenersForWindow(WINDOWS.DIELINE_EDITOR);
@@ -104,10 +105,11 @@ app.on('ready', async () => {
       width,
       height,
       show: false,
-      darkTheme: true,
       closable: false,
       title: 'Polyhedral Net Factory - Texture Fitting',
       icon,
+      titleBarStyle: 'hidden',
+      frame: false,
       webPreferences,
     }, 'texture-transform-editor');
     addEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
