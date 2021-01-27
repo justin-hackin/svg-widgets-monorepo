@@ -96,9 +96,6 @@ app.on('ready', async () => {
   addEventListenersForWindow(WINDOWS.DIELINE_EDITOR);
 
   const assignTextureWindow = async () => {
-    if (browserWindows[WINDOWS.TEXTURE_EDITOR]) {
-      removeEventListenersForWindow('tex');
-    }
     browserWindows[WINDOWS.TEXTURE_EDITOR] = await promisifyWindow({
       x: 0,
       y: 0,
@@ -116,8 +113,11 @@ app.on('ready', async () => {
   };
   await assignTextureWindow();
 
-  ipcMain.on(EVENTS.OPEN_TEXTURE_WINDOW, () => {
-    if (browserWindows[WINDOWS.TEXTURE_EDITOR].isMinimized()) {
+  ipcMain.on(EVENTS.OPEN_TEXTURE_WINDOW, async () => {
+    if (!browserWindows[WINDOWS.TEXTURE_EDITOR]) {
+      await assignTextureWindow();
+      browserWindows[WINDOWS.TEXTURE_EDITOR].show();
+    } else if (browserWindows[WINDOWS.TEXTURE_EDITOR].isMinimized()) {
       browserWindows[WINDOWS.TEXTURE_EDITOR].restore();
     } else if (!browserWindows[WINDOWS.TEXTURE_EDITOR].isVisible()) {
       browserWindows[WINDOWS.TEXTURE_EDITOR].show();
@@ -135,6 +135,7 @@ app.on('ready', async () => {
   });
 
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('close', () => {
+    removeEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
     browserWindows[WINDOWS.TEXTURE_EDITOR] = undefined;
   });
 
