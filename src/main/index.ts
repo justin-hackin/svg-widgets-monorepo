@@ -5,6 +5,10 @@ const path = require('path');
 const { format } = require('url');
 const debug = require('electron-debug');
 
+interface windowMappingObject {
+  [key: string]: (typeof BrowserWindow);
+}
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const {
@@ -30,36 +34,6 @@ app.on('ready', async () => {
   setupIpc(ipcMain);
   const { width, height } = electronScreen.getPrimaryDisplay().workAreaSize;
 
-  const promisifyWindow = (
-    config: typeof BrowserWindowConstructorOptions, route: string,
-  ): Promise<typeof BrowserWindow> => new Promise((resolveFn) => {
-    const mainWindow = new BrowserWindow(config);
-
-    mainWindow.once('ready-to-show', () => {
-      resolveFn(mainWindow);
-    });
-
-    mainWindow.setMenu(null);
-
-    const hashFragment = `#/${route}`;
-    mainWindow.loadURL(isDevelopment
-      ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}${hashFragment}`
-      : `${format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file',
-        slashes: true,
-      })}${hashFragment}`);
-  });
-
-  const webPreferences = {
-    webSecurity: false,
-    nodeIntegration: true,
-    // @ts-ignore
-    preload: path.resolve(__static, 'preload.js'),
-  };
-  interface windowMappingObject {
-    [key: string]: (typeof BrowserWindow);
-  }
   const browserWindows:windowMappingObject = {};
   const routedEventListeners = {};
 
@@ -81,35 +55,56 @@ app.on('ready', async () => {
     });
   };
 
-  browserWindows[WINDOWS.DIELINE_EDITOR] = await promisifyWindow({
-    x: 0,
-    y: 0,
-    width,
-    height,
-    show: false,
-    title: 'Polyhedral Net Factory - Dieline Viewer',
-    icon,
-    titleBarStyle: 'hidden',
-    frame: false,
-    webPreferences,
-  }, 'die-line-viewer');
-  addEventListenersForWindow(WINDOWS.DIELINE_EDITOR);
-
-  const assignTextureWindow = async () => {
-    browserWindows[WINDOWS.TEXTURE_EDITOR] = await promisifyWindow({
+  const promisifyWindow = (
+    config: typeof BrowserWindowConstructorOptions, route: string,
+  ): Promise<typeof BrowserWindow> => new Promise((resolveFn) => {
+    browserWindows[route] = new BrowserWindow({
       x: 0,
       y: 0,
       width,
       height,
       show: false,
-      closable: false,
-      title: 'Polyhedral Net Factory - Texture Fitting',
       icon,
+      menu: null,
       titleBarStyle: 'hidden',
       frame: false,
-      webPreferences,
-    }, 'texture-transform-editor');
-    addEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
+      webPreferences: {
+        webSecurity: false,
+        nodeIntegration: true,
+        // @ts-ignore
+        preload: path.resolve(__static, 'preload.js'),
+      },
+      ...config,
+    });
+    addEventListenersForWindow(route);
+
+    browserWindows[route].once('ready-to-show', () => {
+      resolveFn();
+    });
+
+    browserWindows[route].on('close', () => {
+      removeEventListenersForWindow(route);
+    });
+
+    const hashFragment = `#/${route}`;
+    browserWindows[route].loadURL(isDevelopment
+      ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}${hashFragment}`
+      : `${format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file',
+        slashes: true,
+      })}${hashFragment}`);
+  });
+
+  await promisifyWindow({
+    title: 'Polyhedral Net Factory - Dieline Viewer',
+  }, WINDOWS.DIELINE_EDITOR);
+
+  const assignTextureWindow = async () => {
+    await promisifyWindow({
+      title: 'Polyhedral Net Factory - Texture Fitting',
+      closable: false,
+    }, WINDOWS.TEXTURE_EDITOR);
   };
   await assignTextureWindow();
 
@@ -131,11 +126,9 @@ app.on('ready', async () => {
     if (browserWindows[WINDOWS.TEXTURE_EDITOR]) {
       browserWindows[WINDOWS.TEXTURE_EDITOR].close();
     }
-    removeEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
   });
 
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('close', () => {
-    removeEventListenersForWindow(WINDOWS.TEXTURE_EDITOR);
     browserWindows[WINDOWS.TEXTURE_EDITOR] = undefined;
   });
 

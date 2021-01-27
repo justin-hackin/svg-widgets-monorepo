@@ -13,20 +13,12 @@ import {
   AppBar, Button, Menu, MenuItem, Tooltip,
 } from '@material-ui/core';
 import { applySnapshot, getSnapshot } from 'mobx-state-tree';
-import { Titlebar, Color } from 'custom-electron-titlebar';
 
 import { useStyles } from '../../style';
 import { EVENTS } from '../../../../main/ipc';
 import { HistoryButtons } from '../PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
-import darkTheme from '../../data/material-ui-dark-theme';
-
-// eslint-disable-next-line no-new
-new Titlebar({
-  backgroundColor: Color.fromHex(darkTheme.palette.background.default),
-  menu: undefined,
-});
 
 export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, AdditionalToolbarContent, PanelContent }) => {
   // @ts-ignore

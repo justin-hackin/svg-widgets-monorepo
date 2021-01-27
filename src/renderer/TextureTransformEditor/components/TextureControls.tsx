@@ -90,7 +90,7 @@ export const TextureControls = observer(() => {
   return (
     <AppBar
       color="inherit"
-      position="fixed"
+      position="absolute"
     >
       <Toolbar
         className={clsx({
