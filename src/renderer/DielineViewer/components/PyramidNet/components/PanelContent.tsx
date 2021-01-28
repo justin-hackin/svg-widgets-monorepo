@@ -9,7 +9,6 @@ import { ControlElement } from '../../../../common/components/ControlElement';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
-import { StyleControls } from '../PyramidNetControlPanel/components/StyleControls';
 import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 import { ShapeSelect } from '../../../../common/components/ShapeSelect';
 import { CM_TO_PIXELS_RATIO } from '../../../../common/util/geom';
@@ -30,11 +29,6 @@ const controlsTabs = [
     label: 'Score',
     title: 'Score Pattern',
     component: ScoreControls,
-  },
-  {
-    label: 'Style',
-    title: 'Dieline Style',
-    component: StyleControls,
   },
 ];
 
@@ -86,7 +80,7 @@ export const PanelContent = () => {
           onChange={handleTabChange}
         >
           {controlsTabs.map(({ label }, index) => (
-            <Tab className={classes.dielineToolbarTab} label={label} key={index} />))}
+            <Tab label={label} key={index} />))}
         </Tabs>
       </Paper>
       <div className={classes.tabContent}>

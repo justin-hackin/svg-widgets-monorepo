@@ -91,6 +91,7 @@ const PrintLayer = observer(({
 
             const cloneTransformMatrix = (new DOMMatrixReadOnly())
               .scale(xScale, 1).rotate(radToDeg(decorationRotationRad));
+            // noinspection HtmlDeprecatedTag
             return index === 0
               ? (
                 <g key={index} id={PRINT_IMAGE_ID}>
@@ -172,6 +173,8 @@ export const DielinesLayer = observer(({
   } = widgetStore;
 
   const { cutProps, scoreProps } = preferencesStore;
+  const allCutProps = { ...cutProps, fill: 'none' };
+  const allScoreProps = { ...scoreProps, fill: 'none' };
 
   const CloneContent = () => {
     const CUT_HOLES_ID = 'cut-holes';
@@ -180,12 +183,12 @@ export const DielinesLayer = observer(({
 
     return (
       <>
-        <path d={ascendantEdgeTabs.male.score.getD()} {...scoreProps} />
-        <path d={ascendantEdgeTabs.male.cut.getD()} {...cutProps} />
-        <path d={ascendantEdgeTabs.female.score.getD()} {...scoreProps} />
-        <path d={ascendantEdgeTabs.female.cut.getD()} {...cutProps} />
-        <path d={femaleAscendantFlap.getD()} {...cutProps} />
-        <path d={nonTabbedAscendantScores.getD()} {...scoreProps} />
+        <path d={ascendantEdgeTabs.male.score.getD()} {...allScoreProps} />
+        <path d={ascendantEdgeTabs.male.cut.getD()} {...allCutProps} />
+        <path d={ascendantEdgeTabs.female.score.getD()} {...allScoreProps} />
+        <path d={ascendantEdgeTabs.female.cut.getD()} {...allCutProps} />
+        <path d={femaleAscendantFlap.getD()} {...allCutProps} />
+        <path d={nonTabbedAscendantScores.getD()} {...allScoreProps} />
 
         {range(faceCount).map((index) => {
           const isOdd = !!(index % 2);
@@ -201,12 +204,12 @@ export const DielinesLayer = observer(({
               <>
                 <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
                   {texturePathD && (
-                  <path d={texturePathD} transform={pathScaleMatrix.toString()} {...cutProps} />
+                  <path d={texturePathD} transform={pathScaleMatrix.toString()} {...allCutProps} />
                   )}
                 </g>
                 <g id={BASE_TAB_ID}>
-                  <path d={masterBaseTab.cut.getD()} {...cutProps} />
-                  <path d={masterBaseTab.score.getD()} {...scoreProps} />
+                  <path d={masterBaseTab.cut.getD()} {...allCutProps} />
+                  <path d={masterBaseTab.score.getD()} {...allScoreProps} />
                 </g>
               </>
             ) : (
@@ -240,8 +243,8 @@ export const DielinesLayer = observer(({
         <g transform={fitToCanvasTranslationStr}>
           {useClones ? (<CloneContent />) : (
             <>
-              <path className="score" {...scoreProps} d={score.getD()} />
-              <path className="cut" {...cutProps} d={cut.getD()} />
+              <path className="score" {...allScoreProps} d={score.getD()} />
+              <path className="cut" {...allCutProps} d={cut.getD()} />
             </>
           )}
         </g>

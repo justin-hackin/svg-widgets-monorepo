@@ -10,9 +10,15 @@ import remotedev from 'remotedev';
 import { observer } from 'mobx-react';
 import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { SVGWrapper } from '../data/SVGWrapper';
-import { PreferencesModel } from './PreferencesModel';
+import { PreferencesModel, defaultPreferences } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../components/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../CylinderLightbox';
+
+const getPreferencesStore = () => {
+  const preferencesStore = PreferencesModel.create(defaultPreferences);
+  persist('preferencesStoreLocal', preferencesStore);
+  return preferencesStore;
+};
 
 export const WorkspaceModel = types.model({
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
@@ -22,6 +28,9 @@ export const WorkspaceModel = types.model({
   }),
   selectedWidgetName: 'polyhedral-net',
 })
+  .volatile(() => ({
+    preferences: getPreferencesStore(),
+  }))
   .views((self) => ({
     get selectedWidgetInfo() {
       return self.widgetOptions[self.selectedWidgetName];
@@ -35,11 +44,6 @@ export const WorkspaceModel = types.model({
     get selectedControlPanelProps() {
       return this.selectedWidgetInfo.controlPanelProps;
     },
-    get preferences() {
-      const preferencesStore = PreferencesModel.create({});
-      persist('preferencesStoreLocal', preferencesStore);
-      return preferencesStore;
-    },
     get SelectedControlPanelComponent() {
       return this.selectedWidgetInfo.ControlPanelComponent;
     },
@@ -47,7 +51,7 @@ export const WorkspaceModel = types.model({
       const ObservedSvgComponent = observer(this.SelectedRawSvgComponent);
 
       return observer(() => (
-        <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={this.preferences} />));
+        <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={self.preferences} />));
     },
   }))
   .actions((self) => ({
@@ -64,6 +68,9 @@ export const WorkspaceModel = types.model({
           />
         </SVGWrapper>,
       );
+    },
+    resetPreferences() {
+      self.preferences.reset();
     },
   }));
 

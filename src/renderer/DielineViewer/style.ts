@@ -34,6 +34,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     right: theme.spacing(1),
     position: 'fixed',
   },
+  closeDialogButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+  },
   widgetButton: {
     bottom: theme.spacing(1),
     left: theme.spacing(1),
@@ -93,9 +98,6 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   closeDielineControlsIcon: {
     marginLeft: 'auto',
-  },
-  dielineToolbarTab: {
-    minWidth: 120,
   },
   formControl: {
     margin: theme.spacing(1),

@@ -9,6 +9,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import FolderIcon from '@material-ui/icons/Folder';
 import Toolbar from '@material-ui/core/Toolbar';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
+import SettingsIcon from '@material-ui/icons/Settings';
 import {
   AppBar, Button, Menu, MenuItem, Tooltip,
 } from '@material-ui/core';
@@ -19,6 +20,8 @@ import { EVENTS } from '../../../../main/ipc';
 import { HistoryButtons } from '../PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
+import { SimpleDialog } from '../../../common/components/SimpleDialog';
+import { StyleControls } from '../PyramidNet/PyramidNetControlPanel/components/StyleControls';
 
 export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, AdditionalToolbarContent, PanelContent }) => {
   // @ts-ignore
@@ -30,9 +33,13 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
 
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => { setOpen(true); };
-  const handleDrawerClose = () => { setOpen(false); };
+  const [drawerIsOpen, setDrawerIsOpen] = React.useState(true);
+  const handleDrawerOpen = () => { setDrawerIsOpen(true); };
+  const handleDrawerClose = () => { setDrawerIsOpen(false); };
+
+  const [settingsDialogIsOpen, setSettingsDialogIsOpen] = React.useState(false);
+  const handleSettingsDialogOpen = () => { setSettingsDialogIsOpen(true); };
+  const handleSettingsDialogClose = () => { setSettingsDialogIsOpen(false); };
 
   return (
     <div className={classes.root}>
@@ -40,7 +47,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
         color="inherit"
         aria-label="open drawer"
         onClick={handleDrawerOpen}
-        className={clsx(classes.menuButton, open && classes.hide)}
+        className={clsx(classes.menuButton, drawerIsOpen && classes.hide)}
       >
         <MenuIcon />
       </Fab>
@@ -48,7 +55,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
         className={classes.drawer}
         variant="persistent"
         anchor="right"
-        open={open}
+        open={drawerIsOpen}
         classes={{
           paper: classes.drawerPaper,
         }}
@@ -102,6 +109,15 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
               </MenuItem>
               { AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
             </Menu>
+            <IconButton
+              color="inherit"
+              onClick={handleSettingsDialogOpen}
+            >
+              <SettingsIcon />
+            </IconButton>
+            <SimpleDialog isOpen={settingsDialogIsOpen} handleClose={handleSettingsDialogClose} title="Settings">
+              <StyleControls />
+            </SimpleDialog>
             <IconButton
               color="inherit"
               className={classes.closeDielineControlsIcon}
