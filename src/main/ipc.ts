@@ -15,8 +15,8 @@ export enum WINDOWS {
 enum MAIN_EVENTS {
   SAVE_SVG = 'save-svg',
   SAVE_GLTF = 'save-gltf',
-  SAVE_NET_SVG_AND_SPEC = 'save-net-svg-and-spec',
-  RESOLVE_BOUNDED_TEXTURE_PATH = 'resolve-bounded-texture-path',
+  DIALOG_SAVE_MODEL_WITH_SVG = 'dialog-save-model-with-svg',
+  SAVE_MODEL_WITH_SVG = 'save-model-with-svg',
   LOAD_SNAPSHOT = 'load-snapshot',
   OPEN_SVG = 'open-svg',
   OPEN_TEXTURE_WINDOW = 'open-texture-window',
@@ -73,24 +73,40 @@ export const setupIpc = (ipcMain) => {
   const resolveStringDataFromDialog = async (dialogOptions) => {
     const { canceled, filePaths } = await dialog.showOpenDialog(dialogOptions);
     if (canceled) { return null; }
-    return fsPromises.readFile(filePaths[0], 'utf8');
+    const filePath = filePaths[0];
+    const fileString = await fsPromises.readFile(filePath, 'utf8');
+    return { filePath, fileString };
   };
 
-  ipcMain.handle(EVENTS.SAVE_NET_SVG_AND_SPEC, (e, svgContent, pyramidNetSpec, dialogOptions) => dialog.showSaveDialog({
-    ...dialogOptions,
-    filters: svgFilters,
-  }).then(({ canceled, filePath }) => {
-    if (canceled) {
-      return null;
-    }
-    return Promise.all([
-      fsPromises.writeFile(filePath, svgContent),
-      fsPromises.writeFile(`${filePath.slice(0, -4)}.json`, formattedJSONStringify(pyramidNetSpec))]);
-  }));
+  const writeModelAndSvg = async (svgContent, modelData, svgFilePath) => {
+    const svgFileName = path.basename(svgFilePath, '.svg');
+    const jsonPath = path.join(path.dirname(svgFilePath), `${svgFileName}.json`);
+    await Promise.all([
+      fsPromises.writeFile(svgFilePath, svgContent),
+      fsPromises.writeFile(jsonPath, formattedJSONStringify(modelData))]);
+    return svgFilePath;
+  };
+
+  ipcMain.handle(EVENTS.DIALOG_SAVE_MODEL_WITH_SVG,
+    (e, svgContent, modelData, dialogOptions) => dialog.showSaveDialog({
+      ...dialogOptions,
+      filters: svgFilters,
+    }).then(({ canceled, filePath }) => {
+      if (canceled) {
+        return null;
+      }
+      return writeModelAndSvg(svgContent, modelData, filePath);
+    }));
+
+  ipcMain.handle(EVENTS.SAVE_MODEL_WITH_SVG,
+    (_, svgContent, modelData, filePath) => writeModelAndSvg(svgContent, modelData, filePath));
 
   ipcMain.handle(EVENTS.LOAD_SNAPSHOT, () => resolveStringDataFromDialog(
     { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },
-  ).then((jsonString) => JSON.parse(jsonString)));
+  ).then(({ fileString, filePath }) => ({
+    fileData: JSON.parse(fileString),
+    filePath,
+  })));
 
   ipcMain.handle(EVENTS.OPEN_SVG, async (e, message) => resolveStringDataFromDialog({
     message,

@@ -1,4 +1,6 @@
-import { Instance, types } from 'mobx-state-tree';
+import {
+  applySnapshot, Instance, onSnapshot, types,
+} from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React, { createContext, useContext } from 'react';
 import persist from 'mst-persist';
@@ -6,13 +8,16 @@ import { connectReduxDevtools } from 'mst-middlewares';
 import makeInspectable from 'mobx-devtools-mst';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
+import parseFilepath from 'parse-filepath';
 
 import { observer } from 'mobx-react';
+import { reaction } from 'mobx';
 import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { SVGWrapper } from '../data/SVGWrapper';
 import { PreferencesModel, defaultPreferences } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../components/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../CylinderLightbox';
+import { customTitlebar } from '../../index';
 
 const getPreferencesStore = () => {
   const preferencesStore = PreferencesModel.create(defaultPreferences);
@@ -22,6 +27,7 @@ const getPreferencesStore = () => {
 
 export const WorkspaceModel = types.model({
   svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
+  currentFilePath: types.maybe(types.string),
   widgetOptions: types.frozen({
     'polyhedral-net': PyramidNetOptionsInfo,
     'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
@@ -30,6 +36,8 @@ export const WorkspaceModel = types.model({
 })
   .volatile(() => ({
     preferences: getPreferencesStore(),
+    isPristine: true,
+    isPristineSnapshotDisposer: undefined,
   }))
   .views((self) => ({
     get selectedWidgetInfo() {
@@ -53,10 +61,41 @@ export const WorkspaceModel = types.model({
       return observer(() => (
         <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={self.preferences} />));
     },
+    get currentFileName() {
+      return self.currentFilePath ? parseFilepath(self.currentFilePath).base : 'New Polyhedral Net';
+    },
+    get titleBarText() {
+      return `${self.isPristine ? '' : '*'}${this.currentFileName}`;
+    },
   }))
   .actions((self) => ({
+    afterCreate() {
+      // reset pristine state and tracker on change of selectedStore
+      reaction(() => self.selectedStore, () => {
+        this.setPristineDisposer(onSnapshot(self.selectedStore, () => {
+          this.setIsPristine(false);
+        }));
+      }, { fireImmediately: true });
+
+      // title bar changes for file status indication
+      reaction(() => [self.titleBarText, customTitlebar], () => {
+        customTitlebar.updateTitle(self.titleBarText);
+      });
+    },
+    setPristineDisposer(disposer) {
+      if (self.isPristineSnapshotDisposer) {
+        self.isPristineSnapshotDisposer();
+      }
+      this.setIsPristine(true);
+      self.isPristineSnapshotDisposer = disposer;
+    },
+    setIsPristine(isPristine) {
+      self.isPristine = isPristine;
+    },
     setSelectedWidgetName(name) {
       self.selectedWidgetName = name;
+      this.setIsPristine(true);
+      self.currentFilePath = undefined;
     },
     renderWidgetToString() {
       const { SelectedRawSvgComponent } = self;
@@ -71,6 +110,13 @@ export const WorkspaceModel = types.model({
     },
     resetPreferences() {
       self.preferences.reset();
+    },
+    resetModelToDefault() {
+      applySnapshot(self.selectedStore, self.selectedWidgetInfo.defaultSnapshot);
+    },
+    setCurrentFilePath(filePath) {
+      self.currentFilePath = filePath;
+      this.setIsPristine(true);
     },
   }));
 

@@ -10,8 +10,13 @@ import FolderIcon from '@material-ui/icons/Folder';
 import Toolbar from '@material-ui/core/Toolbar';
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import SettingsIcon from '@material-ui/icons/Settings';
+import FlareIcon from '@material-ui/icons/Flare';
+import FolderOpenIcon from '@material-ui/icons/FolderOpen';
+import SaveIcon from '@material-ui/icons/Save';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
+
 import {
-  AppBar, Button, Menu, MenuItem, Tooltip,
+  AppBar, Button, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@material-ui/core';
 import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 
@@ -40,6 +45,53 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = React.useState(false);
   const handleSettingsDialogOpen = () => { setSettingsDialogIsOpen(true); };
   const handleSettingsDialogClose = () => { setSettingsDialogIsOpen(false); };
+
+  const newHandler = () => {
+    workspaceStore.resetModelToDefault();
+    store.history.clear();
+    workspaceStore.setCurrentFilePath(undefined);
+    resetFileMenuRef();
+  };
+
+  const openSpecHandler = async () => {
+    await globalThis.ipcRenderer.invoke(EVENTS.LOAD_SNAPSHOT).then(({ fileData, filePath }) => {
+      // falsy if file dialog cancelled
+      if (fileData) {
+        applySnapshot(store.shapeDefinition, fileData);
+        workspaceStore.setCurrentFilePath(filePath);
+        store.history.clear();
+      }
+    });
+    resetFileMenuRef();
+  };
+
+  const saveAsHandler = async () => {
+    const filePath = await globalThis.ipcRenderer.invoke(
+      EVENTS.DIALOG_SAVE_MODEL_WITH_SVG,
+      workspaceStore.renderWidgetToString(),
+      getSnapshot(store.shapeDefinition),
+      { message: 'Save widget svg with json data', defaultPath: `${store.getFileBasename()}.svg` },
+    );
+    if (!filePath) { return; }
+    workspaceStore.setCurrentFilePath(filePath);
+    resetFileMenuRef();
+  };
+
+  const saveHandler = async () => {
+    if (!workspaceStore.currentFilePath) {
+      await saveAsHandler();
+      return;
+    }
+    const filePath = await globalThis.ipcRenderer.invoke(
+      EVENTS.SAVE_MODEL_WITH_SVG,
+      workspaceStore.renderWidgetToString(),
+      getSnapshot(store.shapeDefinition),
+      workspaceStore.currentFilePath,
+    );
+
+    if (filePath) { workspaceStore.setCurrentFilePath(filePath); }
+    resetFileMenuRef();
+  };
 
   return (
     <div className={classes.root}>
@@ -82,30 +134,32 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
               history={store.history}
             />
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
-              <MenuItem onClick={async () => {
-                await globalThis.ipcRenderer.invoke(EVENTS.LOAD_SNAPSHOT).then((snapshot) => {
-                  // falsy if file dialog cancelled
-                  if (snapshot) {
-                    applySnapshot(store.shapeDefinition, snapshot);
-                  }
-                });
-                resetFileMenuRef();
-              }}
-              >
-                Open JSON data
+              <MenuItem onClick={newHandler}>
+                <ListItemIcon className={classes.listItemIcon}>
+                  <FlareIcon fontSize="small" />
+                </ListItemIcon>
+                <Typography variant="inherit">New</Typography>
+              </MenuItem>
+              <MenuItem onClick={openSpecHandler}>
+                <ListItemIcon className={classes.listItemIcon}>
+                  <FolderOpenIcon fontSize="small" />
+                </ListItemIcon>
+                <Typography variant="inherit">Open JSON data</Typography>
+              </MenuItem>
+              <MenuItem onClick={saveHandler}>
+                <ListItemIcon className={classes.listItemIcon}>
+                  <SaveIcon fontSize="small" />
+                </ListItemIcon>
+                <Typography variant="inherit">Save</Typography>
               </MenuItem>
               <MenuItem
-                onClick={async () => {
-                  await globalThis.ipcRenderer.invoke(
-                    EVENTS.SAVE_NET_SVG_AND_SPEC,
-                    workspaceStore.renderWidgetToString(),
-                    getSnapshot(store.shapeDefinition),
-                    { message: 'Save widget svg with json data', defaultPath: `${store.getFileBasename()}.svg` },
-                  );
-                  resetFileMenuRef();
-                }}
+                disabled={!workspaceStore.currentFileName}
+                onClick={saveAsHandler}
               >
-                Save to SVG w/ JSON
+                <ListItemIcon className={classes.listItemIcon}>
+                  <SaveAltIcon fontSize="small" />
+                </ListItemIcon>
+                <Typography variant="inherit">Save as ...</Typography>
               </MenuItem>
               { AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
             </Menu>

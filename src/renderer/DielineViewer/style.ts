@@ -34,6 +34,9 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     right: theme.spacing(1),
     position: 'fixed',
   },
+  listItemIcon: {
+    minWidth: theme.spacing(4),
+  },
   closeDialogButton: {
     position: 'absolute',
     right: theme.spacing(1),

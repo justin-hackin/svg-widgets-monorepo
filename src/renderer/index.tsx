@@ -8,6 +8,7 @@ import './common/style/index.css';
 import darkTheme from './DielineViewer/data/material-ui-dark-theme';
 import requireStatic from './requireStatic';
 import { WINDOWS } from '../main/ipc';
+import { workspaceStore } from './DielineViewer/models/WorkspaceModel';
 
 const routes = { // A map of "route" => "component"
   default: DielineViewer,
@@ -22,7 +23,7 @@ render(
 );
 
 // eslint-disable-next-line no-new
-new Titlebar({
+export const customTitlebar = new Titlebar({
   backgroundColor: Color.fromHex(darkTheme.palette.background.default),
   menu: undefined,
   // would be nice if this concern could remain in main via remote.getCurrentWindow().isClosable()
@@ -30,6 +31,7 @@ new Titlebar({
   closeable: route === WINDOWS.DIELINE_EDITOR,
   icon: requireStatic('images/logo.png'),
 });
+customTitlebar.updateTitle(workspaceStore.titleBarText);
 
 // fast refresh
 if (module.hot) {
