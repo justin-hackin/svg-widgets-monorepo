@@ -24,6 +24,11 @@ export interface BaseEdgeConnectionTab {
 // "fin" is the male part of the tab which enters the hole of the tab
 // "handle" is the part of the tab that surrounds the hole of the tab
 const defaultBendGuideValley = { depthRatio: 0.5, theta: Math.PI / 4 };
+/*
+TODO: use of qualifier *Ratio is inconsistent remove all instances,
+ in order to qualify properties, use property metadata which accurately describes
+ property relationships and displays as tooltip on controls
+*/
 
 export const BaseEdgeTabsModel = types.model({
   finDepthToTabDepth: types.number,
@@ -34,6 +39,7 @@ export const BaseEdgeTabsModel = types.model({
   scoreTabMidline: types.boolean,
   roundingDistanceRatio: types.number,
   tabDepthToAscendantTabDepth: types.number,
+  holeTabClearance: types.number,
   bendGuideValley: types.maybe(types.model({
     depthRatio: types.number,
     theta: types.number,
@@ -64,6 +70,7 @@ export function baseEdgeConnectionTab(
     bendGuideValley,
     scoreTabMidline,
     roundingDistanceRatio,
+    holeTabClearance,
   } = tabSpec;
 
   const tabDepth = tabDepthToAscendantTabDepth * ascendantEdgeTabDepth;
@@ -73,12 +80,15 @@ export function baseEdgeConnectionTab(
   const mid = hingedPlotLerp(start, end, 0, 0.5);
   const holeHandleThicknessRatio = (1 - holeBreadthToHalfWidth) / 2;
   const offsetHoleHandle = finOffsetRatio * holeHandleThicknessRatio;
+  const halfTabLength = distanceBetweenPoints(start, end) / 2;
 
   const outLengthRatio = holeHandleThicknessRatio - offsetHoleHandle;
   const inLengthRatio = holeHandleThicknessRatio + offsetHoleHandle;
+  const inLengthHole = (inLengthRatio * halfTabLength) - (holeTabClearance * tabDepth);
+
   const holeBases = [
     hingedPlotLerp(mid, start, 0, outLengthRatio),
-    hingedPlotLerp(start, mid, 0, inLengthRatio),
+    hingedPlot(start, mid, 0, inLengthHole),
   ];
   const holeTheta = -holeTaper + Math.PI / 2;
   const holeEdges = symmetricHingePlotByProjectionDistance(

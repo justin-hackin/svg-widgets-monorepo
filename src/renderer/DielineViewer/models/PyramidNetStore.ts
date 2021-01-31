@@ -89,6 +89,7 @@ export const PyramidNetModel = types.model({
   pyramid: PyramidModel,
   ascendantEdgeTabsSpec: types.late(() => AscendantEdgeTabsModel),
   baseEdgeTabsSpec: types.late(() => BaseEdgeTabsModel),
+  // TODO: don't use weird naming conventions to leverage behaviour, use property metadata
   shapeHeight__PX: types.number,
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
   useDottedStroke: types.boolean,
@@ -431,6 +432,7 @@ export const defaultModelData:SnapshotIn<typeof PyramidNetModel> = {
     tabDepthToAscendantTabDepth: 1.5,
     scoreTabMidline: false,
     roundingDistanceRatio: 0.1,
+    holeTabClearance: 0,
   },
   // @ts-ignore
   useDottedStroke: false,

@@ -70,6 +70,14 @@ export const BaseEdgeTabControls = observer(() => {
       <ControlElement
         component={PanelSlider}
         node={baseEdgeTabsSpec}
+        property="holeTabClearance"
+        min={0}
+        max={0.1}
+        step={VERY_SMALL_NUMBER}
+      />
+      <ControlElement
+        component={PanelSlider}
+        node={baseEdgeTabsSpec}
         property="holeTaper"
         min={Math.PI / 8}
         max={Math.PI / 3}
