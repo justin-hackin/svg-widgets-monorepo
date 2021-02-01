@@ -47,7 +47,7 @@ export const WorkspaceModel = types.model({
       return this.selectedWidgetInfo.RawSvgComponent;
     },
     get selectedStore() {
-      return this.selectedWidgetInfo.WidgetModel.create(this.selectedWidgetInfo.defaultSnapshot);
+      return this.selectedWidgetInfo.WidgetModel.create({});
     },
     get selectedControlPanelProps() {
       return this.selectedWidgetInfo.controlPanelProps;
@@ -112,7 +112,7 @@ export const WorkspaceModel = types.model({
       self.preferences.reset();
     },
     resetModelToDefault() {
-      applySnapshot(self.selectedStore, self.selectedWidgetInfo.defaultSnapshot);
+      applySnapshot(self.selectedStore, {});
     },
     setCurrentFilePath(filePath) {
       self.currentFilePath = filePath;

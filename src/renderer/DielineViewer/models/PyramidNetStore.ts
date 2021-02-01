@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
 import {
-  getParent, getType, Instance, resolveIdentifier, SnapshotIn, types,
+  getParent, getType, Instance, resolveIdentifier, types,
 } from 'mobx-state-tree';
 import {
   chunk, debounce, flatten, range,
@@ -22,7 +22,7 @@ import { EVENTS } from '../../../main/ipc';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
 import { ascendantEdgeConnectionTabs, AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
-import { DashPatternModel, strokeDashPath } from '../util/shapes/strokeDashPath';
+import { DashPatternModel, defaultStrokeDashSpec, strokeDashPath } from '../util/shapes/strokeDashPath';
 import { boundingViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 import { DimensionsModel } from '../../TextureTransformEditor/models/DimensionsModel';
@@ -72,30 +72,25 @@ export interface IRawFaceDecorationModel extends Instance<typeof RawFaceDecorati
 export const FaceDecorationModel = types.union(TextureFaceDecorationModel, RawFaceDecorationModel);
 
 export const PyramidModel = types.model({
-  shapeName: types.string,
+  shapeName: types.optional(types.string, 'small-triambic-icosahedron'),
 }).views((self) => ({
   get geometry() {
     return polyhedra[self.shapeName];
   },
 }));
 
-export const defaultStrokeDashSpec = {
-  strokeDashPathPattern: '● 1 ○ 2',
-  strokeDashLength: 11,
-  strokeDashOffsetRatio: 0,
-};
-
 export const PyramidNetModel = types.model({
-  pyramid: PyramidModel,
-  ascendantEdgeTabsSpec: types.late(() => AscendantEdgeTabsModel),
-  baseEdgeTabsSpec: types.late(() => BaseEdgeTabsModel),
+  pyramid: types.optional(PyramidModel, {}),
+  ascendantEdgeTabsSpec: types.optional(AscendantEdgeTabsModel, {}),
+  baseEdgeTabsSpec: types.optional(BaseEdgeTabsModel, {}),
   // TODO: don't use weird naming conventions to leverage behaviour, use property metadata
-  shapeHeight__PX: types.number,
+  shapeHeight__PX: types.optional(types.number, 20 * CM_TO_PIXELS_RATIO),
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
-  useDottedStroke: types.boolean,
+  useDottedStroke: types.optional(types.boolean, false),
+  // TODO: migrate to preferences
   useClones: types.optional(types.boolean, false),
-  baseScoreDashSpec: types.maybe(types.late(() => DashPatternModel)),
-  interFaceScoreDashSpec: types.maybe(types.late(() => DashPatternModel)),
+  baseScoreDashSpec: types.maybe(DashPatternModel),
+  interFaceScoreDashSpec: types.maybe(DashPatternModel),
   // in this case of faceDecoration being defined, this is a derived value thus could be made volatile
   // however, it needs to be persisted in the model because
   // it can also be defined by cut hole path import via templated svg file
@@ -406,35 +401,3 @@ export const PyramidNetModel = types.model({
   }));
 
 export interface IPyramidNetModel extends Instance<typeof PyramidNetModel> {}
-
-export const defaultModelData:SnapshotIn<typeof PyramidNetModel> = {
-  // @ts-ignore
-  pyramid: { shapeName: 'small-triambic-icosahedron' },
-  ascendantEdgeTabsSpec: {
-    flapRoundingDistanceRatio: 1,
-    holeFlapTaperAngle: 0.3141592653589793,
-    holeReachToTabDepth: 0.1,
-    holeWidthRatio: 0.4,
-    midpointDepthToTabDepth: 0.5,
-    tabDepthToTraversalLength: 0.04810606060599847,
-    tabStartGapToTabDepth: 1,
-    tabEdgeEndpointsIndentation: 1,
-    tabControlPointsProtrusion: 0.6,
-    tabControlPointsAngle: 0.5,
-    tabsCount: 3,
-  },
-  baseEdgeTabsSpec: {
-    finDepthToTabDepth: 1.1,
-    finOffsetRatio: 0.75,
-    holeBreadthToHalfWidth: 0.25,
-    holeDepthToTabDepth: 0.5,
-    holeTaper: 0.6981317007977318,
-    tabDepthToAscendantTabDepth: 1.5,
-    scoreTabMidline: false,
-    roundingDistanceRatio: 0.1,
-    holeTabClearance: 0,
-  },
-  // @ts-ignore
-  useDottedStroke: false,
-  shapeHeight__PX: 20 * CM_TO_PIXELS_RATIO,
-};

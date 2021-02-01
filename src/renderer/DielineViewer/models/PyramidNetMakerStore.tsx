@@ -6,7 +6,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import { polyhedra } from '../data/polyhedra';
-import { defaultModelData, PyramidNetModel } from './PyramidNetStore';
+import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { boundingViewBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
 import { dashPatterns, DashPatternsModel } from '../data/dash-patterns';
@@ -28,7 +28,7 @@ export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryMode
 };
 
 export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
-  pyramidNetSpec: types.optional(PyramidNetModel, defaultModelData),
+  pyramidNetSpec: types.optional(PyramidNetModel, {}),
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   dashPatterns: types.optional(DashPatternsModel, dashPatterns),
   // TODO: make a prototype with history as property and use on all undoable models

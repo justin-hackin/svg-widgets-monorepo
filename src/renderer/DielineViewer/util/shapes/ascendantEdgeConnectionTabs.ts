@@ -15,17 +15,17 @@ import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
 
 export const AscendantEdgeTabsModel = types.model({
-  flapRoundingDistanceRatio: types.number,
-  holeFlapTaperAngle: types.number,
-  holeReachToTabDepth: types.number,
-  holeWidthRatio: types.number,
-  midpointDepthToTabDepth: types.number,
-  tabDepthToTraversalLength: types.number,
-  tabStartGapToTabDepth: types.number,
-  tabControlPointsProtrusion: types.number,
-  tabControlPointsAngle: types.number,
-  tabEdgeEndpointsIndentation: types.number,
-  tabsCount: types.integer,
+  flapRoundingDistanceRatio: types.optional(types.number, 1),
+  holeFlapTaperAngle: types.optional(types.number, 0.5),
+  holeReachToTabDepth: types.optional(types.number, 0.1),
+  holeWidthRatio: types.optional(types.number, 0.4),
+  midpointDepthToTabDepth: types.optional(types.number, 0.5),
+  tabDepthToTraversalLength: types.optional(types.number, 0.05),
+  tabStartGapToTabDepth: types.optional(types.number, 1),
+  tabControlPointsProtrusion: types.optional(types.number, 0.6),
+  tabControlPointsAngle: types.optional(types.number, 0.5),
+  tabEdgeEndpointsIndentation: types.optional(types.number, 1),
+  tabsCount: types.optional(types.integer, 3),
 });
 
 export interface IAscendantEdgeTabsModel extends Instance<typeof AscendantEdgeTabsModel> {

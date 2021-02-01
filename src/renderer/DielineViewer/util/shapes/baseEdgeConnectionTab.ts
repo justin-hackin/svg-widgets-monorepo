@@ -23,33 +23,33 @@ export interface BaseEdgeConnectionTab {
 // "depth" is the distance from the base to the edge
 // "fin" is the male part of the tab which enters the hole of the tab
 // "handle" is the part of the tab that surrounds the hole of the tab
-const defaultBendGuideValley = { depthRatio: 0.5, theta: Math.PI / 4 };
 /*
 TODO: use of qualifier *Ratio is inconsistent remove all instances,
  in order to qualify properties, use property metadata which accurately describes
  property relationships and displays as tooltip on controls
 */
+const BendGuideValleyModel = types.model({
+  depthRatio: types.optional(types.number, 0.9),
+  theta: types.optional(types.number, Math.PI / 4),
+});
 
 export const BaseEdgeTabsModel = types.model({
-  finDepthToTabDepth: types.number,
-  finOffsetRatio: types.number,
-  holeBreadthToHalfWidth: types.number,
-  holeDepthToTabDepth: types.number,
-  holeTaper: types.number,
-  scoreTabMidline: types.boolean,
-  roundingDistanceRatio: types.number,
-  tabDepthToAscendantTabDepth: types.number,
-  holeTabClearance: types.number,
-  bendGuideValley: types.maybe(types.model({
-    depthRatio: types.number,
-    theta: types.number,
-  })),
+  finDepthToTabDepth: types.optional(types.number, 1.1),
+  finOffsetRatio: types.optional(types.number, 0.75),
+  holeBreadthToHalfWidth: types.optional(types.number, 0.25),
+  holeDepthToTabDepth: types.optional(types.number, 0.5),
+  holeTaper: types.optional(types.number, 0.7),
+  scoreTabMidline: types.optional(types.boolean, false),
+  roundingDistanceRatio: types.optional(types.number, 0.1),
+  tabDepthToAscendantTabDepth: types.optional(types.number, 1.5),
+  holeTabClearance: types.optional(types.number, 0.05),
+  bendGuideValley: types.maybe(BendGuideValleyModel),
 }).actions((self) => ({
   unsetBendGuideValley() {
     self.bendGuideValley = undefined;
   },
   resetBendGuideValleyToDefault() {
-    self.bendGuideValley = { ...defaultBendGuideValley };
+    self.bendGuideValley = BendGuideValleyModel.create();
   },
 }));
 

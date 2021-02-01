@@ -1,6 +1,4 @@
-import {
-  Instance, SnapshotIn, types,
-} from 'mobx-state-tree';
+import { Instance, types } from 'mobx-state-tree';
 import { reaction } from 'mobx';
 import {
   angleRelativeToOrigin,
@@ -25,17 +23,17 @@ const rectanglePathCenteredOnOrigin = (width, height) => closedPolygonPath(getRe
 const polygonSideLength = (numSides, inRadius) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
 const CylinderLightboxDataModel = types.model({
-  wallsPerArc: types.integer,
-  holeWidthRatio: types.number,
-  arcsPerRing: types.integer,
-  ringRadius: types.number,
-  ringThicknessRatio: types.number,
-  materialThickness: types.number,
-  dovetailIngressRatio: types.number,
-  dovetailSizeRatio: types.number,
-  cylinderHeight: types.number,
-  holderTabsPerArc: types.integer,
-  holderTabsFeetLengthRatio: types.number,
+  wallsPerArc: types.optional(types.integer, 4),
+  holeWidthRatio: types.optional(types.number, 0.5),
+  arcsPerRing: types.optional(types.integer, 4),
+  ringRadius: types.optional(types.number, CM_TO_PIXELS_RATIO * 11.25),
+  ringThicknessRatio: types.optional(types.number, 0.2),
+  materialThickness: types.optional(types.number, CM_TO_PIXELS_RATIO * 0.3),
+  dovetailIngressRatio: types.optional(types.number, 0.5),
+  dovetailSizeRatio: types.optional(types.number, 0.5),
+  cylinderHeight: types.optional(types.number, CM_TO_PIXELS_RATIO * 2),
+  holderTabsPerArc: types.optional(types.integer, 2),
+  holderTabsFeetLengthRatio: types.optional(types.number, 0.5),
 }).volatile(() => ({
   sectionPathD: null,
   wallPathD: null,
@@ -211,23 +209,9 @@ const CylinderLightboxDataModel = types.model({
 
 export interface ICylinderLightboxDataModel extends Instance<typeof CylinderLightboxDataModel> {}
 
-export const defaultCylinderLightboxSnapshot:SnapshotIn<typeof CylinderLightboxDataModel> = {
-  wallsPerArc: 4,
-  holeWidthRatio: 0.5,
-  arcsPerRing: 4,
-  ringRadius: CM_TO_PIXELS_RATIO * 11.25,
-  ringThicknessRatio: 0.2,
-  materialThickness: CM_TO_PIXELS_RATIO * 0.3,
-  dovetailIngressRatio: 0.5,
-  dovetailSizeRatio: 0.5,
-  cylinderHeight: CM_TO_PIXELS_RATIO * 2,
-  holderTabsPerArc: 2,
-  holderTabsFeetLengthRatio: 0.5,
-};
-
 export const CylinderLightBoxModel = types.model({
   history: types.optional(UndoManagerWithGroupState, {}),
-  shapeDefinition: types.optional(CylinderLightboxDataModel, defaultCylinderLightboxSnapshot),
+  shapeDefinition: types.optional(CylinderLightboxDataModel, {}),
 }).actions(() => ({
   getFileBasename() {
     return 'cylinder_lightbox';

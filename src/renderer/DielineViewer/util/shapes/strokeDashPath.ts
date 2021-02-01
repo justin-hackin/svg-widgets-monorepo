@@ -17,6 +17,12 @@ export function lineSeries(startEndArray) {
   return path;
 }
 
+export const defaultStrokeDashSpec = {
+  strokeDashPathPattern: '● 1 ○ 2',
+  strokeDashLength: 11,
+  strokeDashOffsetRatio: 0,
+};
+
 export const DashPatternModel = types.model({
   strokeDashPathPattern: types.reference(StrokeDashPathPatternModel),
   strokeDashLength: types.number,
