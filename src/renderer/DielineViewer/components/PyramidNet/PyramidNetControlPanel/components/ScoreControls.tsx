@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { PanelSelect } from '../../../../../common/components/PanelSelect';
-import { PanelSlider } from '../../../../../common/components/PanelSlider';
+import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { ratioSliderProps } from './constants';
 import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
 import { VERY_SMALL_NUMBER } from '../../../../../common/constants';
@@ -41,14 +41,14 @@ export const ScoreControls = observer(() => {
             options={dashPatternOptions}
           />
           <ControlElement
-            component={PanelSlider}
+            component={PanelSliderOrTextInput}
             node={interFaceScoreDashSpec}
             property="strokeDashLength"
             label="Inter-face Stroke Dash Length"
             {...strokeLengthProps}
           />
           <ControlElement
-            component={PanelSlider}
+            component={PanelSliderOrTextInput}
             node={interFaceScoreDashSpec}
             property="strokeDashOffsetRatio"
             label="Inter-face Stroke Dash Offset Ratio"
@@ -64,14 +64,14 @@ export const ScoreControls = observer(() => {
             options={dashPatternOptions}
           />
           <ControlElement
-            component={PanelSlider}
+            component={PanelSliderOrTextInput}
             node={baseScoreDashSpec}
             property="strokeDashLength"
             label="Base Stroke Dash Length"
             {...strokeLengthProps}
           />
           <ControlElement
-            component={PanelSlider}
+            component={PanelSliderOrTextInput}
             node={baseScoreDashSpec}
             property="strokeDashOffsetRatio"
             label="Base Stroke Dash Offset Ratio"

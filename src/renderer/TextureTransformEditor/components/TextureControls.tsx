@@ -16,7 +16,7 @@ import clsx from 'clsx';
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
 import { EVENTS } from '../../../main/ipc';
 import { useMst } from '../models';
-import { PanelSlider } from '../../common/components/PanelSlider';
+import { PanelSliderOrTextInput } from '../../common/components/PanelSliderOrTextInput';
 import { HistoryButtons } from
   '../../DielineViewer/components/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useStyles } from '../style';
@@ -151,7 +151,7 @@ export const TextureControls = observer(() => {
               label="Node selection"
             />
             <ControlElement
-              component={PanelSlider}
+              component={PanelSliderOrTextInput}
               node={store}
               property="nodeScaleMux"
               className={classes.nodeScaleMuxSlider}

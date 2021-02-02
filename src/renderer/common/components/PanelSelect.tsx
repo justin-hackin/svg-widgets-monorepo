@@ -5,7 +5,7 @@ import uuid from 'uuid/v1';
 import FormControl from '@material-ui/core/FormControl';
 import React from 'react';
 import { useStyles } from '../../DielineViewer/style';
-import { getLabelFromValuePath } from './PanelSlider';
+import { getLabelFromValuePath } from './PanelSliderOrTextInput';
 
 export const PanelSelect = ({
   options, onChange, value, valuePath, displayEmpty = undefined, label = undefined, className = '',

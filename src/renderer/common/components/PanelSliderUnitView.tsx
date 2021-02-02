@@ -1,7 +1,7 @@
 import React from 'react';
 import gcd from 'gcd';
 
-import { PanelSlider } from './PanelSlider';
+import { PanelSliderOrTextInput } from './PanelSliderOrTextInput';
 
 // TODO: get unit from preferences by default, prop overrides
 // used to present underlying pixel values as unit-specific conversions
@@ -32,7 +32,7 @@ const UNIT_LABEL_FORMAT = {
 export const PanelSliderUnitView = ({
   min, max, value, valuePath, onChange, label, onChangeCommitted,
 }) => (
-  <PanelSlider
+  <PanelSliderOrTextInput
     {...{
       min, max, value, valuePath, onChange, onChangeCommitted, label,
     }}

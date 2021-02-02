@@ -4,7 +4,7 @@ import { startCase } from 'lodash';
 import {
   applyPatch, getPath, getRoot, joinJsonPath,
 } from 'mobx-state-tree';
-import { PanelSlider } from './PanelSlider';
+import { PanelSliderOrTextInput } from './PanelSliderOrTextInput';
 import { PanelSelect } from './PanelSelect';
 import { PanelSwitch } from './PanelSwitch';
 import { PanelColorPicker } from './PanelColorPicker';
@@ -44,8 +44,8 @@ export const ControlElement = observer(({
     label: label || convertPropertyToLabel(property),
     ...props,
   };
-  if (component === PanelSlider || component === PanelSliderUnitView) {
-    const SliderComponent = component as (typeof PanelSlider | typeof PanelSliderUnitView);
+  if (component === PanelSliderOrTextInput || component === PanelSliderUnitView) {
+    const SliderComponent = component as (typeof PanelSliderOrTextInput | typeof PanelSliderUnitView);
     return (
       // @ts-ignore
       <SliderComponent

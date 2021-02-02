@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { PanelSlider } from '../../../../../common/components/PanelSlider';
+import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { ratioSliderProps } from './constants';
 import { VERY_SMALL_NUMBER } from '../../../../../common/constants';
 import { ControlElement } from '../../../../../common/components/ControlElement';
@@ -15,7 +15,7 @@ export const AscendantEdgeTabsControls = observer(() => {
   return (
     <>
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="tabsCount"
         min={2}
@@ -23,7 +23,7 @@ export const AscendantEdgeTabsControls = observer(() => {
         step={1}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="tabDepthToTraversalLength"
         min={0.03}
@@ -31,7 +31,7 @@ export const AscendantEdgeTabsControls = observer(() => {
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="holeReachToTabDepth"
         min={0.05}
@@ -39,7 +39,7 @@ export const AscendantEdgeTabsControls = observer(() => {
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="tabEdgeEndpointsIndentation"
         min={0}
@@ -47,25 +47,25 @@ export const AscendantEdgeTabsControls = observer(() => {
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="tabControlPointsAngle"
         {...ratioSliderProps}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="tabControlPointsProtrusion"
         {...ratioSliderProps}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="tabControlPointsAngle"
         {...ratioSliderProps}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="tabStartGapToTabDepth"
         min={0.3}
@@ -73,7 +73,7 @@ export const AscendantEdgeTabsControls = observer(() => {
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="holeWidthRatio"
         min={0.1}
@@ -81,7 +81,7 @@ export const AscendantEdgeTabsControls = observer(() => {
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={ascendantEdgeTabsSpec}
         property="flapRoundingDistanceRatio"
         {...ratioSliderProps}

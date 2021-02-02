@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@material-ui/core';
-import { PanelSlider } from '../../../../../common/components/PanelSlider';
+import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { PanelColorPicker } from '../../../../../common/components/PanelColorPicker';
 import { ControlElement } from '../../../../../common/components/ControlElement';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
@@ -11,7 +11,7 @@ export const StyleControls = observer(() => {
   return (
     <>
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={preferences}
         property="strokeWidth"
         label="Dieline Stroke Width"

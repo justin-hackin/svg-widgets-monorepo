@@ -42,6 +42,17 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     right: theme.spacing(1),
     top: theme.spacing(1),
   },
+  sliderTextInputContainer: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  sliderTextInput: {
+    flex: '1 0 0',
+    paddingRight: theme.spacing(1),
+  },
+  sliderTextInputToggle: {
+    flex: '0 0 0',
+  },
   widgetButton: {
     bottom: theme.spacing(1),
     left: theme.spacing(1),

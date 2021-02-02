@@ -10,7 +10,7 @@ import {
 import { startCase } from 'lodash';
 
 import { useStyles } from '../../DielineViewer/style';
-import { getLabelFromValuePath } from './PanelSlider';
+import { getLabelFromValuePath } from './PanelSliderOrTextInput';
 import { polyhedra } from '../../DielineViewer/data/polyhedra';
 import requireStatic from '../../requireStatic';
 

@@ -4,7 +4,7 @@ import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { ICylinderLightBoxModel } from '../models';
 import { ControlElement } from '../../../common/components/ControlElement';
 import { CM_TO_PIXELS_RATIO } from '../../../common/util/geom';
-import { PanelSlider } from '../../../common/components/PanelSlider';
+import { PanelSliderOrTextInput } from '../../../common/components/PanelSliderOrTextInput';
 import { VERY_SMALL_NUMBER } from '../../../common/constants';
 import { PanelSliderUnitView } from '../../../common/components/PanelSliderUnitView';
 
@@ -40,7 +40,7 @@ export const CylinderLightboxPanelContent = () => {
       />
 
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={shapeDefinition}
         property="ringThicknessRatio"
         min={0.1}
@@ -48,7 +48,7 @@ export const CylinderLightboxPanelContent = () => {
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={shapeDefinition}
         property="arcsPerRing"
         min={2}
@@ -56,7 +56,7 @@ export const CylinderLightboxPanelContent = () => {
         step={1}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={shapeDefinition}
         property="wallsPerArc"
         min={1}
@@ -64,7 +64,7 @@ export const CylinderLightboxPanelContent = () => {
         step={1}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={shapeDefinition}
         property="dovetailIngressRatio"
         min={0}
@@ -72,7 +72,7 @@ export const CylinderLightboxPanelContent = () => {
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={shapeDefinition}
         property="dovetailSizeRatio"
         min={0}
@@ -80,7 +80,7 @@ export const CylinderLightboxPanelContent = () => {
         step={VERY_SMALL_NUMBER}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={shapeDefinition}
         property="holderTabsPerArc"
         min={1}
@@ -88,7 +88,7 @@ export const CylinderLightboxPanelContent = () => {
         step={1}
       />
       <ControlElement
-        component={PanelSlider}
+        component={PanelSliderOrTextInput}
         node={shapeDefinition}
         property="holderTabsFeetLengthRatio"
         min={0}
