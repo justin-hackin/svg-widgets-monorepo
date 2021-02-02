@@ -17,8 +17,6 @@ const ValueLabelComponent = ({ children, open, value }) => (
   </Tooltip>
 );
 
-// TODO: fix value label cut off and wrong color
-// convert to slider with text input? could allow escaping bounds
 export const PanelSliderOrTextInput = ({
   value, onChange, onChangeCommitted, valuePath,
   min, max, step, enableTextToggle = true, label = undefined, valueLabelFormat = undefined,

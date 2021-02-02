@@ -11,7 +11,6 @@ interface PolyhedraDefs {
   [propName: string]: PyramidGeometrySpec,
 }
 
-// TODO: more accurate lengths for some shapes
 export const polyhedra:PolyhedraDefs = {
   'great-stellated-dodecahedron': {
     relativeFaceEdgeLengths: [PHI, 1, PHI],

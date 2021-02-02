@@ -147,7 +147,7 @@ const CylinderLightboxDataModel = types.model({
     },
     get holderTabHoles() {
       const holesPath = new PathData();
-      // TODO: extract shared operations with wall holes
+      // TODO: extract shared operations with wall holes for DRYness
       const sectionDegrees = 360 / (self.holderTabsPerArc * self.arcsPerRing);
       for (let i = 0; i < self.wallsPerArc; i += 1) {
         const rotation = (i - (self.holderTabsPerArc / 2) + 0.5) * sectionDegrees;

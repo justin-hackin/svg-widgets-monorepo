@@ -11,7 +11,6 @@ export enum WINDOWS {
   DIELINE_EDITOR = 'dieline-editor'
 }
 
-// TODO: use enum if event names allow
 enum MAIN_EVENTS {
   SAVE_SVG = 'save-svg',
   SAVE_GLTF = 'save-gltf',
