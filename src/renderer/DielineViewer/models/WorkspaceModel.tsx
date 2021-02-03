@@ -1,5 +1,5 @@
 import {
-  applySnapshot, Instance, onSnapshot, types,
+  applySnapshot, getType, Instance, onSnapshot, types,
 } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React, { createContext, useContext } from 'react';
@@ -7,17 +7,19 @@ import persist from 'mst-persist';
 import { connectReduxDevtools } from 'mst-middlewares';
 import makeInspectable from 'mobx-devtools-mst';
 // eslint-disable-next-line import/no-extraneous-dependencies
+import { remote } from 'electron';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
 import parseFilepath from 'parse-filepath';
-
+import { startCase } from 'lodash';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
+
 import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { SVGWrapper } from '../data/SVGWrapper';
 import { PreferencesModel, defaultPreferences } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../components/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../CylinderLightbox';
-import { customTitlebar } from '../../index';
 
 const getPreferencesStore = () => {
   const preferencesStore = PreferencesModel.create(defaultPreferences);
@@ -61,8 +63,11 @@ export const WorkspaceModel = types.model({
       return observer(() => (
         <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={self.preferences} />));
     },
+    get selectedShapeName() {
+      return getType(this.selectedStore.shapeDefinition).name;
+    },
     get currentFileName() {
-      return self.currentFilePath ? parseFilepath(self.currentFilePath).base : 'New Polyhedral Net';
+      return self.currentFilePath ? parseFilepath(self.currentFilePath).base : `New ${this.selectedShapeName}`;
     },
     get titleBarText() {
       return `${self.isPristine ? '' : '*'}${this.currentFileName}`;
@@ -78,9 +83,13 @@ export const WorkspaceModel = types.model({
       }, { fireImmediately: true });
 
       // title bar changes for file status indication
-      reaction(() => [self.titleBarText, customTitlebar], () => {
-        customTitlebar.updateTitle(self.titleBarText);
-      });
+      reaction(() => [self.titleBarText], () => {
+        const currentWindow = remote.getCurrentWindow();
+        currentWindow
+          // @ts-ignore
+          .setTitle(`${self.selectedShapeName} ‖  ${startCase(currentWindow.metadata.route)}  ‖  ${
+            self.titleBarText}`);
+      }, { fireImmediately: true });
     },
     setPristineDisposer(disposer) {
       if (self.isPristineSnapshotDisposer) {

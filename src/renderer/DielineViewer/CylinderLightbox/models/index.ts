@@ -22,7 +22,7 @@ const rectanglePathCenteredOnOrigin = (width, height) => closedPolygonPath(getRe
 
 const polygonSideLength = (numSides, inRadius) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
-const CylinderLightboxDataModel = types.model({
+const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
   wallsPerArc: types.optional(types.integer, 4),
   holeWidthRatio: types.optional(types.number, 0.5),
   arcsPerRing: types.optional(types.integer, 4),

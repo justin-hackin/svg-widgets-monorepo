@@ -6,11 +6,6 @@ const fsPromises = require('fs').promises;
 
 const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
 
-export enum WINDOWS {
-  TEXTURE_EDITOR = 'texture-editor',
-  DIELINE_EDITOR = 'dieline-editor'
-}
-
 enum MAIN_EVENTS {
   SAVE_SVG = 'save-svg',
   SAVE_GLTF = 'save-gltf',
@@ -29,6 +24,11 @@ enum ROUTED_EVENTS {
   UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION = 'update-texture-editor-texture',
   UPDATE_TEXTURE_EDITOR_BORDER_DATA = 'update-texture-editor-border-data',
   UPDATE_DIELINE_VIEWER = 'update-dieline-viewer',
+}
+
+export enum WINDOWS {
+  TEXTURE_EDITOR = 'texture-editor',
+  DIELINE_EDITOR = 'dieline-editor'
 }
 
 export const ROUTED_EVENT_MAP: Record<WINDOWS, ROUTED_EVENTS[]> = {

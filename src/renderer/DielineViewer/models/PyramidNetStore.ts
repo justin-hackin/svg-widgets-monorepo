@@ -79,7 +79,7 @@ export const PyramidModel = types.model({
   },
 }));
 
-export const PyramidNetModel = types.model({
+export const PyramidNetModel = types.model('Pyramid Net', {
   pyramid: types.optional(PyramidModel, {}),
   ascendantEdgeTabsSpec: types.optional(AscendantEdgeTabsModel, {}),
   baseEdgeTabsSpec: types.optional(BaseEdgeTabsModel, {}),

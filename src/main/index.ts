@@ -65,9 +65,6 @@ app.on('ready', async () => {
       height,
       show: false,
       icon,
-      menu: null,
-      titleBarStyle: 'hidden',
-      frame: false,
       webPreferences: {
         webSecurity: false,
         nodeIntegration: true,
@@ -76,9 +73,13 @@ app.on('ready', async () => {
       },
       ...config,
     });
+    browserWindows[route].setMenu(null);
+    browserWindows[route].metadata = { route };
+
     addEventListenersForWindow(route);
 
     browserWindows[route].once('ready-to-show', () => {
+      browserWindows[route].show();
       resolveFn();
     });
 
