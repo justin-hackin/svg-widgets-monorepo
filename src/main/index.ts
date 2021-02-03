@@ -98,12 +98,14 @@ app.on('ready', async () => {
   });
 
   await promisifyWindow({
-    title: 'Polyhedral Net Factory - Dieline Viewer',
+    minWidth: 1000,
+    minHeight: 570,
   }, WINDOWS.DIELINE_EDITOR);
 
   const assignTextureWindow = async () => {
     await promisifyWindow({
-      title: 'Polyhedral Net Factory - Texture Fitting',
+      minWidth: 730,
+      minHeight: 730,
       closable: false,
     }, WINDOWS.TEXTURE_EDITOR);
   };
