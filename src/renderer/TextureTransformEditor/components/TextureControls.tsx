@@ -156,6 +156,7 @@ export const TextureControls = observer(() => {
               property="nodeScaleMux"
               className={classes.nodeScaleMuxSlider}
               disabled={!hasPathPattern}
+              enableTextToggle={false}
               label="Node size"
               min={0.1}
               max={10}
