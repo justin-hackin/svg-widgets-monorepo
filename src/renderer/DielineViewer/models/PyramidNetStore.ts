@@ -88,7 +88,6 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
   useDottedStroke: types.optional(types.boolean, false),
   // TODO: migrate to preferences
-  useClones: types.optional(types.boolean, false),
   baseScoreDashSpec: types.maybe(DashPatternModel),
   interFaceScoreDashSpec: types.maybe(DashPatternModel),
   // in this case of faceDecoration being defined, this is a derived value thus could be made volatile

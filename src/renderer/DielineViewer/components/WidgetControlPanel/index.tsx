@@ -26,7 +26,7 @@ import { HistoryButtons } from '../PyramidNet/PyramidNetControlPanel/components/
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 import { SimpleDialog } from '../../../common/components/SimpleDialog';
-import { StyleControls } from '../PyramidNet/PyramidNetControlPanel/components/StyleControls';
+import { PreferencesControls } from '../PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
 
 export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, AdditionalToolbarContent, PanelContent }) => {
   // @ts-ignore
@@ -170,7 +170,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
               <SettingsIcon />
             </IconButton>
             <SimpleDialog isOpen={settingsDialogIsOpen} handleClose={handleSettingsDialogClose} title="Settings">
-              <StyleControls />
+              <PreferencesControls />
             </SimpleDialog>
             <IconButton
               color="inherit"

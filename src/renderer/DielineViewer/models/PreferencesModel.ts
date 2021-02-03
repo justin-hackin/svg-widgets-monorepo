@@ -8,12 +8,14 @@ import { types, Instance, SnapshotIn } from 'mobx-state-tree';
 export interface IPreferencesModel extends Instance<typeof PreferencesModel> {}
 
 export const defaultPreferences: SnapshotIn<IPreferencesModel> = {
+  useClones: false,
   cutStrokeColor: '#FF3A5E',
   scoreStrokeColor: '#BDFF48',
   strokeWidth: 1,
 };
 
 export const PreferencesModel = types.model({
+  useClones: types.boolean,
   cutStrokeColor: types.string,
   scoreStrokeColor: types.string,
   strokeWidth: types.number,

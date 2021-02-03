@@ -9,7 +9,6 @@ import { ControlElement } from '../../../../common/components/ControlElement';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
-import { PanelSwitch } from '../../../../common/components/PanelSwitch';
 import { ShapeSelect } from '../../../../common/components/ShapeSelect';
 import { CM_TO_PIXELS_RATIO } from '../../../../common/util/geom';
 import { PanelSliderUnitView } from '../../../../common/components/PanelSliderUnitView';
@@ -56,11 +55,6 @@ export const PanelContent = () => {
             pyramidNetSpec.setPyramidShapeName(e.target.value);
           }}
           label="Polyhedron"
-        />
-        <ControlElement
-          component={PanelSwitch}
-          node={pyramidNetSpec}
-          property="useClones"
         />
         <ControlElement
           component={PanelSliderUnitView}

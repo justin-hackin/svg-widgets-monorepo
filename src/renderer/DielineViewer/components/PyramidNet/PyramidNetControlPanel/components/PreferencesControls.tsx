@@ -5,11 +5,17 @@ import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSl
 import { PanelColorPicker } from '../../../../../common/components/PanelColorPicker';
 import { ControlElement } from '../../../../../common/components/ControlElement';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
+import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
 
-export const StyleControls = observer(() => {
+export const PreferencesControls = observer(() => {
   const { preferences, resetPreferences } = useWorkspaceMst();
   return (
     <>
+      <ControlElement
+        component={PanelSwitch}
+        node={preferences}
+        property="useClones"
+      />
       <ControlElement
         component={PanelSliderOrTextInput}
         node={preferences}

@@ -165,14 +165,14 @@ export const DielinesLayer = observer(({
     pyramidNetSpec: {
       masterBaseTab,
       makePaths: { cut, score },
-      useClones, texturePathD, pathScaleMatrix, borderInsetFaceHoleTransformMatrix, faceInteriorAngles,
+      texturePathD, pathScaleMatrix, borderInsetFaceHoleTransformMatrix, faceInteriorAngles,
       faceBoundaryPoints,
       pyramid: { geometry: { faceCount } },
       femaleAscendantFlap, ascendantEdgeTabs, nonTabbedAscendantScores,
     },
   } = widgetStore;
 
-  const { cutProps, scoreProps } = preferencesStore;
+  const { cutProps, scoreProps, useClones } = preferencesStore;
   const allCutProps = { ...cutProps, fill: 'none' };
   const allScoreProps = { ...scoreProps, fill: 'none' };
 
