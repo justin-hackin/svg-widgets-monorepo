@@ -20,6 +20,8 @@ import { SVGWrapper } from '../data/SVGWrapper';
 import { PreferencesModel, defaultPreferences } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../components/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../CylinderLightbox';
+import { WINDOWS } from '../../../main/ipc';
+import { CustomBrowserWindowType } from '../../../main';
 
 const getPreferencesStore = () => {
   const preferencesStore = PreferencesModel.create(defaultPreferences);
@@ -84,11 +86,15 @@ export const WorkspaceModel = types.model({
 
       // title bar changes for file status indication
       reaction(() => [self.titleBarText], () => {
-        const currentWindow = remote.getCurrentWindow();
+        // TODO: why can't this be coerced
+        // @ts-ignore
+        const currentWindow = (remote.getCurrentWindow() as CustomBrowserWindowType);
+        // TODO: having texture window title bar populated because it imports workspace model is a sloppy abstraction,
+        // scope this concern to the store for texture editor and only use this reaction for dieline editor
+        const fileTrackingFragment = currentWindow.route === WINDOWS.DIELINE_EDITOR ? `‖  ${
+          self.titleBarText}` : '';
         currentWindow
-          // @ts-ignore
-          .setTitle(`${self.selectedShapeName} ‖  ${startCase(currentWindow.metadata.route)}  ‖  ${
-            self.titleBarText}`);
+          .setTitle(`${self.selectedShapeName} ‖  ${startCase(currentWindow.route)}  ${fileTrackingFragment}`);
       }, { fireImmediately: true });
     },
     setPristineDisposer(disposer) {
@@ -130,10 +136,11 @@ export const WorkspaceModel = types.model({
   }));
 
 export interface IWorkspaceModel extends Instance<typeof WorkspaceModel> {}
-
+// TODO: instantiating this store directly in the module causes unintended side-effects in texture editor:
+// reaction for title bar runs there too but workspace model is only the concern of dieline editor
+// consider this side-effect has the advantage of displaying model name in texture editor -> it doesn't have
+// access to shapeDefinition's model name otherwise
 export const workspaceStore = WorkspaceModel.create({});
-// @ts-ignore
-window.workspaceStore = workspaceStore;
 const WorkspaceStoreContext = createContext<IWorkspaceModel>(workspaceStore);
 
 export const { Provider: WorkspaceProvider } = WorkspaceStoreContext;

@@ -5,15 +5,21 @@ const path = require('path');
 const { format } = require('url');
 const debug = require('electron-debug');
 
-interface windowMappingObject {
-  [key: string]: (typeof BrowserWindow);
-}
-
-const isDevelopment = process.env.NODE_ENV !== 'production';
-
 const {
   setupIpc, EVENTS, WINDOWS, ROUTED_EVENT_MAP,
 } = require('./ipc');
+
+type BrowserWindowType = (typeof BrowserWindow);
+
+interface windowMappingObject {
+  [key: string]: BrowserWindowType;
+}
+
+export interface CustomBrowserWindowType extends BrowserWindowType {
+  route: typeof WINDOWS
+}
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // for debugging build, add isEnabled: true
 debug({ showDevTools: false, isEnabled: true });
@@ -74,7 +80,7 @@ app.on('ready', async () => {
       ...config,
     });
     browserWindows[route].setMenu(null);
-    browserWindows[route].metadata = { route };
+    browserWindows[route].route = route;
 
     addEventListenersForWindow(route);
 
