@@ -1,4 +1,6 @@
 import { types, Instance, SnapshotIn } from 'mobx-state-tree';
+import { DimensionsModel } from '../../../common/models/DimensionsModel';
+import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 
 // reassignment of a mst-persist store will cause undisposed onSnapshot
 // see: https://github.com/agilgur5/mst-persist/issues/20
@@ -12,9 +14,14 @@ export const defaultPreferences: SnapshotIn<IPreferencesModel> = {
   cutStrokeColor: '#FF3A5E',
   scoreStrokeColor: '#BDFF48',
   strokeWidth: 1,
+  dielineDocumentDimensions: {
+    width: CM_TO_PIXELS_RATIO * 49.5,
+    height: CM_TO_PIXELS_RATIO * 27.9,
+  },
 };
 
 export const PreferencesModel = types.model({
+  dielineDocumentDimensions: DimensionsModel,
   useClones: types.boolean,
   cutStrokeColor: types.string,
   scoreStrokeColor: types.string,

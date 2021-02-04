@@ -15,7 +15,6 @@ import { startCase } from 'lodash';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
 
-import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 import { SVGWrapper } from '../data/SVGWrapper';
 import { PreferencesModel, defaultPreferences } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../components/PyramidNet';
@@ -30,7 +29,6 @@ const getPreferencesStore = () => {
 };
 
 export const WorkspaceModel = types.model({
-  svgDimensions: types.frozen({ width: CM_TO_PIXELS_RATIO * 49.5, height: CM_TO_PIXELS_RATIO * 27.9 }),
   currentFilePath: types.maybe(types.string),
   widgetOptions: types.frozen({
     'polyhedral-net': PyramidNetOptionsInfo,
@@ -115,7 +113,7 @@ export const WorkspaceModel = types.model({
     renderWidgetToString() {
       const { SelectedRawSvgComponent } = self;
       return ReactDOMServer.renderToString(
-        <SVGWrapper {...self.svgDimensions}>
+        <SVGWrapper {...self.preferences.dielineDocumentDimensions}>
           <SelectedRawSvgComponent
             preferencesStore={self.preferences}
             widgetStore={self.selectedStore}

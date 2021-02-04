@@ -25,7 +25,7 @@ import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../util/shapes/baseEdg
 import { DashPatternModel, defaultStrokeDashSpec, strokeDashPath } from '../util/shapes/strokeDashPath';
 import { boundingViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
-import { DimensionsModel } from '../../TextureTransformEditor/models/DimensionsModel';
+import { DimensionsModel } from '../../../common/models/DimensionsModel';
 import { getBoundedTexturePathD } from '../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
 

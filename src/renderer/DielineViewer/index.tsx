@@ -12,7 +12,7 @@ import darkTheme from './data/material-ui-dark-theme';
 import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
 import {
-  IWorkspaceModel, useWorkspaceMst, WorkspaceStoreProvider,
+  useWorkspaceMst, WorkspaceStoreProvider,
 } from './models/WorkspaceModel';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
 import { useStyles } from './style';
@@ -26,9 +26,12 @@ const theme = createMuiTheme(darkTheme);
 export const DielineViewerLOC = observer(() => {
   const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
   const {
-    svgDimensions, selectedStore,
-    SelectedControlledSvgComponent, selectedWidgetName, setSelectedWidgetName, selectedControlPanelProps, widgetOptions,
-  } = useWorkspaceMst() as IWorkspaceModel;
+    preferences: { dielineDocumentDimensions },
+    selectedStore,
+    SelectedControlledSvgComponent, selectedWidgetName, setSelectedWidgetName,
+    selectedControlPanelProps, widgetOptions,
+  } = useWorkspaceMst();
+
   const classes = useStyles();
 
   if (!selectedStore) {
@@ -38,7 +41,7 @@ export const DielineViewerLOC = observer(() => {
     <>
       <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
         <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
-          <svg {...svgDimensions}>
+          <svg {...dielineDocumentDimensions}>
             <GridPattern patternId={patternId} />
             <SelectedControlledSvgComponent />
           </svg>

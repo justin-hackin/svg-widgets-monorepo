@@ -7,7 +7,7 @@ import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
 
-import { DimensionsModel } from './DimensionsModel';
+import { DimensionsModel } from '../../../common/models/DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
