@@ -1,7 +1,9 @@
 import React from 'react';
 import gcd from 'gcd';
+import uuid from 'uuid/v1';
 
-import { PanelSliderOrTextInput } from './PanelSliderOrTextInput';
+import { Typography } from '@material-ui/core';
+import { getLabelFromValuePath, PanelSliderOrTextInput } from './PanelSliderOrTextInput';
 
 // TODO: get unit from preferences by default, prop overrides
 // used to present underlying pixel values as unit-specific conversions
@@ -9,6 +11,7 @@ import { PanelSliderOrTextInput } from './PanelSliderOrTextInput';
 import {
   CM_TO_PIXELS_RATIO, CURRENT_UNIT, INCHES_TO_PIXELS_RATIO, UNITS,
 } from '../util/geom';
+import { SubmittableTextInput } from './SubmittableTextInput';
 
 const IN_DENOMINATOR = 64;
 const UNIT_STEP = {
@@ -40,3 +43,18 @@ export const PanelSliderUnitView = ({
     valueLabelFormat={UNIT_LABEL_FORMAT[CURRENT_UNIT]}
   />
 );
+
+export const PanelTextUnitView = ({
+  value, valuePath, onChange, label,
+}) => {
+  const labelId = uuid();
+  const elementLabel = label || getLabelFromValuePath(valuePath);
+  return (
+    <>
+      <Typography id={labelId} gutterBottom>
+        {elementLabel}
+      </Typography>
+      <SubmittableTextInput {...{ value, labelId, onChange }} />
+    </>
+  );
+};

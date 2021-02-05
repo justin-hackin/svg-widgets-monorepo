@@ -1,13 +1,14 @@
-import { startCase, last } from 'lodash';
+import { last, startCase } from 'lodash';
 import uuid from 'uuid/v1';
 import React, { useState } from 'react';
 import {
-  Tooltip, Typography, Slider, FormControl, Input, IconButton,
+  FormControl, IconButton, Slider, Tooltip, Typography,
 } from '@material-ui/core';
 import TuneIcon from '@material-ui/icons/Tune';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 
 import { useStyles } from '../../DielineViewer/style';
+import { SubmittableTextInput } from './SubmittableTextInput';
 
 export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
 
@@ -26,24 +27,6 @@ export const PanelSliderOrTextInput = ({
   const elementLabel = label || getLabelFromValuePath(valuePath);
   const [isSlider, setIsSlider] = useState(true);
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
-
-  const TextInputComponent = (
-    <Input
-      defaultValue={value}
-      type="number"
-      onKeyPress={(e) => {
-        if (e.key === 'Enter') {
-          const parsedFloat = parseFloat((e.target as HTMLInputElement).value);
-          if (!Number.isNaN(parsedFloat)) {
-            onChange(null, parsedFloat);
-            onChangeCommitted();
-          }
-        }
-      }}
-      inputProps={{ 'aria-label': labelId }}
-    />
-  );
-
   const SliderComponent = (
     <Slider
       name={valuePath}
@@ -67,7 +50,17 @@ export const PanelSliderOrTextInput = ({
       </Typography>
       <div className={classes.sliderTextInputContainer}>
         <div className={classes.sliderTextInput}>
-          {(isSlider || enableTextToggle === false) ? SliderComponent : TextInputComponent }
+          {(isSlider || enableTextToggle === false) ? SliderComponent : (
+            <SubmittableTextInput {...{
+              value,
+              labelId,
+              onChange: (e, parsedFloat) => {
+                onChange(e, parsedFloat);
+                onChangeCommitted();
+              },
+            }}
+            />
+          ) }
         </div>
         { enableTextToggle && (
           <IconButton className={classes.sliderTextInputToggle} onClick={toggleIsSlider}>
