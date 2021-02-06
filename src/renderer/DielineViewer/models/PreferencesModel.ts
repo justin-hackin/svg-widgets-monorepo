@@ -1,5 +1,4 @@
 import { types, Instance, SnapshotIn } from 'mobx-state-tree';
-import { DimensionsModel } from '../../../common/models/DimensionsModel';
 import { CM_TO_PIXELS_RATIO } from '../../common/util/geom';
 
 // reassignment of a mst-persist store will cause undisposed onSnapshot
@@ -15,13 +14,16 @@ export const defaultPreferences: SnapshotIn<IPreferencesModel> = {
   scoreStrokeColor: '#BDFF48',
   strokeWidth: 1,
   dielineDocumentDimensions: {
-    width: CM_TO_PIXELS_RATIO * 49.5,
-    height: CM_TO_PIXELS_RATIO * 27.9,
+    width__PX: CM_TO_PIXELS_RATIO * 49.5,
+    height__PX: CM_TO_PIXELS_RATIO * 27.9,
   },
 };
 
 export const PreferencesModel = types.model({
-  dielineDocumentDimensions: DimensionsModel,
+  dielineDocumentDimensions: types.model({
+    width__PX: types.number,
+    height__PX: types.number,
+  }),
   useClones: types.boolean,
   cutStrokeColor: types.string,
   scoreStrokeColor: types.string,

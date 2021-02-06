@@ -1,15 +1,19 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@material-ui/core';
+
 import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { PanelColorPicker } from '../../../../../common/components/PanelColorPicker';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
+import { PanelTextInput } from '../../../../../common/components/PanelTextInput';
 
 export const PreferencesControls = observer(() => {
   const { preferences, resetPreferences } = useWorkspaceMst();
   return (
     <>
+      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width__PX" />
+      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height__PX" />
       <PanelSwitch
         node={preferences}
         property="useClones"

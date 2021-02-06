@@ -8,16 +8,18 @@ import { observer } from 'mobx-react';
 // TODO: round up/down max/min/step based on unit (so that all values are divisible by the step)
 import { SubmittableTextInput } from './SubmittableTextInput';
 import { mstDataToProps } from '../util/mst';
+import { useStyles } from '../../DielineViewer/style';
 
 export const PanelTextInput = observer(({
-  node, property, label,
+  node, property, label = undefined,
 }) => {
+  const classes = useStyles();
   const labelId = uuid();
   const {
     value, setValue, label: resolvedLabel, valuePath, useUnits,
   } = mstDataToProps(node, property, label);
   return (
-    <>
+    <div className={classes.formControl}>
       <Typography id={labelId} gutterBottom>
         {resolvedLabel}
       </Typography>
@@ -28,6 +30,6 @@ export const PanelTextInput = observer(({
         valuePath={valuePath}
         labelId={labelId}
       />
-    </>
+    </div>
   );
 });

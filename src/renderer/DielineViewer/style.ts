@@ -29,6 +29,13 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
     display: 'flex',
   },
+  simpleDialog: {
+    maxHeight: '90%',
+  },
+  simpleDialogContent: {
+    overflow: 'auto',
+    padding: theme.spacing(1),
+  },
   menuButton: {
     top: theme.spacing(1),
     right: theme.spacing(1),

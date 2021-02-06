@@ -20,12 +20,19 @@ export const mstDataToProps = (node, property, labelOverride = undefined) => {
       value: val,
     });
   };
+  const useUnits = isUnitValue(property);
+  const label = (() => {
+    if (labelOverride) {
+      return `${labelOverride}${useUnits ? ` (${CURRENT_UNIT})` : ''}`;
+    }
+    return convertPropertyToLabel(property);
+  })();
   return {
     value,
     valuePath,
     setValue,
-    useUnits: isUnitValue(value),
-    label: labelOverride || convertPropertyToLabel(property),
+    useUnits,
+    label,
   };
 };
 

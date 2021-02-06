@@ -15,7 +15,6 @@ import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWi
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
-    // @ts-ignore
     pyramidNetSpec: { normalizedDecorationBoundaryPoints },
   } = store;
   const normalizedDecorationBoundaryPathD = closedPolygonPath(normalizedDecorationBoundaryPoints).getD();

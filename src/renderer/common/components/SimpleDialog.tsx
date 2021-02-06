@@ -12,7 +12,7 @@ export const SimpleDialog = ({
   const classes = useStyles();
 
   return (
-    <Dialog aria-labelledby="simple-dialog-title" open={isOpen}>
+    <Dialog className={classes.simpleDialog} aria-labelledby="simple-dialog-title" open={isOpen}>
       <DialogTitle disableTypography id="simple-dialog-title">
         <Typography variant="h6">{title}</Typography>
         <IconButton
@@ -23,7 +23,9 @@ export const SimpleDialog = ({
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      { children }
+      <div className={classes.simpleDialogContent}>
+        { children }
+      </div>
     </Dialog>
   );
 };
