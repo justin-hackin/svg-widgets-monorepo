@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import { Button } from '@material-ui/core';
 import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { PanelColorPicker } from '../../../../../common/components/PanelColorPicker';
-import { ControlElement } from '../../../../../common/components/ControlElement';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
 
@@ -11,13 +10,11 @@ export const PreferencesControls = observer(() => {
   const { preferences, resetPreferences } = useWorkspaceMst();
   return (
     <>
-      <ControlElement
-        component={PanelSwitch}
+      <PanelSwitch
         node={preferences}
         property="useClones"
       />
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={preferences}
         property="strokeWidth"
         label="Dieline Stroke Width"
@@ -25,14 +22,12 @@ export const PreferencesControls = observer(() => {
         max={3}
         step={0.01}
       />
-      <ControlElement
-        component={PanelColorPicker}
+      <PanelColorPicker
         node={preferences}
         property="scoreStrokeColor"
         label="Cut Stroke Color"
       />
-      <ControlElement
-        component={PanelColorPicker}
+      <PanelColorPicker
         node={preferences}
         property="cutStrokeColor"
         label="Score Stroke Color"

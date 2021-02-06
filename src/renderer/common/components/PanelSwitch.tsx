@@ -3,15 +3,17 @@ import uuid from 'uuid/v1';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import { Switch } from '@material-ui/core';
+import { observer } from 'mobx-react';
 
 import { useStyles } from '../../DielineViewer/style';
+import { mstDataToProps } from '../util/mst';
 
-export const PanelSwitch = ({
-  label, onChange, value = undefined, defaultValue = undefined, valuePath, ...rest
+export const PanelSwitchUncontrolled = observer(({
+  value, valuePath, onChange, label,
 }) => {
   const classes = useStyles();
   const labelId = uuid();
-  if (value === undefined && defaultValue === undefined) { return null; }
+  if (value === undefined) { return null; }
 
   return (
     <FormControl className={classes.formControl}>
@@ -19,13 +21,29 @@ export const PanelSwitch = ({
         {label}
       </Typography>
       <Switch
-        {...(defaultValue ? { value: defaultValue } : { checked: value })}
+        value={value}
         name={valuePath}
         aria-labelledby={labelId}
         color="primary"
         onChange={onChange}
-        {...rest}
       />
     </FormControl>
+  );
+});
+
+export const PanelSwitch = ({ node, property, label = undefined }) => {
+  const {
+    value, setValue, label: resolvedLabel, valuePath,
+  } = mstDataToProps(node, property, label);
+  if (value === undefined) { return null; }
+  return (
+    <PanelSwitchUncontrolled
+      value={value}
+      label={resolvedLabel}
+      valuePath={valuePath}
+      onChange={(e) => {
+        setValue(e.target.checked);
+      }}
+    />
   );
 };

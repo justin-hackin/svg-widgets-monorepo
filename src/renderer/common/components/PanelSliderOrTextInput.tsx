@@ -1,72 +1,53 @@
 import { last, startCase } from 'lodash';
 import uuid from 'uuid/v1';
 import React, { useState } from 'react';
-import {
-  FormControl, IconButton, Slider, Tooltip, Typography,
-} from '@material-ui/core';
+import { FormControl, IconButton, Typography } from '@material-ui/core';
 import TuneIcon from '@material-ui/icons/Tune';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 
 import { useStyles } from '../../DielineViewer/style';
 import { SubmittableTextInput } from './SubmittableTextInput';
+import { mstDataToProps } from '../util/mst';
+import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';
 
 export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
 
-const ValueLabelComponent = ({ children, open, value }) => (
-  <Tooltip open={open} enterTouchDelay={0} placement="top" title={value} arrow>
-    {children}
-  </Tooltip>
-);
-
 export const PanelSliderOrTextInput = ({
-  value, onChange, onChangeCommitted, valuePath,
-  min, max, step, enableTextToggle = true, label = undefined, valueLabelFormat = undefined,
+  node, property, min, max, step = undefined, className = undefined, label = undefined,
 }) => {
   const classes = useStyles();
   const labelId = uuid();
-  const elementLabel = label || getLabelFromValuePath(valuePath);
+  const {
+    setValue, valuePath, value, label: computedLabel, useUnits,
+  } = mstDataToProps(node, property, label);
   const [isSlider, setIsSlider] = useState(true);
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
-  const SliderComponent = (
-    <Slider
-      name={valuePath}
-      value={value}
-      aria-labelledby={labelId}
-      valueLabelDisplay="auto"
-      ValueLabelComponent={ValueLabelComponent}
-      valueLabelFormat={
-      valueLabelFormat || ((val) => val && val.toFixed(2))
-    }
-      {...{
-        onChange, onChangeCommitted, min, max, step,
-      }}
-    />
-  );
 
   return (
-    <FormControl className={classes.formControl}>
+    <FormControl className={`${classes.formControl} ${className}`}>
       <Typography id={labelId} gutterBottom>
-        {elementLabel}
+        {label || computedLabel}
       </Typography>
       <div className={classes.sliderTextInputContainer}>
         <div className={classes.sliderTextInput}>
-          {(isSlider || enableTextToggle === false) ? SliderComponent : (
-            <SubmittableTextInput {...{
-              value,
-              labelId,
-              onChange: (e, parsedFloat) => {
-                onChange(e, parsedFloat);
-                onChangeCommitted();
-              },
+          {(isSlider) ? (
+            <UnlabeledPanelSliderComponent {...{
+              node, property, min, max, step, labelId,
             }}
+            />
+          ) : (
+            <SubmittableTextInput
+              useUnits={useUnits}
+              value={value}
+              setValue={setValue}
+              valuePath={valuePath}
+              labelId={labelId}
             />
           ) }
         </div>
-        { enableTextToggle && (
-          <IconButton className={classes.sliderTextInputToggle} onClick={toggleIsSlider}>
-            {isSlider ? (<KeyboardIcon />) : (<TuneIcon />)}
-          </IconButton>
-        )}
+        <IconButton className={classes.sliderTextInputToggle} onClick={toggleIsSlider}>
+          {isSlider ? (<KeyboardIcon />) : (<TuneIcon />)}
+        </IconButton>
       </div>
     </FormControl>
   );

@@ -102,6 +102,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexDirection: 'column',
   },
+  shapeSelect: {},
   shapeSelectDisplay: {
     display: 'flex',
     alignItems: 'center',
@@ -117,6 +118,9 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     margin: theme.spacing(1),
     display: 'flex',
     flexDirection: 'column',
+    '&$shapeSelect': {
+      marginBottom: theme.spacing(3),
+    },
   },
   panelChromePicker: {
     alignSelf: 'flex-end',

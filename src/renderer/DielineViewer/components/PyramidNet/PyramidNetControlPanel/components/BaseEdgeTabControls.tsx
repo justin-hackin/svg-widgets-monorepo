@@ -3,9 +3,8 @@ import { observer } from 'mobx-react';
 
 import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { ratioSliderProps } from './constants';
-import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
-import { VERY_SMALL_NUMBER } from '../../../../../common/constants';
-import { ControlElement } from '../../../../../common/components/ControlElement';
+import { PanelSwitch, PanelSwitchUncontrolled } from '../../../../../common/components/PanelSwitch';
+import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
 
@@ -24,66 +23,57 @@ export const BaseEdgeTabControls = observer(() => {
 
   return (
     <>
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="roundingDistanceRatio"
         {...ratioSliderProps}
       />
-      <ControlElement
-        component={PanelSwitch}
+      <PanelSwitch
         node={baseEdgeTabsSpec}
         property="scoreTabMidline"
       />
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="finDepthToTabDepth"
         {...{ ...ratioSliderProps, min: 0.05 }}
       />
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="tabDepthToAscendantTabDepth"
         min={0.6}
         max={2}
-        step={VERY_SMALL_NUMBER}
+        step={DEFAULT_SLIDER_STEP}
       />
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="holeDepthToTabDepth"
         {...{ ...ratioSliderProps, min: 0.05 }}
       />
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="finOffsetRatio"
         {...ratioSliderProps}
       />
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="holeBreadthToHalfWidth"
         {...{ ...ratioSliderProps, min: 0.05 }}
       />
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="holeTabClearance"
         min={0}
         max={0.1}
-        step={VERY_SMALL_NUMBER}
+        step={DEFAULT_SLIDER_STEP}
       />
-      <ControlElement
-        component={PanelSliderOrTextInput}
+      <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="holeTaper"
         min={Math.PI / 8}
         max={Math.PI / 3}
-        step={VERY_SMALL_NUMBER}
+        step={DEFAULT_SLIDER_STEP}
       />
-      <PanelSwitch
+      <PanelSwitchUncontrolled
         label="Use Bend Guide Valley"
         valuePath="BaseEdgeTabControls__useBendGuideValley"
         value={!!bendGuideValley}
@@ -97,19 +87,17 @@ export const BaseEdgeTabControls = observer(() => {
       />
       {baseEdgeTabsSpec.bendGuideValley && (
         <>
-          <ControlElement
-            component={PanelSliderOrTextInput}
+          <PanelSliderOrTextInput
             node={bendGuideValley}
             property="depthRatio"
             {...ratioSliderProps}
           />
-          <ControlElement
-            component={PanelSliderOrTextInput}
+          <PanelSliderOrTextInput
             node={bendGuideValley}
             property="theta"
             min={Math.PI / 16}
             max={Math.PI / 3}
-            step={VERY_SMALL_NUMBER}
+            step={DEFAULT_SLIDER_STEP}
           />
         </>
       )}

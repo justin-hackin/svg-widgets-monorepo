@@ -2,6 +2,7 @@ import {
 // @ts-ignore
   Line, point, segment, Polygon,
 } from '@flatten-js/core';
+import gcd from 'gcd';
 import { isNaN, isNumber, range } from 'lodash';
 import offset from '@flatten-js/polygon-offset';
 
@@ -46,9 +47,40 @@ export const castCoordToRawPoint = (coord: Coord): RawPoint => {
 export const rawPointToString = ({ x, y }: RawPoint) => `${x},${y}`;
 
 export const PHI:number = (1 + Math.sqrt(5)) / 2;
+
+export enum UNITS {
+  cm = 'cm', in = 'in',
+}
+
 const INCHES_TO_CM_RATIO = 1.0 / 2.54;
 export const INCHES_TO_PIXELS_RATIO = 96;
 export const CM_TO_PIXELS_RATIO = INCHES_TO_CM_RATIO * INCHES_TO_PIXELS_RATIO;
+export const UNIT_TO_PIXELS = {
+  [UNITS.cm]: 1.0 / 2.54,
+  [UNITS.in]: 96,
+};
+
+export const CURRENT_UNIT = UNITS.in;
+const IN_DENOMINATOR = 64;
+export const UNIT_STEP = {
+  [UNITS.cm]: CM_TO_PIXELS_RATIO * 0.1,
+  [UNITS.in]: (1.0 / IN_DENOMINATOR) * INCHES_TO_PIXELS_RATIO,
+};
+export const UNIT_LABEL_FORMAT = {
+  [UNITS.cm]: (val) => `${(val).toFixed(3)}`,
+  [UNITS.in]: (val) => {
+    const unitVal = val / UNIT_TO_PIXELS[CURRENT_UNIT];
+    const abs = Math.floor(unitVal);
+    const absStr = abs ? `${abs} ` : '';
+    const remainder = unitVal - abs;
+    const numerator = Math.round(remainder * IN_DENOMINATOR);
+    const gcdVal = gcd(numerator, IN_DENOMINATOR);
+    const fractionStr = numerator ? `${numerator / gcdVal}/${IN_DENOMINATOR / gcdVal}` : '';
+    const wholeStr = !absStr && !fractionStr ? 0 : `${absStr}${fractionStr}`;
+    return ` ${wholeStr} `;
+  },
+};
+export const pxToUnitView = (val) => UNIT_LABEL_FORMAT[CURRENT_UNIT](val);
 
 export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
 export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);
@@ -214,9 +246,3 @@ export const offsetPolygonPoints = (points: RawPoint[], offsetDistance) => {
   const offsetPoly = offset(poly, offsetDistance);
   return offsetPoly.vertices.map(castCoordToRawPoint);
 };
-
-export enum UNITS {
-  cm = 'cm', in = 'in',
-}
-
-export const CURRENT_UNIT = UNITS.in;

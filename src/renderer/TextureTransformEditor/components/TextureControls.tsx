@@ -16,13 +16,12 @@ import clsx from 'clsx';
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
 import { EVENTS } from '../../../main/ipc';
 import { useMst } from '../models';
-import { PanelSliderOrTextInput } from '../../common/components/PanelSliderOrTextInput';
 import { HistoryButtons } from
   '../../DielineViewer/components/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useStyles } from '../style';
-import { VERY_SMALL_NUMBER } from '../../common/constants';
+import { DEFAULT_SLIDER_STEP } from '../../common/constants';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
-import { ControlElement } from '../../common/components/ControlElement';
+import { PanelSliderComponent } from '../../common/components/PanelSliderComponent';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -150,17 +149,15 @@ export const TextureControls = observer(() => {
               )}
               label="Node selection"
             />
-            <ControlElement
-              component={PanelSliderOrTextInput}
+            <PanelSliderComponent
               node={store}
               property="nodeScaleMux"
               className={classes.nodeScaleMuxSlider}
               disabled={!hasPathPattern}
-              enableTextToggle={false}
               label="Node size"
               min={0.1}
               max={10}
-              step={VERY_SMALL_NUMBER}
+              step={DEFAULT_SLIDER_STEP}
             />
             <FormControlLabel
               className={classes.checkboxControlLabel}

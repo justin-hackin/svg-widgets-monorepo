@@ -1,16 +1,15 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { PanelSelect } from '../../../../../common/components/PanelSelect';
+import { UncontrolledPanelSelect } from '../../../../../common/components/PanelSelect';
 import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { ratioSliderProps } from './constants';
-import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
-import { VERY_SMALL_NUMBER } from '../../../../../common/constants';
-import { ControlElement } from '../../../../../common/components/ControlElement';
+import { PanelSwitchUncontrolled } from '../../../../../common/components/PanelSwitch';
+import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
 
-const strokeLengthProps = { min: 1, max: 100, step: VERY_SMALL_NUMBER };
+const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 
 export const ScoreControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -23,7 +22,7 @@ export const ScoreControls = observer(() => {
   const dashPatternOptions = dashPatterns.map(({ label, id }) => ({ value: id, label }));
   return (
     <>
-      <PanelSwitch
+      <PanelSwitchUncontrolled
         value={useDottedStroke}
         valuePath="pyramidNetSpec.useDottedStroke"
         onChange={(e) => { setUseDottedStroke(e.target.checked); }}
@@ -31,47 +30,43 @@ export const ScoreControls = observer(() => {
       />
       {useDottedStroke && (
         <>
-          <PanelSelect
-            valuePath="pyramidNetSpec.interFaceScoreDashSpec.strokeDashPathPattern.id"
+          <UncontrolledPanelSelect
             value={interFaceScoreDashSpec.strokeDashPathPattern.id}
+            name="interFaceScoreDashSpec.strokeDashPathPattern.id"
             label="Inter-face stroke dash pattern"
             onChange={(e) => {
               setInterFaceScoreDashSpecPattern(e.target.value);
             }}
             options={dashPatternOptions}
           />
-          <ControlElement
-            component={PanelSliderOrTextInput}
+          <PanelSliderOrTextInput
             node={interFaceScoreDashSpec}
             property="strokeDashLength"
             label="Inter-face Stroke Dash Length"
             {...strokeLengthProps}
           />
-          <ControlElement
-            component={PanelSliderOrTextInput}
+          <PanelSliderOrTextInput
             node={interFaceScoreDashSpec}
             property="strokeDashOffsetRatio"
             label="Inter-face Stroke Dash Offset Ratio"
             {...ratioSliderProps}
           />
-          <PanelSelect
-            valuePath="baseScoreDashSpec.strokeDashPathPattern.id"
+          <UncontrolledPanelSelect
             value={baseScoreDashSpec.strokeDashPathPattern.id}
+            name="baseScoreDashSpec.strokeDashPathPattern.id"
             label="Base Stroke Dash Pattern"
             onChange={(e) => {
               setBaseScoreDashSpecPattern(e.target.value);
             }}
             options={dashPatternOptions}
           />
-          <ControlElement
-            component={PanelSliderOrTextInput}
+          <PanelSliderOrTextInput
             node={baseScoreDashSpec}
             property="strokeDashLength"
             label="Base Stroke Dash Length"
             {...strokeLengthProps}
           />
-          <ControlElement
-            component={PanelSliderOrTextInput}
+          <PanelSliderOrTextInput
             node={baseScoreDashSpec}
             property="strokeDashOffsetRatio"
             label="Base Stroke Dash Offset Ratio"

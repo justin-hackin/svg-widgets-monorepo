@@ -4,25 +4,27 @@ import MenuItem from '@material-ui/core/MenuItem';
 import uuid from 'uuid/v1';
 import FormControl from '@material-ui/core/FormControl';
 import React from 'react';
-import { useStyles } from '../../DielineViewer/style';
-import { getLabelFromValuePath } from './PanelSliderOrTextInput';
+import { observer } from 'mobx-react';
 
-export const PanelSelect = ({
-  options, onChange, value, valuePath, displayEmpty = undefined, label = undefined, className = '',
+import { useStyles } from '../../DielineViewer/style';
+import { mstDataToProps } from '../util/mst';
+
+export const UncontrolledPanelSelect = observer(({
+  value, onChange, options, label, name, displayEmpty = undefined,
 }) => {
-  const displayedLabel = label || getLabelFromValuePath(valuePath);
   const classes = useStyles();
   const labelId = `${label}__${uuid()}`;
   const selectProps = {
     labelId,
     value,
-    name: valuePath,
+    name,
     displayEmpty,
     onChange,
   };
+  if (value === undefined) { return null; }
   return (
-    <FormControl className={`${classes.formControl} ${className}`}>
-      <InputLabel id={labelId}>{ displayedLabel }</InputLabel>
+    <FormControl className={classes.formControl}>
+      <InputLabel id={labelId}>{ label }</InputLabel>
       <Select {...selectProps}>
         {options.map(({ label: optionLabel, value: optionValue }, i) => (
           <MenuItem key={i} value={optionValue}>{optionLabel}</MenuItem>
@@ -30,4 +32,22 @@ export const PanelSelect = ({
       </Select>
     </FormControl>
   );
-};
+});
+
+export const PanelSelect = observer(({
+  node, property, options, label,
+}) => {
+  const {
+    value, setValue, label: resolvedLabel, valuePath,
+  } = mstDataToProps(node, property, label);
+  const onChange = (e) => {
+    setValue(e.target.value);
+  };
+  return (
+    <UncontrolledPanelSelect
+      {...{
+        onChange, options, value, label: resolvedLabel, name: valuePath,
+      }}
+    />
+  );
+});

@@ -1,17 +1,17 @@
 import React from 'react';
 import Divider from '@material-ui/core/Divider';
 import { Paper, Tab, Tabs } from '@material-ui/core';
+import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
 import { useStyles } from '../../../style';
-import { ControlElement } from '../../../../common/components/ControlElement';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { ShapeSelect } from '../../../../common/components/ShapeSelect';
 import { CM_TO_PIXELS_RATIO } from '../../../../common/util/geom';
-import { PanelSliderUnitView } from '../../../../common/components/PanelSliderUnitView';
+import { PanelSliderComponent } from '../../../../common/components/PanelSliderComponent';
 
 const controlsTabs = [
   {
@@ -31,7 +31,7 @@ const controlsTabs = [
   },
 ];
 
-export const PanelContent = () => {
+export const PanelContent = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
   const classes = useStyles();
@@ -47,17 +47,15 @@ export const PanelContent = () => {
   return (
     <>
       <div className={classes.shapeSection}>
-        <ControlElement
-          component={ShapeSelect}
-          node={pyramidNetSpec.pyramid}
-          property="shapeName"
+        <ShapeSelect
+          className={classes.shapeSelect}
+          value={pyramidNetSpec.pyramid.shapeName}
           onChange={(e) => {
             pyramidNetSpec.setPyramidShapeName(e.target.value);
           }}
-          label="Polyhedron"
+          name="polyhedron-shape"
         />
-        <ControlElement
-          component={PanelSliderUnitView}
+        <PanelSliderComponent
           node={pyramidNetSpec}
           property="shapeHeight__PX"
           min={20 * CM_TO_PIXELS_RATIO}
@@ -83,4 +81,4 @@ export const PanelContent = () => {
       </div>
     </>
   );
-};
+});

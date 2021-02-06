@@ -8,28 +8,28 @@ import {
   Avatar, ListItemAvatar, Typography,
 } from '@material-ui/core';
 import { startCase } from 'lodash';
+import { observer } from 'mobx-react';
 
 import { useStyles } from '../../DielineViewer/style';
-import { getLabelFromValuePath } from './PanelSliderOrTextInput';
 import { polyhedra } from '../../DielineViewer/data/polyhedra';
 import requireStatic from '../../requireStatic';
 
-export const ShapeSelect = ({
-  onChange, value, valuePath, displayEmpty = undefined, label = undefined, className = '',
+export const ShapeSelect = observer(({
+  onChange, value, name, displayEmpty = undefined, className = undefined,
 }) => {
-  const displayedLabel = label || getLabelFromValuePath(valuePath);
+  const label = 'Polyhedron';
   const classes = useStyles();
   const labelId = `${label}__${uuid()}`;
   const selectProps = {
     labelId,
     value,
-    name: valuePath,
+    name,
     displayEmpty,
     onChange,
   };
   return (
-    <FormControl className={`${classes.formControl} ${className}`}>
-      <InputLabel id={labelId}>{ displayedLabel }</InputLabel>
+    <FormControl className={`${className} ${classes.formControl}`}>
+      <InputLabel id={labelId}>{ label }</InputLabel>
       <Select {...selectProps} SelectDisplayProps={{ className: classes.shapeSelectDisplay }}>
         {Object.keys(polyhedra).map((shapeName, i) => (
           <MenuItem key={i} value={shapeName}>
@@ -49,4 +49,4 @@ export const ShapeSelect = ({
       </Select>
     </FormControl>
   );
-};
+});
