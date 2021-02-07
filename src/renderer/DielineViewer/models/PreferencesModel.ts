@@ -30,10 +30,10 @@ export const PreferencesModel = types.model({
   strokeWidth: types.number,
 }).views((self) => ({
   get scoreProps() {
-    return { stroke: self.scoreStrokeColor, strokeWidth: self.strokeWidth };
+    return { stroke: self.scoreStrokeColor, strokeWidth: self.strokeWidth, fill: 'none' };
   },
   get cutProps() {
-    return { stroke: self.cutStrokeColor, strokeWidth: self.strokeWidth };
+    return { stroke: self.cutStrokeColor, strokeWidth: self.strokeWidth, fill: 'none' };
   },
 })).actions((self) => ({
   reset() {
