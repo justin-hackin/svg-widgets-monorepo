@@ -17,10 +17,11 @@ import { reaction } from 'mobx';
 
 import { SVGWrapper } from '../data/SVGWrapper';
 import { PreferencesModel, defaultPreferences } from './PreferencesModel';
-import { PyramidNetOptionsInfo } from '../components/PyramidNet';
-import { CylinderLightboxWidgetOptionsInfo } from '../CylinderLightbox';
+import { PyramidNetOptionsInfo } from '../widgets/PyramidNet';
+import { CylinderLightboxWidgetOptionsInfo } from '../widgets/CylinderLightbox';
 import { WINDOWS } from '../../../main/ipc';
 import { CustomBrowserWindowType } from '../../../main';
+import { PyramidNetTestTabsOptionsInfo } from '../widgets/PyramidNetTestTabs';
 
 const getPreferencesStore = () => {
   const preferencesStore = PreferencesModel.create(defaultPreferences);

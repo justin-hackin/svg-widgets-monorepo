@@ -22,11 +22,11 @@ import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 
 import { useStyles } from '../../style';
 import { EVENTS } from '../../../../main/ipc';
-import { HistoryButtons } from '../PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
+import { HistoryButtons } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 import { SimpleDialog } from '../../../common/components/SimpleDialog';
-import { PreferencesControls } from '../PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
+import { PreferencesControls } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
 
 export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, AdditionalToolbarContent, PanelContent }) => {
   // @ts-ignore

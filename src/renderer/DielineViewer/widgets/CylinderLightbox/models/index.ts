@@ -5,11 +5,11 @@ import {
   CM_TO_PIXELS_RATIO,
   getOriginPoint, lineLerp,
   pointFromPolar, radToDeg, sumPoints,
-} from '../../../common/util/geom';
-import { DestinationCommand, PathData } from '../../util/PathData';
-import { UndoManagerWithGroupState } from '../../../common/components/UndoManagerWithGroupState';
-import { closedPolygonPath } from '../../util/shapes/generic';
-import { subtractDValues, unifyDValues } from '../../../common/util/path-boolean';
+} from '../../../../common/util/geom';
+import { DestinationCommand, PathData } from '../../../util/PathData';
+import { UndoManagerWithGroupState } from '../../../../common/components/UndoManagerWithGroupState';
+import { closedPolygonPath } from '../../../util/shapes/generic';
+import { subtractDValues, unifyDValues } from '../../../../common/util/path-boolean';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
