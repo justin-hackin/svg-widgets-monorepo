@@ -34,6 +34,7 @@ export const WorkspaceModel = types.model({
   widgetOptions: types.frozen({
     'polyhedral-net': PyramidNetOptionsInfo,
     'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
+    'polyhedral-net-test-tabs': PyramidNetTestTabsOptionsInfo,
   }),
   selectedWidgetName: 'polyhedral-net',
 })

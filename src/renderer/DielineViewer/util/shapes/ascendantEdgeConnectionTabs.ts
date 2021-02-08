@@ -109,7 +109,7 @@ export const ascendantEdgeConnectionTabs = (
   return commands;
 };
 
-interface AscendantEdgeConnectionPaths {
+export interface AscendantEdgeConnectionPaths {
   female: {
     cut: PathData,
     score: PathData,

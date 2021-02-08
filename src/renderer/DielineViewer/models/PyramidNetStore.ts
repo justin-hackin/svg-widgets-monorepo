@@ -12,15 +12,19 @@ import {
   CM_TO_PIXELS_RATIO,
   degToRad,
   getTextureTransformMatrix, hingedPlot, hingedPlotByProjectionDistance,
-  offsetPolygonPoints,
+  offsetPolygonPoints, PointLike,
   polygonPointsGivenAnglesAndSides, radToDeg,
   RawPoint,
-  scalePoint,
+  scalePoint, sumPoints,
   triangleAnglesGivenSides,
 } from '../../common/util/geom';
 import { EVENTS } from '../../../main/ipc';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
-import { ascendantEdgeConnectionTabs, AscendantEdgeTabsModel } from '../util/shapes/ascendantEdgeConnectionTabs';
+import {
+  AscendantEdgeConnectionPaths,
+  ascendantEdgeConnectionTabs,
+  AscendantEdgeTabsModel,
+} from '../util/shapes/ascendantEdgeConnectionTabs';
 import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
 import { DashPatternModel, defaultStrokeDashSpec, strokeDashPath } from '../util/shapes/strokeDashPath';
 import { boundingViewBoxAttrs } from '../../../common/util/svg';
@@ -45,6 +49,21 @@ export const ImageFaceDecorationPatternModel = types.model({
   sourceFileName: types.string,
 });
 export interface IImageFaceDecorationPatternModel extends Instance<typeof ImageFaceDecorationPatternModel> {}
+
+const applyFlap = (startPt:PointLike, endPt:PointLike,
+  path: PathData, flapDirectionIsUp: boolean,
+  handleFlapDepth: number, testTabHandleFlapRounding: number) => {
+  const startFlapEdge = { x: 0, y: (flapDirectionIsUp ? 1 : -1) * handleFlapDepth };
+  const flapPortion = roundedEdgePath([
+    endPt,
+    sumPoints(endPt, startFlapEdge),
+    sumPoints(startPt, startFlapEdge),
+    startPt,
+  ], testTabHandleFlapRounding);
+  path
+    .concatPath(flapPortion.sliceCommandsDangerously(1, -1))
+    .close();
+};
 
 // from texture editor
 export const TextureFaceDecorationModel = types.model({
@@ -94,6 +113,10 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   // however, it needs to be persisted in the model because
   // it can also be defined by cut hole path import via templated svg file
 })
+  .volatile(() => ({
+    testTabHandleFlapDepth: 2,
+    testTabHandleFlapRounding: 0.5,
+  }))
   .views((self) => ({
     get tabIntervalRatios() {
       const {
@@ -184,14 +207,49 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         ),
       );
     },
+
+    get baseTabDepth() {
+      return self.baseEdgeTabsSpec.tabDepthToAscendantTabDepth * this.ascendantEdgeTabDepth;
+    },
+
     get masterBaseTab() {
       return baseEdgeConnectionTab(
         this.faceBoundaryPoints[1], this.faceBoundaryPoints[2],
-        this.ascendantEdgeTabDepth, self.baseEdgeTabsSpec, self.baseScoreDashSpec,
+        this.baseTabDepth, self.baseEdgeTabsSpec, self.baseScoreDashSpec,
       );
     },
 
-    get femaleAscendantFlap() {
+    get testBaseTab() {
+      const startPt = this.faceBoundaryPoints[0];
+      const endPt = { x: this.actualFaceEdgeLengths[1], y: 0 };
+      const { cut, score } = baseEdgeConnectionTab(
+        this.faceBoundaryPoints[0], endPt,
+        this.baseTabDepth, self.baseEdgeTabsSpec, self.baseScoreDashSpec,
+      );
+      applyFlap(startPt, endPt, cut, false,
+        self.testTabHandleFlapDepth * this.baseTabDepth, self.testTabHandleFlapRounding);
+      return { cut, score };
+    },
+
+    get testAscendantTab(): AscendantEdgeConnectionPaths {
+      const startPt = this.faceBoundaryPoints[0];
+      const endPt = { x: this.actualFaceEdgeLengths[0], y: 0 };
+
+      const { male, female } = ascendantEdgeConnectionTabs(
+        startPt, endPt,
+        self.ascendantEdgeTabsSpec, self.interFaceScoreDashSpec, this.tabIntervalRatios, this.tabGapIntervalRatios,
+      );
+      female.cut
+        .concatPath(this.testTabFemaleAscendantFlap);
+
+      applyFlap(startPt, endPt, male.cut, false,
+        self.testTabHandleFlapDepth * this.baseTabDepth, self.testTabHandleFlapRounding);
+      applyFlap(endPt, startPt, female.cut, true,
+        self.testTabHandleFlapDepth * this.baseTabDepth, self.testTabHandleFlapRounding);
+      return { male, female };
+    },
+
+    computeFemaleAscendantFlap(start, end) {
       // female tab outer flap
       const remainderGapAngle = 2 * Math.PI - this.faceInteriorAngles[2] * self.pyramid.geometry.faceCount;
       if (remainderGapAngle < 0) {
@@ -202,17 +260,26 @@ export const PyramidNetModel = types.model('Pyramid Net', {
 
       const flapApexAngle = Math.min(remainderGapAngle - FLAP_APEX_IMPINGE_MARGIN, this.faceInteriorAngles[2]);
       const outerPt1 = hingedPlotByProjectionDistance(
-        this.faceBoundaryPoints[1], this.faceBoundaryPoints[0], flapApexAngle, -this.ascendantEdgeTabDepth,
+        end, start, flapApexAngle, -this.ascendantEdgeTabDepth,
       );
       const outerPt2 = hingedPlotByProjectionDistance(
-        this.faceBoundaryPoints[0], this.faceBoundaryPoints[1], -FLAP_BASE_ANGLE, this.ascendantEdgeTabDepth,
+        start, end, -FLAP_BASE_ANGLE, this.ascendantEdgeTabDepth,
       );
 
       return roundedEdgePath(
-        [this.faceBoundaryPoints[0], outerPt1, outerPt2, this.faceBoundaryPoints[1]],
+        [start, outerPt1, outerPt2, end],
         self.ascendantEdgeTabsSpec.flapRoundingDistanceRatio,
       );
     },
+
+    get femaleAscendantFlap() {
+      return this.computeFemaleAscendantFlap(this.faceBoundaryPoints[0], this.faceBoundaryPoints[1]);
+    },
+
+    get testTabFemaleAscendantFlap() {
+      return this.computeFemaleAscendantFlap({ x: this.actualFaceEdgeLengths[0], y: 0 }, this.faceBoundaryPoints[0]);
+    },
+
     get nonTabbedAscendantScores() {
       // inter-face scoring
       return this.faceTabFenceposts.slice(1, -1).reduce((path, endPt) => {
@@ -241,7 +308,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         baseEdgeTabsSpec,
       } = self;
       const {
-        faceInteriorAngles, ascendantEdgeTabDepth, faceTabFenceposts,
+        faceInteriorAngles, baseTabDepth, faceTabFenceposts,
       } = this;
       const cut = new PathData();
       const score = new PathData();
@@ -252,7 +319,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
         const edgePt2 = faceTabFenceposts[index + 1];
         const baseEdgeTab = baseEdgeConnectionTab(
-          edgePt1, edgePt2, ascendantEdgeTabDepth, baseEdgeTabsSpec, baseScoreDashSpec,
+          edgePt1, edgePt2, baseTabDepth, baseEdgeTabsSpec, baseScoreDashSpec,
         );
         cut.concatPath(baseEdgeTab.cut);
         score.concatPath(baseEdgeTab.score);

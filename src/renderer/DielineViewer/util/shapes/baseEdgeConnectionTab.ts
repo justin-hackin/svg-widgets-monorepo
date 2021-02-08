@@ -58,10 +58,9 @@ export interface IBaseEdgeTabsModel extends Instance<typeof BaseEdgeTabsModel> {
 
 export function baseEdgeConnectionTab(
   start: RawPoint, end: RawPoint,
-  ascendantEdgeTabDepth, tabSpec: IBaseEdgeTabsModel, scoreDashSpec: IDashPatternModel,
+  tabDepth, tabSpec: IBaseEdgeTabsModel, scoreDashSpec: IDashPatternModel,
 ): BaseEdgeConnectionTab {
   const {
-    tabDepthToAscendantTabDepth,
     holeDepthToTabDepth,
     holeTaper,
     holeBreadthToHalfWidth,
@@ -73,7 +72,6 @@ export function baseEdgeConnectionTab(
     holeTabClearance,
   } = tabSpec;
 
-  const tabDepth = tabDepthToAscendantTabDepth * ascendantEdgeTabDepth;
   const cutPath = new PathData();
   const scorePath = new PathData();
 
