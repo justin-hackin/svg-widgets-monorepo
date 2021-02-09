@@ -11,7 +11,7 @@ import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { ShapeSelect } from '../../../../common/components/ShapeSelect';
 import { CM_TO_PIXELS_RATIO } from '../../../../common/util/geom';
-import { PanelSliderComponent } from '../../../../common/components/PanelSliderComponent';
+import { PanelSliderOrTextInput } from '../../../../common/components/PanelSliderOrTextInput';
 
 const controlsTabs = [
   {
@@ -55,7 +55,7 @@ export const PanelContent = observer(() => {
           }}
           name="polyhedron-shape"
         />
-        <PanelSliderComponent
+        <PanelSliderOrTextInput
           node={pyramidNetSpec}
           property="shapeHeight__PX"
           min={20 * CM_TO_PIXELS_RATIO}
