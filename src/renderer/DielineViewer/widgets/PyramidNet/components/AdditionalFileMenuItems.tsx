@@ -2,6 +2,7 @@ import React from 'react';
 import { ListItemIcon, MenuItem, Typography } from '@material-ui/core';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
+import HowToVoteIcon from '@material-ui/icons/HowToVote';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
@@ -11,6 +12,7 @@ import { useStyles } from '../../../style';
 
 export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const workspaceStore = useWorkspaceMst();
+  const preferencesStore = workspaceStore.preferences;
   const classes = useStyles();
   const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
   return (
@@ -41,6 +43,19 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
           <OpenInBrowserIcon fontSize="small" />
         </ListItemIcon>
         <Typography variant="inherit">Import face cut path from template</Typography>
+      </MenuItem>
+      <MenuItem onClick={async () => {
+        await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderTestTabsToString(store, preferencesStore), {
+          message: 'Save tab tester',
+          defaultPath: `${store.getFileBasename()}--test-tabs.svg`,
+        });
+        resetFileMenuRef();
+      }}
+      >
+        <ListItemIcon className={classes.listItemIcon}>
+          <HowToVoteIcon fontSize="small" />
+        </ListItemIcon>
+        <Typography variant="inherit">Download tab tester SVG</Typography>
       </MenuItem>
     </>
   );

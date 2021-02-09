@@ -12,6 +12,8 @@ import { boundingViewBoxAttrs, pathDToViewBoxStr } from '../../../common/util/sv
 import { dashPatterns, DashPatternsModel } from '../data/dash-patterns';
 import { EVENTS } from '../../../main/ipc';
 import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
+import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTestTabsSvg';
+import { SVGWrapper } from '../data/SVGWrapper';
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
   const {
@@ -50,6 +52,15 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   renderDecorationBoundaryToString():string {
     // @ts-ignore
     return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: self }));
+  },
+
+  renderTestTabsToString(widgetStore, preferencesStore): string {
+    // @ts-ignore
+    return ReactDOMServer.renderToString(
+      <SVGWrapper>
+        <PyramidNetTestTabs preferencesStore={preferencesStore} widgetStore={widgetStore} />
+      </SVGWrapper>,
+    );
   },
 
   getFileBasename() {
