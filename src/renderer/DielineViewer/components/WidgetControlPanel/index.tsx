@@ -54,14 +54,12 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   };
 
   const openSpecHandler = async () => {
-    await globalThis.ipcRenderer.invoke(EVENTS.LOAD_SNAPSHOT).then(({ fileData, filePath }) => {
-      // falsy if file dialog cancelled
-      if (fileData) {
-        applySnapshot(store.shapeDefinition, fileData);
-        workspaceStore.setCurrentFilePath(filePath);
-        store.history.clear();
-      }
-    });
+    const { fileData, filePath } = await globalThis.ipcRenderer.invoke(EVENTS.LOAD_SNAPSHOT);
+    if (fileData) {
+      applySnapshot(store.shapeDefinition, fileData);
+      workspaceStore.setCurrentFilePath(filePath);
+      store.history.clear();
+    }
     resetFileMenuRef();
   };
 
@@ -72,8 +70,9 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
       getSnapshot(store.shapeDefinition),
       { message: 'Save widget svg with json data', defaultPath: `${store.getFileBasename()}.svg` },
     );
-    if (!filePath) { return; }
-    workspaceStore.setCurrentFilePath(filePath);
+    if (filePath) {
+      workspaceStore.setCurrentFilePath(filePath);
+    }
     resetFileMenuRef();
   };
 

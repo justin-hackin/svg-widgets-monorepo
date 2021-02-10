@@ -69,7 +69,7 @@ export const WorkspaceModel = types.model({
       return getType(this.selectedStore.shapeDefinition).name;
     },
     get currentFileName() {
-      return self.currentFilePath ? parseFilepath(self.currentFilePath).base : `New ${this.selectedShapeName}`;
+      return self.currentFilePath ? parseFilepath(self.currentFilePath).name : `New ${this.selectedShapeName}`;
     },
     get titleBarText() {
       return `${self.isPristine ? '' : '*'}${this.currentFileName}`;

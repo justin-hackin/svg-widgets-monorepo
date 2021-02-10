@@ -77,19 +77,19 @@ export const setupIpc = (ipcMain) => {
     return { filePath, fileString };
   };
 
-  const writeModelAndSvg = async (svgContent, modelData, svgFilePath) => {
-    const svgFileName = path.basename(svgFilePath, '.svg');
-    const jsonPath = path.join(path.dirname(svgFilePath), `${svgFileName}.json`);
+  const writeModelAndSvg = async (svgContent, modelData, jsonFilePath) => {
+    const fileName = path.basename(jsonFilePath, '.json');
+    const svgFilePath = path.join(path.dirname(jsonFilePath), `${fileName}.svg`);
     await Promise.all([
       fsPromises.writeFile(svgFilePath, svgContent),
-      fsPromises.writeFile(jsonPath, formattedJSONStringify(modelData))]);
-    return svgFilePath;
+      fsPromises.writeFile(jsonFilePath, formattedJSONStringify(modelData))]);
+    return jsonFilePath;
   };
 
   ipcMain.handle(EVENTS.DIALOG_SAVE_MODEL_WITH_SVG,
     (e, svgContent, modelData, dialogOptions) => dialog.showSaveDialog({
       ...dialogOptions,
-      filters: svgFilters,
+      filters: jsonFilters,
     }).then(({ canceled, filePath }) => {
       if (canceled) {
         return null;
