@@ -1,5 +1,5 @@
 const {
-  app, BrowserWindow, BrowserWindowConstructorOptions, nativeImage, ipcMain, screen: electronScreen,
+  app, BrowserWindow, BrowserWindowConstructorOptions, nativeImage, nativeTheme, ipcMain, screen: electronScreen,
 } = require('electron');
 const path = require('path');
 const { format } = require('url');
@@ -71,6 +71,7 @@ app.on('ready', async () => {
       height,
       show: false,
       icon,
+      darkTheme: true,
       webPreferences: {
         webSecurity: false,
         nodeIntegration: true,
@@ -79,6 +80,8 @@ app.on('ready', async () => {
       },
       ...config,
     });
+
+    nativeTheme.themeSource = 'dark';
     browserWindows[route].setMenu(null);
     browserWindows[route].route = route;
 
