@@ -16,7 +16,6 @@ import {
 } from '../../../models/PyramidNetStore';
 import { closedPolygonPath } from '../../../util/shapes/generic';
 import { theme } from '../../../../TextureTransformEditor';
-import { PathData } from '../../../util/PathData';
 
 const DielineGroup = ({ children }) => (
   <g {...{
@@ -166,7 +165,8 @@ export const DielinesLayer = observer(({
     pyramidNetSpec: {
       masterBaseTabCut,
       masterBaseTabScore,
-      makePaths: { cut, score },
+      netPaths: { cut, score },
+      decorationCutPath,
       texturePathD, pathScaleMatrix, borderInsetFaceHoleTransformMatrix, faceInteriorAngles,
       faceBoundaryPoints,
       pyramid: { geometry: { faceCount } },
@@ -243,8 +243,10 @@ export const DielinesLayer = observer(({
         <g transform={fitToCanvasTranslationStr}>
           {useClones ? (<CloneContent />) : (
             <>
-              <path className="score" {...scoreProps} d={score.getD()} />
-              <path className="cut" {...cutProps} d={cut.getD()} />
+              <path className="net-score" {...scoreProps} d={score.getD()} />
+              <path className="net-cut" {...cutProps} d={cut.getD()} />
+              { decorationCutPath
+                && (<path className="face-decoration-cut" {...cutProps} d={decorationCutPath.getD()} />)}
             </>
           )}
         </g>

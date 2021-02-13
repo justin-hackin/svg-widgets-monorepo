@@ -306,17 +306,9 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       return ascendantTabs;
     },
 
-    get makePaths() {
-      const {
-        pyramid: {
-          geometry: { faceCount },
-        },
-        baseScoreDashSpec,
-        baseEdgeTabsSpec,
-      } = self;
-      const {
-        faceInteriorAngles, baseTabDepth, faceTabFenceposts,
-      } = this;
+    get netPaths() {
+      const { baseScoreDashSpec, baseEdgeTabsSpec } = self;
+      const { baseTabDepth, faceTabFenceposts } = this;
       const score = new PathData();
       const innerCut = new PathData();
       const boundaryCut = new PathData();
@@ -341,24 +333,27 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       // female inner
       innerCut.concatPath(this.ascendantEdgeTabs.female.cut);
       score.concatPath(this.ascendantEdgeTabs.female.score);
-
-      if (this.texturePathD) {
-        const insetDecorationPath = (new PathData(this.texturePathD))
-          .transform(`${
-            this.borderInsetFaceHoleTransformMatrix.toString()} ${
-            this.pathScaleMatrix.toString()}`);
-        range(faceCount).forEach((index) => {
-          const isOdd = !!(index % 2);
-          const xScale = isOdd ? -1 : 1;
-          const asymetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
-          const rotationRad = -1 * xScale * index * faceInteriorAngles[2] + asymetryNudge;
-          const tiledDecorationPath = (new PathData()).concatPath(insetDecorationPath)
-            .transform(`scale(${xScale}, 1) rotate(${radToDeg(rotationRad)})`);
-          innerCut.concatPath(tiledDecorationPath);
-        });
-      }
       const cut = (new PathData()).concatPath(innerCut).concatPath(boundaryCut);
       return { cut, score };
+    },
+
+    get decorationCutPath():PathData {
+      if (!this.texturePathD) { return null; }
+      const cut = new PathData();
+      const insetDecorationPath = (new PathData(this.texturePathD))
+        .transform(`${
+          this.borderInsetFaceHoleTransformMatrix.toString()} ${
+          this.pathScaleMatrix.toString()}`);
+      range(self.pyramid.geometry.faceCount).forEach((index) => {
+        const isOdd = !!(index % 2);
+        const xScale = isOdd ? -1 : 1;
+        const asymetryNudge = isOdd ? this.faceInteriorAngles[2] - 2 * ((Math.PI / 2) - this.faceInteriorAngles[0]) : 0;
+        const rotationRad = -1 * xScale * index * this.faceInteriorAngles[2] + asymetryNudge;
+        const tiledDecorationPath = insetDecorationPath.clone()
+          .transform(`scale(${xScale}, 1) rotate(${radToDeg(rotationRad)})`);
+        cut.concatPath(tiledDecorationPath);
+      });
+      return cut;
     },
     // get borderInsetFaceHoleTransform() {
     //   return `translate(${self.insetPolygon.vertices[0].x}, ${self.insetPolygon.vertices[0].y}) scale(${
