@@ -12,7 +12,7 @@ import {
   CM_TO_PIXELS_RATIO,
   degToRad,
   getTextureTransformMatrix, hingedPlot, hingedPlotByProjectionDistance,
-  offsetPolygonPoints, PointLike,
+  offsetPolygonPoints,
   polygonPointsGivenAnglesAndSides, radToDeg,
   RawPoint,
   scalePoint, sumPoints,
@@ -50,19 +50,18 @@ export const ImageFaceDecorationPatternModel = types.model({
 });
 export interface IImageFaceDecorationPatternModel extends Instance<typeof ImageFaceDecorationPatternModel> {}
 
-const applyFlap = (startPt:PointLike, endPt:PointLike,
+// TODO: this could cover cases where last segment open/close is not a horizontal line (use hingePlot for startFlapEdge)
+const applyFlap = (
   path: PathData, flapDirectionIsUp: boolean,
-  handleFlapDepth: number, testTabHandleFlapRounding: number) => {
+  handleFlapDepth: number, testTabHandleFlapRounding: number,
+) => {
+  const startPt = path.lastPosition;
+  const endPt = path.currentSegmentStart;
   const startFlapEdge = { x: 0, y: (flapDirectionIsUp ? 1 : -1) * handleFlapDepth };
-  const flapPortion = roundedEdgePath([
-    endPt,
-    sumPoints(endPt, startFlapEdge),
+  path.curvedLineSegments([
     sumPoints(startPt, startFlapEdge),
-    startPt,
-  ], testTabHandleFlapRounding);
-  path
-    .concatPath(flapPortion.sliceCommandsDangerously(1, -1))
-    .close();
+    sumPoints(endPt, startFlapEdge),
+  ], testTabHandleFlapRounding, true);
 };
 
 // from texture editor
@@ -219,14 +218,22 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       );
     },
 
+    get masterBaseTabCut() {
+      return (new PathData()).concatPath(this.masterBaseTab.innerCut).concatPath(this.masterBaseTab.boundaryCut);
+    },
+
+    get masterBaseTabScore() {
+      return this.masterBaseTab.score;
+    },
+
     get testBaseTab() {
-      const startPt = this.faceBoundaryPoints[0];
       const endPt = { x: this.actualFaceEdgeLengths[1], y: 0 };
-      const { cut, score } = baseEdgeConnectionTab(
+      const { boundaryCut, innerCut, score } = baseEdgeConnectionTab(
         this.faceBoundaryPoints[0], endPt,
         this.baseTabDepth, self.baseEdgeTabsSpec, self.baseScoreDashSpec,
       );
-      applyFlap(startPt, endPt, cut, false,
+      const cut = (new PathData()).concatPath(innerCut).concatPath(boundaryCut);
+      applyFlap(cut, false,
         self.testTabHandleFlapDepth * this.baseTabDepth, self.testTabHandleFlapRounding);
       return { cut, score };
     },
@@ -242,9 +249,9 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       female.cut
         .concatPath(this.testTabFemaleAscendantFlap);
 
-      applyFlap(startPt, endPt, male.cut, false,
+      applyFlap(male.cut, false,
         self.testTabHandleFlapDepth * this.baseTabDepth, self.testTabHandleFlapRounding);
-      applyFlap(endPt, startPt, female.cut, true,
+      applyFlap(female.cut, true,
         self.testTabHandleFlapDepth * this.baseTabDepth, self.testTabHandleFlapRounding);
       return { male, female };
     },
@@ -310,27 +317,29 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       const {
         faceInteriorAngles, baseTabDepth, faceTabFenceposts,
       } = this;
-      const cut = new PathData();
       const score = new PathData();
-      score.concatPath(this.nonTabbedAscendantScores);
-      cut.concatPath(this.femaleAscendantFlap);
+      const innerCut = new PathData();
+      const boundaryCut = new PathData();
 
+      score.concatPath(this.nonTabbedAscendantScores);
+      boundaryCut.concatPath(this.femaleAscendantFlap);
       // base edge tabs
       faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
         const edgePt2 = faceTabFenceposts[index + 1];
         const baseEdgeTab = baseEdgeConnectionTab(
           edgePt1, edgePt2, baseTabDepth, baseEdgeTabsSpec, baseScoreDashSpec,
         );
-        cut.concatPath(baseEdgeTab.cut);
+        boundaryCut.weldPath(baseEdgeTab.boundaryCut);
+        innerCut.concatPath(baseEdgeTab.innerCut);
         score.concatPath(baseEdgeTab.score);
       });
 
       // male tabs
-      cut.concatPath(this.ascendantEdgeTabs.male.cut);
+      boundaryCut.weldPath(this.ascendantEdgeTabs.male.cut, true);
       score.concatPath(this.ascendantEdgeTabs.male.score);
 
       // female inner
-      cut.concatPath(this.ascendantEdgeTabs.female.cut);
+      innerCut.concatPath(this.ascendantEdgeTabs.female.cut);
       score.concatPath(this.ascendantEdgeTabs.female.score);
 
       if (this.texturePathD) {
@@ -345,9 +354,10 @@ export const PyramidNetModel = types.model('Pyramid Net', {
           const rotationRad = -1 * xScale * index * faceInteriorAngles[2] + asymetryNudge;
           const tiledDecorationPath = (new PathData()).concatPath(insetDecorationPath)
             .transform(`scale(${xScale}, 1) rotate(${radToDeg(rotationRad)})`);
-          cut.concatPath(tiledDecorationPath);
+          innerCut.concatPath(tiledDecorationPath);
         });
       }
+      const cut = (new PathData()).concatPath(innerCut).concatPath(boundaryCut);
       return { cut, score };
     },
     // get borderInsetFaceHoleTransform() {

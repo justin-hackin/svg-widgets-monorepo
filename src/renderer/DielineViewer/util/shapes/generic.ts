@@ -27,8 +27,10 @@ const minSegmentLength = (points) => {
 export const roundedEdgePath = (points: RoundPointPointsItem[], retractionDistanceRatio: number): PathData => {
   const path = new PathData();
   const retractionDistance = (minSegmentLength(points) * retractionDistanceRatio) / 2;
-  const pointOfRoundPoint = (roundPoint: RoundPointPointsItem):RawPoint => (isPointLike(roundPoint)
-    ? roundPoint : roundPoint.point);
+  const pointOfRoundPoint = (roundPoint: RoundPointPointsItem):RawPoint => ({
+    ...(isPointLike(roundPoint)
+      ? roundPoint : roundPoint.point),
+  });
   path.move(pointOfRoundPoint(points[0]));
   points.slice(1, -1).reduce((acc: PathData, item, pointIndex) => {
     const thisPoint = pointOfRoundPoint(item);

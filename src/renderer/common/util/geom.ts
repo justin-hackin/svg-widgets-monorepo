@@ -87,6 +87,9 @@ export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);
 export const pointFromPolar = (theta, length):RawPoint => ({
   x: Math.cos(theta) * length, y: Math.sin(theta) * length,
 });
+export const pointsAreEqual = (pt1, pt2, marginOfError = 0.01) => (
+  Math.abs(pt1.x - pt2.x) < marginOfError && Math.abs(pt1.y - pt2.y) < marginOfError);
+
 export const distanceFromOrigin = ({ x, y }) => Math.sqrt(x ** 2 + y ** 2);
 export const angleRelativeToOrigin = ({ x, y }) => Math.atan2(y, x);
 

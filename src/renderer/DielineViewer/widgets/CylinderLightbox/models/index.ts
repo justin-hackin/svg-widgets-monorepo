@@ -170,9 +170,8 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
         .line({ x: secondFootStart, y: -self.materialThickness__PX }) // crotch end
         .line({ x: secondFootStart, y: 0 }) // second foot start
         .line({ x: secondFootEnd, y: 0 }) // second foot end
-        // slight redundancy of line to move point instead of just close
-        .curvedLineSegments([{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }, getOriginPoint()], 0.5)
-        .close();
+        .curvedLineSegments([{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
+          0.5, true);
     },
     get designBoundaryRadius() {
       return this.innerRadius - this.actualHolderTabFeetLength;

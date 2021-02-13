@@ -15,7 +15,8 @@ import { VERY_LARGE_NUMBER } from '../../../common/constants';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,
-  cut: PathData,
+  innerCut: PathData,
+  boundaryCut: PathData,
 }
 
 // "base" is crease upon which tab it folds
@@ -72,8 +73,9 @@ export function baseEdgeConnectionTab(
     holeTabClearance,
   } = tabSpec;
 
-  const cutPath = new PathData();
-  const scorePath = new PathData();
+  const boundaryCut = new PathData();
+  const innerCut = new PathData();
+  const score = new PathData();
 
   const mid = hingedPlotLerp(start, end, 0, 0.5);
   const holeHandleThicknessRatio = (1 - holeBreadthToHalfWidth) / 2;
@@ -106,11 +108,10 @@ export function baseEdgeConnectionTab(
     finDepth / finTraversal, holeTheta,
   );
 
-  cutPath
+  innerCut
     .move(holeBases[0])
     .line(holeBases[1])
-    .curvedLineSegments([holeEdges[1], holeEdges[0], holeBases[0]], roundingDistanceRatio)
-    .close();
+    .curvedLineSegments([holeEdges[1], holeEdges[0]], roundingDistanceRatio, true);
 
   const handleEdges = [
     hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
@@ -132,19 +133,19 @@ export function baseEdgeConnectionTab(
     handleCornerPoints.push(handleValleyEdges[0], handleValleyDip, handleValleyEdges[1]);
   }
   handleCornerPoints.push(handleEdges[1], finBases[0]);
-  cutPath.move(start).curvedLineSegments(handleCornerPoints, roundingDistanceRatio)
+  boundaryCut.move(start).curvedLineSegments(handleCornerPoints, roundingDistanceRatio)
     .curvedLineSegments(
       [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBases[1]], roundingDistanceRatio,
     )
     .line(end);
 
-  scorePath.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));
+  score.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));
   if (scoreTabMidline) {
     // TODO: this score doesn't meet with rounded tab edges, use bezier formula to find match
-    scorePath.concatPath(strokeDashPath(tabMidpoints[0], tabMidpoints[1], scoreDashSpec));
+    score.concatPath(strokeDashPath(tabMidpoints[0], tabMidpoints[1], scoreDashSpec));
   }
-  scorePath.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
-  scorePath.concatPath(strokeDashPath(holeBases[1], finBases[0], scoreDashSpec));
+  score.concatPath(strokeDashPath(start, holeBases[0], scoreDashSpec));
+  score.concatPath(strokeDashPath(holeBases[1], finBases[0], scoreDashSpec));
 
-  return { cut: cutPath, score: scorePath };
+  return { innerCut, boundaryCut, score };
 }

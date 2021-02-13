@@ -1,8 +1,9 @@
-import { cloneDeep, includes } from 'lodash';
+import { cloneDeep, includes, last } from 'lodash';
 // @ts-ignore
 import svgpath from 'svgpath';
+import { reverse } from 'svg-path-reverse';
 import {
-  castCoordToRawPoint, Coord, RawPoint, rawPointToString,
+  castCoordToRawPoint, Coord, PointLike, pointsAreEqual, RawPoint, rawPointToString,
 } from '../../common/util/geom';
 import { roundedEdgePath } from './shapes/generic';
 
@@ -183,11 +184,11 @@ const parseSVG = (d) => {
 const composeSVG = (commands) => commands.map((command) => commandToString(command)).join(' ');
 
 export class PathData {
-  private _commands: Command[];
+  public commands: Command[];
 
   constructor(d?: string) {
     // TODO: check instance type
-    this._commands = d ? parseSVG(d) : [];
+    this.commands = d ? parseSVG(d) : [];
     return this;
   }
 
@@ -204,55 +205,51 @@ export class PathData {
   private _assertLastCommandIsBezier() {
     this._assertLastCommandExists();
     // @ts-ignore
-    const lastCommand = this._commands[this._commands.length - 1];
+    const lastCommand = this.commands[this.commands.length - 1];
     if (isBezierCommand(lastCommand)) {
       throw new Error(`expected last command to be a bezier (command code one of ${BEZIER_COMMAND_CODES
       }) but instead saw ${lastCommand.code}`);
     }
   }
 
-  get commands() {
-    return this._commands;
-  }
-
   move(to:Coord):PathData {
-    this._commands.push(COMMAND_FACTORY.M(to));
+    this.commands.push(COMMAND_FACTORY.M(to));
     return this;
   }
 
   line(to:Coord):PathData {
     this._assertLastCommandExists();
-    this._commands.push(COMMAND_FACTORY.L(to));
+    this.commands.push(COMMAND_FACTORY.L(to));
     return this;
   }
 
   close():PathData {
     this._assertLastCommandExists();
-    this._commands.push(COMMAND_FACTORY.Z());
+    this.commands.push(COMMAND_FACTORY.Z());
     return this;
   }
 
   cubicBezier(ctrl1: Coord, ctrl2: Coord, to: Coord):PathData {
     this._assertLastCommandExists();
-    this._commands.push(COMMAND_FACTORY.C(ctrl1, ctrl2, to));
+    this.commands.push(COMMAND_FACTORY.C(ctrl1, ctrl2, to));
     return this;
   }
 
   smoothCubicBezier(ctrl2: Coord, to: Coord):PathData {
     this._assertLastCommandIsBezier();
-    this._commands.push(COMMAND_FACTORY.S(ctrl2, to));
+    this.commands.push(COMMAND_FACTORY.S(ctrl2, to));
     return this;
   }
 
   quadraticBezier(ctrl1: Coord, to: Coord):PathData {
     this._assertLastCommandExists();
-    this._commands.push(COMMAND_FACTORY.Q(ctrl1, to));
+    this.commands.push(COMMAND_FACTORY.Q(ctrl1, to));
     return this;
   }
 
   smoothQuadraticBezier(to: Coord):PathData {
     this._assertLastCommandIsBezier();
-    this._commands.push(COMMAND_FACTORY.T(to));
+    this.commands.push(COMMAND_FACTORY.T(to));
     return this;
   }
 
@@ -260,65 +257,148 @@ export class PathData {
     radiusX:number, radiusY:number, xAxisRotation:number, largeArcFlag:boolean, sweepFlag:boolean, to: Coord,
   ):PathData {
     this._assertLastCommandExists();
-    this._commands.push(COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, largeArcFlag, sweepFlag, to));
+    this.commands.push(COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, largeArcFlag, sweepFlag, to));
     return this;
   }
 
-  getLastMoveIndex(index) {
-    for (let i = index - 1; i >= 0; i -= 1) {
-      if (this._commands[i].code.toUpperCase() === 'M') {
-        return i;
-      }
-    }
-    return null;
+  clone() {
+    return (new PathData()).concatPath(this);
   }
 
-  concatCommands(_commands):PathData {
-    this._commands = this._commands.concat(cloneDeep(_commands));
+  reverse():PathData {
+    this.commands = parseSVG(reverse(this.getD()));
+    return this;
+  }
+
+  getSegmentStartIndex(atIndex = undefined):number {
+    const index = atIndex || this.commands.length - 1;
+    for (let i = index - 1; i >= 0; i -= 1) {
+      if (this.commands[i].code === 'M') {
+        return i;
+      }
+      // use recursive because M0,0 L1,1 Z L2,2 Z L3,3 is still valid svg (based on Inkscape manual test not formal def)
+      if (this.commands[i].code === 'Z') {
+        return this.getSegmentStartIndex(i - 1);
+      }
+    }
+    throw new Error(
+      `PathData getSegmentStartIndex: failed to find a start position before index "${index
+      }". Do you have a PathData instance without any Z or M commands in it?`,
+    );
+  }
+
+  get currentSegmentStart(): PointLike {
+    return (this.commands[this.getSegmentStartIndex()] as DestinationCommand).to;
+  }
+
+  get lastPosition():PointLike {
+    return this.lastCommand.code === CommandCodes.Z
+      ? this.currentSegmentStart : (this.lastCommand as DestinationCommand).to;
+  }
+
+  concatCommands(commands):PathData {
+    this.commands = this.commands.concat(cloneDeep(commands));
     return this;
   }
 
   concatPath(path):PathData {
-    this._commands = this._commands.concat(cloneDeep(path._commands));
+    this.commands = this.commands.concat(cloneDeep(path.commands));
     return this;
   }
 
   get lastCommand(): Command {
-    return this._commands[this._commands.length - 1];
+    return this.commands[this.commands.length - 1];
   }
 
-  curvedLineSegments(toPoints, roundingRatio) {
+  get endPoint(): PointLike {
+    if (this.lastCommand.code === CommandCodes.Z) {
+      return this.currentSegmentStart;
+    }
+    return this.lastCommand.to;
+  }
+
+  curvedLineSegments(toPoints, roundingRatio, endWithClose = false) {
     // TODO: handle last command is close
     this._assertLastCommandExists();
-    const toAppendCommands = roundedEdgePath(
-      // @ts-ignore
-      [this.lastCommand.to, ...toPoints], roundingRatio,
-    )._commands.slice(1);
-    this._commands = this._commands.concat(toAppendCommands);
+    const modifiedPoints = this.commands.length ? [this.endPoint, ...toPoints] : [...toPoints];
+    if (endWithClose) {
+      modifiedPoints.push(this.currentSegmentStart);
+    }
+    const toAppendCommands = roundedEdgePath(modifiedPoints, roundingRatio).commands
+      // include move command if the path doesn't have any commands yet
+      .slice(this.commands.length ? 1 : 0, endWithClose ? -1 : undefined);
+    this.commands = this.commands.concat(toAppendCommands);
+    if (endWithClose) { this.close(); }
     return this;
   }
 
-  // TODO: make this weldPath, throws error if first command in param doesn't match last endpoint
-  // this could lead to the rendering of invalid svg
-  // meant to be used in conjunction with concatPath to fuse paths that start and end at same the point
-  sliceCommandsDangerously(...params):PathData {
-    this._commands = this._commands.slice(...params);
+  breakApart(): PathData[] {
+    return this.commands
+      .reduce((acc, command, index, array) => {
+        if (command.code === CommandCodes.M) {
+          if (!index) {
+            acc.currentPath.commands.push({ ...command });
+          } else {
+            acc.subPaths.push(acc.currentPath);
+            acc.currentPath = (new PathData());
+            acc.currentPath.commands.push({ ...command });
+          }
+          return acc;
+        }
+        if (command.code === CommandCodes.Z) {
+          acc.currentPath.commands.push(command);
+          acc.subPaths.push(acc.currentPath);
+          acc.currentPath = new PathData();
+          return acc;
+        }
+
+        // svg paths can be closed and continued without a following M command, account for this by adding M
+        // TODO: Why is "as Command" casting needed here to avoid ts lint error?
+        if (acc.currentPath.commands.length === 0 && (command as Command).code !== CommandCodes.M) {
+          if (!acc.subPaths.length) {
+            throw new Error('PathData breakApart: discovered no opening M command for path');
+          }
+          const pathStart = last(acc.subPaths).currentSegmentStart;
+          acc.currentPath.commands.push(COMMAND_FACTORY.M(pathStart));
+        }
+        acc.currentPath.commands.push(command);
+        if (index === array.length - 1) {
+          acc.subPaths.push(acc.currentPath);
+        }
+        return acc;
+      }, { subPaths: [], currentPath: (new PathData()) } as (
+        {subPaths: PathData[], currentPath: PathData}
+      )).subPaths;
+  }
+
+  weldPath(path: PathData, closesPath = false, marginOfError = undefined):PathData {
+    debugger; // eslint-disable-line no-debugger
+    if (!pointsAreEqual(this.lastPosition, (path.commands[0] as DestinationCommand).to, marginOfError)) {
+      throw new Error('invalid use of weldPath: first parameter path must'
+        + ' start at the same position as the end of path instance end position');
+    }
+    if (closesPath && !pointsAreEqual(path.lastPosition, this.currentSegmentStart)) {
+      throw new Error('invalid use of weldPath: when using closesPath option, instance\'s currentSegementStart '
+        + 'must be equal to the last command of first parameter path\'s lastPosition');
+    }
+    this.commands = this.commands.concat(...path.commands.slice(1, closesPath ? -1 : undefined));
+    if (closesPath) { this.close(); }
     return this;
   }
 
   getDestinationPoints() {
-    return this._commands.filter((cmd) => isDestinationCommand(cmd))
+    return this.commands.filter((cmd) => isDestinationCommand(cmd))
       .map((cmd) => (cmd as DestinationCommand).to);
   }
 
   // TODO: getControlPoints, getInferredControlPoints
 
   transform(matrix:string) {
-    this._commands = parseSVG(svgpath(this.getD()).transform(matrix).toString());
+    this.commands = parseSVG(svgpath(this.getD()).transform(matrix).toString());
     return this;
   }
 
   getD():string {
-    return composeSVG(this._commands);
+    return composeSVG(this.commands);
   }
 }
