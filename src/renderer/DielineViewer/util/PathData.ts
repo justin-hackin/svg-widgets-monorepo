@@ -372,7 +372,6 @@ export class PathData {
   }
 
   weldPath(path: PathData, closesPath = false, marginOfError = undefined):PathData {
-    debugger; // eslint-disable-line no-debugger
     if (!pointsAreEqual(this.lastPosition, (path.commands[0] as DestinationCommand).to, marginOfError)) {
       throw new Error('invalid use of weldPath: first parameter path must'
         + ' start at the same position as the end of path instance end position');

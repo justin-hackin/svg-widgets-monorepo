@@ -52,12 +52,15 @@ const textureFilters = [{ name: 'Vector/bitmap file', extensions: ['svg', 'jpg',
 const jsonFilters = [{ name: 'JSON', extensions: ['json'] }];
 const glbFilters = [{ name: 'GLB 3D model', extensions: ['glb'] }];
 
+// CONVENTION: use undefined as response from aborted file operation
+// this way, destructuring the await of the event will not throw as it would with attempting null destructuring
+
 export const setupIpc = (ipcMain) => {
   ipcMain.handle(EVENTS.SAVE_SVG, (e, fileContent, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,
     filters: svgFilters,
   }).then(({ canceled, filePath }) => {
-    if (canceled) { return null; }
+    if (canceled) { return undefined; }
     return fsPromises.writeFile(filePath, fileContent);
   }));
 
@@ -65,21 +68,31 @@ export const setupIpc = (ipcMain) => {
     ...dialogOptions,
     filters: glbFilters,
   }).then(({ canceled, filePath }) => {
-    if (canceled) { return null; }
+    if (canceled) { return undefined; }
     return fsPromises.writeFile(filePath, Buffer.from(glbArrayBuffer));
   }));
 
   const resolveStringDataFromDialog = async (dialogOptions) => {
     const { canceled, filePaths } = await dialog.showOpenDialog(dialogOptions);
-    if (canceled) { return null; }
+    if (canceled) { return undefined; }
     const filePath = filePaths[0];
     const fileString = await fsPromises.readFile(filePath, 'utf8');
     return { filePath, fileString };
   };
 
-  const writeModelAndSvg = async (svgContent, modelData, jsonFilePath) => {
-    const fileName = path.basename(jsonFilePath, '.json');
-    const svgFilePath = path.join(path.dirname(jsonFilePath), `${fileName}.svg`);
+  const writeModelAndSvg = async (svgContent, modelData, filePath) => {
+    const fileName = path.basename(filePath, '.json');
+    const svgFilePath = path.join(path.dirname(filePath), `${fileName}.svg`);
+    /*
+      must coerce a file name without extension to a json file
+      even though json filter is on dialog, it will not add the extension
+      as a user, I expect coercion for a file name without extension in the location bar
+      this is a better user experience because
+      as a user, I can't be sure if I add .json to the path I will not get
+      a double-extension if file dialog adds the filtered extension
+     */
+    const jsonFilePath = path.join(path.dirname(filePath), `${fileName}.json`);
+
     await Promise.all([
       fsPromises.writeFile(svgFilePath, svgContent),
       fsPromises.writeFile(jsonFilePath, formattedJSONStringify(modelData))]);
@@ -92,7 +105,7 @@ export const setupIpc = (ipcMain) => {
       filters: jsonFilters,
     }).then(({ canceled, filePath }) => {
       if (canceled) {
-        return null;
+        return undefined;
       }
       return writeModelAndSvg(svgContent, modelData, filePath);
     }));

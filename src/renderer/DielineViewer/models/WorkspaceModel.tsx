@@ -1,5 +1,5 @@
 import {
-  applySnapshot, getType, Instance, onSnapshot, types,
+  applySnapshot, getSnapshot, getType, Instance, types,
 } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React, { createContext, useContext } from 'react';
@@ -30,7 +30,6 @@ const getPreferencesStore = () => {
 };
 
 export const WorkspaceModel = types.model({
-  currentFilePath: types.maybe(types.string),
   widgetOptions: types.frozen({
     'polyhedral-net': PyramidNetOptionsInfo,
     'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
@@ -40,8 +39,8 @@ export const WorkspaceModel = types.model({
 })
   .volatile(() => ({
     preferences: getPreferencesStore(),
-    isPristine: true,
-    isPristineSnapshotDisposer: undefined,
+    savedSnapshot: undefined,
+    currentFilePath: undefined,
   }))
   .views((self) => ({
     get selectedWidgetInfo() {
@@ -55,6 +54,15 @@ export const WorkspaceModel = types.model({
     },
     get selectedControlPanelProps() {
       return this.selectedWidgetInfo.controlPanelProps;
+    },
+    get selectedStoreIsSaved() {
+      // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,
+      // instead flagging history records with the associated file name upon save
+      // + creating a middleware variable currentSnapshotIsSaved
+      // this will also allow history to become preserved across files with titlebar accuracy
+      const currentSnapshot = getSnapshot(this.selectedStore.shapeDefinition);
+      // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
+      return JSON.stringify(self.savedSnapshot) === JSON.stringify(currentSnapshot);
     },
     get SelectedControlPanelComponent() {
       return this.selectedWidgetInfo.ControlPanelComponent;
@@ -72,18 +80,11 @@ export const WorkspaceModel = types.model({
       return self.currentFilePath ? parseFilepath(self.currentFilePath).name : `New ${this.selectedShapeName}`;
     },
     get titleBarText() {
-      return `${self.isPristine ? '' : '*'}${this.currentFileName}`;
+      return `${this.selectedStoreIsSaved ? '' : '*'}${this.currentFileName}`;
     },
   }))
   .actions((self) => ({
     afterCreate() {
-      // reset pristine state and tracker on change of selectedStore
-      reaction(() => self.selectedStore, () => {
-        this.setPristineDisposer(onSnapshot(self.selectedStore, () => {
-          this.setIsPristine(false);
-        }));
-      }, { fireImmediately: true });
-
       // title bar changes for file status indication
       reaction(() => [self.titleBarText], () => {
         // TODO: why can't this be coerced
@@ -97,20 +98,9 @@ export const WorkspaceModel = types.model({
           .setTitle(`${self.selectedShapeName} ‖  ${startCase(currentWindow.route)}  ${fileTrackingFragment}`);
       }, { fireImmediately: true });
     },
-    setPristineDisposer(disposer) {
-      if (self.isPristineSnapshotDisposer) {
-        self.isPristineSnapshotDisposer();
-      }
-      this.setIsPristine(true);
-      self.isPristineSnapshotDisposer = disposer;
-    },
-    setIsPristine(isPristine) {
-      self.isPristine = isPristine;
-    },
     setSelectedWidgetName(name) {
       self.selectedWidgetName = name;
-      this.setIsPristine(true);
-      self.currentFilePath = undefined;
+      this.clearCurrentFileData();
     },
     renderWidgetToString() {
       const { SelectedRawSvgComponent } = self;
@@ -129,9 +119,13 @@ export const WorkspaceModel = types.model({
     resetModelToDefault() {
       applySnapshot(self.selectedStore, {});
     },
-    setCurrentFilePath(filePath) {
+    setCurrentFileData(filePath, snapshot) {
       self.currentFilePath = filePath;
-      this.setIsPristine(true);
+      self.savedSnapshot = snapshot;
+    },
+    clearCurrentFileData() {
+      self.currentFilePath = undefined;
+      self.savedSnapshot = undefined;
     },
   }));
 

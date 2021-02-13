@@ -49,29 +49,29 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   const newHandler = () => {
     workspaceStore.resetModelToDefault();
     store.history.clear();
-    workspaceStore.setCurrentFilePath(undefined);
+    workspaceStore.clearCurrentFileData();
     resetFileMenuRef();
   };
 
   const openSpecHandler = async () => {
     const { fileData, filePath } = await globalThis.ipcRenderer.invoke(EVENTS.LOAD_SNAPSHOT);
     if (fileData) {
+      workspaceStore.setCurrentFileData(filePath, fileData);
       applySnapshot(store.shapeDefinition, fileData);
-      workspaceStore.setCurrentFilePath(filePath);
-      store.history.clear();
     }
     resetFileMenuRef();
   };
 
   const saveAsHandler = async () => {
+    const snapshot = getSnapshot(store.shapeDefinition);
     const filePath = await globalThis.ipcRenderer.invoke(
       EVENTS.DIALOG_SAVE_MODEL_WITH_SVG,
       workspaceStore.renderWidgetToString(),
-      getSnapshot(store.shapeDefinition),
-      { message: 'Save widget svg with json data', defaultPath: `${store.getFileBasename()}.svg` },
+      snapshot,
+      { message: 'Save widget svg with json data', defaultPath: `${store.getFileBasename()}` },
     );
     if (filePath) {
-      workspaceStore.setCurrentFilePath(filePath);
+      workspaceStore.setCurrentFileData(filePath, snapshot);
     }
     resetFileMenuRef();
   };
@@ -81,14 +81,17 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
       await saveAsHandler();
       return;
     }
+    const snapshot = getSnapshot(store.shapeDefinition);
     const filePath = await globalThis.ipcRenderer.invoke(
       EVENTS.SAVE_MODEL_WITH_SVG,
       workspaceStore.renderWidgetToString(),
-      getSnapshot(store.shapeDefinition),
+      snapshot,
       workspaceStore.currentFilePath,
     );
 
-    if (filePath) { workspaceStore.setCurrentFilePath(filePath); }
+    if (filePath) {
+      workspaceStore.setCurrentFileData(filePath, snapshot);
+    }
     resetFileMenuRef();
   };
 
