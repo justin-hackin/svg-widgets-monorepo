@@ -38,24 +38,27 @@ export const CylinderLightboxPanelContent = () => {
       />
       <PanelSliderOrTextInput
         node={shapeDefinition}
-        property="materialThickness__PX"
+        property="materialThickness"
         min={CM_TO_PIXELS_RATIO * 0.1}
         max={CM_TO_PIXELS_RATIO}
+        useUnits
       />
       <PanelSliderOrTextInput
         node={shapeDefinition}
-        property="cylinderHeight__PX"
+        property="cylinderHeight"
         min={CM_TO_PIXELS_RATIO}
         max={CM_TO_PIXELS_RATIO * 30}
         step={0.1 * CM_TO_PIXELS_RATIO}
+        useUnits
       />
 
       <PanelSliderOrTextInput
         node={shapeDefinition}
-        property="ringRadius__PX"
+        property="ringRadius"
         min={CM_TO_PIXELS_RATIO * 10}
         max={CM_TO_PIXELS_RATIO * 60}
         step={0.25 * CM_TO_PIXELS_RATIO}
+        useUnits
       />
       <PanelSliderOrTextInput
         node={shapeDefinition}

@@ -5,13 +5,13 @@ import { ICylinderLightBoxModel } from '../models';
 export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: ICylinderLightBoxModel}) => {
   const {
     shapeDefinition: {
-      sectionPathD, wallPathD, ringRadius__PX, innerRadius, designBoundaryRadius, holderTab,
+      sectionPathD, wallPathD, ringRadius, innerRadius, designBoundaryRadius, holderTab,
     },
   } = widgetStore;
 
   return (
     <g>
-      <circle r={ringRadius__PX} fill="none" stroke="red" />
+      <circle r={ringRadius} fill="none" stroke="red" />
       <circle r={innerRadius} fill="none" stroke="green" />
       <circle r={designBoundaryRadius} fill="none" stroke="blue" />
       <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />

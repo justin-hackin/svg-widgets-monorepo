@@ -14,15 +14,15 @@ export const defaultPreferences: SnapshotIn<IPreferencesModel> = {
   scoreStrokeColor: '#BDFF48',
   strokeWidth: 1,
   dielineDocumentDimensions: {
-    width__PX: CM_TO_PIXELS_RATIO * 49.5,
-    height__PX: CM_TO_PIXELS_RATIO * 27.9,
+    width: CM_TO_PIXELS_RATIO * 49.5,
+    height: CM_TO_PIXELS_RATIO * 27.9,
   },
 };
 
 export const PreferencesModel = types.model({
   dielineDocumentDimensions: types.model({
-    width__PX: types.number,
-    height__PX: types.number,
+    width: types.number,
+    height: types.number,
   }),
   useClones: types.boolean,
   cutStrokeColor: types.string,

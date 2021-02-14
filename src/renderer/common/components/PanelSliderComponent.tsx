@@ -2,9 +2,9 @@ import { Slider, Tooltip, Typography } from '@material-ui/core';
 import React from 'react';
 import uuid from 'uuid/v1';
 
+import { observer } from 'mobx-react';
 import { getHistory, mstDataToProps } from '../util/mst';
 import { CURRENT_UNIT, UNIT_LABEL_FORMAT, UNIT_STEP } from '../util/geom';
-import { observer } from 'mobx-react';
 import { useStyles } from '../../DielineViewer/style';
 
 const ValueLabelComponent = ({
@@ -24,11 +24,12 @@ export const UnlabeledPanelSliderComponent = observer(({
   max,
   step,
   labelId,
+  useUnits = false,
   className = undefined,
   disabled = false,
 }) => {
   const {
-    value, setValue, valuePath, useUnits,
+    value, setValue, valuePath,
   } = mstDataToProps(node, property);
   const history = getHistory(node);
   return (
@@ -67,12 +68,13 @@ export const PanelSliderComponent = observer(({
   min,
   max,
   disabled = false,
+  useUnits = false,
   className = undefined,
   step = undefined,
   label = undefined,
 }) => {
   const labelId = uuid();
-  const { label: resolvedLabel } = mstDataToProps(node, property, label);
+  const { label: resolvedLabel } = mstDataToProps(node, property, label, useUnits);
   const classes = useStyles();
   return (
     <div className={classes.formControl}>

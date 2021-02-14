@@ -26,12 +26,12 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
   wallsPerArc: types.optional(types.integer, 4),
   holeWidthRatio: types.optional(types.number, 0.5),
   arcsPerRing: types.optional(types.integer, 4),
-  ringRadius__PX: types.optional(types.number, CM_TO_PIXELS_RATIO * 11.25),
+  ringRadius: types.optional(types.number, CM_TO_PIXELS_RATIO * 11.25),
   ringThicknessRatio: types.optional(types.number, 0.2),
-  materialThickness__PX: types.optional(types.number, CM_TO_PIXELS_RATIO * 0.3),
+  materialThickness: types.optional(types.number, CM_TO_PIXELS_RATIO * 0.3),
   dovetailIngressRatio: types.optional(types.number, 0.5),
   dovetailSizeRatio: types.optional(types.number, 0.5),
-  cylinderHeight__PX: types.optional(types.number, CM_TO_PIXELS_RATIO * 2),
+  cylinderHeight: types.optional(types.number, CM_TO_PIXELS_RATIO * 2),
   holderTabsPerArc: types.optional(types.integer, 2),
   holderTabsFeetLengthRatio: types.optional(types.number, 0.5),
 }).volatile(() => ({
@@ -40,13 +40,13 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
 }))
   .views((self) => ({
     get innerRadius() {
-      return self.ringRadius__PX * (1 - self.ringThicknessRatio);
+      return self.ringRadius * (1 - self.ringThicknessRatio);
     },
     get midRadius() {
-      return self.ringRadius__PX * (1 - (self.ringThicknessRatio / 2));
+      return self.ringRadius * (1 - (self.ringThicknessRatio / 2));
     },
     get ringThickness() {
-      return self.ringThicknessRatio * self.ringRadius__PX;
+      return self.ringThicknessRatio * self.ringRadius;
     },
     get wallPolygonNumSides() {
       return self.arcsPerRing * self.wallsPerArc;
@@ -60,7 +60,7 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
     },
     get absNotchPath() {
       const origin = getOriginPoint();
-      const distance = self.ringThicknessRatio * self.ringRadius__PX * self.dovetailSizeRatio;
+      const distance = self.ringThicknessRatio * self.ringRadius * self.dovetailSizeRatio;
 
       const basePoint1 = pointFromPolar(Math.PI / 3, distance);
       const basePoint2 = pointFromPolar(Math.PI * (2 / 3), distance);
@@ -102,7 +102,7 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
       const sectionDegrees = 360 / this.wallPolygonNumSides;
       for (let i = 0; i < self.wallsPerArc; i += 1) {
         const rotation = (i - (self.wallsPerArc / 2) + 0.5) * sectionDegrees;
-        const thisHole = rectanglePathCenteredOnOrigin(self.materialThickness__PX, this.actualHoleWidth)
+        const thisHole = rectanglePathCenteredOnOrigin(self.materialThickness, this.actualHoleWidth)
           .transform(`rotate(${rotation}) translate(${this.midRadius}, 0)`);
         holesPath.concatPath(thisHole);
       }
@@ -111,11 +111,11 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
     get sectionArcPath() {
       const sectionArcPath = new PathData();
       const halfArcAngle = (2 * Math.PI * 0.5) / self.arcsPerRing;
-      const outerArcLeft = pointFromPolar(-halfArcAngle, self.ringRadius__PX);
-      const outerArcRight = pointFromPolar(halfArcAngle, self.ringRadius__PX);
+      const outerArcLeft = pointFromPolar(-halfArcAngle, self.ringRadius);
+      const outerArcRight = pointFromPolar(halfArcAngle, self.ringRadius);
       sectionArcPath
         .move(outerArcLeft)
-        .ellipticalArc(self.ringRadius__PX, self.ringRadius__PX, 0, true, false, outerArcRight);
+        .ellipticalArc(self.ringRadius, self.ringRadius, 0, true, false, outerArcRight);
 
       const innerArcRight = pointFromPolar(halfArcAngle, this.innerRadius);
       const innerArcLeft = pointFromPolar(-halfArcAngle, this.innerRadius);
@@ -126,21 +126,21 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
       return sectionArcPath;
     },
     get innerWallPolygonSideLength() {
-      return polygonSideLength(this.wallPolygonNumSides, this.midRadius - self.materialThickness__PX / 2);
+      return polygonSideLength(this.wallPolygonNumSides, this.midRadius - self.materialThickness / 2);
     },
     get wallHorizontalRect() {
       return rectanglePathCenteredOnOrigin(
-        this.innerWallPolygonSideLength, self.cylinderHeight__PX - 2 * self.materialThickness__PX,
+        this.innerWallPolygonSideLength, self.cylinderHeight - 2 * self.materialThickness,
       );
     },
     get wallVerticalRect() {
-      return rectanglePathCenteredOnOrigin(this.actualHoleWidth, self.cylinderHeight__PX);
+      return rectanglePathCenteredOnOrigin(this.actualHoleWidth, self.cylinderHeight);
     },
     get holderTabRadius() {
-      return this.innerRadius + this.ringThickness / 4 - self.materialThickness__PX / 4;
+      return this.innerRadius + this.ringThickness / 4 - self.materialThickness / 4;
     },
     get holderTabFeetLengthMax() {
-      return (this.ringThickness - self.materialThickness__PX) / 2;
+      return (this.ringThickness - self.materialThickness) / 2;
     },
     get actualHolderTabFeetLength() {
       return this.holderTabFeetLengthMax * self.holderTabsFeetLengthRatio;
@@ -151,7 +151,7 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
       const sectionDegrees = 360 / (self.holderTabsPerArc * self.arcsPerRing);
       for (let i = 0; i < self.wallsPerArc; i += 1) {
         const rotation = (i - (self.holderTabsPerArc / 2) + 0.5) * sectionDegrees;
-        const thisHole = rectanglePathCenteredOnOrigin(this.actualHolderTabFeetLength, self.materialThickness__PX)
+        const thisHole = rectanglePathCenteredOnOrigin(this.actualHolderTabFeetLength, self.materialThickness)
           .transform(`rotate(${rotation}) translate(${this.holderTabRadius}, 0)`);
         holesPath.concatPath(thisHole);
       }
@@ -163,11 +163,11 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
     get holderTab() {
       const secondFootStart = this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
       const secondFootEnd = 2 * this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
-      const tabTop = -self.materialThickness__PX - this.actualHolderTabFeetLength;
+      const tabTop = -self.materialThickness - this.actualHolderTabFeetLength;
       return (new PathData()).move(getOriginPoint()) // first foot start
         .line({ x: this.actualHolderTabFeetLength, y: 0 }) // first foot end
-        .line({ x: this.actualHolderTabFeetLength, y: -self.materialThickness__PX }) // crotch start
-        .line({ x: secondFootStart, y: -self.materialThickness__PX }) // crotch end
+        .line({ x: this.actualHolderTabFeetLength, y: -self.materialThickness }) // crotch start
+        .line({ x: secondFootStart, y: -self.materialThickness }) // crotch end
         .line({ x: secondFootStart, y: 0 }) // second foot start
         .line({ x: secondFootEnd, y: 0 }) // second foot end
         .curvedLineSegments([{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],

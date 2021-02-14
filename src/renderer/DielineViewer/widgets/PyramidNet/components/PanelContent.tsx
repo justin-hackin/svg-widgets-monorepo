@@ -57,9 +57,10 @@ export const PanelContent = observer(() => {
         />
         <PanelSliderOrTextInput
           node={pyramidNetSpec}
-          property="shapeHeight__PX"
+          property="shapeHeight"
           min={20 * CM_TO_PIXELS_RATIO}
           max={60 * CM_TO_PIXELS_RATIO}
+          useUnits
         />
       </div>
       <Divider />

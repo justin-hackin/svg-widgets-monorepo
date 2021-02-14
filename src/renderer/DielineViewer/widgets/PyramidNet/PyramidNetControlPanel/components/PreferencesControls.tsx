@@ -12,8 +12,8 @@ export const PreferencesControls = observer(() => {
   const { preferences, resetPreferences } = useWorkspaceMst();
   return (
     <>
-      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width__PX" />
-      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height__PX" />
+      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width" useUnits />
+      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" useUnits />
       <PanelSwitch
         node={preferences}
         property="useClones"

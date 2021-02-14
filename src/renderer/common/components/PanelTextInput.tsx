@@ -11,13 +11,13 @@ import { mstDataToProps } from '../util/mst';
 import { useStyles } from '../../DielineViewer/style';
 
 export const PanelTextInput = observer(({
-  node, property, label = undefined,
+  node, property, useUnits= false, label = undefined,
 }) => {
   const classes = useStyles();
   const labelId = uuid();
   const {
-    value, setValue, label: resolvedLabel, valuePath, useUnits,
-  } = mstDataToProps(node, property, label);
+    value, setValue, label: resolvedLabel, valuePath,
+  } = mstDataToProps(node, property, label, useUnits);
   return (
     <div className={classes.formControl}>
       <Typography id={labelId} gutterBottom>

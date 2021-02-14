@@ -102,7 +102,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   ascendantEdgeTabsSpec: types.optional(AscendantEdgeTabsModel, {}),
   baseEdgeTabsSpec: types.optional(BaseEdgeTabsModel, {}),
   // TODO: don't use weird naming conventions to leverage behaviour, use property metadata
-  shapeHeight__PX: types.optional(types.number, 20 * CM_TO_PIXELS_RATIO),
+  shapeHeight: types.optional(types.number, 20 * CM_TO_PIXELS_RATIO),
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
   useDottedStroke: types.optional(types.boolean, false),
   // TODO: migrate to preferences
@@ -163,9 +163,9 @@ export const PyramidNetModel = types.model('Pyramid Net', {
 
     // factor to scale face lengths such that the first edge will be equal to 1
     get faceLengthAdjustRatio() {
-      const { shapeHeight__PX } = self;
+      const { shapeHeight } = self;
       const { relativeFaceEdgeLengths, diameter } = self.pyramid.geometry;
-      const firstSideLengthInPx = ((shapeHeight__PX * relativeFaceEdgeLengths[0]) / diameter);
+      const firstSideLengthInPx = ((shapeHeight * relativeFaceEdgeLengths[0]) / diameter);
       return firstSideLengthInPx / FACE_FIRST_EDGE_NORMALIZED_SIZE;
     },
 

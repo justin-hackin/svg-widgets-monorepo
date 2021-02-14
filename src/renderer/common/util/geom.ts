@@ -67,17 +67,17 @@ export const UNIT_STEP = {
   [UNITS.in]: (1.0 / IN_DENOMINATOR) * INCHES_TO_PIXELS_RATIO,
 };
 export const UNIT_LABEL_FORMAT = {
-  [UNITS.cm]: (val) => `${(val).toFixed(3)}`,
+  [UNITS.cm]: (val) => `${(val).toFixed(3)} cm`,
   [UNITS.in]: (val) => {
     const unitVal = val / UNIT_TO_PIXELS[CURRENT_UNIT];
     const abs = Math.floor(unitVal);
-    const absStr = abs ? `${abs} ` : '';
+    const absStr = abs ? `${abs}` : '';
     const remainder = unitVal - abs;
     const numerator = Math.round(remainder * IN_DENOMINATOR);
     const gcdVal = gcd(numerator, IN_DENOMINATOR);
-    const fractionStr = numerator ? `${numerator / gcdVal}/${IN_DENOMINATOR / gcdVal}` : '';
+    const fractionStr = numerator ? ` ${numerator / gcdVal}/${IN_DENOMINATOR / gcdVal}` : '';
     const wholeStr = !absStr && !fractionStr ? 0 : `${absStr}${fractionStr}`;
-    return ` ${wholeStr} `;
+    return ` ${wholeStr}" `;
   },
 };
 export const pxToUnitView = (val) => UNIT_LABEL_FORMAT[CURRENT_UNIT](val);

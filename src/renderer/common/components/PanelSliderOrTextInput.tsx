@@ -13,13 +13,13 @@ import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';
 export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
 
 export const PanelSliderOrTextInput = ({
-  node, property, min, max, step = undefined, className = undefined, label = undefined,
+  node, property, min, max, step = undefined, useUnits = false, className = undefined, label = undefined,
 }) => {
   const classes = useStyles();
   const labelId = uuid();
   const {
-    setValue, valuePath, value, label: computedLabel, useUnits,
-  } = mstDataToProps(node, property, label);
+    setValue, valuePath, value, label: computedLabel,
+  } = mstDataToProps(node, property, label, useUnits);
   const [isSlider, setIsSlider] = useState(true);
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
 
@@ -32,7 +32,7 @@ export const PanelSliderOrTextInput = ({
         <div className={classes.sliderTextInput}>
           {(isSlider) ? (
             <UnlabeledPanelSliderComponent {...{
-              node, property, min, max, step, labelId,
+              node, property, min, max, step, useUnits, labelId,
             }}
             />
           ) : (
