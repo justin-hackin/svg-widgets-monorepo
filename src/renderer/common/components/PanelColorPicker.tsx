@@ -1,8 +1,10 @@
-import uuid from 'uuid/v1';
 import React from 'react';
+import uuid from 'uuid/v1';
+import { startCase } from 'lodash';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import { ChromePicker } from 'react-color';
+
 import { useStyles } from '../../DielineViewer/style';
 import { mstDataToProps } from '../util/mst';
 
@@ -11,9 +13,8 @@ export const PanelColorPicker = ({
 }) => {
   const classes = useStyles();
   const labelId = uuid();
-  const {
-    value, setValue, label: resolvedLabel,
-  } = mstDataToProps(node, property, label);
+  const { value, setValue } = mstDataToProps(node, property);
+  const resolvedLabel = `${label || startCase(property)}`;
   if (value === undefined) { return null; }
   return (
     <FormControl className={classes.formControl}>

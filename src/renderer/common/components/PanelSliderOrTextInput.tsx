@@ -9,6 +9,7 @@ import { useStyles } from '../../DielineViewer/style';
 import { SubmittableTextInput } from './SubmittableTextInput';
 import { mstDataToProps } from '../util/mst';
 import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';
+import { CURRENT_UNIT } from '../util/geom';
 
 export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
 
@@ -18,15 +19,16 @@ export const PanelSliderOrTextInput = ({
   const classes = useStyles();
   const labelId = uuid();
   const {
-    setValue, valuePath, value, label: computedLabel,
-  } = mstDataToProps(node, property, label, useUnits);
+    setValue, valuePath, value,
+  } = mstDataToProps(node, property);
+  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${CURRENT_UNIT})` : ''}`;
   const [isSlider, setIsSlider] = useState(true);
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
 
   return (
     <FormControl className={`${classes.formControl} ${className}`}>
       <Typography id={labelId} gutterBottom>
-        {label || computedLabel}
+        {resolvedLabel}
       </Typography>
       <div className={classes.sliderTextInputContainer}>
         <div className={classes.sliderTextInput}>

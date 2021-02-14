@@ -1,10 +1,8 @@
-import { startCase } from 'lodash';
 import {
   applyPatch, getPath, getRoot, joinJsonPath,
 } from 'mobx-state-tree';
-import { CURRENT_UNIT } from './geom';
 
-export const mstDataToProps = (node, property, labelOverride = undefined, useUnits = false) => {
+export const mstDataToProps = (node, property) => {
   const value = node[property];
   const valuePath = joinJsonPath([getPath(node), property]);
   const setValue = (val) => {
@@ -14,12 +12,11 @@ export const mstDataToProps = (node, property, labelOverride = undefined, useUni
       value: val,
     });
   };
-  const label = `${labelOverride || startCase(property)}${useUnits ? ` (${CURRENT_UNIT})` : ''}`;
+
   return {
     value,
     valuePath,
     setValue,
-    label,
   };
 };
 

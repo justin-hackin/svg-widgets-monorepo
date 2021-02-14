@@ -1,6 +1,7 @@
 import { Slider, Tooltip, Typography } from '@material-ui/core';
 import React from 'react';
 import uuid from 'uuid/v1';
+import { startCase } from 'lodash';
 
 import { observer } from 'mobx-react';
 import { getHistory, mstDataToProps } from '../util/mst';
@@ -74,7 +75,7 @@ export const PanelSliderComponent = observer(({
   label = undefined,
 }) => {
   const labelId = uuid();
-  const { label: resolvedLabel } = mstDataToProps(node, property, label, useUnits);
+  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${CURRENT_UNIT})` : ''}`;
   const classes = useStyles();
   return (
     <div className={classes.formControl}>

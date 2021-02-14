@@ -1,4 +1,5 @@
 import React from 'react';
+import { startCase } from 'lodash';
 import uuid from 'uuid/v1';
 import { Typography } from '@material-ui/core';
 import { observer } from 'mobx-react';
@@ -9,15 +10,18 @@ import { observer } from 'mobx-react';
 import { SubmittableTextInput } from './SubmittableTextInput';
 import { mstDataToProps } from '../util/mst';
 import { useStyles } from '../../DielineViewer/style';
+import { CURRENT_UNIT } from '../util/geom';
 
 export const PanelTextInput = observer(({
-  node, property, useUnits= false, label = undefined,
+  node, property, useUnits = false, label = undefined,
 }) => {
   const classes = useStyles();
   const labelId = uuid();
   const {
-    value, setValue, label: resolvedLabel, valuePath,
-  } = mstDataToProps(node, property, label, useUnits);
+    value, setValue, valuePath,
+  } = mstDataToProps(node, property);
+
+  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${CURRENT_UNIT})` : ''}`;
   return (
     <div className={classes.formControl}>
       <Typography id={labelId} gutterBottom>

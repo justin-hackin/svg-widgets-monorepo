@@ -6,6 +6,7 @@ import FormControl from '@material-ui/core/FormControl';
 import React from 'react';
 import { observer } from 'mobx-react';
 
+import { startCase } from 'lodash';
 import { useStyles } from '../../DielineViewer/style';
 import { mstDataToProps } from '../util/mst';
 
@@ -38,8 +39,9 @@ export const PanelSelect = observer(({
   node, property, options, label,
 }) => {
   const {
-    value, setValue, label: resolvedLabel, valuePath,
-  } = mstDataToProps(node, property, label);
+    value, setValue, valuePath,
+  } = mstDataToProps(node, property);
+  const resolvedLabel = label || startCase(property);
   const onChange = (e) => {
     setValue(e.target.value);
   };
