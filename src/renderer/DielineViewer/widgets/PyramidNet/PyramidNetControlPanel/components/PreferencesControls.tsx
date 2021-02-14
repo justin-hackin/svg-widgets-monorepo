@@ -7,13 +7,21 @@ import { PanelColorPicker } from '../../../../../common/components/PanelColorPic
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
 import { PanelTextInput } from '../../../../../common/components/PanelTextInput';
+import { PanelRadio } from '../../../../../common/components/PanelRadio';
+import { UNITS } from '../../../../../common/util/geom';
 
 export const PreferencesControls = observer(() => {
   const { preferences, resetPreferences } = useWorkspaceMst();
+  const options = Object.keys(UNITS).map((unit) => ({ value: unit, label: unit }));
   return (
     <>
-      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width" useUnits />
-      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" useUnits />
+      <PanelRadio
+        node={preferences}
+        property="displayUnit"
+        options={options}
+      />
+      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width" />
+      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" />
       <PanelSwitch
         node={preferences}
         property="useClones"
@@ -46,6 +54,5 @@ export const PreferencesControls = observer(() => {
         Reset
       </Button>
     </>
-
   );
 });

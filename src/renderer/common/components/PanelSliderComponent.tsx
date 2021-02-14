@@ -5,8 +5,9 @@ import { startCase } from 'lodash';
 
 import { observer } from 'mobx-react';
 import { getHistory, mstDataToProps } from '../util/mst';
-import { CURRENT_UNIT, UNIT_LABEL_FORMAT, UNIT_STEP } from '../util/geom';
+import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../util/geom';
 import { useStyles } from '../../DielineViewer/style';
+import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 
 const ValueLabelComponent = ({
   children,
@@ -25,7 +26,7 @@ export const UnlabeledPanelSliderComponent = observer(({
   max,
   step,
   labelId,
-  useUnits = false,
+  unit = undefined,
   className = undefined,
   disabled = false,
 }) => {
@@ -47,8 +48,8 @@ export const UnlabeledPanelSliderComponent = observer(({
       onChangeCommitted={history && (() => {
         history.stopGroup();
       })}
-      step={step || (useUnits && UNIT_STEP[CURRENT_UNIT])}
-      valueLabelFormat={useUnits ? UNIT_LABEL_FORMAT[CURRENT_UNIT] : undefined}
+      step={step || (unit && UNIT_STEP[unit])}
+      valueLabelFormat={unit ? UNIT_LABEL_FORMAT[unit] : undefined}
       name={valuePath}
       key={valuePath}
       aria-labelledby={labelId}
@@ -75,7 +76,8 @@ export const PanelSliderComponent = observer(({
   label = undefined,
 }) => {
   const labelId = uuid();
-  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${CURRENT_UNIT})` : ''}`;
+  const { preferences: { displayUnit } } = useWorkspaceMst();
+  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${displayUnit})` : ''}`;
   const classes = useStyles();
   return (
     <div className={classes.formControl}>
@@ -88,6 +90,7 @@ export const PanelSliderComponent = observer(({
         min,
         max,
         step,
+        unit: useUnits ? displayUnit : undefined,
         labelId,
         className,
         disabled,

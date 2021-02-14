@@ -10,7 +10,7 @@ import { observer } from 'mobx-react';
 import { SubmittableTextInput } from './SubmittableTextInput';
 import { mstDataToProps } from '../util/mst';
 import { useStyles } from '../../DielineViewer/style';
-import { CURRENT_UNIT } from '../util/geom';
+import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 
 export const PanelTextInput = observer(({
   node, property, useUnits = false, label = undefined,
@@ -20,8 +20,8 @@ export const PanelTextInput = observer(({
   const {
     value, setValue, valuePath,
   } = mstDataToProps(node, property);
-
-  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${CURRENT_UNIT})` : ''}`;
+  const { preferences: { displayUnit } } = useWorkspaceMst();
+  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${displayUnit})` : ''}`;
   return (
     <div className={classes.formControl}>
       <Typography id={labelId} gutterBottom>

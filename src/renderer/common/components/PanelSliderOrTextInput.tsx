@@ -9,7 +9,7 @@ import { useStyles } from '../../DielineViewer/style';
 import { SubmittableTextInput } from './SubmittableTextInput';
 import { mstDataToProps } from '../util/mst';
 import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';
-import { CURRENT_UNIT } from '../util/geom';
+import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 
 export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
 
@@ -21,7 +21,8 @@ export const PanelSliderOrTextInput = ({
   const {
     setValue, valuePath, value,
   } = mstDataToProps(node, property);
-  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${CURRENT_UNIT})` : ''}`;
+  const { preferences: { displayUnit } } = useWorkspaceMst();
+  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${displayUnit})` : ''}`;
   const [isSlider, setIsSlider] = useState(true);
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
 
