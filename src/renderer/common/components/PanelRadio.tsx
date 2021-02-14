@@ -1,5 +1,3 @@
-import InputLabel from '@material-ui/core/InputLabel';
-import uuid from 'uuid/v1';
 import FormControl from '@material-ui/core/FormControl';
 import React from 'react';
 import { observer } from 'mobx-react';
@@ -15,13 +13,12 @@ export const UncontrolledPanelRadio = observer(({
   value, onChange, options, label, name,
 }) => {
   const classes = useStyles();
-  if (value === undefined) { return null; }
   return (
     <FormControl className={classes.formControl}>
       <FormLabel component="legend">{ label }</FormLabel>
       <RadioGroup {...{ name, value, onChange }} row>
         {options.map(({ label: optionLabel, value: optionValue }) => (
-          <FormControlLabel key={value} value={optionValue} control={<Radio />} label={optionLabel} />
+          <FormControlLabel key={optionValue} value={optionValue} control={<Radio />} label={optionLabel} />
         ))}
       </RadioGroup>
     </FormControl>
