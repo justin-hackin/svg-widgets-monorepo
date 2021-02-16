@@ -54,6 +54,7 @@ export const TextureTransformEditorModel = types
     viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
     history: types.optional(UndoManagerWithGroupState, {}),
     modifierTracking: types.optional(ModifierTrackingModel, {}),
+    isBordered: types.optional(types.boolean, true),
   })
   .volatile(() => ({
     shapeObject: null,
@@ -104,6 +105,9 @@ export const TextureTransformEditorModel = types
     },
     get faceBoundary() {
       if (!self.decorationBoundary || !self.borderToInsetRatio) { return undefined; }
+      if (!self.isBordered) {
+        return self.decorationBoundary;
+      }
       const vertices = self.decorationBoundary.vertices
         .map((pt) => sumPoints(scalePoint(pt, self.borderToInsetRatio), self.insetToBorderOffset));
       return BoundaryModel.create({ vertices });
@@ -184,6 +188,9 @@ export const TextureTransformEditorModel = types
     },
     setShapeObject(shape) {
       self.shapeObject = shape;
+    },
+    setIsBordered(isUsed) {
+      self.isBordered = isUsed;
     },
     // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
     getFileBasename() {

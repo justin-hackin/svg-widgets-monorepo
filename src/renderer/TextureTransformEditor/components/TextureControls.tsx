@@ -17,11 +17,12 @@ import { DragModeOptionsGroup } from './DragModeOptionGroup';
 import { EVENTS } from '../../../main/ipc';
 import { useMst } from '../models';
 import { HistoryButtons } from
-    '../../DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
+  '../../DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useStyles } from '../style';
 import { DEFAULT_SLIDER_STEP } from '../../common/constants';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { PanelSliderComponent } from '../../common/components/PanelSliderComponent';
+import { ITextureTransformEditorModel } from '../models/TextureTransformEditorModel';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -48,7 +49,8 @@ export const TextureControls = observer(() => {
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, downloadShapeGLTF,
     setTexturePath, setTextureImage,
-  } = store;
+    isBordered, setIsBordered,
+  } = store as ITextureTransformEditorModel;
   const classes = useStyles();
   const {
     pattern: { isPositive = undefined } = {}, setIsPositive, rotate: textureRotate, hasPathPattern,
@@ -118,6 +120,21 @@ export const TextureControls = observer(() => {
           <FolderOpenIcon fontSize="large" />
         </IconButton>
         <HistoryButtons history={history} />
+        <FormControlLabel
+          className={classes.checkboxControlLabel}
+          labelPlacement="top"
+          control={(
+            <Switch
+              checked={isBordered}
+              onChange={(e) => {
+                setIsBordered(e.target.checked);
+              }}
+              color="primary"
+            />
+          )}
+          label="Bordered"
+        />
+
         <FormControlLabel
           className={classes.checkboxControlLabel}
           labelPlacement="top"
