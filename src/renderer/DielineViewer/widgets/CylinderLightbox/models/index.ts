@@ -2,14 +2,14 @@ import { Instance, types } from 'mobx-state-tree';
 import { reaction } from 'mobx';
 import {
   angleRelativeToOrigin,
-  CM_TO_PIXELS_RATIO,
   getOriginPoint, lineLerp,
-  pointFromPolar, radToDeg, sumPoints,
+  pointFromPolar, sumPoints,
 } from '../../../../common/util/geom';
 import { DestinationCommand, PathData } from '../../../util/PathData';
 import { UndoManagerWithGroupState } from '../../../../common/components/UndoManagerWithGroupState';
 import { closedPolygonPath } from '../../../util/shapes/generic';
 import { subtractDValues, unifyDValues } from '../../../../common/util/path-boolean';
+import { CM_TO_PIXELS_RATIO, radToDeg } from '../../../../common/util/units';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },

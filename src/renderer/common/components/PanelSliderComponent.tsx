@@ -5,9 +5,9 @@ import { startCase } from 'lodash';
 
 import { observer } from 'mobx-react';
 import { getHistory, mstDataToProps } from '../util/mst';
-import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../util/geom';
 import { useStyles } from '../../DielineViewer/style';
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
+import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../util/units';
 
 const ValueLabelComponent = ({
   children,

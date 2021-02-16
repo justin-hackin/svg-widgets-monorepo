@@ -10,8 +10,8 @@ import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEd
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { ShapeSelect } from '../../../../common/components/ShapeSelect';
-import { CM_TO_PIXELS_RATIO } from '../../../../common/util/geom';
 import { PanelSliderOrTextInput } from '../../../../common/components/PanelSliderOrTextInput';
+import { CM_TO_PIXELS_RATIO } from '../../../../common/util/units';
 
 const controlsTabs = [
   {

@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { IPreferencesModel } from '../../../models/PreferencesModel';
 import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
 import {
-  lineLerp, matrixWithTransformOrigin, radToDeg,
+  lineLerp, matrixWithTransformOrigin,
 // eslint-disable-next-line import/named
 } from '../../../../common/util/geom';
 import {
@@ -16,6 +16,7 @@ import {
 } from '../../../models/PyramidNetStore';
 import { closedPolygonPath } from '../../../util/shapes/generic';
 import { theme } from '../../../../TextureTransformEditor';
+import { radToDeg } from '../../../../common/util/units';
 
 const DielineGroup = ({ children }) => (
   <g {...{

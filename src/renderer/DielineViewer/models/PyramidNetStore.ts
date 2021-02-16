@@ -9,12 +9,9 @@ import {
 
 import { polyhedra } from '../data/polyhedra';
 import {
-  CM_TO_PIXELS_RATIO,
-  degToRad,
   getTextureTransformMatrix, hingedPlot, hingedPlotByProjectionDistance,
   offsetPolygonPoints,
-  polygonPointsGivenAnglesAndSides, radToDeg,
-  RawPoint,
+  polygonPointsGivenAnglesAndSides, RawPoint,
   scalePoint, sumPoints,
   triangleAnglesGivenSides,
 } from '../../common/util/geom';
@@ -32,6 +29,7 @@ import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 import { DimensionsModel } from '../../../common/models/DimensionsModel';
 import { getBoundedTexturePathD } from '../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
+import { CM_TO_PIXELS_RATIO, degToRad, radToDeg } from '../../common/util/units';
 
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 

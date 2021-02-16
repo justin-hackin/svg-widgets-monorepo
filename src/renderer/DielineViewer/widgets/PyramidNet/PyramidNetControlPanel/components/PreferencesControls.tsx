@@ -8,7 +8,7 @@ import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
 import { PanelTextInput } from '../../../../../common/components/PanelTextInput';
 import { PanelRadio } from '../../../../../common/components/PanelRadio';
-import { UNITS } from '../../../../../common/util/geom';
+import { UNITS } from '../../../../../common/util/units';
 
 export const PreferencesControls = observer(() => {
   const { preferences, resetPreferences } = useWorkspaceMst();

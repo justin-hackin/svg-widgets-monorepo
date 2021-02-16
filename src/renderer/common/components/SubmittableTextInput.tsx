@@ -2,8 +2,8 @@ import { Input } from '@material-ui/core';
 import React from 'react';
 import parseFraction from 'parse-fraction';
 
-import { pxToUnitView, UNIT_TO_PIXELS } from '../util/geom';
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
+import { pxToUnitView, UNIT_TO_PIXELS } from '../util/units';
 
 export const SubmittableTextInput = ({
   value,
