@@ -12,7 +12,6 @@ import { mstDataToProps } from '../util/mst';
 import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 
-
 export const PanelSliderOrTextInput = observer(({
   node, property, min, max, step = undefined, useUnits = false, className = undefined, label = undefined,
 }) => {
@@ -35,7 +34,7 @@ export const PanelSliderOrTextInput = observer(({
         <div className={classes.sliderTextInput}>
           {(isSlider) ? (
             <UnlabeledPanelSliderComponent {...{
-              node, property, min, max, step, useUnits, unit: displayUnit, labelId,
+              node, property, min, max, step, unit: useUnits ? displayUnit : undefined, labelId,
             }}
             />
           ) : (
