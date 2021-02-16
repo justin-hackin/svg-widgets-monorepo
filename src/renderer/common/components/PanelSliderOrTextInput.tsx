@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { FormControl, IconButton, Typography } from '@material-ui/core';
 import TuneIcon from '@material-ui/icons/Tune';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
+import { observer } from 'mobx-react';
 
 import { useStyles } from '../../DielineViewer/style';
 import { SubmittableTextInput } from './SubmittableTextInput';
@@ -11,9 +12,8 @@ import { mstDataToProps } from '../util/mst';
 import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 
-export const getLabelFromValuePath = (valuePath) => startCase(last((valuePath.split('.'))));
 
-export const PanelSliderOrTextInput = ({
+export const PanelSliderOrTextInput = observer(({
   node, property, min, max, step = undefined, useUnits = false, className = undefined, label = undefined,
 }) => {
   const classes = useStyles();
@@ -35,7 +35,7 @@ export const PanelSliderOrTextInput = ({
         <div className={classes.sliderTextInput}>
           {(isSlider) ? (
             <UnlabeledPanelSliderComponent {...{
-              node, property, min, max, step, useUnits, labelId,
+              node, property, min, max, step, useUnits, unit: displayUnit, labelId,
             }}
             />
           ) : (
@@ -54,4 +54,4 @@ export const PanelSliderOrTextInput = ({
       </div>
     </FormControl>
   );
-};
+});

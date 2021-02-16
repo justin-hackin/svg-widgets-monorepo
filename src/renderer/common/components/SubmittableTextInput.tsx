@@ -1,11 +1,12 @@
 import { Input } from '@material-ui/core';
-import React from 'react';
+import React, { createRef, useEffect } from 'react';
 import parseFraction from 'parse-fraction';
+import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 import { pxToUnitView, UNIT_TO_PIXELS } from '../util/units';
 
-export const SubmittableTextInput = ({
+export const SubmittableTextInput = observer(({
   value,
   setValue,
   valuePath,
@@ -13,8 +14,15 @@ export const SubmittableTextInput = ({
   useUnits = false,
 }) => {
   const { preferences: { displayUnit } } = useWorkspaceMst();
+  const inputRef = createRef<HTMLInputElement>();
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.value = pxToUnitView(value, displayUnit);
+    }
+  }, [displayUnit]);
   return (
     <Input
+      inputRef={inputRef}
       defaultValue={useUnits ? pxToUnitView(value, displayUnit) : value}
       name={valuePath}
       onKeyPress={(e) => {
@@ -38,4 +46,4 @@ export const SubmittableTextInput = ({
       inputProps={{ 'aria-label': labelId }}
     />
   );
-};
+});

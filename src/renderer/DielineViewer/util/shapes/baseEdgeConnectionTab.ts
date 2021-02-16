@@ -1,5 +1,6 @@
 import { Instance, types } from 'mobx-state-tree';
 
+import { Cache } from 'three';
 import { PathData } from '../PathData';
 import {
   distanceBetweenPoints,
@@ -12,6 +13,7 @@ import {
 import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
 import { arrowTabPlots } from './symmetricRoundedTab';
 import { VERY_LARGE_NUMBER } from '../../../common/constants';
+import clear = Cache.clear;
 
 export interface BaseEdgeConnectionTab {
   score: PathData,
@@ -90,9 +92,19 @@ export function baseEdgeConnectionTab(
     hingedPlotLerp(mid, start, 0, outLengthRatio),
     hingedPlot(start, mid, 0, inLengthHole),
   ];
+
+  const clearanceLength = tabDepth * 0.1;
+  // nudge the hole protrusion and tab away from the pyramid net in order to lessen hard angles
+  // which cause problems with a drag-blade in a home cutting machine
+
+  const holeBasesClearance = [
+    hingedPlotByProjectionDistance(start, holeBases[0], Math.PI / 2, clearanceLength),
+    hingedPlotByProjectionDistance(start, holeBases[1], Math.PI / 2, clearanceLength),
+  ];
+
   const holeTheta = -holeTaper + Math.PI / 2;
   const holeEdges = symmetricHingePlotByProjectionDistance(
-    holeBases[0], holeBases[1], holeTheta, tabDepth * holeDepthToTabDepth,
+    holeBasesClearance[0], holeBasesClearance[1], holeTheta, tabDepth * holeDepthToTabDepth,
   );
 
   const finBases = [
@@ -100,23 +112,31 @@ export function baseEdgeConnectionTab(
     hingedPlotLerp(mid, end, 0, outLengthRatio),
   ];
 
+  const finBasesClearance = [
+    hingedPlotByProjectionDistance(start, finBases[0], Math.PI / 2, clearanceLength),
+    hingedPlotByProjectionDistance(start, finBases[1], Math.PI / 2, clearanceLength),
+  ];
+
   const finDepth = finDepthToTabDepth * tabDepth;
   const finTraversal = distanceBetweenPoints(finBases[0], finBases[1]);
   // for plotting points only, need rounding clamp based on all roundings
   const { tabMidpoints, tabApexes } = arrowTabPlots(
-    finBases[0], finBases[1], 0.5,
+    finBasesClearance[0], finBasesClearance[1], 0.5,
     finDepth / finTraversal, holeTheta,
   );
 
   innerCut
     .move(holeBases[0])
     .line(holeBases[1])
-    .curvedLineSegments([holeEdges[1], holeEdges[0]], roundingDistanceRatio, true);
+    .line(holeBasesClearance[1])
+    .curvedLineSegments([holeEdges[1], holeEdges[0], holeBasesClearance[0]], roundingDistanceRatio)
+    .close();
 
+  const baseHandleEnd = hingedPlot(start, finBases[0], 0, clearanceLength * 2);
   const handleEdges = [
-    hingedPlotByProjectionDistance(finBases[0], start, holeTheta, -tabDepth),
+    hingedPlotByProjectionDistance(baseHandleEnd, start, holeTheta, -tabDepth),
     // TODO: should this go back to symmetric?
-    hingedPlotByProjectionDistance(start, finBases[0], Math.PI * 0.6, tabDepth),
+    hingedPlotByProjectionDistance(start, baseHandleEnd, Math.PI * 0.6, tabDepth),
   ];
   const handleCornerPoints = [handleEdges[0]];
 
@@ -132,11 +152,14 @@ export function baseEdgeConnectionTab(
     );
     handleCornerPoints.push(handleValleyEdges[0], handleValleyDip, handleValleyEdges[1]);
   }
-  handleCornerPoints.push(handleEdges[1], finBases[0]);
+  handleCornerPoints.push(handleEdges[1], baseHandleEnd);
   boundaryCut.move(start).curvedLineSegments(handleCornerPoints, roundingDistanceRatio)
+    .line(finBases[0])
+    .line(finBasesClearance[0])
     .curvedLineSegments(
-      [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBases[1]], roundingDistanceRatio,
+      [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]], roundingDistanceRatio,
     )
+    .line(finBases[1])
     .line(end);
 
   score.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));
