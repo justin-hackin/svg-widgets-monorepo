@@ -45,6 +45,7 @@ export const BaseEdgeTabsModel = types.model({
   tabDepthToAscendantTabDepth: types.optional(types.number, 1.5),
   holeTabClearance: types.optional(types.number, 0.05),
   bendGuideValley: types.maybe(BendGuideValleyModel),
+  tabConjunctionClearance: types.optional(types.number, 0.1),
 }).actions((self) => ({
   unsetBendGuideValley() {
     self.bendGuideValley = undefined;
@@ -71,6 +72,7 @@ export function baseEdgeConnectionTab(
     scoreTabMidline,
     roundingDistanceRatio,
     holeTabClearance,
+    tabConjunctionClearance,
   } = tabSpec;
 
   const boundaryCut = new PathData();
@@ -91,7 +93,7 @@ export function baseEdgeConnectionTab(
     hingedPlot(start, mid, 0, inLengthHole),
   ];
 
-  const clearanceLength = tabDepth * 0.1;
+  const clearanceLength = tabDepth * tabConjunctionClearance;
   // nudge the hole protrusion and tab away from the pyramid net in order to lessen hard angles
   // which cause problems with a drag-blade in a home cutting machine
 

@@ -73,6 +73,13 @@ export const BaseEdgeTabControls = observer(() => {
         max={Math.PI / 3}
         step={DEFAULT_SLIDER_STEP}
       />
+      <PanelSliderOrTextInput
+        node={baseEdgeTabsSpec}
+        property="tabConjunctionClearance"
+        min={0.05}
+        max={0.4}
+        step={0.01}
+      />
       <PanelSwitchUncontrolled
         label="Use Bend Guide Valley"
         valuePath="BaseEdgeTabControls__useBendGuideValley"
