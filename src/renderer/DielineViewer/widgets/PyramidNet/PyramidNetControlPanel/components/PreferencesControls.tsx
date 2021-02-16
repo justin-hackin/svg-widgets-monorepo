@@ -24,7 +24,11 @@ export const PreferencesControls = observer(() => {
       <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" />
       <PanelSwitch
         node={preferences}
-        property="useClones"
+        property="useClonesForBaseTabs"
+      />
+      <PanelSwitch
+        node={preferences}
+        property="useClonesForDecoration"
       />
       <PanelSliderOrTextInput
         node={preferences}

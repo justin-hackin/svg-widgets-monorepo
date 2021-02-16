@@ -1,4 +1,4 @@
-import { last, startCase } from 'lodash';
+import { startCase } from 'lodash';
 import uuid from 'uuid/v1';
 import React, { useState } from 'react';
 import { FormControl, IconButton, Typography } from '@material-ui/core';
