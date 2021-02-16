@@ -1,6 +1,5 @@
 import { Instance, types } from 'mobx-state-tree';
 
-import { Cache } from 'three';
 import { PathData } from '../PathData';
 import {
   distanceBetweenPoints,
@@ -13,7 +12,6 @@ import {
 import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
 import { arrowTabPlots } from './symmetricRoundedTab';
 import { VERY_LARGE_NUMBER } from '../../../common/constants';
-import clear = Cache.clear;
 
 export interface BaseEdgeConnectionTab {
   score: PathData,
@@ -21,7 +19,7 @@ export interface BaseEdgeConnectionTab {
   boundaryCut: PathData,
 }
 
-// "base" is crease upon which tab it folds
+// "base" is crease upon which the tab folds
 // "edge" is opposite the base (most distant from it)
 // "depth" is the distance from the base to the edge
 // "fin" is the male part of the tab which enters the hole of the tab
@@ -154,13 +152,13 @@ export function baseEdgeConnectionTab(
   }
   handleCornerPoints.push(handleEdges[1], baseHandleEnd);
   boundaryCut.move(start).curvedLineSegments(handleCornerPoints, roundingDistanceRatio)
-    .line(finBases[0])
-    .line(finBasesClearance[0])
-    .curvedLineSegments(
-      [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]], roundingDistanceRatio,
-    )
-    .line(finBases[1])
-    .line(end);
+    .curvedLineSegments([finBases[0], finBasesClearance[0], tabMidpoints[0]], 0.5);
+  boundaryCut.commands.pop();
+  boundaryCut.curvedLineSegments(
+    [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]], roundingDistanceRatio,
+  );
+  boundaryCut.commands.pop();
+  boundaryCut.curvedLineSegments([finBasesClearance[1], finBases[1], end], 0.5);
 
   score.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));
   if (scoreTabMidline) {
