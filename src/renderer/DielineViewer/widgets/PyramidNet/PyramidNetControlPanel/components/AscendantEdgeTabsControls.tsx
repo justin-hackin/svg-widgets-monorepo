@@ -53,11 +53,6 @@ export const AscendantEdgeTabsControls = observer(() => {
       />
       <PanelSliderOrTextInput
         node={ascendantEdgeTabsSpec}
-        property="tabControlPointsAngle"
-        {...ratioSliderProps}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
         property="tabStartGapToTabDepth"
         min={0.3}
         max={1}
