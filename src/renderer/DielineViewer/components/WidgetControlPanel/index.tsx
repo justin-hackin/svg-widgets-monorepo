@@ -28,6 +28,9 @@ import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
 import { SimpleDialog } from '../../../common/components/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
 
+const OPEN_TXT = 'Open';
+const SAVE_TXT = 'Save';
+
 export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, AdditionalToolbarContent, PanelContent }) => {
   // @ts-ignore
   const classes = useStyles();
@@ -54,7 +57,9 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   };
 
   const openSpecHandler = async () => {
-    const { fileData, filePath } = await globalThis.ipcRenderer.invoke(EVENTS.LOAD_SNAPSHOT);
+    const { fileData, filePath } = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
+      message: OPEN_TXT,
+    });
     if (fileData) {
       workspaceStore.setCurrentFileData(filePath, fileData);
       applySnapshot(store.shapeDefinition, fileData);
@@ -87,6 +92,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
       workspaceStore.renderWidgetToString(),
       snapshot,
       workspaceStore.currentFilePath,
+      { message: SAVE_TXT },
     );
 
     if (filePath) {
@@ -146,13 +152,13 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
                 <ListItemIcon className={classes.listItemIcon}>
                   <FolderOpenIcon fontSize="small" />
                 </ListItemIcon>
-                <Typography variant="inherit">Open JSON data</Typography>
+                <Typography variant="inherit">{OPEN_TXT}</Typography>
               </MenuItem>
               <MenuItem onClick={saveHandler}>
                 <ListItemIcon className={classes.listItemIcon}>
                   <SaveIcon fontSize="small" />
                 </ListItemIcon>
-                <Typography variant="inherit">Save</Typography>
+                <Typography variant="inherit">{SAVE_TXT}</Typography>
               </MenuItem>
               <MenuItem
                 disabled={!workspaceStore.currentFileName}
@@ -163,7 +169,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
                 </ListItemIcon>
                 <Typography variant="inherit">Save as ...</Typography>
               </MenuItem>
-              { AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
+              {AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
             </Menu>
             <IconButton
               color="inherit"

@@ -13,7 +13,7 @@ enum MAIN_EVENTS {
   SAVE_GLTF = 'save-gltf',
   DIALOG_SAVE_MODEL_WITH_SVG = 'dialog-save-model-with-svg',
   SAVE_MODEL_WITH_SVG = 'save-model-with-svg',
-  LOAD_SNAPSHOT = 'load-snapshot',
+  DIALOG_LOAD_JSON = 'dialog-load-json',
   OPEN_SVG = 'open-svg',
   OPEN_TEXTURE_WINDOW = 'open-texture-window',
   RESET_DRAG_MODE = 'reset-drag-mode',
@@ -124,8 +124,8 @@ export const setupIpc = (ipcMain) => {
   ipcMain.handle(EVENTS.SAVE_MODEL_WITH_SVG,
     (_, svgContent, modelData, filePath) => writeModelAndSvg(svgContent, modelData, filePath));
 
-  ipcMain.handle(EVENTS.LOAD_SNAPSHOT, () => resolveStringDataFromDialog(
-    { filters: jsonFilters, message: 'Load JSON pyramid net spec data' },
+  ipcMain.handle(EVENTS.DIALOG_LOAD_JSON, (e, dialogOptions) => resolveStringDataFromDialog(
+    { ...dialogOptions, filters: jsonFilters },
   ).then(({ fileString, filePath }) => ({
     fileData: JSON.parse(fileString),
     filePath,

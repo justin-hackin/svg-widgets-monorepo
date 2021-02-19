@@ -288,7 +288,11 @@ export const TextureTransformEditorModel = types
     },
     saveTexture() {
       if (!self.texture) { return; }
-      globalThis.ipcRenderer.send(EVENTS.SAVE_JSON, getSnapshot(self.texture), {
+      const fileData = {
+        shapeName: self.shapeName,
+        textureSnapshot: getSnapshot(self.texture),
+      };
+      globalThis.ipcRenderer.invoke(EVENTS.SAVE_JSON, fileData, {
         message: 'Save texture specification',
         defaultPath: `${self.shapeName}__${self.texture.pattern.sourceFileName}--TEXTURE.json`,
       });
