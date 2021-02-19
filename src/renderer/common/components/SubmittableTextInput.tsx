@@ -16,7 +16,7 @@ export const SubmittableTextInput = observer(({
   const { preferences: { displayUnit } } = useWorkspaceMst();
   const inputRef = createRef<HTMLInputElement>();
   useEffect(() => {
-    if (inputRef.current) {
+    if (inputRef.current && useUnits) {
       inputRef.current.value = pxToUnitView(value, displayUnit);
     }
   }, [displayUnit]);

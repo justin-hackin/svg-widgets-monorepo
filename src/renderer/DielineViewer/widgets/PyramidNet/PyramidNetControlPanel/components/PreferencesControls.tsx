@@ -20,8 +20,8 @@ export const PreferencesControls = observer(() => {
         property="displayUnit"
         options={options}
       />
-      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width" />
-      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" />
+      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width" useUnits />
+      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" useUnits />
       <PanelSwitch
         node={preferences}
         property="useClonesForBaseTabs"
