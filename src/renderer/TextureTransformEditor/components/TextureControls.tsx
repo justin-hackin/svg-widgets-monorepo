@@ -9,6 +9,8 @@ import CachedIcon from '@material-ui/icons/Cached';
 import TelegramIcon from '@material-ui/icons/Telegram';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
+import ArchiveIcon from '@material-ui/icons/Archive';
+
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
@@ -44,13 +46,13 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 export const TextureControls = observer(() => {
   const store = useMst();
   const {
-    texture, sendTexture, decorationBoundary, selectedTextureNodeIndex,
+    texture, sendTexture, saveTexture, decorationBoundary, selectedTextureNodeIndex,
     showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, downloadShapeGLTF,
     setTexturePath, setTextureImage,
     isBordered, setIsBordered,
-  } = store as ITextureTransformEditorModel;
+  }: ITextureTransformEditorModel = store;
   const classes = useStyles();
   const {
     pattern: { isPositive = undefined } = {}, setIsPositive, rotate: textureRotate, hasPathPattern,
@@ -275,6 +277,13 @@ export const TextureControls = observer(() => {
               <span>
                 <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
                   <GetAppIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Export texture arrangement" arrow>
+              <span>
+                <IconButton onClick={() => { saveTexture(); }} aria-label="export texture" component="span">
+                  <ArchiveIcon fontSize="large" />
                 </IconButton>
               </span>
             </Tooltip>

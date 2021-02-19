@@ -283,10 +283,15 @@ export const TextureTransformEditorModel = types
     },
 
     sendTexture() {
-      if (!self.texture) {
-        return;
-      }
+      if (!self.texture) { return; }
       globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, getSnapshot(self.texture));
+    },
+    saveTexture() {
+      if (!self.texture) { return; }
+      globalThis.ipcRenderer.send(EVENTS.SAVE_JSON, getSnapshot(self.texture), {
+        message: 'Save texture specification',
+        defaultPath: `${self.shapeName}__${self.texture.pattern.sourceFileName}--TEXTURE.json`,
+      });
     },
   }))
   .actions((self) => {

@@ -1,3 +1,4 @@
+const { endsWith } = require('lodash');
 const { dialog } = require('electron');
 const datauri = require('datauri');
 const sizeOfImage = require('image-size');
@@ -8,6 +9,7 @@ const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
 
 enum MAIN_EVENTS {
   SAVE_SVG = 'save-svg',
+  SAVE_JSON = 'save-json',
   SAVE_GLTF = 'save-gltf',
   DIALOG_SAVE_MODEL_WITH_SVG = 'dialog-save-model-with-svg',
   SAVE_MODEL_WITH_SVG = 'save-model-with-svg',
@@ -62,6 +64,15 @@ export const setupIpc = (ipcMain) => {
   }).then(({ canceled, filePath }) => {
     if (canceled) { return undefined; }
     return fsPromises.writeFile(filePath, fileContent);
+  }));
+
+  ipcMain.handle(EVENTS.SAVE_JSON, (e, jsonData, dialogOptions) => dialog.showSaveDialog({
+    ...dialogOptions,
+    filters: jsonFilters,
+  }).then(({ canceled, filePath }) => {
+    if (canceled) { return undefined; }
+    const resolvedFilePath = endsWith(filePath, '.json') ? filePath : `${filePath}.json`;
+    return fsPromises.writeFile(resolvedFilePath, JSON.stringify(jsonData));
   }));
 
   ipcMain.handle(EVENTS.SAVE_GLTF, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
