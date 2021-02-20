@@ -9,7 +9,7 @@ import { DestinationCommand, PathData } from '../../../util/PathData';
 import { UndoManagerWithGroupState } from '../../../../common/components/UndoManagerWithGroupState';
 import { closedPolygonPath } from '../../../util/shapes/generic';
 import { subtractDValues, unifyDValues } from '../../../../common/util/path-boolean';
-import { CM_TO_PIXELS_RATIO, radToDeg } from '../../../../common/util/units';
+import { PIXELS_PER_CM, radToDeg } from '../../../../common/util/units';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -26,12 +26,12 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
   wallsPerArc: types.optional(types.integer, 4),
   holeWidthRatio: types.optional(types.number, 0.5),
   arcsPerRing: types.optional(types.integer, 4),
-  ringRadius: types.optional(types.number, CM_TO_PIXELS_RATIO * 11.25),
+  ringRadius: types.optional(types.number, PIXELS_PER_CM * 11.25),
   ringThicknessRatio: types.optional(types.number, 0.2),
-  materialThickness: types.optional(types.number, CM_TO_PIXELS_RATIO * 0.3),
+  materialThickness: types.optional(types.number, PIXELS_PER_CM * 0.3),
   dovetailIngressRatio: types.optional(types.number, 0.5),
   dovetailSizeRatio: types.optional(types.number, 0.5),
-  cylinderHeight: types.optional(types.number, CM_TO_PIXELS_RATIO * 2),
+  cylinderHeight: types.optional(types.number, PIXELS_PER_CM * 2),
   holderTabsPerArc: types.optional(types.integer, 2),
   holderTabsFeetLengthRatio: types.optional(types.number, 0.5),
 }).volatile(() => ({

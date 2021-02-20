@@ -4,7 +4,7 @@ import parseFraction from 'parse-fraction';
 import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
-import { pxToUnitView, UNIT_TO_PIXELS } from '../util/units';
+import { pxToUnitView, PIXELS_PER_UNIT } from '../util/units';
 
 export const SubmittableTextInput = observer(({
   value,
@@ -31,7 +31,7 @@ export const SubmittableTextInput = observer(({
           if (useUnits) {
             try {
               const [num, denom] = parseFraction(stringValue);
-              setValue((num / denom) * UNIT_TO_PIXELS[displayUnit]);
+              setValue((num / denom) * PIXELS_PER_UNIT[displayUnit]);
               // eslint-disable-next-line no-empty
             } catch (_) {
             }

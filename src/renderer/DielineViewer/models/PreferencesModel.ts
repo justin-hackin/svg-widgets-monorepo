@@ -1,5 +1,5 @@
 import { types, Instance, SnapshotIn } from 'mobx-state-tree';
-import { CM_TO_PIXELS_RATIO, UNITS } from '../../common/util/units';
+import { PIXELS_PER_CM, UNITS } from '../../common/util/units';
 
 // reassignment of a mst-persist store will cause undisposed onSnapshot
 // see: https://github.com/agilgur5/mst-persist/issues/20
@@ -16,8 +16,8 @@ export const defaultPreferences: SnapshotIn<IPreferencesModel> = {
   scoreStrokeColor: '#BDFF48',
   strokeWidth: 1,
   dielineDocumentDimensions: {
-    width: CM_TO_PIXELS_RATIO * 49.5,
-    height: CM_TO_PIXELS_RATIO * 27.9,
+    width: PIXELS_PER_CM * 49.5,
+    height: PIXELS_PER_CM * 27.9,
   },
 };
 

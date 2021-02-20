@@ -29,7 +29,7 @@ import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 import { DimensionsModel } from '../../../common/models/DimensionsModel';
 import { getBoundedTexturePathD } from '../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
-import { CM_TO_PIXELS_RATIO, degToRad, radToDeg } from '../../common/util/units';
+import { PIXELS_PER_CM, degToRad, radToDeg } from '../../common/util/units';
 
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
 
@@ -100,7 +100,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   ascendantEdgeTabsSpec: types.optional(AscendantEdgeTabsModel, {}),
   baseEdgeTabsSpec: types.optional(BaseEdgeTabsModel, {}),
   // TODO: don't use weird naming conventions to leverage behaviour, use property metadata
-  shapeHeight: types.optional(types.number, 20 * CM_TO_PIXELS_RATIO),
+  shapeHeight: types.optional(types.number, 20 * PIXELS_PER_CM),
   faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
   useDottedStroke: types.optional(types.boolean, false),
   // TODO: migrate to preferences

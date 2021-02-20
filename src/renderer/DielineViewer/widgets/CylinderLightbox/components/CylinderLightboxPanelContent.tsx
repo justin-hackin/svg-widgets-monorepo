@@ -6,7 +6,7 @@ import { PanelSliderOrTextInput } from '../../../../common/components/PanelSlide
 import { PanelSliderComponent } from '../../../../common/components/PanelSliderComponent';
 import { DEFAULT_SLIDER_STEP } from '../../../../common/constants';
 import { useStyles } from '../../../style';
-import { CM_TO_PIXELS_RATIO } from '../../../../common/util/units';
+import { PIXELS_PER_CM } from '../../../../common/util/units';
 
 export const CylinderLightboxPanelContent = () => {
   const workspaceStore = useWorkspaceMst();
@@ -39,25 +39,25 @@ export const CylinderLightboxPanelContent = () => {
       <PanelSliderOrTextInput
         node={shapeDefinition}
         property="materialThickness"
-        min={CM_TO_PIXELS_RATIO * 0.1}
-        max={CM_TO_PIXELS_RATIO}
+        min={PIXELS_PER_CM * 0.1}
+        max={PIXELS_PER_CM}
         useUnits
       />
       <PanelSliderOrTextInput
         node={shapeDefinition}
         property="cylinderHeight"
-        min={CM_TO_PIXELS_RATIO}
-        max={CM_TO_PIXELS_RATIO * 30}
-        step={0.1 * CM_TO_PIXELS_RATIO}
+        min={PIXELS_PER_CM}
+        max={PIXELS_PER_CM * 30}
+        step={0.1 * PIXELS_PER_CM}
         useUnits
       />
 
       <PanelSliderOrTextInput
         node={shapeDefinition}
         property="ringRadius"
-        min={CM_TO_PIXELS_RATIO * 10}
-        max={CM_TO_PIXELS_RATIO * 60}
-        step={0.25 * CM_TO_PIXELS_RATIO}
+        min={PIXELS_PER_CM * 10}
+        max={PIXELS_PER_CM * 60}
+        step={0.25 * PIXELS_PER_CM}
         useUnits
       />
       <PanelSliderOrTextInput
