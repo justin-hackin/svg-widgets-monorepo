@@ -39,6 +39,7 @@ export const PrintLayer = observer(({
       faceDecoration,
       faceLengthAdjustRatio,
       faceBoundaryPoints,
+      faceIsSymmetrical,
       pyramid: { geometry: { faceCount } },
     },
   } = widgetStore;
@@ -75,9 +76,10 @@ export const PrintLayer = observer(({
       <g transform={fitToCanvasTranslationStr}>
         {
           range(faceCount).map((index) => {
-            const isOdd = !!(index % 2);
-            const xScale = isOdd ? -1 : 1;
-            const asymmetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+            const isMirrored = !!(index % 2) && !faceIsSymmetrical;
+            const xScale = isMirrored ? -1 : 1;
+            const asymmetryNudge = (isMirrored)
+              ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
             const decorationRotationRad = -1 * index * faceInteriorAngles[2] * xScale + asymmetryNudge;
 
             const cloneTransformMatrix = (new DOMMatrixReadOnly())

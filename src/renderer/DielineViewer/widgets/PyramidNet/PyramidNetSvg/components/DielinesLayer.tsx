@@ -33,6 +33,7 @@ export const DielinesLayer = observer(({
       decorationCutPath,
       texturePathD, pathScaleMatrix, borderInsetFaceHoleTransformMatrix, faceInteriorAngles,
       faceBoundaryPoints,
+      faceIsSymmetrical,
       pyramid: { geometry: { faceCount } },
       femaleAscendantFlap, ascendantEdgeTabs, nonTabbedAscendantScores,
     },
@@ -54,9 +55,10 @@ export const DielinesLayer = observer(({
     return (
       <g id={DECORATION_CUT_ID}>
         {range(faceCount).map((index) => {
-          const isOdd = !!(index % 2);
-          const xScale = isOdd ? -1 : 1;
-          const asymmetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+          // TODO: transform matrix calculation not DRY with image faces and non-cloned decoration cut
+          const isMirrored = !!(index % 2) && !faceIsSymmetrical;
+          const xScale = isMirrored ? -1 : 1;
+          const asymmetryNudge = isMirrored ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
           const baseTabRotationRad = -1 * index * faceInteriorAngles[2];
           const decorationRotationRad = xScale * baseTabRotationRad + asymmetryNudge;
           const cloneTransformMatrix = (new DOMMatrixReadOnly())
@@ -100,9 +102,9 @@ export const DielinesLayer = observer(({
         <path d={nonTabbedAscendantScores.getD()} {...scoreProps} />
 
         {range(faceCount).map((index) => {
-          const isOdd = !!(index % 2);
-          const xScale = isOdd ? -1 : 1;
-          const asymmetryNudge = isOdd ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
+          const isMirrored = !!(index % 2) && !faceIsSymmetrical;
+          const xScale = isMirrored ? -1 : 1;
+          const asymmetryNudge = isMirrored ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
           const baseTabRotationRad = -1 * index * faceInteriorAngles[2];
           const decorationRotationRad = xScale * baseTabRotationRad + asymmetryNudge;
           const cloneTransformMatrix = (new DOMMatrixReadOnly())
@@ -120,7 +122,7 @@ export const DielinesLayer = observer(({
                   xlinkHref={`#${BASE_TAB_ID}`}
                   transform={matrixWithTransformOrigin(
                     faceMasterBaseMidpoint,
-                    (new DOMMatrixReadOnly()).scale(isOdd ? -1 : 1, 1),
+                    (new DOMMatrixReadOnly()).scale(isMirrored ? -1 : 1, 1),
                   ).toString()}
                 />
               </g>
