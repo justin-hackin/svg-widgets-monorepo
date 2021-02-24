@@ -20,7 +20,6 @@ import { ITextureTransformEditorModel } from '../models/TextureTransformEditorMo
 const { useEffect, useRef, useState } = React;
 
 const IDEAL_RADIUS = 60;
-const CAMERA_Z_DROP = -2000;
 
 const loader = new GLTFLoader();
 
@@ -96,7 +95,7 @@ export const ShapePreview = observer(() => {
     theScene.add(globalLight);
 
     const theCamera = new PerspectiveCamera(45, width / height, 0.1, 2000);
-    theCamera.position.set(300, 300, CAMERA_Z_DROP);
+    theCamera.position.set(300, 0, 300);
     setCamera(theCamera);
 
     const theControls = new OrbitControls(theCamera, theRenderer.domElement);
@@ -139,7 +138,6 @@ export const ShapePreview = observer(() => {
         scene.traverse((child: Mesh) => {
           if (child.isMesh) {
             const scale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
-            camera.lookAt(child.position.x, child.position.y, child.position.z + CAMERA_Z_DROP);
             child.scale.fromArray([scale, scale, scale]);
             setShapeObject(child);
           }
