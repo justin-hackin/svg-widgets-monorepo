@@ -130,9 +130,13 @@ export const PyramidNetModel = types.model('Pyramid Net', {
     },
 
     get relativeFaceEdgeLengths() {
-      if (self.pyramid.geometry.uniqueFaceEdgeLengths.length === 3) { return self.pyramid.geometry.uniqueFaceEdgeLengths; }
+      if (self.pyramid.geometry.uniqueFaceEdgeLengths.length === 3) {
+        return self.pyramid.geometry.uniqueFaceEdgeLengths;
+      }
       const firstLength = self.pyramid.geometry.uniqueFaceEdgeLengths[0];
-      if (self.pyramid.geometry.uniqueFaceEdgeLengths.length === 2) { return [...self.pyramid.geometry.uniqueFaceEdgeLengths, firstLength]; }
+      if (self.pyramid.geometry.uniqueFaceEdgeLengths.length === 2) {
+        return [...self.pyramid.geometry.uniqueFaceEdgeLengths, firstLength];
+      }
       return [firstLength, firstLength, firstLength];
     },
 
