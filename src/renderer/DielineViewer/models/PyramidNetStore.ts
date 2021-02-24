@@ -31,7 +31,7 @@ import { getBoundedTexturePathD } from '../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
 import { CM_TO_PIXELS_RATIO, degToRad, radToDeg } from '../../common/util/units';
 
-export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
+export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 
 export const PathFaceDecorationPatternModel = types.model({
   pathD: types.string,

@@ -91,10 +91,7 @@ export const TextureControls = observer(() => {
 
   // TODO: add whitespace, improve button definition and input alignment
   return (
-    <AppBar
-      color="inherit"
-      position="absolute"
-    >
+    <AppBar color="inherit">
       <Toolbar
         className={clsx({
           [classes.textureToolbar]: true,
