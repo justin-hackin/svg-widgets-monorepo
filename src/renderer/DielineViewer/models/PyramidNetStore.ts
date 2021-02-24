@@ -353,16 +353,10 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         .transform(`${
           this.borderInsetFaceHoleTransformMatrix.toString()} ${
           this.pathScaleMatrix.toString()}`);
-      range(self.pyramid.geometry.faceCount).forEach((index) => {
-        const isMirrored = !!(index % 2) && !this.faceIsSymmetrical;
-        const xScale = isMirrored ? -1 : 1;
-        const asymetryNudge = isMirrored
-          ? this.faceInteriorAngles[2] - 2 * ((Math.PI / 2) - this.faceInteriorAngles[0]) : 0;
-        const rotationRad = -1 * xScale * index * this.faceInteriorAngles[2] + asymetryNudge;
-        const tiledDecorationPath = insetDecorationPath.clone()
-          .transform(`scale(${xScale}, 1) rotate(${radToDeg(rotationRad)})`);
+      for (const matrix of this.faceDecorationTransformMatricies) {
+        const tiledDecorationPath = insetDecorationPath.clone().transform(matrix.toString());
         cut.concatPath(tiledDecorationPath);
-      });
+      }
       return cut;
     },
     // get borderInsetFaceHoleTransform() {
@@ -405,6 +399,20 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       }
       // invalid types caught by runtime mst type checking, for linting only
       return null;
+    },
+    get faceDecorationTransformMatricies(): DOMMatrixReadOnly[] {
+      const matrices = [];
+      for (let i = 0; i < self.pyramid.geometry.faceCount; i += 1) {
+        const isMirrored = !!(i % 2) && !this.faceIsSymmetrical;
+        const xScale = isMirrored ? -1 : 1;
+        const asymmetryNudge = isMirrored
+          ? this.faceInteriorAngles[2] - 2 * ((Math.PI / 2) - this.faceInteriorAngles[0]) : 0;
+        const baseTabRotationRad = -1 * i * this.faceInteriorAngles[2];
+        const decorationRotationRad = xScale * baseTabRotationRad + asymmetryNudge;
+        matrices.push((new DOMMatrixReadOnly())
+          .scale(xScale, 1).rotate(radToDeg(decorationRotationRad)));
+      }
+      return matrices;
     },
   //  =========================================================
   }))

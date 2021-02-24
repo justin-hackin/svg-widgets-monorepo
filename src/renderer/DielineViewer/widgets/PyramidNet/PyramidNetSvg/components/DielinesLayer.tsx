@@ -1,9 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { range } from 'lodash';
 import { IPreferencesModel } from '../../../../models/PreferencesModel';
 import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
-import { radToDeg } from '../../../../../common/util/units';
 import { lineLerp, matrixWithTransformOrigin } from '../../../../../common/util/geom';
 
 const DielineGroup = ({ children }) => (
@@ -31,10 +29,10 @@ export const DielinesLayer = observer(({
       masterBaseTabScore,
       netPaths: { cut, score },
       decorationCutPath,
-      texturePathD, pathScaleMatrix, borderInsetFaceHoleTransformMatrix, faceInteriorAngles,
+      faceDecorationTransformMatricies,
+      texturePathD, pathScaleMatrix, borderInsetFaceHoleTransformMatrix,
       faceBoundaryPoints,
       faceIsSymmetrical,
-      pyramid: { geometry: { faceCount } },
       femaleAscendantFlap, ascendantEdgeTabs, nonTabbedAscendantScores,
     },
   } = widgetStore;
@@ -54,36 +52,25 @@ export const DielinesLayer = observer(({
     const CUT_HOLES_ID = 'cut-holes-master';
     return (
       <g id={DECORATION_CUT_ID}>
-        {range(faceCount).map((index) => {
-          // TODO: transform matrix calculation not DRY with image faces and non-cloned decoration cut
-          const isMirrored = !!(index % 2) && !faceIsSymmetrical;
-          const xScale = isMirrored ? -1 : 1;
-          const asymmetryNudge = isMirrored ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
-          const baseTabRotationRad = -1 * index * faceInteriorAngles[2];
-          const decorationRotationRad = xScale * baseTabRotationRad + asymmetryNudge;
-          const cloneTransformMatrix = (new DOMMatrixReadOnly())
-            .scale(xScale, 1).rotate(radToDeg(decorationRotationRad));
+        {faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
+          ? (
+            <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
+              {texturePathD && (
+              <path d={texturePathD} transform={pathScaleMatrix.toString()} {...cutProps} />
+              )}
+            </g>
 
-          return index === 0
-            ? (
-              <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
-                {texturePathD && (
-                  <path d={texturePathD} transform={pathScaleMatrix.toString()} {...cutProps} />
-                )}
-              </g>
-
-            ) : (
-              <>
-                <use
-                  key={`${index}-decoration`}
-                  xlinkHref={`#${CUT_HOLES_ID}`}
-                  transform={
+          ) : (
+            <>
+              <use
+                key={`${index}-decoration`}
+                xlinkHref={`#${CUT_HOLES_ID}`}
+                transform={
                     cloneTransformMatrix.toString()
                   }
-                />
-              </>
-            );
-        })}
+              />
+            </>
+          )))}
       </g>
     );
   };
@@ -101,14 +88,8 @@ export const DielinesLayer = observer(({
         <path d={femaleAscendantFlap.getD()} {...cutProps} />
         <path d={nonTabbedAscendantScores.getD()} {...scoreProps} />
 
-        {range(faceCount).map((index) => {
+        {faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => {
           const isMirrored = !!(index % 2) && !faceIsSymmetrical;
-          const xScale = isMirrored ? -1 : 1;
-          const asymmetryNudge = isMirrored ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
-          const baseTabRotationRad = -1 * index * faceInteriorAngles[2];
-          const decorationRotationRad = xScale * baseTabRotationRad + asymmetryNudge;
-          const cloneTransformMatrix = (new DOMMatrixReadOnly())
-            .scale(xScale, 1).rotate(radToDeg(decorationRotationRad));
 
           return index === 0
             ? (

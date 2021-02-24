@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react';
 import { getType } from 'mobx-state-tree';
-import { range } from 'lodash';
 import React from 'react';
 import { IPreferencesModel } from '../../../../models/PreferencesModel';
 import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
@@ -12,7 +11,6 @@ import {
 } from '../../../../models/PyramidNetStore';
 import { theme } from '../../../../../TextureTransformEditor';
 import { closedPolygonPath } from '../../../../util/shapes/generic';
-import { radToDeg } from '../../../../../common/util/units';
 
 const PrintGroup = ({ children }) => (
   <g {...{
@@ -35,12 +33,11 @@ export const PrintLayer = observer(({
   const {
     fitToCanvasTranslationStr,
     pyramidNetSpec: {
-      borderInsetFaceHoleTransformMatrix, faceInteriorAngles,
+      borderInsetFaceHoleTransformMatrix,
       faceDecoration,
+      faceDecorationTransformMatricies,
       faceLengthAdjustRatio,
       faceBoundaryPoints,
-      faceIsSymmetrical,
-      pyramid: { geometry: { faceCount } },
     },
   } = widgetStore;
 
@@ -75,72 +72,59 @@ export const PrintLayer = observer(({
       </defs>
       <g transform={fitToCanvasTranslationStr}>
         {
-          range(faceCount).map((index) => {
-            const isMirrored = !!(index % 2) && !faceIsSymmetrical;
-            const xScale = isMirrored ? -1 : 1;
-            const asymmetryNudge = (isMirrored)
-              ? faceInteriorAngles[2] - 2 * ((Math.PI / 2) - faceInteriorAngles[0]) : 0;
-            const decorationRotationRad = -1 * index * faceInteriorAngles[2] * xScale + asymmetryNudge;
+          faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
+            ? (
+              <g key={index} id={PRINT_IMAGE_ID}>
+                <use id="border-fill" xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />
+                <use
+                  id="bleed-stroke"
+                  xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
+                  fill="none"
+                  stroke={borderFill}
+                  strokeWidth={faceLengthAdjustRatio * 20}
+                  strokeLinejoin="round"
+                />
+                <use
+                  id="outer-glow"
+                  xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
+                  fill="none"
+                  stroke={theme.palette.grey['50']}
+                  strokeWidth={faceLengthAdjustRatio}
+                  filter={`url(#${BLUR_ID})`}
+                  clipPath={`url(#${CLIP_PATH_ID})`}
+                />
+                <path
+                  id="inner-glow"
+                  d={decorationBoundaryPathD}
+                  fill="none"
+                  stroke={theme.palette.grey['50']}
+                  strokeWidth={faceLengthAdjustRatio}
+                  filter={`url(#${BLUR_ID})`}
+                />
 
-            const cloneTransformMatrix = (new DOMMatrixReadOnly())
-              .scale(xScale, 1).rotate(radToDeg(decorationRotationRad));
-            // noinspection HtmlDeprecatedTag
-            return index === 0
-              ? (
-                <g key={index} id={PRINT_IMAGE_ID}>
-                  <use id="border-fill" xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />
-                  <use
-                    id="bleed-stroke"
-                    xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
-                    fill="none"
-                    stroke={borderFill}
-                    strokeWidth={faceLengthAdjustRatio * 20}
-                    strokeLinejoin="round"
-                  />
-                  <use
-                    id="outer-glow"
-                    xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
-                    fill="none"
-                    stroke={theme.palette.grey['50']}
-                    strokeWidth={faceLengthAdjustRatio}
-                    filter={`url(#${BLUR_ID})`}
-                    clipPath={`url(#${CLIP_PATH_ID})`}
-                  />
-                  <path
-                    id="inner-glow"
-                    d={decorationBoundaryPathD}
-                    fill="none"
-                    stroke={theme.palette.grey['50']}
-                    strokeWidth={faceLengthAdjustRatio}
-                    filter={`url(#${BLUR_ID})`}
-                  />
-
-                  <g transform={borderInsetFaceHoleTransformMatrix.toString()}>
-                    <g clipPath={`url(#${CLIP_PATH_ID})`}>
-                      <image
-                        xlinkHref={imageData}
-                        pointerEvents="bounding-box"
-                        {...dimensions}
-                        transform={
+                <g transform={borderInsetFaceHoleTransformMatrix.toString()}>
+                  <g clipPath={`url(#${CLIP_PATH_ID})`}>
+                    <image
+                      xlinkHref={imageData}
+                      pointerEvents="bounding-box"
+                      {...dimensions}
+                      transform={
                           (new DOMMatrixReadOnly())
                             .scale(faceLengthAdjustRatio, faceLengthAdjustRatio)
                             .multiply(transformMatrix)
                             .toString()
                         }
-                      />
-                    </g>
+                    />
                   </g>
                 </g>
-              ) : (
-                <use
-                  key={`${index}-decoration`}
-                  xlinkHref={`#${PRINT_IMAGE_ID}`}
-                  transform={
-                    cloneTransformMatrix.toString()
-                  }
-                />
-              );
-          })
+              </g>
+            ) : (
+              <use
+                key={`${index}-decoration`}
+                xlinkHref={`#${PRINT_IMAGE_ID}`}
+                transform={cloneTransformMatrix.toString()}
+              />
+            )))
         }
       </g>
     </PrintGroup>
