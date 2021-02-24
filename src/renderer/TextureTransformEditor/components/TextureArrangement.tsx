@@ -111,7 +111,7 @@ export const TextureArrangement = observer(() => {
       className="svg-container"
       width="50%"
       height="100%"
-      style={{ overflow: 'hidden', width: '50%' }}
+      style={{ overflow: 'hidden', position: 'relative' }}
       {...viewUseWheel()}
     >
       <svg
