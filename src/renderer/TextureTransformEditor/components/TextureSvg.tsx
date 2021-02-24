@@ -100,7 +100,12 @@ export const TextureSvgUnobserved = ({
       {faceBoundary
       && (
         <path
-          stroke={hasPathPattern === false ? '#ddd' : HOLES_COLOR}
+          stroke={(() => {
+            if (!isOnScreen) {
+              return faceBoundaryFill;
+            }
+            return hasPathPattern === false ? '#ddd' : HOLES_COLOR;
+          })()}
           strokeWidth={FACE_OUTLINE_STROKE}
           fill={faceBoundaryFill}
           d={faceBoundary.pathD}
@@ -184,15 +189,13 @@ export const TextureSvgUnobserved = ({
           </g>
         </g>
       )}
-      {isOnScreen && (
-        <path
-          fill="none"
-          strokeWidth={FACE_OUTLINE_STROKE}
-          stroke="#ff0000"
-          strokeOpacity={0.4}
-          d={decorationBoundaryPathD}
-        />
-      )}
+      <path
+        fill="none"
+        strokeWidth={FACE_OUTLINE_STROKE}
+        stroke={isOnScreen ? '#ff0000' : faceBoundaryFill}
+        strokeOpacity={isOnScreen ? 0.4 : 1}
+        d={decorationBoundaryPathD}
+      />
     </svg>
   );
 };

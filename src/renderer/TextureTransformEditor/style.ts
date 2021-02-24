@@ -56,6 +56,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   textureToolbar: {
     display: 'flex',
     flexWrap: 'wrap',
+    position: 'initial',
   },
   textureToolbarWithTexture: {
     [theme.breakpoints.down('md')]: {

@@ -31,7 +31,7 @@ import { getBoundedTexturePathD } from '../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
 import { PIXELS_PER_CM, degToRad, radToDeg } from '../../common/util/units';
 
-export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 1000;
+export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 
 export const PathFaceDecorationPatternModel = types.model({
   pathD: types.string,
@@ -129,16 +129,31 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         ]);
     },
 
+    get relativeFaceEdgeLengths() {
+      if (self.pyramid.geometry.uniqueFaceEdgeLengths.length === 3) {
+        return self.pyramid.geometry.uniqueFaceEdgeLengths;
+      }
+      const firstLength = self.pyramid.geometry.uniqueFaceEdgeLengths[0];
+      if (self.pyramid.geometry.uniqueFaceEdgeLengths.length === 2) {
+        return [...self.pyramid.geometry.uniqueFaceEdgeLengths, firstLength];
+      }
+      return [firstLength, firstLength, firstLength];
+    },
+
+    get faceIsSymmetrical() {
+      return self.pyramid.geometry.uniqueFaceEdgeLengths.length < 3;
+    },
+
     get tabGapIntervalRatios() {
       return chunk([0, ...flatten(this.tabIntervalRatios), 1], 2);
     },
 
     get faceEdgeNormalizer() {
-      return FACE_FIRST_EDGE_NORMALIZED_SIZE / self.pyramid.geometry.relativeFaceEdgeLengths[0];
+      return FACE_FIRST_EDGE_NORMALIZED_SIZE / this.relativeFaceEdgeLengths[0];
     },
 
     get normalizedFaceEdgeLengths() {
-      return self.pyramid.geometry.relativeFaceEdgeLengths.map(
+      return this.relativeFaceEdgeLengths.map(
         // @ts-ignore
         (val) => val * self.faceEdgeNormalizer,
       );
@@ -162,8 +177,8 @@ export const PyramidNetModel = types.model('Pyramid Net', {
     // factor to scale face lengths such that the first edge will be equal to 1
     get faceLengthAdjustRatio() {
       const { shapeHeight } = self;
-      const { relativeFaceEdgeLengths, diameter } = self.pyramid.geometry;
-      const firstSideLengthInPx = ((shapeHeight * relativeFaceEdgeLengths[0]) / diameter);
+      const { diameter } = self.pyramid.geometry;
+      const firstSideLengthInPx = ((shapeHeight * this.relativeFaceEdgeLengths[0]) / diameter);
       return firstSideLengthInPx / FACE_FIRST_EDGE_NORMALIZED_SIZE;
     },
 
@@ -342,15 +357,10 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         .transform(`${
           this.borderInsetFaceHoleTransformMatrix.toString()} ${
           this.pathScaleMatrix.toString()}`);
-      range(self.pyramid.geometry.faceCount).forEach((index) => {
-        const isOdd = !!(index % 2);
-        const xScale = isOdd ? -1 : 1;
-        const asymetryNudge = isOdd ? this.faceInteriorAngles[2] - 2 * ((Math.PI / 2) - this.faceInteriorAngles[0]) : 0;
-        const rotationRad = -1 * xScale * index * this.faceInteriorAngles[2] + asymetryNudge;
-        const tiledDecorationPath = insetDecorationPath.clone()
-          .transform(`scale(${xScale}, 1) rotate(${radToDeg(rotationRad)})`);
+      for (const matrix of this.faceDecorationTransformMatricies) {
+        const tiledDecorationPath = insetDecorationPath.clone().transform(matrix.toString());
         cut.concatPath(tiledDecorationPath);
-      });
+      }
       return cut;
     },
     // get borderInsetFaceHoleTransform() {
@@ -393,6 +403,20 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       }
       // invalid types caught by runtime mst type checking, for linting only
       return null;
+    },
+    get faceDecorationTransformMatricies(): DOMMatrixReadOnly[] {
+      const matrices = [];
+      for (let i = 0; i < self.pyramid.geometry.faceCount; i += 1) {
+        const isMirrored = !!(i % 2) && !this.faceIsSymmetrical;
+        const xScale = isMirrored ? -1 : 1;
+        const asymmetryNudge = isMirrored
+          ? this.faceInteriorAngles[2] - 2 * ((Math.PI / 2) - this.faceInteriorAngles[0]) : 0;
+        const baseTabRotationRad = -1 * i * this.faceInteriorAngles[2];
+        const decorationRotationRad = xScale * baseTabRotationRad + asymmetryNudge;
+        matrices.push((new DOMMatrixReadOnly())
+          .scale(xScale, 1).rotate(radToDeg(decorationRotationRad)));
+      }
+      return matrices;
     },
   //  =========================================================
   }))

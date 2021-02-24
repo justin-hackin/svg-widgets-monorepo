@@ -58,11 +58,11 @@ const TextureTransformEditorLOC = observer(() => {
   return (
     <ThemeProvider theme={theme}>
       <Box className={classes.root}>
+        <TextureControls />
         <div style={{ position: 'absolute', left: '50%' }}>
           <ShapePreview />
         </div>
         <TextureArrangement />
-        <TextureControls />
       </Box>
     </ThemeProvider>
   );
