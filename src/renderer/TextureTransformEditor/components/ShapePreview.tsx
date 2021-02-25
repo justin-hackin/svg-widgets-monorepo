@@ -94,8 +94,8 @@ export const ShapePreview = observer(() => {
     globalLight.intensity = 2.0;
     theScene.add(globalLight);
 
-    const theCamera = new PerspectiveCamera(45, width / height, 0.1, 2000);
-    theCamera.position.set(300, 0, 300);
+    const theCamera = new PerspectiveCamera(30, width / height, 0.1, 2000);
+    theCamera.position.set(0, 0, 200);
     setCamera(theCamera);
 
     const theControls = new OrbitControls(theCamera, theRenderer.domElement);
