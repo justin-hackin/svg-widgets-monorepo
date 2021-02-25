@@ -1,5 +1,6 @@
 import { inRange } from 'lodash';
 import {
+  applySnapshot,
   getSnapshot, Instance, resolvePath, types,
 } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
@@ -286,16 +287,28 @@ export const TextureTransformEditorModel = types
       if (!self.texture) { return; }
       globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, getSnapshot(self.texture));
     },
-    saveTexture() {
+    saveTextureArrangement() {
       if (!self.texture) { return; }
       const fileData = {
         shapeName: self.shapeName,
         textureSnapshot: getSnapshot(self.texture),
       };
       globalThis.ipcRenderer.invoke(EVENTS.SAVE_JSON, fileData, {
-        message: 'Save texture specification',
+        message: 'Save texture arrangement',
         defaultPath: `${self.shapeName}__${self.texture.pattern.sourceFileName}--TEXTURE.json`,
       });
+    },
+    async openTextureArrangement() {
+      const { fileData } = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
+        message: 'Import texture arrangement',
+      });
+      // TODO: snackbar error alerts
+      if (!fileData) { return; }
+      const { shapeName, textureSnapshot } = fileData;
+      if (shapeName !== self.shapeName || !textureSnapshot) {
+        return;
+      }
+      applySnapshot(self.texture, textureSnapshot);
     },
   }))
   .actions((self) => {

@@ -9,7 +9,8 @@ import CachedIcon from '@material-ui/icons/Cached';
 import TelegramIcon from '@material-ui/icons/Telegram';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
-import ArchiveIcon from '@material-ui/icons/Archive';
+import SaveIcon from '@material-ui/icons/Save';
+import PublishIcon from '@material-ui/icons/Publish';
 
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
@@ -44,15 +45,15 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 );
 
 export const TextureControls = observer(() => {
-  const store = useMst();
+  const store:ITextureTransformEditorModel = useMst();
   const {
-    texture, sendTexture, saveTexture, decorationBoundary, selectedTextureNodeIndex,
-    showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
+    texture, sendTexture, saveTextureArrangement, openTextureArrangement, decorationBoundary,
+    selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, downloadShapeGLTF,
     setTexturePath, setTextureImage,
     isBordered, setIsBordered,
-  }: ITextureTransformEditorModel = store;
+  } = store;
   const classes = useStyles();
   const {
     pattern: { isPositive = undefined } = {}, setIsPositive, rotate: textureRotate, hasPathPattern,
@@ -116,7 +117,7 @@ export const TextureControls = observer(() => {
           aria-label="send texture"
           component="span"
         >
-          <FolderOpenIcon fontSize="large" />
+          <PublishIcon fontSize="large" />
         </IconButton>
         <HistoryButtons history={history} />
         <FormControlLabel
@@ -148,8 +149,32 @@ export const TextureControls = observer(() => {
           )}
           label="Auto-rotate preview"
         />
+        <Tooltip title="Open texture arrangement" arrow>
+          <span>
+            <IconButton
+              onClick={() => { openTextureArrangement(); }}
+              aria-label="open texture"
+              component="span"
+            >
+              <FolderOpenIcon fontSize="large" />
+            </IconButton>
+          </span>
+        </Tooltip>
         {texture && (
           <>
+            <Tooltip title="Save texture arrangement" arrow>
+              <span>
+                <IconButton
+                  onClick={() => {
+                    saveTextureArrangement();
+                  }}
+                  aria-label="save texture"
+                  component="span"
+                >
+                  <SaveIcon fontSize="large" />
+                </IconButton>
+              </span>
+            </Tooltip>
             <FormControlLabel
               className={classes.checkboxControlLabel}
               labelPlacement="top"
@@ -274,13 +299,6 @@ export const TextureControls = observer(() => {
               <span>
                 <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
                   <GetAppIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Tooltip title="Export texture arrangement" arrow>
-              <span>
-                <IconButton onClick={() => { saveTexture(); }} aria-label="export texture" component="span">
-                  <ArchiveIcon fontSize="large" />
                 </IconButton>
               </span>
             </Tooltip>

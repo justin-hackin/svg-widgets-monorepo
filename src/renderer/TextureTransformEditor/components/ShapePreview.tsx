@@ -70,9 +70,9 @@ export const ShapePreview = observer(() => {
   // renderer boundary size change
   useEffect(() => {
     if (!threeContainerRef.current || !camera || !renderer) { return; }
+    renderer.setSize(width, height);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
   }, [width, height, threeContainerRef, camera, renderer]);
 
   // THREE rendering setup
@@ -121,6 +121,7 @@ export const ShapePreview = observer(() => {
     }
   }, [autoRotatePreview, controls]);
 
+  // shape change
   useEffect(() => {
     if (!shapeName || !camera || !scene) { return; }
     loader.load(
