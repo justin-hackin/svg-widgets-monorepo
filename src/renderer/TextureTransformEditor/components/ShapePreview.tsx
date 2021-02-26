@@ -5,6 +5,7 @@ import {
 } from 'three';
 import Canvg, { presets } from 'canvg';
 import ReactDOMServer from 'react-dom/server';
+import npot from 'nearest-power-of-two';
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -20,7 +21,7 @@ import { ITextureTransformEditorModel } from '../models/TextureTransformEditorMo
 const { useEffect, useRef, useState } = React;
 
 const IDEAL_RADIUS = 60;
-
+const TEXTURE_BITMAP_SCALE = 0.1;
 const loader = new GLTFLoader();
 
 export const ShapePreview = observer(() => {
@@ -57,6 +58,11 @@ export const ShapePreview = observer(() => {
       );
       // @ts-ignore
       Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
+        const { width: vbWidth, height: vbHeight } = viewBoxAttrs;
+        v.resize(
+          npot(vbWidth * TEXTURE_BITMAP_SCALE),
+          npot(vbHeight * TEXTURE_BITMAP_SCALE), 'none',
+        );
         await v.render();
         // @ts-ignore
         material.map.image = textureCanvas.transferToImageBitmap();
