@@ -26,6 +26,7 @@ enum ROUTED_EVENTS {
   UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION = 'update-texture-editor-texture',
   UPDATE_TEXTURE_EDITOR_BORDER_DATA = 'update-texture-editor-border-data',
   UPDATE_DIELINE_VIEWER = 'update-dieline-viewer',
+  REQUEST_SHAPE_CHANGE = 'request-shape-change',
 }
 
 export enum WINDOWS {
@@ -37,6 +38,7 @@ export const ROUTED_EVENT_MAP: Record<WINDOWS, ROUTED_EVENTS[]> = {
   [WINDOWS.DIELINE_EDITOR]: [
     ROUTED_EVENTS.REQUEST_SHAPE_UPDATE,
     ROUTED_EVENTS.UPDATE_DIELINE_VIEWER,
+    ROUTED_EVENTS.REQUEST_SHAPE_CHANGE,
   ],
   [WINDOWS.TEXTURE_EDITOR]: [
     ROUTED_EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION,
@@ -126,10 +128,14 @@ export const setupIpc = (ipcMain) => {
 
   ipcMain.handle(EVENTS.DIALOG_LOAD_JSON, (e, dialogOptions) => resolveStringDataFromDialog(
     { ...dialogOptions, filters: jsonFilters },
-  ).then(({ fileString, filePath }) => ({
-    fileData: JSON.parse(fileString),
-    filePath,
-  })));
+  ).then((res) => {
+    if (!res) { return undefined; }
+    const { fileString, filePath } = res;
+    return {
+      fileData: JSON.parse(fileString),
+      filePath,
+    };
+  }));
 
   ipcMain.handle(EVENTS.OPEN_SVG, async (e, message) => resolveStringDataFromDialog({
     message,

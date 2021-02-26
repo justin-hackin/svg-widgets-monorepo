@@ -53,19 +53,25 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         <Typography variant="inherit">{IMPORT_SVG_DECORATION_TXT}</Typography>
       </MenuItem>
       <MenuItem onClick={async () => {
-        const { fileData } = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
+        const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
           message: IMPORT_TEXTURE_TXT,
         });
         const currentShapeName = store.pyramidNetSpec.pyramid.shapeName;
         resetFileMenuRef();
-        if (!fileData) {
+        if (!res) {
           return;
         }
+        const { fileData } = res;
         if (fileData.shapeName !== currentShapeName) {
-          // eslint-disable-next-line no-alert
-          alert(`Failed to load texture: current shape is ${startCase(currentShapeName)
-          } but the selected texture was for ${startCase(fileData.shapeName)} shape.`);
-          return;
+          // eslint-disable-next-line no-restricted-globals, no-alert
+          const doIt = confirm(`The current shape is ${startCase(currentShapeName)
+          } but the chosen texture was for ${startCase(fileData.shapeName)
+          } shape. Do you want to change the Polyhedron and load its default settings?`);
+          if (doIt) {
+            store.pyramidNetSpec.setPyramidShapeName(fileData.shapeName);
+          } else {
+            return;
+          }
         }
         store.pyramidNetSpec.setTextureFaceDecoration(fileData.textureSnapshot);
       }}

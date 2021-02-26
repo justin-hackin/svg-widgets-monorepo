@@ -15,7 +15,7 @@ import { polyhedra } from '../../DielineViewer/data/polyhedra';
 import requireStatic from '../../requireStatic';
 
 export const ShapeSelect = observer(({
-  onChange, value, name, displayEmpty = undefined, className = undefined,
+  onChange, value, name, displayEmpty = undefined, className = undefined, isCompactDisplay = false,
 }) => {
   const label = 'Polyhedron';
   const classes = useStyles();
@@ -27,10 +27,17 @@ export const ShapeSelect = observer(({
     displayEmpty,
     onChange,
   };
+
+  const optionalCompactClass = isCompactDisplay ? classes.compactShapeSelect : undefined;
+  const selectDisplayClassName = `${classes.shapeSelectDisplay} ${
+    optionalCompactClass}`;
   return (
-    <FormControl className={`${className} ${classes.formControl}`}>
-      <InputLabel id={labelId}>{ label }</InputLabel>
-      <Select {...selectProps} SelectDisplayProps={{ className: classes.shapeSelectDisplay }}>
+    <FormControl className={`${className} ${classes.shapeSelect} ${classes.formControl} ${optionalCompactClass}`}>
+      { !isCompactDisplay && <InputLabel id={labelId}>{ label }</InputLabel>}
+      <Select
+        {...selectProps}
+        SelectDisplayProps={{ className: selectDisplayClassName }}
+      >
         {Object.keys(polyhedra).map((shapeName, i) => (
           <MenuItem key={i} value={shapeName}>
             {/* preview images generated with https://codesandbox.io/s/youthful-joliot-uxiy */}

@@ -1,10 +1,10 @@
 import { inRange } from 'lodash';
 import {
-  applySnapshot,
   getSnapshot, Instance, resolvePath, types,
 } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
+import { when } from 'mobx';
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
 
@@ -298,17 +298,34 @@ export const TextureTransformEditorModel = types
         defaultPath: `${self.shapeName}__${self.texture.pattern.sourceFileName}--TEXTURE.json`,
       });
     },
-    async openTextureArrangement() {
-      const { fileData } = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
+    setTextureFromSnapshot(textureSnapshot) {
+      self.texture = TextureModel.create(textureSnapshot);
+    },
+    openTextureArrangement() {
+      globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
         message: 'Import texture arrangement',
+      }).then((res) => {
+        // TODO: snackbar error alerts
+        if (!res) { return; }
+
+        const { fileData: { shapeName, textureSnapshot } } = res;
+        if (!textureSnapshot) {
+          return;
+        }
+        if (shapeName !== self.shapeName) {
+          globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_CHANGE, shapeName);
+          // TODO: this is a dirty trick, disentangle calculation of boundary points from dieline editor
+          // and/or enable async ipc across multiple windows so requesting updates can be done in one ipc event
+          // (which provides an optional shape override)
+          when(() => (self.shapeName === shapeName), () => {
+            setTimeout(() => {
+              this.setTextureFromSnapshot(textureSnapshot);
+            });
+          });
+        } else {
+          this.setTextureFromSnapshot(textureSnapshot);
+        }
       });
-      // TODO: snackbar error alerts
-      if (!fileData) { return; }
-      const { shapeName, textureSnapshot } = fileData;
-      if (shapeName !== self.shapeName || !textureSnapshot) {
-        return;
-      }
-      applySnapshot(self.texture, textureSnapshot);
     },
   }))
   .actions((self) => {

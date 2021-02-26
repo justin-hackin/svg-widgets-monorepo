@@ -110,10 +110,19 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     flexDirection: 'column',
   },
   shapeSelect: {},
+  compactShapeSelect: {},
   shapeSelectDisplay: {
     display: 'flex',
     alignItems: 'center',
     width: '100%',
+    '&$compactShapeSelect': {
+      '& $shapeName': {
+        display: 'none',
+      },
+      '& $shapeAvatar': {
+        width: '50px',
+      },
+    },
   },
   toolbar: {
     padding: `0 ${theme.spacing(1)}px`,
@@ -127,6 +136,9 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     flexDirection: 'column',
     '&$shapeSelect': {
       marginBottom: theme.spacing(3),
+      '&$compactShapeSelect': {
+        width: '75px',
+      },
     },
   },
   panelChromePicker: {

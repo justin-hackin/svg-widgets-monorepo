@@ -26,6 +26,7 @@ import { DEFAULT_SLIDER_STEP } from '../../common/constants';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { PanelSliderComponent } from '../../common/components/PanelSliderComponent';
 import { ITextureTransformEditorModel } from '../models/TextureTransformEditorModel';
+import { ShapeSelect } from '../../common/components/ShapeSelect';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -53,6 +54,7 @@ export const TextureControls = observer(() => {
     history, downloadShapeGLTF,
     setTexturePath, setTextureImage,
     isBordered, setIsBordered,
+    shapeName,
   } = store;
   const classes = useStyles();
   const {
@@ -148,6 +150,14 @@ export const TextureControls = observer(() => {
             />
           )}
           label="Auto-rotate preview"
+        />
+        <ShapeSelect
+          isCompactDisplay
+          value={shapeName}
+          onChange={(e) => {
+            globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_CHANGE, e.target.value);
+          }}
+          name="polyhedron-shape"
         />
         <Tooltip title="Open texture arrangement" arrow>
           <span>

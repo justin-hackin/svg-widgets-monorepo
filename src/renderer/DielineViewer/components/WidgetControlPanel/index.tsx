@@ -57,10 +57,11 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   };
 
   const openSpecHandler = async () => {
-    const { fileData, filePath } = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
+    const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
       message: OPEN_TXT,
     });
-    if (fileData) {
+    if (res) {
+      const { fileData, filePath } = res;
       workspaceStore.setCurrentFileData(filePath, fileData);
       applySnapshot(store.shapeDefinition, fileData);
     }

@@ -75,15 +75,18 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
     self.pyramidNetSpec.setTextureFaceDecoration(faceDecoration);
   };
   const sendShapeUpdateHandler = () => { self.sendShapeUpdate(); };
+  const updateShapeHandler = (_, shapeName) => { self.pyramidNetSpec.setPyramidShapeName(shapeName); }
 
   return {
     afterCreate() {
       globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
       globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, updateDielineHandler);
+      globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_CHANGE, updateShapeHandler);
     },
     beforeDestroy() {
       globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_DIELINE_VIEWER, updateDielineHandler);
       globalThis.ipcRenderer.removeListener(EVENTS.REQUEST_SHAPE_UPDATE, updateDielineHandler);
+      globalThis.ipcRenderer.removeListener(EVENTS.REQUEST_SHAPE_CHANGE, updateShapeHandler);
     },
   };
 });
