@@ -25,7 +25,6 @@ import { useStyles } from '../style';
 import { DEFAULT_SLIDER_STEP } from '../../common/constants';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { PanelSliderComponent } from '../../common/components/PanelSliderComponent';
-import { ITextureTransformEditorModel } from '../models/TextureTransformEditorModel';
 import { ShapeSelect } from '../../common/components/ShapeSelect';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
@@ -46,12 +45,12 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 );
 
 export const TextureControls = observer(() => {
-  const store:ITextureTransformEditorModel = useMst();
+  const store = useMst();
   const {
     texture, sendTexture, saveTextureArrangement, openTextureArrangement, decorationBoundary,
     selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
-    history, downloadShapeGLTF,
+    history, shapePreview: { downloadShapeGLTF },
     setTexturePath, setTextureImage,
     isBordered, setIsBordered,
     shapeName,

@@ -1,7 +1,7 @@
 import { getParentOfType, types } from 'mobx-state-tree';
 import { includes, flatten } from 'lodash';
 import { EVENTS } from '../../../main/ipc';
-import { TextureTransformEditorModel } from './TextureTransformEditorModel';
+import { TextureEditorModel } from './TextureEditorModel';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',
@@ -18,7 +18,7 @@ const keyTrackingModelFactory = (keysToTrack, target = window) => {
     return acc;
   }, {})).actions((self) => ({
     set(key, value) {
-      const { history } = getParentOfType(self, TextureTransformEditorModel);
+      const { history } = getParentOfType(self, TextureEditorModel);
       history.withoutUndo(() => {
         self[key] = value;
       });

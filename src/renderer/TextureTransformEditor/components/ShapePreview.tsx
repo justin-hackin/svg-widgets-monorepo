@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import {
-  Mesh, MeshPhongMaterial, Object3D, PerspectiveCamera, Renderer, Scene, WebGLRenderer,
+  Mesh, Object3D, PerspectiveCamera, Renderer, Scene, WebGLRenderer,
 } from 'three';
 import Canvg, { presets } from 'canvg';
 import ReactDOMServer from 'react-dom/server';
@@ -16,62 +16,60 @@ import requireStatic from '../../requireStatic';
 import { TextureSvgUnobserved } from './TextureSvg';
 import { useMst } from '../models';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
-import { ITextureTransformEditorModel } from '../models/TextureTransformEditorModel';
+import { ITextureEditorModel } from '../models/TextureEditorModel';
 
 const { useEffect, useRef, useState } = React;
 
 const IDEAL_RADIUS = 60;
-const TEXTURE_BITMAP_SCALE = 0.1;
+const TEXTURE_BITMAP_SCALE = 0.2;
 const loader = new GLTFLoader();
 
 export const ShapePreview = observer(() => {
-  const store:ITextureTransformEditorModel = useMst();
+  const store:ITextureEditorModel = useMst();
   const {
-    texture, faceBoundary, shapeName, placementAreaDimensions: { width, height }, autoRotatePreview,
-    shapeObject, setShapeObject,
+    faceBoundary, shapeName, placementAreaDimensions: { width, height }, autoRotatePreview, texture,
+    shapePreview: { shapeObject, setShapeObject, setShapeTexture },
   } = store;
+  const {
+    scale, rotate, translate, pattern: { isPositive = undefined } = {},
+  } = texture || {};
+
   const [renderer, setRenderer] = useState<Renderer>();
   const [camera, setCamera] = useState<PerspectiveCamera>();
   const [controls, setControls] = useState<OrbitControls>();
   const [scene, setScene] = useState<Scene>();
-  const [readyForCanvasRender, setReadyForCanvasRender] = useState<boolean>(true);
 
   const polyhedronObjectRef = useRef<Object3D>();
   const threeContainerRef = useRef<HTMLDivElement>();
   const requestRef = React.useRef<number>(0);
 
   const { viewBoxAttrs } = faceBoundary || {};
-  const { transformMatrixDraggedStr, pattern: { isPositive = undefined } = {} } = texture || {};
 
-  // update shape texture
   useEffect(() => {
-    if (shapeObject && viewBoxAttrs && readyForCanvasRender) {
-      setReadyForCanvasRender(false);
-      const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
-      // TODO: throw if material not MeshPhong
-      // @ts-ignore
-      const { material }: {material: MeshPhongMaterial} = shapeObject;
-      const ctx = textureCanvas.getContext('2d');
-      // @ts-ignore
-      const svgStr = ReactDOMServer.renderToString(
-        React.createElement(TextureSvgUnobserved, { viewBox: viewBoxAttrsToString(viewBoxAttrs), store }),
+    if (!shapeObject || !viewBoxAttrs) { return; }
+
+    const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
+    // TODO: throw if material not MeshPhong
+    // @ts-ignore
+    const ctx = textureCanvas.getContext('2d');
+    // @ts-ignore
+    const svgStr = ReactDOMServer.renderToString(
+      React.createElement(TextureSvgUnobserved, { viewBox: viewBoxAttrsToString(viewBoxAttrs), store }),
+    );
+    // @ts-ignore
+    Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
+      const {
+        width: vbWidth,
+        height: vbHeight,
+      } = viewBoxAttrs;
+      v.resize(
+        npot(vbWidth * TEXTURE_BITMAP_SCALE),
+        npot(vbHeight * TEXTURE_BITMAP_SCALE), 'none',
       );
-      // @ts-ignore
-      Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
-        const { width: vbWidth, height: vbHeight } = viewBoxAttrs;
-        v.resize(
-          npot(vbWidth * TEXTURE_BITMAP_SCALE),
-          npot(vbHeight * TEXTURE_BITMAP_SCALE), 'none',
-        );
-        await v.render();
-        // @ts-ignore
-        material.map.image = textureCanvas.transferToImageBitmap();
-        // @ts-ignore
-        material.map.needsUpdate = true;
-        setReadyForCanvasRender(true);
-      });
-    }
-  }, [shapeObject, transformMatrixDraggedStr, isPositive, viewBoxAttrs]);
+      await v.render();
+      setShapeTexture(textureCanvas.transferToImageBitmap());
+    });
+  }, [shapeObject, scale, rotate, translate, isPositive, viewBoxAttrs]);
 
   // renderer boundary size change
   useEffect(() => {
@@ -83,7 +81,7 @@ export const ShapePreview = observer(() => {
 
   // THREE rendering setup
   useEffect(() => {
-    if (threeContainerRef.current && shapeObject) { return undefined; }
+    if (!threeContainerRef || renderer) { return undefined; }
     const theScene = new Scene();
     const theRenderer = new WebGLRenderer({
       alpha: true,
@@ -119,7 +117,7 @@ export const ShapePreview = observer(() => {
     requestRef.current = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(requestRef.current);
-  }, [threeContainerRef, shapeObject]);
+  }, [threeContainerRef]);
 
   useEffect(() => {
     if (controls) {
@@ -144,8 +142,8 @@ export const ShapePreview = observer(() => {
         // @ts-ignore
         scene.traverse((child: Mesh) => {
           if (child.isMesh) {
-            const scale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
-            child.scale.fromArray([scale, scale, scale]);
+            const normalizingScale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
+            child.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
             setShapeObject(child);
           }
         });

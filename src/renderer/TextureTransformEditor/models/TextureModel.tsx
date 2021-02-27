@@ -9,7 +9,7 @@ import {
 } from '../../DielineViewer/models/PyramidNetStore';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
-import { TextureTransformEditorModel } from './TextureTransformEditorModel';
+import { TextureEditorModel } from './TextureEditorModel';
 import {
   calculateTransformOriginChangeOffset, getOriginPoint,
   getTextureTransformMatrix,
@@ -70,7 +70,7 @@ export const TextureModel = TextureFaceDecorationModel
       return (new PathData(pathD)).getDestinationPoints();
     },
     get parentHistoryManager() {
-      return getParentOfType(self, TextureTransformEditorModel).history;
+      return getParentOfType(self, TextureEditorModel).history;
     },
   }))
   .actions((self) => ({

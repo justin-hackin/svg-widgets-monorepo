@@ -5,21 +5,20 @@ import makeInspectable from 'mobx-devtools-mst';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
 
-import { ITextureTransformEditorModel, TextureTransformEditorModel } from './TextureTransformEditorModel';
+import { ITextureEditorModel, TextureEditorModel } from './TextureEditorModel';
 
-export const textureTransformEditorStore = TextureTransformEditorModel.create();
+export const textureTransformEditorStore = TextureEditorModel.create();
 if (process.env.NODE_ENV !== 'production') {
   makeInspectable(textureTransformEditorStore);
   connectReduxDevtools(remotedev, textureTransformEditorStore);
 }
 
-const TextureTransformEditorStoreContext = createContext<ITextureTransformEditorModel>(
+const TextureTransformEditorStoreContext = createContext<ITextureEditorModel>(
   textureTransformEditorStore,
 );
 
 export const { Provider } = TextureTransformEditorStoreContext;
 
-export function useMst():ITextureTransformEditorModel {
-  const store = useContext(TextureTransformEditorStoreContext);
-  return store;
+export function useMst() {
+  return useContext(TextureTransformEditorStoreContext);
 }

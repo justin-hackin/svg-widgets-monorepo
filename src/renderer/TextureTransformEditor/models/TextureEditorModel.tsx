@@ -1,10 +1,12 @@
 import { inRange } from 'lodash';
 import {
+  getParentOfType,
   getSnapshot, Instance, resolvePath, types,
 } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
 import { when } from 'mobx';
+import { MeshPhongMaterial } from 'three';
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
 
@@ -45,7 +47,7 @@ const getFitScale = (bounds, image) => {
   };
 };
 
-export const TextureTransformEditorModel = types
+export const TextureEditorModel = types
   .model('TextureTransformEditor', {
     shapeName: types.maybe(types.string),
     decorationBoundary: types.maybe(BoundaryModel),
@@ -55,11 +57,11 @@ export const TextureTransformEditorModel = types
     viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
     history: types.optional(UndoManagerWithGroupState, {}),
     modifierTracking: types.optional(ModifierTrackingModel, {}),
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    shapePreview: types.optional(types.late(() => ShapePreviewModel), {}),
     isBordered: types.optional(types.boolean, true),
   })
   .volatile(() => ({
-    shapeObject: null,
-    gltfExporter: new GLTFExporter(),
     // amount of scaling required to make the decoration area match the size of the face boundary
     borderToInsetRatio: null,
     // translation required to bring the decoration area first corner to the face boundary first corner
@@ -187,9 +189,6 @@ export const TextureTransformEditorModel = types
         imageData, dimensions, sourceFileName,
       }));
     },
-    setShapeObject(shape) {
-      self.shapeObject = shape;
-    },
     setIsBordered(isUsed) {
       self.isBordered = isUsed;
     },
@@ -197,15 +196,7 @@ export const TextureTransformEditorModel = types
     getFileBasename() {
       return `${self.shapeName || 'shape'}__${resolvePath(self, '/texture/pattern/sourceFileName') || 'undecorated'}`;
     },
-    async downloadShapeGLTF() {
-      return self.gltfExporter
-        .parse(self.shapeObject, (shapeGLTF) => {
-          globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLTF, shapeGLTF, {
-            message: 'Save shape preview',
-            defaultPath: `${this.getFileBasename()}.glb`,
-          });
-        }, { binary: true });
-    },
+
     // TODO: add limits for view scale and
     // these seem like the domain of the texture model but setters for
     // textureScaleDiff (and more to follow) need boundary
@@ -320,7 +311,7 @@ export const TextureTransformEditorModel = types
           when(() => (self.shapeName === shapeName), () => {
             setTimeout(() => {
               this.setTextureFromSnapshot(textureSnapshot);
-            });
+            }, 100);
           });
         } else {
           this.setTextureFromSnapshot(textureSnapshot);
@@ -348,4 +339,29 @@ export const TextureTransformEditorModel = types
     };
   });
 
-export interface ITextureTransformEditorModel extends Instance<typeof TextureTransformEditorModel> {}
+const ShapePreviewModel = types.model({
+}).volatile(() => ({
+  shapeObject: null,
+  gltfExporter: new GLTFExporter(),
+})).actions((self) => ({
+  async downloadShapeGLTF() {
+    return self.gltfExporter
+      .parse(self.shapeObject, (shapeGLTF) => {
+        globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLTF, shapeGLTF, {
+          message: 'Save shape preview',
+          defaultPath: `${getParentOfType(self, TextureEditorModel).getFileBasename()}.glb`,
+        });
+      }, { binary: true });
+  },
+  setShapeObject(shape) {
+    self.shapeObject = shape;
+  },
+  setShapeTexture(imageBitmap) {
+    if (!self.shapeObject) { throw new Error('setShapeTexture: shapeObject does not exist'); }
+    const { material }: {material: MeshPhongMaterial} = self.shapeObject;
+    material.map.image = imageBitmap;
+    material.map.needsUpdate = true;
+  },
+}));
+
+export interface ITextureEditorModel extends Instance<typeof TextureEditorModel> {}
