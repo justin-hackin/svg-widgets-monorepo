@@ -37,12 +37,8 @@ const TextureTransformEditorLOC = observer(() => {
     };
 
     window.addEventListener('resize', resizeHandler);
-    // when timeout is 0 sometimes a white bar is apparent at the top of the document
-    // suggesting handler was applied too early
-    setTimeout(() => {
-      resizeHandler();
-      globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_UPDATE);
-    }, 100);
+    globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_UPDATE);
+    resizeHandler();
 
     return () => {
       window.removeEventListener('resize', resizeHandler);
