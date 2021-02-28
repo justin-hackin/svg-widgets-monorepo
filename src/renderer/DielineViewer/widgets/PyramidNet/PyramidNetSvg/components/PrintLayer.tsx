@@ -50,7 +50,8 @@ export const PrintLayer = observer(({
   }
 
   const { imageData, dimensions } = pattern as IImageFaceDecorationPatternModel;
-  const PRINT_IMAGE_ID = 'print-image';
+  const PRINT_IMAGE_ID = 'print-face-decoration';
+  const PRINT_BLEED_PATH_ID = 'print-bleed-path-id';
   const CLIP_PATH_ID = 'clip-path';
   const BLUR_ID = 'blur-filter';
   const FACE_BOUNDARY_PATH_ID = 'face-boundary-path';
@@ -71,61 +72,78 @@ export const PrintLayer = observer(({
         </filter>
       </defs>
       <g transform={fitToCanvasTranslationStr}>
-        {
-          faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
-            ? (
-              <g key={index} id={PRINT_IMAGE_ID}>
-                <use id="border-fill" xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />
+        <g id="bleed-stroke-group">
+          {
+            faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
+              ? (
+                <g key={index} id={PRINT_BLEED_PATH_ID}>
+                  <use
+                    id="bleed-stroke"
+                    xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
+                    fill="none"
+                    stroke={borderFill}
+                    strokeWidth={faceLengthAdjustRatio * 20}
+                    strokeLinejoin="round"
+                  />
+                </g>
+              ) : (
                 <use
-                  id="bleed-stroke"
-                  xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
-                  fill="none"
-                  stroke={borderFill}
-                  strokeWidth={faceLengthAdjustRatio * 20}
-                  strokeLinejoin="round"
+                  key={`${index}-decoration`}
+                  xlinkHref={`#${PRINT_BLEED_PATH_ID}`}
+                  transform={cloneTransformMatrix.toString()}
                 />
-                <use
-                  id="outer-glow"
-                  xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
-                  fill="none"
-                  stroke={theme.palette.grey['50']}
-                  strokeWidth={faceLengthAdjustRatio}
-                  filter={`url(#${BLUR_ID})`}
-                  clipPath={`url(#${CLIP_PATH_ID})`}
-                />
-                <path
-                  id="inner-glow"
-                  d={decorationBoundaryPathD}
-                  fill="none"
-                  stroke={theme.palette.grey['50']}
-                  strokeWidth={faceLengthAdjustRatio}
-                  filter={`url(#${BLUR_ID})`}
-                />
+              )))
+          }
+        </g>
+        <g id="print-decoration-group">
+          {
+            faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
+              ? (
+                <g key={index} id={PRINT_IMAGE_ID}>
+                  <use id="border-fill" xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />
+                  <use
+                    id="outer-glow"
+                    xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
+                    fill="none"
+                    stroke={theme.palette.grey['50']}
+                    strokeWidth={faceLengthAdjustRatio}
+                    filter={`url(#${BLUR_ID})`}
+                    clipPath={`url(#${CLIP_PATH_ID})`}
+                  />
+                  <path
+                    id="inner-glow"
+                    d={decorationBoundaryPathD}
+                    fill="none"
+                    stroke={theme.palette.grey['50']}
+                    strokeWidth={faceLengthAdjustRatio}
+                    filter={`url(#${BLUR_ID})`}
+                  />
 
-                <g transform={borderInsetFaceHoleTransformMatrix.toString()}>
-                  <g clipPath={`url(#${CLIP_PATH_ID})`}>
-                    <image
-                      xlinkHref={imageData}
-                      pointerEvents="bounding-box"
-                      {...dimensions}
-                      transform={
+                  <g transform={borderInsetFaceHoleTransformMatrix.toString()}>
+                    <g clipPath={`url(#${CLIP_PATH_ID})`}>
+                      <image
+                        xlinkHref={imageData}
+                        pointerEvents="bounding-box"
+                        {...dimensions}
+                        transform={
                           (new DOMMatrixReadOnly())
                             .scale(faceLengthAdjustRatio, faceLengthAdjustRatio)
                             .multiply(transformMatrix)
                             .toString()
                         }
-                    />
+                      />
+                    </g>
                   </g>
                 </g>
-              </g>
-            ) : (
-              <use
-                key={`${index}-decoration`}
-                xlinkHref={`#${PRINT_IMAGE_ID}`}
-                transform={cloneTransformMatrix.toString()}
-              />
-            )))
-        }
+              ) : (
+                <use
+                  key={`${index}-decoration`}
+                  xlinkHref={`#${PRINT_IMAGE_ID}`}
+                  transform={cloneTransformMatrix.toString()}
+                />
+              )))
+          }
+        </g>
       </g>
     </PrintGroup>
   );
