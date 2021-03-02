@@ -7,7 +7,7 @@ import React from 'react';
 import {
   Avatar, ListItemAvatar, Typography,
 } from '@material-ui/core';
-import { startCase } from 'lodash';
+import { startCase, sortBy } from 'lodash';
 import { observer } from 'mobx-react';
 
 import { useStyles } from '../../DielineViewer/style';
@@ -38,7 +38,7 @@ export const ShapeSelect = observer(({
         {...selectProps}
         SelectDisplayProps={{ className: selectDisplayClassName }}
       >
-        {Object.keys(polyhedra).map((shapeName, i) => (
+        {sortBy(Object.keys(polyhedra)).map((shapeName, i) => (
           <MenuItem key={i} value={shapeName}>
             {/* preview images generated with https://codesandbox.io/s/youthful-joliot-uxiy */}
             <ListItemAvatar>
