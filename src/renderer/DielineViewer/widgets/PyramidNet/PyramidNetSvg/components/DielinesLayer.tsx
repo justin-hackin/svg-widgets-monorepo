@@ -28,11 +28,11 @@ export const DielinesLayer = observer(({
       masterBaseTabCut,
       masterBaseTabScore,
       netPaths: { cut, score },
+      pyramid: { faceIsSymmetrical },
       decorationCutPath,
       faceDecorationTransformMatricies,
       texturePathD, pathScaleMatrix, borderInsetFaceHoleTransformMatrix,
       faceBoundaryPoints,
-      faceIsSymmetrical,
       femaleAscendantFlap, ascendantEdgeTabs, nonTabbedAscendantScores,
     },
   } = widgetStore;

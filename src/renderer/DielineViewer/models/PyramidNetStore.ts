@@ -1,5 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
+import { generateDivisorsAscending } from 'integer-divisors';
+
 import {
   getParent, getType, Instance, resolveIdentifier, types,
 } from 'mobx-state-tree';
@@ -89,9 +91,22 @@ export const FaceDecorationModel = types.union(TextureFaceDecorationModel, RawFa
 
 export const PyramidModel = types.model({
   shapeName: types.optional(types.string, 'small-triambic-icosahedron'),
+  netsPerPyramid: types.optional(types.integer, 1),
 }).views((self) => ({
   get geometry() {
     return polyhedra[self.shapeName];
+  },
+  get faceIsSymmetrical() {
+    return this.geometry.uniqueFaceEdgeLengths.length < 3;
+  },
+  // allows multiple nets to build a single pyramid e.g. one face per net
+  get netsPerPyramidOptions() {
+    return [...generateDivisorsAscending(this.geometry.faceCount)]
+      // can't apply ascendant edge tabs to a single non-symmetrical face because male & female edge lengths not equal
+      .filter((divisor) => this.faceIsSymmetrical || divisor !== this.geometry.faceCount);
+  },
+  get facesPerNet() {
+    return this.geometry.faceCount / self.netsPerPyramid;
   },
 }));
 
@@ -138,10 +153,6 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         return [...self.pyramid.geometry.uniqueFaceEdgeLengths, firstLength];
       }
       return [firstLength, firstLength, firstLength];
-    },
-
-    get faceIsSymmetrical() {
-      return self.pyramid.geometry.uniqueFaceEdgeLengths.length < 3;
     },
 
     get tabGapIntervalRatios() {
@@ -206,13 +217,9 @@ export const PyramidNetModel = types.model('Pyramid Net', {
     },
 
     get faceTabFenceposts() {
-      const {
-        pyramid: {
-          geometry: { faceCount },
-        },
-      } = self;
+      const { pyramid: { facesPerNet } } = self;
       const { faceBoundaryPoints, faceInteriorAngles, actualFaceEdgeLengths } = this;
-      return range(faceCount + 1).map(
+      return range(facesPerNet + 1).map(
         (index) => hingedPlot(
           faceBoundaryPoints[1], faceBoundaryPoints[0], Math.PI * 2 - index * faceInteriorAngles[2],
           index % 2 ? actualFaceEdgeLengths[2] : actualFaceEdgeLengths[0],
@@ -313,7 +320,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         this.faceBoundaryPoints[1], this.faceBoundaryPoints[0],
         self.ascendantEdgeTabsSpec, self.interFaceScoreDashSpec, this.tabIntervalRatios, this.tabGapIntervalRatios,
       );
-      const rotationMatrix = `rotate(${radToDeg(-self.pyramid.geometry.faceCount * this.faceInteriorAngles[2])})`;
+      const rotationMatrix = `rotate(${radToDeg(-self.pyramid.facesPerNet * this.faceInteriorAngles[2])})`;
       ascendantTabs.male.cut.transform(rotationMatrix);
       ascendantTabs.male.score.transform(rotationMatrix);
       return ascendantTabs;
@@ -338,7 +345,6 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         innerCut.concatPath(baseEdgeTab.innerCut);
         score.concatPath(baseEdgeTab.score);
       });
-
       // male tabs
       boundaryCut.weldPath(this.ascendantEdgeTabs.male.cut, true);
       score.concatPath(this.ascendantEdgeTabs.male.score);
@@ -406,8 +412,8 @@ export const PyramidNetModel = types.model('Pyramid Net', {
     },
     get faceDecorationTransformMatricies(): DOMMatrixReadOnly[] {
       const matrices = [];
-      for (let i = 0; i < self.pyramid.geometry.faceCount; i += 1) {
-        const isMirrored = !!(i % 2) && !this.faceIsSymmetrical;
+      for (let i = 0; i < self.pyramid.facesPerNet; i += 1) {
+        const isMirrored = !!(i % 2) && !self.pyramid.faceIsSymmetrical;
         const xScale = isMirrored ? -1 : 1;
         const asymmetryNudge = isMirrored
           ? this.faceInteriorAngles[2] - 2 * ((Math.PI / 2) - this.faceInteriorAngles[0]) : 0;
@@ -451,6 +457,8 @@ export const PyramidNetModel = types.model('Pyramid Net', {
     setPyramidShapeName(name: string) {
       self.faceDecoration = undefined;
       self.pyramid.shapeName = name;
+      // all geometries have 1 as option, but different shapes have different divisors > 1
+      self.pyramid.netsPerPyramid = 1;
     },
 
     setRawFaceDecoration(d) {

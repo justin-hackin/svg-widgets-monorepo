@@ -36,7 +36,7 @@ export const UncontrolledPanelSelect = observer(({
 });
 
 export const PanelSelect = observer(({
-  node, property, options, label,
+  node, property, options, label = undefined,
 }) => {
   const {
     value, setValue, valuePath,

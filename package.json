@@ -38,6 +38,7 @@
     "electron-debug": "^3.2.0",
     "gcd": "0.0.1",
     "image-size": "^0.9.3",
+    "integer-divisors": "^1.0.1",
     "lodash": "^4.17.19",
     "mobx": "^5.15.4",
     "mobx-devtools-mst": "^0.9.22",
