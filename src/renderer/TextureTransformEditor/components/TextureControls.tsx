@@ -184,46 +184,48 @@ export const TextureControls = observer(() => {
                 </IconButton>
               </span>
             </Tooltip>
-            <FormControlLabel
-              className={classes.checkboxControlLabel}
-              labelPlacement="top"
-              control={(
-                <Switch
-                  checked={showNodes}
-                  disabled={!hasPathPattern}
-                  onChange={(e) => {
-                    setShowNodes(e.target.checked);
-                  }}
-                  color="primary"
-                />
+            {hasPathPattern && (
+            <>
+              <FormControlLabel
+                className={classes.checkboxControlLabel}
+                labelPlacement="top"
+                control={(
+                  <Switch
+                    checked={showNodes}
+                    onChange={(e) => {
+                      setShowNodes(e.target.checked);
+                    }}
+                    color="primary"
+                  />
               )}
-              label="Node selection"
-            />
-            <PanelSliderComponent
-              node={store}
-              property="nodeScaleMux"
-              className={classes.nodeScaleMuxSlider}
-              disabled={!hasPathPattern}
-              label="Node size"
-              min={0.1}
-              max={10}
-              step={DEFAULT_SLIDER_STEP}
-            />
-            <FormControlLabel
-              className={classes.checkboxControlLabel}
-              labelPlacement="top"
-              control={(
-                <Switch
-                  checked={isPositive}
-                  disabled={!hasPathPattern}
-                  onChange={(e) => {
-                    setIsPositive(e.target.checked);
-                  }}
-                  color="primary"
-                />
-              )}
-              label="Fill is positive"
-            />
+                label="Node selection"
+              />
+              <PanelSliderComponent
+                node={store}
+                property="nodeScaleMux"
+                className={classes.nodeScaleMuxSlider}
+                label="Node size"
+                min={0.1}
+                max={10}
+                step={DEFAULT_SLIDER_STEP}
+              />
+              <FormControlLabel
+                className={classes.checkboxControlLabel}
+                labelPlacement="top"
+                control={(
+                  <Switch
+                    checked={isPositive}
+                    onChange={(e) => {
+                      setIsPositive(e.target.checked);
+                    }}
+                    color="primary"
+                  />
+                )}
+                label="Fill is positive"
+              />
+            </>
+            )}
+
             <TextField
               className={classes.rotationInput}
               label="Rotate"
