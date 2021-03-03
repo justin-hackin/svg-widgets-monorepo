@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import {
-  Mesh, Object3D, PerspectiveCamera, Renderer, Scene, WebGLRenderer,
+  Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, Renderer, Scene, WebGLRenderer,
 } from 'three';
 import Canvg, { presets } from 'canvg';
 import ReactDOMServer from 'react-dom/server';
@@ -93,11 +93,6 @@ export const ShapePreview = observer(() => {
     threeContainerRef.current.appendChild(theRenderer.domElement);
     setRenderer(theRenderer);
 
-    const globalLight = new (THREE.AmbientLight)(0xffffff);
-    // soft white light
-    globalLight.intensity = 2.0;
-    theScene.add(globalLight);
-
     const theCamera = new PerspectiveCamera(30, width / height, 0.1, 2000);
     theCamera.position.set(0, 0, 200);
     setCamera(theCamera);
@@ -144,6 +139,10 @@ export const ShapePreview = observer(() => {
           if (child.isMesh) {
             const normalizingScale = IDEAL_RADIUS / child.geometry.boundingSphere.radius;
             child.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
+            const oldMaterial = child.material;
+            child.material = new MeshBasicMaterial();
+            // @ts-ignore
+            child.material.map = oldMaterial.map;
             setShapeObject(child);
           }
         });
