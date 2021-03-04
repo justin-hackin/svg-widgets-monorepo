@@ -4,10 +4,8 @@ import { observer } from 'mobx-react';
 import { RawPoint, scalePoint } from '../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
 import { useMst } from '../models';
-import {
-  IImageFaceDecorationPatternModel,
-  IPathFaceDecorationPatternModel,
-} from '../../DielineViewer/models/PyramidNetStore';
+import { IImageFaceDecorationPatternModel } from '../../common/models/ImageFaceDecorationPatternModel';
+import { IPathFaceDecorationPatternModel } from '../../common/models/PathFaceDecorationPatternModel';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#222';

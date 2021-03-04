@@ -3,14 +3,13 @@ import { getType } from 'mobx-state-tree';
 import React from 'react';
 import { IPreferencesModel } from '../../../../models/PreferencesModel';
 import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
+import { theme } from '../../../../../TextureTransformEditor';
+import { closedPolygonPath } from '../../../../util/shapes/generic';
 import {
   IImageFaceDecorationPatternModel,
   ImageFaceDecorationPatternModel,
-  ITextureFaceDecorationModel,
-  TextureFaceDecorationModel,
-} from '../../../../models/PyramidNetStore';
-import { theme } from '../../../../../TextureTransformEditor';
-import { closedPolygonPath } from '../../../../util/shapes/generic';
+} from '../../../../../common/models/ImageFaceDecorationPatternModel';
+import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from '../../../../models/TextureFaceDecorationModel';
 
 const PrintGroup = ({ children }) => (
   <g {...{

@@ -1,20 +1,18 @@
 /* eslint-disable no-param-reassign */
 import { reaction } from 'mobx';
 import { generateDivisorsAscending } from 'integer-divisors';
-
-import {
-  getParent, getType, Instance, resolveIdentifier, types,
-} from 'mobx-state-tree';
-import {
-  chunk, flatten, range,
-} from 'lodash';
+import { getParent, getType, Instance, resolveIdentifier, types, } from 'mobx-state-tree';
+import { chunk, flatten, range, } from 'lodash';
 
 import { polyhedra } from '../data/polyhedra';
 import {
-  getTextureTransformMatrix, hingedPlot, hingedPlotByProjectionDistance,
+  hingedPlot,
+  hingedPlotByProjectionDistance,
   offsetPolygonPoints,
-  polygonPointsGivenAnglesAndSides, RawPoint,
-  scalePoint, sumPoints,
+  polygonPointsGivenAnglesAndSides,
+  RawPoint,
+  scalePoint,
+  sumPoints,
   triangleAnglesGivenSides,
 } from '../../common/util/geom';
 import { EVENTS } from '../../../main/ipc';
@@ -28,34 +26,18 @@ import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../util/shapes/baseEdg
 import { DashPatternModel, defaultStrokeDashSpec, strokeDashPath } from '../util/shapes/strokeDashPath';
 import { boundingViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
-import { DimensionsModel } from '../../../common/models/DimensionsModel';
 import { getBoundedTexturePathD } from '../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
-import { PIXELS_PER_CM, degToRad, radToDeg } from '../../common/util/units';
+import { degToRad, PIXELS_PER_CM, radToDeg } from '../../common/util/units';
+import {
+  IPathFaceDecorationPatternModel,
+  PathFaceDecorationPatternModel
+} from '../../common/models/PathFaceDecorationPatternModel';
+import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from './TextureFaceDecorationModel';
+import { IRawFaceDecorationModel, RawFaceDecorationModel } from './RawFaceDecorationModel';
 
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 
-export const PathFaceDecorationPatternModel = types.model({
-  pathD: types.string,
-  sourceFileName: types.string,
-  isPositive: types.boolean,
-});
-
-export interface IPathFaceDecorationPatternModel extends Instance<typeof PathFaceDecorationPatternModel> {}
-
-export const ImageFaceDecorationPatternModel = types.model({
-  imageData: types.string,
-  dimensions: DimensionsModel,
-  sourceFileName: types.string,
-  isBordered: types.optional(types.boolean, true),
-}).actions((self) => ({
-  setIsBordered(isBordered) {
-    self.isBordered = isBordered;
-  },
-}));
-export interface IImageFaceDecorationPatternModel extends Instance<typeof ImageFaceDecorationPatternModel> {}
-
-// TODO: this could cover cases where last segment open/close is not a horizontal line (use hingePlot for startFlapEdge)
 const applyFlap = (
   path: PathData, flapDirectionIsUp: boolean,
   handleFlapDepth: number, testTabHandleFlapRounding: number,
@@ -69,31 +51,6 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-// TODO: move to common folder
-// from texture editor send
-export const TextureFaceDecorationModel = types.model({
-  pattern: types.union(PathFaceDecorationPatternModel, ImageFaceDecorationPatternModel),
-  transformOrigin: types.frozen<RawPoint>(),
-  translate: types.frozen<RawPoint>(),
-  rotate: types.number,
-  scale: types.number,
-}).views((self) => ({
-  get transformMatrix() {
-    const {
-      transformOrigin, rotate, scale, translate,
-    } = self;
-    return getTextureTransformMatrix(transformOrigin, scale, rotate, translate);
-  },
-}));
-export interface ITextureFaceDecorationModel extends Instance<typeof TextureFaceDecorationModel> {}
-
-// from file menu template upload
-const RawFaceDecorationModel = types.model({
-  dValue: types.string,
-});
-export interface IRawFaceDecorationModel extends Instance<typeof RawFaceDecorationModel> {}
-
-export const FaceDecorationModel = types.union(TextureFaceDecorationModel, RawFaceDecorationModel);
 
 export const PyramidModel = types.model({
   shapeName: types.optional(types.string, 'small-triambic-icosahedron'),
@@ -120,16 +77,11 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   pyramid: types.optional(PyramidModel, {}),
   ascendantEdgeTabsSpec: types.optional(AscendantEdgeTabsModel, {}),
   baseEdgeTabsSpec: types.optional(BaseEdgeTabsModel, {}),
-  // TODO: don't use weird naming conventions to leverage behaviour, use property metadata
   shapeHeight: types.optional(types.number, 20 * PIXELS_PER_CM),
-  faceDecoration: types.maybe(types.late(() => FaceDecorationModel)),
+  faceDecoration: types.maybe(types.union(TextureFaceDecorationModel, RawFaceDecorationModel)),
   useDottedStroke: types.optional(types.boolean, false),
-  // TODO: migrate to preferences
   baseScoreDashSpec: types.maybe(DashPatternModel),
   interFaceScoreDashSpec: types.maybe(DashPatternModel),
-  // in this case of faceDecoration being defined, this is a derived value thus could be made volatile
-  // however, it needs to be persisted in the model because
-  // it can also be defined by cut hole path import via templated svg file
 })
   .volatile(() => ({
     testTabHandleFlapDepth: 2,
@@ -376,10 +328,6 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       }
       return cut;
     },
-    // get borderInsetFaceHoleTransform() {
-    //   return `translate(${self.insetPolygon.vertices[0].x}, ${self.insetPolygon.vertices[0].y}) scale(${
-    //     (self.insetPolygon.box.width) / self.borderPolygon.box.width
-    //   })`;
 
     get borderInsetFaceHoleTransformMatrix(): DOMMatrixReadOnly {
       const scale = 1 / this.borderToInsetRatio;

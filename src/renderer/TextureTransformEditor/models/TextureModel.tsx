@@ -1,12 +1,5 @@
 import { Instance, getParentOfType, getType } from 'mobx-state-tree';
-// @ts-ignore
 
-import {
-  IImageFaceDecorationPatternModel,
-  IPathFaceDecorationPatternModel,
-  PathFaceDecorationPatternModel,
-  TextureFaceDecorationModel,
-} from '../../DielineViewer/models/PyramidNetStore';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
 import { TextureEditorModel } from './TextureEditorModel';
@@ -16,6 +9,12 @@ import {
   scalePoint,
   sumPoints,
 } from '../../common/util/geom';
+import { IImageFaceDecorationPatternModel } from '../../common/models/ImageFaceDecorationPatternModel';
+import {
+  IPathFaceDecorationPatternModel,
+  PathFaceDecorationPatternModel,
+} from '../../common/models/PathFaceDecorationPatternModel';
+import { TextureFaceDecorationModel } from '../../DielineViewer/models/TextureFaceDecorationModel';
 
 const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);
