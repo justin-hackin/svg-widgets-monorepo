@@ -28,6 +28,7 @@ import {
   calculateTransformOriginChangeOffset, getOriginPoint, scalePoint, sumPoints, transformPoint,
 } from '../../common/util/geom';
 import {
+  IImageFaceDecorationPatternModel,
   ImageFaceDecorationPatternModel,
   PathFaceDecorationPatternModel,
 } from '../../DielineViewer/models/PyramidNetStore';
@@ -73,7 +74,6 @@ export const TextureEditorModel = types
     modifierTracking: types.optional(ModifierTrackingModel, {}),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     shapePreview: types.optional(types.late(() => ShapePreviewModel), {}),
-    isBordered: types.optional(types.boolean, true),
   })
   .volatile(() => ({
     // amount of scaling required to make the decoration area match the size of the face boundary
@@ -123,7 +123,10 @@ export const TextureEditorModel = types
     },
     get faceBoundary() {
       if (!self.decorationBoundary || !self.borderToInsetRatio) { return undefined; }
-      if (!self.isBordered) {
+      // TODO: no more dirty type checking
+      const textureIsBordered = self.texture
+        ? (self.texture.pattern as IImageFaceDecorationPatternModel).isBordered : null;
+      if (textureIsBordered === false) {
         return self.decorationBoundary;
       }
       const vertices = self.decorationBoundary.vertices
@@ -203,9 +206,6 @@ export const TextureEditorModel = types
       this.setTexture(ImageFaceDecorationPatternModel.create({
         imageData, dimensions, sourceFileName,
       }));
-    },
-    setIsBordered(isUsed) {
-      self.isBordered = isUsed;
     },
     // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
     getFileBasename() {
@@ -427,8 +427,11 @@ const ShapePreviewModel = types.model({
           // @ts-ignore
           scale, rotate, translate,
           // @ts-ignore
-          faceBoundary: { pathD: boundaryPathD } = {}, pattern: { isPositive, pathD: patternPathD, imageData } = {},
-        } = {}, isBordered,
+          faceBoundary: { pathD: boundaryPathD } = {},
+          pattern: {
+            isPositive = undefined, pathD: patternPathD = undefined, imageData = undefined, isBordered = undefined,
+          } = {},
+        } = {},
       } = self.parentTextureEditor;
       return [
         self.shapeMesh, scale, rotate, translate, boundaryPathD, isPositive, patternPathD, imageData, isBordered,

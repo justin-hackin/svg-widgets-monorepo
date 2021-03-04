@@ -150,7 +150,7 @@ app.on('ready', async () => {
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('blur', sendResetDragMode);
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('minimize', sendResetDragMode);
   browserWindows[WINDOWS.TEXTURE_EDITOR].on('hide', sendResetDragMode);
-
+  browserWindows[WINDOWS.TEXTURE_EDITOR].show();
   browserWindows[WINDOWS.DIELINE_EDITOR].show();
 });
 

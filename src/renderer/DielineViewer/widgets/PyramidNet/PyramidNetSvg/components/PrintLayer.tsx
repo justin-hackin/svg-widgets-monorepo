@@ -49,7 +49,7 @@ export const PrintLayer = observer(({
     return null;
   }
 
-  const { imageData, dimensions } = pattern as IImageFaceDecorationPatternModel;
+  const { imageData, dimensions, isBordered } = pattern as IImageFaceDecorationPatternModel;
   const PRINT_IMAGE_ID = 'print-face-decoration';
   const PRINT_BLEED_PATH_ID = 'print-bleed-path-id';
   const CLIP_PATH_ID = 'clip-path';
@@ -72,6 +72,7 @@ export const PrintLayer = observer(({
         </filter>
       </defs>
       <g transform={fitToCanvasTranslationStr}>
+        { isBordered && (
         <g id="bleed-stroke-group">
           {
             faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
@@ -95,31 +96,36 @@ export const PrintLayer = observer(({
               )))
           }
         </g>
+        )}
         <g id="print-decoration-group">
           {
             faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
               ? (
                 <g key={index} id={PRINT_IMAGE_ID}>
                   <use id="border-fill" xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />
-                  <use
-                    id="outer-glow"
-                    xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
-                    fill="none"
-                    stroke={theme.palette.grey['50']}
-                    strokeWidth={faceLengthAdjustRatio}
-                    filter={`url(#${BLUR_ID})`}
-                    clipPath={`url(#${CLIP_PATH_ID})`}
-                  />
-                  <path
-                    id="inner-glow"
-                    d={decorationBoundaryPathD}
-                    fill="none"
-                    stroke={theme.palette.grey['50']}
-                    strokeWidth={faceLengthAdjustRatio}
-                    filter={`url(#${BLUR_ID})`}
-                  />
+                  {isBordered && (
+                    <>
+                      <use
+                        id="outer-glow"
+                        xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`}
+                        fill="none"
+                        stroke={theme.palette.grey['50']}
+                        strokeWidth={faceLengthAdjustRatio}
+                        filter={`url(#${BLUR_ID})`}
+                        clipPath={`url(#${CLIP_PATH_ID})`}
+                      />
+                      <path
+                        id="inner-glow"
+                        d={decorationBoundaryPathD}
+                        fill="none"
+                        stroke={theme.palette.grey['50']}
+                        strokeWidth={faceLengthAdjustRatio}
+                        filter={`url(#${BLUR_ID})`}
+                      />
+                    </>
+                  )}
 
-                  <g transform={borderInsetFaceHoleTransformMatrix.toString()}>
+                  <g transform={isBordered ? borderInsetFaceHoleTransformMatrix.toString() : ''}>
                     <g clipPath={`url(#${CLIP_PATH_ID})`}>
                       <image
                         xlinkHref={imageData}

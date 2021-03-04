@@ -52,12 +52,12 @@ export const TextureControls = observer(() => {
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, shapePreview: { downloadShapeGLTF },
     setTexturePath, setTextureImage,
-    isBordered, setIsBordered,
     shapeName,
   } = store;
   const classes = useStyles();
   const {
-    pattern: { isPositive = undefined } = {}, setIsPositive, rotate: textureRotate, hasPathPattern,
+    pattern: { isPositive = undefined, isBordered = undefined, setIsBordered = undefined } = {},
+    setIsPositive, rotate: textureRotate, hasPathPattern,
   } = texture || {};
   const numFaceSides = decorationBoundary.vertices.length;
 
@@ -121,20 +121,22 @@ export const TextureControls = observer(() => {
           <PublishIcon fontSize="large" />
         </IconButton>
         <HistoryButtons history={history} />
-        <FormControlLabel
-          className={classes.checkboxControlLabel}
-          labelPlacement="top"
-          control={(
-            <Switch
-              checked={isBordered}
-              onChange={(e) => {
-                setIsBordered(e.target.checked);
-              }}
-              color="primary"
-            />
-          )}
-          label="Bordered"
-        />
+        {isBordered !== undefined && (
+          <FormControlLabel
+            className={classes.checkboxControlLabel}
+            labelPlacement="top"
+            control={(
+              <Switch
+                checked={isBordered}
+                onChange={(e) => {
+                  setIsBordered(e.target.checked);
+                }}
+                color="primary"
+              />
+            )}
+            label="Bordered"
+          />
+        )}
 
         <FormControlLabel
           className={classes.checkboxControlLabel}

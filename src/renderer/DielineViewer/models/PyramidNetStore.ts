@@ -6,7 +6,7 @@ import {
   getParent, getType, Instance, resolveIdentifier, types,
 } from 'mobx-state-tree';
 import {
-  chunk, debounce, flatten, range,
+  chunk, flatten, range,
 } from 'lodash';
 
 import { polyhedra } from '../data/polyhedra';
@@ -47,7 +47,12 @@ export const ImageFaceDecorationPatternModel = types.model({
   imageData: types.string,
   dimensions: DimensionsModel,
   sourceFileName: types.string,
-});
+  isBordered: types.optional(types.boolean, true),
+}).actions((self) => ({
+  setIsBordered(isBordered) {
+    self.isBordered = isBordered;
+  },
+}));
 export interface IImageFaceDecorationPatternModel extends Instance<typeof ImageFaceDecorationPatternModel> {}
 
 // TODO: this could cover cases where last segment open/close is not a horizontal line (use hingePlot for startFlapEdge)
@@ -414,6 +419,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
     },
     get faceDecorationTransformMatricies(): DOMMatrixReadOnly[] {
       const matrices = [];
+
       for (let i = 0; i < self.pyramid.facesPerNet; i += 1) {
         const isMirrored = !!(i % 2) && !self.pyramid.faceIsSymmetrical;
         const xScale = isMirrored ? -1 : 1;
