@@ -37,6 +37,7 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
 }).volatile(() => ({
   sectionPathD: null,
   wallPathD: null,
+  disposers: [],
 }))
   .views((self) => ({
     get innerRadius() {
@@ -180,18 +181,18 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
     afterCreate() {
       this.setSectionPathD();
       this.setWallPathD();
-      reaction(
+      self.disposers.push(reaction(
         () => [self.dovetailTab, self.dovetailNotch, self.sectionArcPath, self.holderTabHoles, self.wallHoles],
         () => {
           this.setSectionPathD();
         },
-      );
-      reaction(
+      ));
+      self.disposers.push(reaction(
         () => [self.wallHorizontalRect, self.wallVerticalRect],
         () => {
           this.setWallPathD();
         },
-      );
+      ));
     },
     setSectionPathD() {
       const subtractionContent = (new PathData())

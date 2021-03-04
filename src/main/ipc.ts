@@ -10,7 +10,7 @@ const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
 enum MAIN_EVENTS {
   SAVE_SVG = 'save-svg',
   SAVE_JSON = 'save-json',
-  SAVE_GLTF = 'save-gltf',
+  SAVE_GLB = 'save-glb',
   DIALOG_SAVE_MODEL_WITH_SVG = 'dialog-save-model-with-svg',
   SAVE_MODEL_WITH_SVG = 'save-model-with-svg',
   DIALOG_LOAD_JSON = 'dialog-load-json',
@@ -77,7 +77,7 @@ export const setupIpc = (ipcMain) => {
     return fsPromises.writeFile(resolvedFilePath, JSON.stringify(jsonData));
   }));
 
-  ipcMain.handle(EVENTS.SAVE_GLTF, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
+  ipcMain.handle(EVENTS.SAVE_GLB, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,
     filters: glbFilters,
   }).then(({ canceled, filePath }) => {

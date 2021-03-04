@@ -47,7 +47,6 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
   sendShapeUpdate() {
     // @ts-ignore
     self.pyramidNetSpec.sendTextureUpdate();
-    self.pyramidNetSpec.sendTextureBorderData();
   },
   renderDecorationBoundaryToString():string {
     // @ts-ignore

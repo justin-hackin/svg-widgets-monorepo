@@ -64,7 +64,8 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-// from texture editor
+// TODO: move to common folder
+// from texture editor send
 export const TextureFaceDecorationModel = types.model({
   pattern: types.union(PathFaceDecorationPatternModel, ImageFaceDecorationPatternModel),
   transformOrigin: types.frozen<RawPoint>(),
@@ -128,6 +129,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   .volatile(() => ({
     testTabHandleFlapDepth: 2,
     testTabHandleFlapRounding: 0.5,
+    disposers: [],
   }))
   .views((self) => ({
     get tabIntervalRatios() {
@@ -429,30 +431,26 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   .actions((self) => ({
     afterCreate() {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      reaction(
+      self.disposers.push(reaction(
         () => [self.normalizedDecorationBoundaryPoints, self.faceDecoration],
         () => {
           this.sendTextureUpdate();
         },
-      );
+      ));
 
-      reaction(
-        () => [self.pyramid.shapeName],
+      self.disposers.push(reaction(
+        () => [self.pyramid.shapeName, self.textureBorderWidth],
         () => {
           this.sendTextureUpdate();
         },
-      );
-
-      reaction(() => self.textureBorderWidth, () => {
-        this.sendTextureBorderData();
-      });
+      ));
     },
 
-    sendTextureBorderData: debounce(() => {
-      globalThis.ipcRenderer.send(
-        EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, self.borderToInsetRatio, self.insetToBorderOffset,
-      );
-    }, 250),
+    beforeDestroy() {
+      for (const disposer of self.disposers) {
+        disposer();
+      }
+    },
 
     setPyramidShapeName(name: string) {
       self.faceDecoration = undefined;
@@ -497,7 +495,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION,
         self.normalizedDecorationBoundaryPoints,
         self.pyramid.shapeName,
-        self.faceDecoration);
+        self.faceDecoration, self.borderToInsetRatio, self.insetToBorderOffset);
     },
   }));
 

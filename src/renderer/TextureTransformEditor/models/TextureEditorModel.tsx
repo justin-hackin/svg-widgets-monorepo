@@ -4,12 +4,23 @@ import {
   getSnapshot, Instance, resolvePath, types,
 } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
+import npot from 'nearest-power-of-two';
+import { reaction, when } from 'mobx';
+import {
+  Mesh,
+  MeshBasicMaterial,
+  MeshPhongMaterial,
+  PerspectiveCamera,
+  Scene, WebGLRenderer,
+} from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import OrbitControls from 'threejs-orbit-controls';
+import ReactDOMServer from 'react-dom/server';
+import React from 'react';
+import Canvg, { presets } from 'canvg';
 
-import { when } from 'mobx';
-import { MeshPhongMaterial } from 'three';
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
-
 import { DimensionsModel } from '../../../common/models/DimensionsModel';
 import { EVENTS } from '../../../main/ipc';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
@@ -21,6 +32,9 @@ import {
   PathFaceDecorationPatternModel,
 } from '../../DielineViewer/models/PyramidNetStore';
 import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
+import requireStatic from '../../requireStatic';
+import { TextureSvgUnobserved } from '../components/TextureSvg';
+import { viewBoxAttrsToString } from '../../../common/util/svg';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -73,6 +87,7 @@ export const TextureEditorModel = types
     selectedTextureNodeIndex: null,
     MIN_VIEW_SCALE: 0.3,
     MAX_VIEW_SCALE: 3,
+    disposers: [],
   }))
   .views((self) => ({
     get imageCoverScale() {
@@ -308,11 +323,11 @@ export const TextureEditorModel = types
           // TODO: this is a dirty trick, disentangle calculation of boundary points from dieline editor
           // and/or enable async ipc across multiple windows so requesting updates can be done in one ipc event
           // (which provides an optional shape override)
-          when(() => (self.shapeName === shapeName), () => {
+          self.disposers.push(when(() => (self.shapeName === shapeName), () => {
             setTimeout(() => {
               this.setTextureFromSnapshot(textureSnapshot);
             }, 100);
-          });
+          }));
         } else {
           this.setTextureFromSnapshot(textureSnapshot);
         }
@@ -320,45 +335,187 @@ export const TextureEditorModel = types
     },
   }))
   .actions((self) => {
-    const updateBorderDataHandler = (e, borderToInsetRatio, insetToBorderOffset) => {
+    const shapeDecorationHandler = (_,
+      decorationBoundaryVertices, shapeName,
+      faceDecoration, borderToInsetRatio, insetToBorderOffset) => {
       self.setFaceBorderData(borderToInsetRatio, insetToBorderOffset);
-    };
-    const shapeDecorationHandler = (_, decorationBoundaryVertices, shapeName, faceDecoration) => {
       self.textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration);
     };
 
     return {
       afterCreate() {
-        globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, updateBorderDataHandler);
         globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION, shapeDecorationHandler);
       },
       beforeDestroy() {
-        globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA, updateBorderDataHandler);
         globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION, shapeDecorationHandler);
+        for (const disposer of self.disposers) {
+          disposer();
+        }
       },
     };
   });
 
 const ShapePreviewModel = types.model({
 }).volatile(() => ({
-  shapeObject: null,
   gltfExporter: new GLTFExporter(),
+  gltfLoader: new GLTFLoader(),
+  renderer: null,
+  scene: new Scene(),
+  shapeScene: null,
+  shapeMesh: null,
+  camera: null,
+  controls: null,
+  animationFrame: null,
+  IDEAL_RADIUS: 60,
+  TEXTURE_BITMAP_SCALE: 0.2,
+  disposers: [],
+})).views((self) => ({
+  get canvasDimensions() {
+    const { width, height } = this.parentTextureEditor.placementAreaDimensions || {};
+    return width ? { width, height } : undefined;
+  },
+  get parentTextureEditor() {
+    return getParentOfType(self, TextureEditorModel);
+  },
 })).actions((self) => ({
+  setup(rendererContainer) {
+    self.renderer = new WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      preserveDrawingBuffer: true,
+    });
+    rendererContainer.appendChild(self.renderer.domElement);
+    self.renderer.setPixelRatio(window.devicePixelRatio);
+    self.camera = new PerspectiveCamera(
+      30, self.canvasDimensions.width / self.canvasDimensions.height, 0.1, 2000,
+    );
+    self.camera.position.set(0, 0, 200);
+    self.controls = new OrbitControls(self.camera, self.renderer.domElement);
+
+    // update renderer dimensions
+    self.disposers.push(reaction(() => [self.canvasDimensions, self.renderer], () => {
+      if (self.renderer) {
+        const { width, height } = self.canvasDimensions;
+        self.renderer.setSize(width, height);
+        self.camera.aspect = width / height;
+        self.camera.updateProjectionMatrix();
+      }
+    }, { fireImmediately: true }));
+
+    // auto rotate update controls
+    self.disposers.push(reaction(() => [self.parentTextureEditor.autoRotatePreview], () => {
+      self.controls.autoRotate = self.parentTextureEditor.autoRotatePreview;
+    }, { fireImmediately: true }));
+
+    // shape change
+    self.disposers.push(reaction(() => [self.parentTextureEditor.shapeName], () => {
+      this.setShape(self.parentTextureEditor.shapeName);
+    }, { fireImmediately: true }));
+
+    self.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
+      const animate = () => {
+        controls.update();
+        renderer.render(scene, camera);
+        window.requestAnimationFrame(animate);
+      };
+      return animate;
+    })(self.renderer, self.controls, self.camera, self.scene));
+
+    self.disposers.push(reaction(() => {
+      const {
+        texture: {
+          // @ts-ignore
+          scale, rotate, translate,
+          // @ts-ignore
+          faceBoundary: { pathD: boundaryPathD } = {}, pattern: { isPositive, pathD: patternPathD, imageData } = {},
+        } = {}, isBordered,
+      } = self.parentTextureEditor;
+      return [
+        self.shapeMesh, scale, rotate, translate, boundaryPathD, isPositive, patternPathD, imageData, isBordered,
+      ];
+    }, () => {
+      const { shapeMesh, parentTextureEditor: { faceBoundary: { viewBoxAttrs } } } = self;
+      if (!shapeMesh || !viewBoxAttrs) { return; }
+      const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
+      // TODO: throw if material not MeshPhong
+      // @ts-ignore
+      const ctx = textureCanvas.getContext('2d');
+      // @ts-ignore
+      const svgStr = ReactDOMServer.renderToString(
+        React.createElement(TextureSvgUnobserved, {
+          viewBox: viewBoxAttrsToString(viewBoxAttrs),
+          store: self.parentTextureEditor,
+        }),
+      );
+      // @ts-ignore
+      Canvg.from(ctx, svgStr, presets.offscreen()).then(async (v) => {
+        const {
+          width: vbWidth,
+          height: vbHeight,
+        } = viewBoxAttrs;
+        v.resize(
+          npot(vbWidth * self.TEXTURE_BITMAP_SCALE),
+          npot(vbHeight * self.TEXTURE_BITMAP_SCALE), 'none',
+        );
+        await v.render();
+        this.setShapeTexture(textureCanvas.transferToImageBitmap());
+      });
+    }));
+  },
+  beforeDestroy() {
+    if (self.animationFrame) {
+      cancelAnimationFrame(self.animationFrame);
+    }
+    for (const disposer of self.disposers) {
+      disposer();
+    }
+  },
   async downloadShapeGLTF() {
     return self.gltfExporter
-      .parse(self.shapeObject, (shapeGLTF) => {
-        globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLTF, shapeGLTF, {
+      .parse(self.shapeMesh, (shapeGLTF) => {
+        globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLB, shapeGLTF, {
           message: 'Save shape preview',
-          defaultPath: `${getParentOfType(self, TextureEditorModel).getFileBasename()}.glb`,
+          defaultPath: `${self.parentTextureEditor.getFileBasename()}.glb`,
         });
       }, { binary: true });
   },
-  setShapeObject(shape) {
-    self.shapeObject = shape;
+  setShapeMesh(shape) {
+    self.shapeMesh = shape;
+  },
+  setShapeScene(scene) {
+    self.shapeScene = scene;
+  },
+
+  setShape(shapeName) {
+    const modelUrl = requireStatic(`models/${shapeName}.gltf`);
+    self.gltfLoader.load(
+      // resource URL
+      modelUrl,
+      ({ scene: importScene }) => {
+        if (self.shapeScene) {
+          self.scene.remove(self.shapeScene);
+        }
+        self.scene.add(importScene);
+        this.setShapeScene(importScene);
+
+        self.scene.traverse((child) => {
+          const meshChild = (child as Mesh);
+          if (meshChild.isMesh) {
+            const normalizingScale = self.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
+            meshChild.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
+            const oldMaterial = meshChild.material;
+            meshChild.material = new MeshBasicMaterial();
+            // @ts-ignore
+            meshChild.material.map = oldMaterial.map;
+            this.setShapeMesh(child);
+          }
+        });
+      },
+    );
   },
   setShapeTexture(imageBitmap) {
-    if (!self.shapeObject) { throw new Error('setShapeTexture: shapeObject does not exist'); }
-    const { material }: {material: MeshPhongMaterial} = self.shapeObject;
+    if (!self.shapeMesh) { throw new Error('setShapeTexture: shapeMesh does not exist'); }
+    const { material }: {material: MeshPhongMaterial} = self.shapeMesh;
     material.map.image = imageBitmap;
     material.map.needsUpdate = true;
   },

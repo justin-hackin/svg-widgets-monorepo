@@ -41,6 +41,7 @@ export const WorkspaceModel = types.model({
     preferences: getPreferencesStore(),
     savedSnapshot: undefined,
     currentFilePath: undefined,
+    disposers: [],
   }))
   .views((self) => ({
     get selectedWidgetInfo() {
@@ -86,7 +87,7 @@ export const WorkspaceModel = types.model({
   .actions((self) => ({
     afterCreate() {
       // title bar changes for file status indication
-      reaction(() => [self.titleBarText], () => {
+      self.disposers.push(reaction(() => [self.titleBarText], () => {
         // TODO: why can't this be coerced
         // @ts-ignore
         const currentWindow = (remote.getCurrentWindow() as CustomBrowserWindowType);
@@ -96,7 +97,12 @@ export const WorkspaceModel = types.model({
           self.titleBarText}` : '';
         currentWindow
           .setTitle(`${self.selectedShapeName} ‖  ${startCase(currentWindow.route)}  ${fileTrackingFragment}`);
-      }, { fireImmediately: true });
+      }, { fireImmediately: true }));
+    },
+    beforeDestroy() {
+      for (const disposer of self.disposers) {
+        disposer();
+      }
     },
     setSelectedWidgetName(name) {
       self.selectedWidgetName = name;
