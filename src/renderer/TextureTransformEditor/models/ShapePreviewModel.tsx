@@ -5,7 +5,25 @@ import npot from 'nearest-power-of-two';
 import OrbitControls from 'threejs-orbit-controls';
 import Canvg, { presets } from 'canvg';
 import {
-  Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, Scene, WebGLRenderer,
+  AmbientLight,
+  Mesh,
+  MeshPhongMaterial,
+  PerspectiveCamera,
+  PointLight,
+  Scene,
+  Texture,
+  WebGLRenderer,
+  SphereGeometry,
+  BackSide,
+  DoubleSide,
+  PlaneGeometry,
+  NearestFilter,
+  MeshBasicMaterial,
+  MeshStandardMaterial,
+  MeshDepthMaterial,
+  RGBADepthPacking,
+  sRGBEncoding,
+  MeshLambertMaterial,
 } from 'three';
 import { reaction } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
@@ -21,8 +39,12 @@ export const ShapePreviewModel = types.model({})
   .volatile(() => ({
     gltfExporter: new GLTFExporter(),
     gltfLoader: new GLTFLoader(),
-    renderer: null,
     scene: new Scene(),
+    lightColor: 0x404040,
+    internalLight: null,
+    ambientLight: null,
+    castPlane: null,
+    renderer: null,
     shapeScene: null,
     shapeMesh: null,
     camera: null,
@@ -30,6 +52,7 @@ export const ShapePreviewModel = types.model({})
     animationFrame: null,
     IDEAL_RADIUS: 60,
     TEXTURE_BITMAP_SCALE: 0.2,
+
     disposers: [],
   }))
   .views((self) => ({
@@ -54,14 +77,31 @@ export const ShapePreviewModel = types.model({})
         antialias: true,
         preserveDrawingBuffer: true,
       });
+      self.renderer.shadowMap.enabled = true;
       rendererContainer.appendChild(self.renderer.domElement);
       self.renderer.setPixelRatio(window.devicePixelRatio);
+
+      const planeGeometry = new PlaneGeometry(100000, 100000);
+      const planeMaterial = new MeshPhongMaterial({ color: 0xffffff });
+      planeMaterial.side = DoubleSide;
+      self.castPlane = new Mesh(planeGeometry, planeMaterial);
+      self.castPlane.position.z = -100;
+      self.castPlane.receiveShadow = true;
+      self.scene.add(self.castPlane);
+
+      // self.ambientLight = new AmbientLight(self.lightColor);
+      // self.ambientLight.intensity = 1;
+      // self.scene.add(self.ambientLight);
+
+      self.internalLight = new PointLight(self.lightColor);
+      self.internalLight.castShadow = true;
+      self.internalLight.intensity = 2;
+
       self.camera = new PerspectiveCamera(
-        30, self.canvasDimensions.width / self.canvasDimensions.height, 0.1, 2000,
+        60, self.canvasDimensions.width / self.canvasDimensions.height, 0.1, 40000,
       );
       self.camera.position.set(0, 0, 200);
       self.controls = new OrbitControls(self.camera, self.renderer.domElement);
-
       // update renderer dimensions
       self.disposers.push(reaction(() => [self.canvasDimensions, self.renderer], () => {
         if (self.renderer) {
@@ -84,15 +124,6 @@ export const ShapePreviewModel = types.model({})
       self.disposers.push(reaction(() => [self.parentTextureEditor.shapeName], () => {
         this.setShape(self.parentTextureEditor.shapeName);
       }, { fireImmediately: true }));
-
-      self.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
-        const animate = () => {
-          controls.update();
-          renderer.render(scene, camera);
-          window.requestAnimationFrame(animate);
-        };
-        return animate;
-      })(self.renderer, self.controls, self.camera, self.scene));
 
       self.disposers.push(reaction(() => {
         const {
@@ -119,10 +150,7 @@ export const ShapePreviewModel = types.model({})
           return;
         }
         const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
-        // TODO: throw if material not MeshPhong
-        // @ts-ignore
         const ctx = textureCanvas.getContext('2d');
-        // @ts-ignore
         const svgStr = ReactDOMServer.renderToString(
           React.createElement(TextureSvgUnobserved, {
             viewBox: viewBoxAttrsToString(viewBoxAttrs),
@@ -143,6 +171,15 @@ export const ShapePreviewModel = types.model({})
             this.setShapeTexture(textureCanvas.transferToImageBitmap());
           });
       }));
+
+      self.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
+        const animate = () => {
+          controls.update();
+          renderer.render(scene, camera);
+          window.requestAnimationFrame(animate);
+        };
+        return animate;
+      })(self.renderer, self.controls, self.camera, self.scene));
     },
     beforeDestroy() {
       if (self.animationFrame) {
@@ -179,16 +216,29 @@ export const ShapePreviewModel = types.model({})
           }
           self.scene.add(importScene);
           this.setShapeScene(importScene);
+          self.shapeScene.add(self.internalLight);
 
           self.scene.traverse((child) => {
+            // TODO: three.js advises not modifying model within this function
             const meshChild = (child as Mesh);
             if (meshChild.isMesh) {
               const normalizingScale = self.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
               meshChild.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
-              const oldMaterial = meshChild.material;
-              meshChild.material = new MeshBasicMaterial();
               // @ts-ignore
-              meshChild.material.map = oldMaterial.map;
+              const oldMaterialMap = (meshChild.material.map as Texture);
+              meshChild.material = new MeshLambertMaterial({
+                /* eslint-disable object-property-newline */
+                // @ts-ignore
+                map: oldMaterialMap, alphaMap: oldMaterialMap, magFilter: NearestFilter,
+                side: DoubleSide, transparent: true, alphaTest: 0.5,
+                /* eslint-enable */
+              });
+              meshChild.castShadow = true;
+              meshChild.customDepthMaterial = new MeshDepthMaterial({
+                depthPacking: RGBADepthPacking,
+                map: oldMaterialMap,
+                alphaTest: 0.5,
+              });
               this.setShapeMesh(child);
             }
           });

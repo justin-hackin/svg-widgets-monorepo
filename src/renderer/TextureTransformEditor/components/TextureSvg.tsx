@@ -8,8 +8,8 @@ import { IImageFaceDecorationPatternModel } from '../../common/models/ImageFaceD
 import { IPathFaceDecorationPatternModel } from '../../common/models/PathFaceDecorationPatternModel';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
-const HOLES_COLOR = '#222';
-const MATERIAL_COLOR = '#ffaa00';
+const HOLES_COLOR = '#000';
+const MATERIAL_COLOR = '#fff';
 const IMAGE_TEXTURE_DESIGN_BOUNDARY_FILL = '#00ff00';
 
 export const TextureSvgUnobserved = ({
