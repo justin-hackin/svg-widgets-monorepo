@@ -16,14 +16,9 @@ import {
   SphereGeometry,
   BackSide,
   DoubleSide,
-  PlaneGeometry,
-  NearestFilter,
   MeshBasicMaterial,
-  MeshStandardMaterial,
-  MeshDepthMaterial,
-  RGBADepthPacking,
-  sRGBEncoding,
-  MeshLambertMaterial,
+  MeshDistanceMaterial,
+  BasicShadowMap,
 } from 'three';
 import { reaction } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
@@ -35,6 +30,8 @@ import { EVENTS } from '../../../main/ipc';
 import requireStatic from '../../requireStatic';
 import { TextureEditorModel } from './TextureEditorModel';
 
+// shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
+
 export const ShapePreviewModel = types.model({})
   .volatile(() => ({
     gltfExporter: new GLTFExporter(),
@@ -43,16 +40,17 @@ export const ShapePreviewModel = types.model({})
     lightColor: 0x404040,
     internalLight: null,
     ambientLight: null,
-    castPlane: null,
+    castSphere: null,
     renderer: null,
     shapeScene: null,
     shapeMesh: null,
+    shapeMaterialMap: null,
     camera: null,
     controls: null,
     animationFrame: null,
-    IDEAL_RADIUS: 60,
+    IDEAL_RADIUS: 6,
     TEXTURE_BITMAP_SCALE: 0.2,
-
+    MARGIN: 1,
     disposers: [],
   }))
   .views((self) => ({
@@ -69,6 +67,25 @@ export const ShapePreviewModel = types.model({})
     get parentTextureEditor() {
       return getParentOfType(self, TextureEditorModel);
     },
+    get cameraRadius() {
+      return self.IDEAL_RADIUS * 3.1;
+    },
+    get sphereRadius() {
+      return self.IDEAL_RADIUS * 3;
+    },
+    get maxCameraRadius() {
+      return this.sphereRadius - self.MARGIN;
+    },
+    get cameraFar() {
+      return this.sphereRadius + this.maxCameraRadius + self.MARGIN;
+    },
+    get resolvedUseAlphaTexturePreview() {
+      return this.parentTextureEditor && this.parentTextureEditor.texture
+        && this.parentTextureEditor.texture.pattern && this.parentTextureEditor.texture.pattern.useAlphaTexturePreview;
+    },
+    get useAlpha() {
+      return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.texture;
+    },
   }))
   .actions((self) => ({
     setup(rendererContainer) {
@@ -78,30 +95,40 @@ export const ShapePreviewModel = types.model({})
         preserveDrawingBuffer: true,
       });
       self.renderer.shadowMap.enabled = true;
+      self.renderer.shadowMap.type = BasicShadowMap;
       rendererContainer.appendChild(self.renderer.domElement);
       self.renderer.setPixelRatio(window.devicePixelRatio);
 
-      const planeGeometry = new PlaneGeometry(100000, 100000);
-      const planeMaterial = new MeshPhongMaterial({ color: 0xffffff });
-      planeMaterial.side = DoubleSide;
-      self.castPlane = new Mesh(planeGeometry, planeMaterial);
-      self.castPlane.position.z = -100;
-      self.castPlane.receiveShadow = true;
-      self.scene.add(self.castPlane);
+      self.ambientLight = new AmbientLight(self.lightColor);
+      self.ambientLight.intensity = 2;
+      self.scene.add(self.ambientLight);
 
-      // self.ambientLight = new AmbientLight(self.lightColor);
-      // self.ambientLight.intensity = 1;
-      // self.scene.add(self.ambientLight);
+      // alphaOnChange will add/remove as needed
+      const sphereGeometry = new SphereGeometry(self.sphereRadius, 20, 20);
+      const sphereMaterial = new MeshPhongMaterial({
+        color: 0xff0000,
+        shininess: 10,
+        specular: 0x111111,
+        side: BackSide,
+      });
+      self.castSphere = new Mesh(sphereGeometry, sphereMaterial);
+      self.castSphere.receiveShadow = true;
 
-      self.internalLight = new PointLight(self.lightColor);
+      self.internalLight = new PointLight(self.lightColor, 3, 20);
       self.internalLight.castShadow = true;
-      self.internalLight.intensity = 2;
+      self.internalLight.shadow.camera.near = 1;
+      self.internalLight.shadow.camera.far = self.sphereRadius + self.MARGIN;
+      self.internalLight.shadow.bias = -0.005;
 
       self.camera = new PerspectiveCamera(
-        60, self.canvasDimensions.width / self.canvasDimensions.height, 0.1, 40000,
+        60, self.canvasDimensions.width / self.canvasDimensions.height, 0.1, self.cameraFar,
       );
-      self.camera.position.set(0, 0, 200);
+      self.camera.position.set(0, 0, self.cameraRadius);
+
       self.controls = new OrbitControls(self.camera, self.renderer.domElement);
+      self.controls.enablePan = false;
+      self.controls.maxDistance = self.maxCameraRadius;
+
       // update renderer dimensions
       self.disposers.push(reaction(() => [self.canvasDimensions, self.renderer], () => {
         if (self.renderer) {
@@ -125,6 +152,7 @@ export const ShapePreviewModel = types.model({})
         this.setShape(self.parentTextureEditor.shapeName);
       }, { fireImmediately: true }));
 
+      // texture change
       self.disposers.push(reaction(() => {
         const {
           texture: {
@@ -172,6 +200,11 @@ export const ShapePreviewModel = types.model({})
           });
       }));
 
+      // use alpha change
+      self.disposers.push(reaction(() => [self.resolvedUseAlphaTexturePreview, self.useAlpha], () => {
+        this.alphaOnChange();
+      }));
+
       self.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
         const animate = () => {
           controls.update();
@@ -189,6 +222,9 @@ export const ShapePreviewModel = types.model({})
         disposer();
       }
     },
+    setMaterialMap(map) {
+      self.shapeMaterialMap = map;
+    },
     async downloadShapeGLTF() {
       return self.gltfExporter
         .parse(self.shapeMesh, (shapeGLTF) => {
@@ -204,7 +240,36 @@ export const ShapePreviewModel = types.model({})
     setShapeScene(scene) {
       self.shapeScene = scene;
     },
+    alphaOnChange() {
+      if (self.useAlpha) {
+        self.shapeMesh.material = new MeshPhongMaterial({
+          map: self.shapeMaterialMap,
+          alphaMap: self.shapeMaterialMap,
+          side: DoubleSide,
+          alphaTest: 0.5,
+          transparent: true,
+        });
 
+        // will this be exported? customDepthMaterial is not
+        // eslint-disable-next-line max-len
+        // see https://stackoverflow.com/questions/64973079/threejs-customdepthmaterial-property-on-mesh-not-included-in-scene-tojson-outp
+        self.shapeMesh.customDistanceMaterial = new MeshDistanceMaterial({
+          alphaMap: self.shapeMesh.material.alphaMap,
+          alphaTest: self.shapeMesh.material.alphaTest,
+        });
+        self.shapeMesh.castShadow = true;
+        self.shapeMesh.material.needsUpdate = true;
+        self.scene.add(self.castSphere);
+        self.shapeScene.add(self.internalLight);
+      } else {
+        self.shapeMesh.material = new MeshBasicMaterial({ map: self.shapeMaterialMap, side: DoubleSide });
+        self.shapeMesh.customDistanceMaterial = undefined;
+        //  if useAlphaTexturePreview initially false, we remove something that's not in the scene already on 1st call
+        self.scene.remove(self.castSphere);
+        self.scene.remove(self.internalLight);
+      }
+      self.shapeMesh.castShadow = self.useAlpha;
+    },
     setShape(shapeName) {
       const modelUrl = requireStatic(`models/${shapeName}.gltf`);
       self.gltfLoader.load(
@@ -216,32 +281,15 @@ export const ShapePreviewModel = types.model({})
           }
           self.scene.add(importScene);
           this.setShapeScene(importScene);
-          self.shapeScene.add(self.internalLight);
 
-          self.scene.traverse((child) => {
-            // TODO: three.js advises not modifying model within this function
-            const meshChild = (child as Mesh);
-            if (meshChild.isMesh) {
-              const normalizingScale = self.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
-              meshChild.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
-              // @ts-ignore
-              const oldMaterialMap = (meshChild.material.map as Texture);
-              meshChild.material = new MeshLambertMaterial({
-                /* eslint-disable object-property-newline */
-                // @ts-ignore
-                map: oldMaterialMap, alphaMap: oldMaterialMap, magFilter: NearestFilter,
-                side: DoubleSide, transparent: true, alphaTest: 0.5,
-                /* eslint-enable */
-              });
-              meshChild.castShadow = true;
-              meshChild.customDepthMaterial = new MeshDepthMaterial({
-                depthPacking: RGBADepthPacking,
-                map: oldMaterialMap,
-                alphaTest: 0.5,
-              });
-              this.setShapeMesh(child);
-            }
-          });
+          // @ts-ignore
+          const meshChild:Mesh = importScene.children.find((child) => (child as Mesh).isMesh);
+          const normalizingScale = self.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
+          meshChild.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
+          // @ts-ignore
+          this.setMaterialMap(meshChild.material.map as Texture);
+          this.setShapeMesh(meshChild);
+          this.alphaOnChange();
         },
       );
     },

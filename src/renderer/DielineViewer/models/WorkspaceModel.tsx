@@ -141,6 +141,8 @@ export interface IWorkspaceModel extends Instance<typeof WorkspaceModel> {}
 // consider this side-effect has the advantage of displaying model name in texture editor -> it doesn't have
 // access to shapeDefinition's model name otherwise
 export const workspaceStore = WorkspaceModel.create({});
+// @ts-ignore
+window.workpsaceStore = workspaceStore;
 const WorkspaceStoreContext = createContext<IWorkspaceModel>(workspaceStore);
 
 export const { Provider: WorkspaceProvider } = WorkspaceStoreContext;

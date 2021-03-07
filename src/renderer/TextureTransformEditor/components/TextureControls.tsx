@@ -11,7 +11,6 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import PublishIcon from '@material-ui/icons/Publish';
-
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
@@ -55,10 +54,7 @@ export const TextureControls = observer(() => {
     shapeName,
   } = store;
   const classes = useStyles();
-  const {
-    pattern: { isPositive = undefined, isBordered = undefined, setIsBordered = undefined } = {},
-    setIsPositive, rotate: textureRotate, hasPathPattern,
-  } = texture || {};
+  const { pattern, rotate: textureRotate, hasPathPattern } = texture || {};
   const numFaceSides = decorationBoundary.vertices.length;
 
   // when truthy, snap menu is open
@@ -121,15 +117,15 @@ export const TextureControls = observer(() => {
           <PublishIcon fontSize="large" />
         </IconButton>
         <HistoryButtons history={history} />
-        {isBordered !== undefined && (
+        {pattern && !hasPathPattern && (
           <FormControlLabel
             className={classes.checkboxControlLabel}
             labelPlacement="top"
             control={(
               <Switch
-                checked={isBordered}
+                checked={pattern.isBordered}
                 onChange={(e) => {
-                  setIsBordered(e.target.checked);
+                  pattern.setIsBordered(e.target.checked);
                 }}
                 color="primary"
               />
@@ -216,14 +212,28 @@ export const TextureControls = observer(() => {
                 labelPlacement="top"
                 control={(
                   <Switch
-                    checked={isPositive}
+                    checked={pattern.isPositive}
                     onChange={(e) => {
-                      setIsPositive(e.target.checked);
+                      pattern.setIsPositive(e.target.checked);
                     }}
                     color="primary"
                   />
                 )}
                 label="Fill is positive"
+              />
+              <FormControlLabel
+                className={classes.checkboxControlLabel}
+                labelPlacement="top"
+                control={(
+                  <Switch
+                    checked={pattern.useAlphaTexturePreview}
+                    onChange={(e) => {
+                      pattern.setUseAlphaTexturePreview(e.target.checked);
+                    }}
+                    color="primary"
+                  />
+                )}
+                label="Use Alpha Texture"
               />
             </>
             )}

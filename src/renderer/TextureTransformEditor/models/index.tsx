@@ -8,6 +8,8 @@ import remotedev from 'remotedev';
 import { ITextureEditorModel, TextureEditorModel } from './TextureEditorModel';
 
 export const textureTransformEditorStore = TextureEditorModel.create();
+// @ts-ignore
+window.textureTransformEditorStore = textureTransformEditorStore;
 if (process.env.NODE_ENV !== 'production') {
   makeInspectable(textureTransformEditorStore);
   connectReduxDevtools(remotedev, textureTransformEditorStore);

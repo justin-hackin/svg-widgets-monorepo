@@ -117,10 +117,6 @@ export const TextureModel = TextureFaceDecorationModel
       self.translate = sumPoints(self.translate, scalePoint(relativeDifference, -1));
       self.transformOriginDiff = getOriginPoint();
     },
-    setIsPositive(isPositive) {
-      if (!self.hasPathPattern) { throw new Error('invalid call to setIsPositive: texture must be path'); }
-      (self.pattern as IPathFaceDecorationPatternModel).isPositive = isPositive;
-    },
     resetTransformDiff() {
       Object.assign(self, transformDiffDefaults);
     },

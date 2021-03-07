@@ -9,7 +9,8 @@ import { IPathFaceDecorationPatternModel } from '../../common/models/PathFaceDec
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';
-const MATERIAL_COLOR = '#fff';
+const WHITE = '#fff';
+const MUTED_WHITE = '#aaa';
 const IMAGE_TEXTURE_DESIGN_BOUNDARY_FILL = '#00ff00';
 
 export const TextureSvgUnobserved = ({
@@ -27,6 +28,7 @@ export const TextureSvgUnobserved = ({
     placementAreaDimensions,
   } = store || useMst();
   const isOnScreen = !store;
+  const materialColor = isOnScreen ? MUTED_WHITE : WHITE;
 
   // TODO: consider if passing props from parent is more apt than useMst
   if (!decorationBoundaryPathD) { return null; }
@@ -46,14 +48,14 @@ export const TextureSvgUnobserved = ({
   const DOT_RADIUS_TO_WHOLE = 0.05;
   const TEXTURE_CLIP_ID = 'texture-clip';
 
-  const faceBoundaryFill = (!pattern || hasPathPattern) ? MATERIAL_COLOR : HOLES_COLOR;
+  const faceBoundaryFill = (!pattern || hasPathPattern) ? materialColor : HOLES_COLOR;
 
   const designBoundaryFill = (() => {
     if (!pattern) {
       return HOLES_COLOR;
     }
     if (hasPathPattern) {
-      return pattern.isPositive ? HOLES_COLOR : MATERIAL_COLOR;
+      return pattern.isPositive ? HOLES_COLOR : materialColor;
     }
     // some of the color shines through at the edge of design boundary
     return isOnScreen ? IMAGE_TEXTURE_DESIGN_BOUNDARY_FILL : HOLES_COLOR;
@@ -125,7 +127,7 @@ export const TextureSvgUnobserved = ({
                   <path
                     pointerEvents="bounding-box"
                     {...textureTranslationUseDrag()}
-                    fill={isPositive ? MATERIAL_COLOR : HOLES_COLOR}
+                    fill={isPositive ? materialColor : HOLES_COLOR}
                     d={pathD}
                   />
                 );
