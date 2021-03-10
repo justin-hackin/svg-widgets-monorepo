@@ -1,20 +1,31 @@
 import React from 'react';
+import {
+  HashRouter,
+  Switch,
+  Route,
+} from 'react-router-dom';
 import { render } from 'react-dom';
 
 import { TextureTransformEditor } from './TextureTransformEditor';
 import { DielineViewer } from './DielineViewer';
 import './common/style/index.css';
-import { WINDOWS } from '../main/ipc';
+import { ROUTES } from '../main/ipc';
 
-const routes = { // A map of "route" => "component"
-  default: DielineViewer,
-  [WINDOWS.TEXTURE_EDITOR]: TextureTransformEditor,
-  [WINDOWS.DIELINE_EDITOR]: DielineViewer,
-};
+const App = () => (
+  <HashRouter>
+    <Switch>
+      <Route path={`/${ROUTES.TEXTURE_EDITOR}`}>
+        <TextureTransformEditor />
+      </Route>
+      <Route path={`/${ROUTES.DIELINE_EDITOR}`}>
+        <DielineViewer />
+      </Route>
+    </Switch>
+  </HashRouter>
+);
 
-const route = window.location.hash.split('#/')[1];
 render(
-  React.createElement(routes[route]),
+  (<App />),
   document.getElementById('app'),
 );
 

@@ -24,7 +24,7 @@ import { useStyles } from '../../style';
 import { EVENTS } from '../../../../main/ipc';
 import { HistoryButtons } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
-import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
+import { IPyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { SimpleDialog } from '../../../common/components/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
 
@@ -36,7 +36,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   const classes = useStyles();
   useTheme();
   const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
+  const pyramidNetPluginStore = workspaceStore.selectedStore as IPyramidNetPluginModel;
 
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
@@ -51,7 +51,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
 
   const newHandler = () => {
     workspaceStore.resetModelToDefault();
-    store.history.clear();
+    pyramidNetPluginStore.history.clear();
     workspaceStore.clearCurrentFileData();
     resetFileMenuRef();
   };
@@ -62,19 +62,23 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
     });
     if (res) {
       const { fileData, filePath } = res;
+      if (workspaceStore.selectedStore.onFileOpen) {
+        workspaceStore.selectedStore.onFileOpen(filePath, fileData);
+      } else {
+        applySnapshot(pyramidNetPluginStore.shapeDefinition, fileData);
+      }
       workspaceStore.setCurrentFileData(filePath, fileData);
-      applySnapshot(store.shapeDefinition, fileData);
     }
     resetFileMenuRef();
   };
 
   const saveAsHandler = async () => {
-    const snapshot = getSnapshot(store.shapeDefinition);
+    const snapshot = getSnapshot(pyramidNetPluginStore.shapeDefinition);
     const filePath = await globalThis.ipcRenderer.invoke(
       EVENTS.DIALOG_SAVE_MODEL_WITH_SVG,
       workspaceStore.renderWidgetToString(),
       snapshot,
-      { message: 'Save widget svg with json data', defaultPath: `${store.getFileBasename()}` },
+      { message: 'Save widget svg with json data', defaultPath: `${pyramidNetPluginStore.getFileBasename()}` },
     );
     if (filePath) {
       workspaceStore.setCurrentFileData(filePath, snapshot);
@@ -87,7 +91,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
       await saveAsHandler();
       return;
     }
-    const snapshot = getSnapshot(store.shapeDefinition);
+    const snapshot = getSnapshot(pyramidNetPluginStore.shapeDefinition);
     const filePath = await globalThis.ipcRenderer.invoke(
       EVENTS.SAVE_MODEL_WITH_SVG,
       workspaceStore.renderWidgetToString(),
@@ -140,7 +144,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
             */}
             {AdditionalToolbarContent && <AdditionalToolbarContent />}
             <HistoryButtons
-              history={store.history}
+              history={pyramidNetPluginStore.history}
             />
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={newHandler}>

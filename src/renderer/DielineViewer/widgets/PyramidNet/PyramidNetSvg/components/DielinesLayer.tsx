@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { IPreferencesModel } from '../../../../models/PreferencesModel';
-import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
+import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { lineLerp, matrixWithTransformOrigin } from '../../../../../common/util/geom';
 
 const DielineGroup = ({ children }) => (
@@ -17,7 +17,7 @@ const DielineGroup = ({ children }) => (
 export const DielinesLayer = observer(({
   widgetStore, preferencesStore,
 }: {
-  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetFactoryModel,
+  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetPluginModel,
 }) => {
   if (!preferencesStore || !widgetStore) {
     return null;

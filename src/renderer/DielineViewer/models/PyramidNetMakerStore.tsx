@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file,no-param-reassign */
 import {
-  Instance, types, tryResolve,
+  Instance, types, tryResolve, applySnapshot,
 } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
@@ -10,12 +10,13 @@ import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { boundingViewBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
 import { dashPatterns, DashPatternsModel } from '../data/dash-patterns';
-import { EVENTS } from '../../../main/ipc';
 import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
 import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTestTabsSvg';
 import { SVGWrapper } from '../data/SVGWrapper';
+import { TextureEditorModel } from '../../TextureTransformEditor/models/TextureEditorModel';
+import { ITextureFaceDecorationModel } from './TextureFaceDecorationModel';
 
-export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryModel }) => {
+export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetPluginModel }) => {
   const {
     pyramidNetSpec: { normalizedDecorationBoundaryPoints },
   } = store;
@@ -28,8 +29,9 @@ export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetFactoryMode
   );
 };
 
-export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
+export const PyramidNetPluginModel = types.model('PyramidNetFactory', {
   pyramidNetSpec: types.optional(PyramidNetModel, {}),
+  textureEditor: types.optional(TextureEditorModel, {}),
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   dashPatterns: types.optional(DashPatternsModel, dashPatterns),
   // TODO: make a prototype with history as property and use on all undoable models
@@ -69,25 +71,16 @@ export const PyramidNetFactoryModel = types.model('PyramidNetFactory', {
       tryResolve(self, '/pyramidNetSpec/faceDecoration/pattern/sourceFileName') || 'undecorated'
     }`;
   },
-})).actions((self) => {
-  const updateDielineHandler = (e, faceDecoration) => {
-    self.pyramidNetSpec.setTextureFaceDecoration(faceDecoration);
-  };
-  const sendShapeUpdateHandler = () => { self.sendShapeUpdate(); };
-  const updateShapeHandler = (_, shapeName) => { self.pyramidNetSpec.setPyramidShapeName(shapeName); }
+  onFileOpen(filePath, fileData) {
+    applySnapshot(self.pyramidNetSpec, fileData);
+    // @ts-ignore
+    const textureIsFromTextureEditor = (obj: unknown): obj is ITextureFaceDecorationModel => !!obj.transformOrigin;
+    const shouldUpdateTextureEditor = self.pyramidNetSpec.faceDecoration
+      && textureIsFromTextureEditor(self.pyramidNetSpec.faceDecoration);
+    if (shouldUpdateTextureEditor) {
+      self.textureEditor.setTexture(self.pyramidNetSpec.faceDecoration);
+    }
+  },
+}));
 
-  return {
-    afterCreate() {
-      globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_UPDATE, sendShapeUpdateHandler);
-      globalThis.ipcRenderer.on(EVENTS.UPDATE_DIELINE_VIEWER, updateDielineHandler);
-      globalThis.ipcRenderer.on(EVENTS.REQUEST_SHAPE_CHANGE, updateShapeHandler);
-    },
-    beforeDestroy() {
-      globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_DIELINE_VIEWER, updateDielineHandler);
-      globalThis.ipcRenderer.removeListener(EVENTS.REQUEST_SHAPE_UPDATE, updateDielineHandler);
-      globalThis.ipcRenderer.removeListener(EVENTS.REQUEST_SHAPE_CHANGE, updateShapeHandler);
-    },
-  };
-});
-
-export interface IPyramidNetFactoryModel extends Instance<typeof PyramidNetFactoryModel> {}
+export interface IPyramidNetPluginModel extends Instance<typeof PyramidNetPluginModel> {}

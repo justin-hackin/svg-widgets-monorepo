@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
-import { reaction } from 'mobx';
-import { generateDivisorsAscending } from 'integer-divisors';
-import { getParent, getType, Instance, resolveIdentifier, types, } from 'mobx-state-tree';
-import { chunk, flatten, range, } from 'lodash';
+import {
+  getParent, getType, Instance, resolveIdentifier, types,
+} from 'mobx-state-tree';
+import { chunk, flatten, range } from 'lodash';
 
 import { polyhedra } from '../data/polyhedra';
 import {
@@ -15,7 +15,6 @@ import {
   sumPoints,
   triangleAnglesGivenSides,
 } from '../../common/util/geom';
-import { EVENTS } from '../../../main/ipc';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
 import {
   AscendantEdgeConnectionPaths,
@@ -31,7 +30,7 @@ import { PathData } from '../util/PathData';
 import { degToRad, PIXELS_PER_CM, radToDeg } from '../../common/util/units';
 import {
   IPathFaceDecorationPatternModel,
-  PathFaceDecorationPatternModel
+  PathFaceDecorationPatternModel,
 } from '../../common/models/PathFaceDecorationPatternModel';
 import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from './TextureFaceDecorationModel';
 import { IRawFaceDecorationModel, RawFaceDecorationModel } from './RawFaceDecorationModel';
@@ -51,7 +50,6 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-
 export const PyramidModel = types.model({
   shapeName: types.optional(types.string, 'small-triambic-icosahedron'),
   netsPerPyramid: types.optional(types.integer, 1),
@@ -64,21 +62,23 @@ export const PyramidModel = types.model({
   },
   // allows multiple nets to build a single pyramid e.g. one face per net
   get netsPerPyramidOptions() {
-    return [...generateDivisorsAscending(this.geometry.faceCount)]
-      // can't apply ascendant edge tabs to a single non-symmetrical face because male & female edge lengths not equal
-      .filter((divisor) => this.faceIsSymmetrical || divisor !== this.geometry.faceCount);
+    // TODO: re-enable this as integer divisors of face count, integer-divisor npm emits regeneratorRuntime errors
+    return [1];
+    // can't apply ascendant edge tabs to a single non-symmetrical face because male & female edge lengths not equal
+    // .filter((divisor) => this.faceIsSymmetrical || divisor !== this.geometry.faceCount);
   },
   get facesPerNet() {
     return this.geometry.faceCount / self.netsPerPyramid;
   },
 }));
+const FaceDecorationModel = types.union(TextureFaceDecorationModel, RawFaceDecorationModel);
 
 export const PyramidNetModel = types.model('Pyramid Net', {
   pyramid: types.optional(PyramidModel, {}),
   ascendantEdgeTabsSpec: types.optional(AscendantEdgeTabsModel, {}),
   baseEdgeTabsSpec: types.optional(BaseEdgeTabsModel, {}),
   shapeHeight: types.optional(types.number, 20 * PIXELS_PER_CM),
-  faceDecoration: types.maybe(types.union(TextureFaceDecorationModel, RawFaceDecorationModel)),
+  faceDecoration: types.maybe(FaceDecorationModel),
   useDottedStroke: types.optional(types.boolean, false),
   baseScoreDashSpec: types.maybe(DashPatternModel),
   interFaceScoreDashSpec: types.maybe(DashPatternModel),
@@ -86,7 +86,6 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   .volatile(() => ({
     testTabHandleFlapDepth: 2,
     testTabHandleFlapRounding: 0.5,
-    disposers: [],
   }))
   .views((self) => ({
     get tabIntervalRatios() {
@@ -383,29 +382,6 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   //  =========================================================
   }))
   .actions((self) => ({
-    afterCreate() {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      self.disposers.push(reaction(
-        () => [self.normalizedDecorationBoundaryPoints, self.faceDecoration],
-        () => {
-          this.sendTextureUpdate();
-        },
-      ));
-
-      self.disposers.push(reaction(
-        () => [self.pyramid.shapeName, self.textureBorderWidth],
-        () => {
-          this.sendTextureUpdate();
-        },
-      ));
-    },
-
-    beforeDestroy() {
-      for (const disposer of self.disposers) {
-        disposer();
-      }
-    },
-
     setPyramidShapeName(name: string) {
       self.faceDecoration = undefined;
       self.pyramid.shapeName = name;
@@ -442,14 +418,6 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       self.baseScoreDashSpec.strokeDashPathPattern = resolveIdentifier(
         StrokeDashPathPatternModel, getParent(self), id,
       );
-    },
-
-    sendTextureUpdate() {
-      // @ts-ignore
-      globalThis.ipcRenderer.send(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION,
-        self.normalizedDecorationBoundaryPoints,
-        self.pyramid.shapeName,
-        self.faceDecoration, self.borderToInsetRatio, self.insetToBorderOffset);
     },
   }));
 

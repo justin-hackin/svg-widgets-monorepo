@@ -5,11 +5,11 @@ import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSl
 import { ratioSliderProps } from './constants';
 import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
+import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 
 export const AscendantEdgeTabsControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
+  const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
   const { pyramidNetSpec: { ascendantEdgeTabsSpec } = {} } = store;
   return (
     <>

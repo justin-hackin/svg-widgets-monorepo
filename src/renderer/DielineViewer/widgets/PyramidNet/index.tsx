@@ -1,5 +1,5 @@
 import { PyramidNet } from './PyramidNetSvg';
-import { PyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
+import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { AdditionalToolbarContent } from './components/AdditionalToolbarContent';
 import { AdditionalFileMenuItems } from './components/AdditionalFileMenuItems';
 import { PanelContent } from './components/PanelContent';
@@ -11,5 +11,5 @@ export const PyramidNetOptionsInfo = {
     AdditionalFileMenuItems,
     PanelContent,
   },
-  WidgetModel: PyramidNetFactoryModel,
+  WidgetModel: PyramidNetPluginModel,
 };

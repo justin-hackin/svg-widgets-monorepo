@@ -6,20 +6,24 @@ import { observer } from 'mobx-react';
 
 import { viewBoxAttrsToString } from '../../../common/util/svg';
 import { TextureSvg } from './TextureSvg';
-import { useMst } from '../models';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { castCoordToRawPoint } from '../../common/util/geom';
+import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
+import { IPyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 
 export const TextureArrangement = observer(() => {
+  const workspaceStore = useWorkspaceMst();
+  const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;
   const {
+    texture,
     placementAreaDimensions,
     absoluteMovementToSvg, translateAbsoluteCoordsToRelative,
-    texture, decorationBoundary,
+    decorationBoundary,
     viewScalePercentStr, viewScaleCenterPercentStr,
     minImageScale, maxImageScale,
     viewScaleDiff, setViewScaleDiff, reconcileViewScaleDiff,
     modifierTracking: { dragMode = undefined } = {},
-  } = useMst() || {};
+  } = pyramidNetPluginStore.textureEditor || {};
   const {
     setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
     reconcileTranslateDiff, reconcileRotateDiff, reconcileScaleDiff, reconcileTransformOriginDiff,

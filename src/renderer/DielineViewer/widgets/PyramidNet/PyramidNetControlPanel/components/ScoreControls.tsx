@@ -7,7 +7,7 @@ import { ratioSliderProps } from './constants';
 import { PanelSwitchUncontrolled } from '../../../../../common/components/PanelSwitch';
 import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
+import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 
 const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 
@@ -18,7 +18,7 @@ export const ScoreControls = observer(() => {
       useDottedStroke, setUseDottedStroke,
       interFaceScoreDashSpec, baseScoreDashSpec, setInterFaceScoreDashSpecPattern, setBaseScoreDashSpecPattern,
     } = {}, dashPatterns,
-  } = workspaceStore.selectedStore as IPyramidNetFactoryModel;
+  } = workspaceStore.selectedStore as IPyramidNetPluginModel;
   const dashPatternOptions = dashPatterns.map(({ label, id }) => ({ value: id, label }));
   return (
     <>

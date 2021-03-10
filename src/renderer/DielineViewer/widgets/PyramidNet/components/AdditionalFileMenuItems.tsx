@@ -7,7 +7,7 @@ import HowToVoteIcon from '@material-ui/icons/HowToVote';
 import { startCase } from 'lodash';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
-import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
+import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 import { EVENTS } from '../../../../../main/ipc';
 import { extractCutHolesFromSvgString } from '../../../../../common/util/svg';
 import { useStyles } from '../../../style';
@@ -21,7 +21,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const workspaceStore = useWorkspaceMst();
   const preferencesStore = workspaceStore.preferences;
   const classes = useStyles();
-  const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
+  const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
 
   return (
     <>

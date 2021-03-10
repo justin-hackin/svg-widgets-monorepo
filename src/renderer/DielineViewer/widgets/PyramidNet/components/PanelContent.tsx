@@ -4,7 +4,7 @@ import { Paper, Tab, Tabs } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
-import { IPyramidNetFactoryModel } from '../../../models/PyramidNetMakerStore';
+import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 import { useStyles } from '../../../style';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
@@ -34,7 +34,7 @@ const controlsTabs = [
 
 export const PanelContent = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as IPyramidNetFactoryModel;
+  const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
   const classes = useStyles();
   const { pyramidNetSpec } = store;
   const { pyramid } = pyramidNetSpec;

@@ -1,4 +1,4 @@
-import { PyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
+import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { AdditionalToolbarContent } from '../PyramidNet/components/AdditionalToolbarContent';
 import { AdditionalFileMenuItems } from '../PyramidNet/components/AdditionalFileMenuItems';
 import { PanelContent } from '../PyramidNet/components/PanelContent';
@@ -11,5 +11,5 @@ export const PyramidNetTestTabsOptionsInfo = {
     AdditionalFileMenuItems,
     PanelContent,
   },
-  WidgetModel: PyramidNetFactoryModel,
+  WidgetModel: PyramidNetPluginModel,
 };

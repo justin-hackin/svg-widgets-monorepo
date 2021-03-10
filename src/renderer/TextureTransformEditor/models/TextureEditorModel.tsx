@@ -1,8 +1,8 @@
 import { inRange } from 'lodash';
 import {
+  getParentOfType,
   getSnapshot, Instance, resolvePath, types,
 } from 'mobx-state-tree';
-import { when } from 'mobx';
 
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
@@ -23,6 +23,7 @@ import {
 } from '../../common/models/ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from '../../common/models/PathFaceDecorationPatternModel';
 import { ShapePreviewModel } from './ShapePreviewModel';
+import { PyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -51,8 +52,6 @@ const getFitScale = (bounds, image) => {
 
 export const TextureEditorModel = types
   .model('TextureTransformEditor', {
-    shapeName: types.maybe(types.string),
-    decorationBoundary: types.maybe(BoundaryModel),
     texture: types.maybe(TextureModel),
     // since both controls and matrix function require degrees, use degrees as unit instead of radians
     placementAreaDimensions: types.maybe(DimensionsModel),
@@ -77,17 +76,31 @@ export const TextureEditorModel = types
     disposers: [],
   }))
   .views((self) => ({
+    get parentPyramidNetPluginModel() {
+      return getParentOfType(self, PyramidNetPluginModel);
+    },
+    get shapeName() {
+      return this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName;
+    },
+
+    get decorationBoundary() {
+      return BoundaryModel.create({
+        vertices:
+        this.parentPyramidNetPluginModel.pyramidNetSpec.normalizedDecorationBoundaryPoints,
+      });
+    },
+
     get imageCoverScale() {
-      if (!self.decorationBoundary || !self.texture) {
+      if (!this.decorationBoundary || !self.texture) {
         return undefined;
       }
-      return getCoverScale(self.decorationBoundary.viewBoxAttrs, self.texture.dimensions);
+      return getCoverScale(this.decorationBoundary.viewBoxAttrs, self.texture.dimensions);
     },
     get faceFittingScale() {
-      if (!self.placementAreaDimensions || !self.decorationBoundary) {
+      if (!self.placementAreaDimensions || !this.decorationBoundary) {
         return undefined;
       }
-      return getFitScale(self.placementAreaDimensions, self.decorationBoundary.viewBoxAttrs);
+      return getFitScale(self.placementAreaDimensions, this.decorationBoundary.viewBoxAttrs);
     },
     get minImageScale() {
       return this.imageCoverScale && (0.1 * this.imageCoverScale.scale);
@@ -109,23 +122,24 @@ export const TextureEditorModel = types
         && self.texture.destinationPoints[self.selectedTextureNodeIndex];
     },
     get faceBoundary() {
-      if (!self.decorationBoundary || !self.borderToInsetRatio) { return undefined; }
+      if (!this.decorationBoundary || !self.borderToInsetRatio) { return undefined; }
       // TODO: no more dirty type checking
       const textureIsBordered = self.texture
         ? (self.texture.pattern as IImageFaceDecorationPatternModel).isBordered : null;
       if (textureIsBordered === false) {
-        return self.decorationBoundary;
+        return this.decorationBoundary;
       }
-      const vertices = self.decorationBoundary.vertices
+      const vertices = this.decorationBoundary.vertices
         .map((pt) => sumPoints(scalePoint(pt, self.borderToInsetRatio), self.insetToBorderOffset));
       return BoundaryModel.create({ vertices });
     },
-  })).actions((self) => ({
-    setFaceBorderData(borderToInsetRatio, insetToBorderOffset) {
-      self.borderToInsetRatio = borderToInsetRatio;
-      self.insetToBorderOffset = insetToBorderOffset;
+    get borderToInsetRatio() {
+      return this.parentPyramidNetPluginModel.pyramidNetSpec.borderToInsetRatio;
     },
-
+    get insetToBorderOffset() {
+      return this.parentPyramidNetPluginModel.pyramidNetSpec.insetToBorderOffset;
+    },
+  })).actions((self) => ({
     setPlacementAreaDimensions(placementAreaDimensions) {
       self.history.withoutUndo(() => {
         self.placementAreaDimensions = placementAreaDimensions;
@@ -202,28 +216,6 @@ export const TextureEditorModel = types
     // TODO: add limits for view scale and
     // these seem like the domain of the texture model but setters for
     // textureScaleDiff (and more to follow) need boundary
-    textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration) {
-      // eslint-disable-next-line no-shadow
-      const thisAction = () => {
-        self.shapeName = shapeName;
-        // @ts-ignore
-        self.decorationBoundary = BoundaryModel.create({ vertices: decorationBoundaryVertices });
-
-        if (faceDecoration) {
-          self.texture = TextureModel.create(faceDecoration);
-        } else {
-          self.texture = undefined;
-        }
-      };
-
-      // if decoration boundary is currently set
-      // ensure undo history starts after first setting of boundary and texture
-      if (!self.decorationBoundary) {
-        self.history.withoutUndo(thisAction);
-      } else {
-        thisAction();
-      }
-    },
     absoluteMovementToSvg(absCoords) {
       return scalePoint(absCoords, 1 / (self.viewScaleDragged * self.faceFittingScale.scale));
     },
@@ -276,9 +268,9 @@ export const TextureEditorModel = types
       self.texture.transformOrigin = newTransformOrigin;
     },
 
-    sendTexture() {
+    sendTextureToDielineEditor() {
       if (!self.texture) { return; }
-      globalThis.ipcRenderer.send(EVENTS.UPDATE_DIELINE_VIEWER, getSnapshot(self.texture));
+      self.parentPyramidNetPluginModel.pyramidNetSpec.setTextureFaceDecoration(getSnapshot(self.texture));
     },
     saveTextureArrangement() {
       if (!self.texture) { return; }
@@ -306,40 +298,11 @@ export const TextureEditorModel = types
           return;
         }
         if (shapeName !== self.shapeName) {
-          globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_CHANGE, shapeName);
-          // TODO: this is a dirty trick, disentangle calculation of boundary points from dieline editor
-          // and/or enable async ipc across multiple windows so requesting updates can be done in one ipc event
-          // (which provides an optional shape override)
-          self.disposers.push(when(() => (self.shapeName === shapeName), () => {
-            setTimeout(() => {
-              this.setTextureFromSnapshot(textureSnapshot);
-            }, 100);
-          }));
-        } else {
-          this.setTextureFromSnapshot(textureSnapshot);
+          self.parentPyramidNetPluginModel.pyramidNetSpec.setPyramidShapeName(shapeName);
         }
+        this.setTextureFromSnapshot(textureSnapshot);
       });
     },
-  }))
-  .actions((self) => {
-    const shapeDecorationHandler = (_,
-      decorationBoundaryVertices, shapeName,
-      faceDecoration, borderToInsetRatio, insetToBorderOffset) => {
-      self.setFaceBorderData(borderToInsetRatio, insetToBorderOffset);
-      self.textureEditorUpdateHandler(decorationBoundaryVertices, shapeName, faceDecoration);
-    };
-
-    return {
-      afterCreate() {
-        globalThis.ipcRenderer.on(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION, shapeDecorationHandler);
-      },
-      beforeDestroy() {
-        globalThis.ipcRenderer.removeListener(EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION, shapeDecorationHandler);
-        for (const disposer of self.disposers) {
-          disposer();
-        }
-      },
-    };
-  });
+  }));
 
 export interface ITextureEditorModel extends Instance<typeof TextureEditorModel> {}

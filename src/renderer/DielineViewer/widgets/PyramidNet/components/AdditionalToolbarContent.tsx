@@ -1,22 +1,18 @@
 import { Button, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import React from 'react';
-import { EVENTS } from '../../../../../main/ipc';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../../../../../main/ipc';
 
-export const AdditionalToolbarContent = () => {
-  const handleOpenTextureEditor = () => {
-    globalThis.ipcRenderer.send(EVENTS.OPEN_TEXTURE_WINDOW);
-  };
-
-  return (
-    <Tooltip title="Open/reveal texture editor" arrow>
+export const AdditionalToolbarContent = () => (
+  <Tooltip title="Open/reveal texture editor" arrow>
+    <Link to={`/${ROUTES.TEXTURE_EDITOR}`}>
       <Button
         color="inherit"
         startIcon={<OpenInNewIcon />}
-        onClick={handleOpenTextureEditor}
       >
         Texture
       </Button>
-    </Tooltip>
-  );
-};
+    </Link>
+  </Tooltip>
+);

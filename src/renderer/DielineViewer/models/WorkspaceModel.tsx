@@ -7,11 +7,8 @@ import persist from 'mst-persist';
 import { connectReduxDevtools } from 'mst-middlewares';
 import makeInspectable from 'mobx-devtools-mst';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { remote } from 'electron';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
 import parseFilepath from 'parse-filepath';
-import { startCase } from 'lodash';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
 
@@ -19,8 +16,6 @@ import { SVGWrapper } from '../data/SVGWrapper';
 import { PreferencesModel, defaultPreferences } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../widgets/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../widgets/CylinderLightbox';
-import { WINDOWS } from '../../../main/ipc';
-import { CustomBrowserWindowType } from '../../../main';
 import { PyramidNetTestTabsOptionsInfo } from '../widgets/PyramidNetTestTabs';
 
 const getPreferencesStore = () => {
@@ -80,23 +75,18 @@ export const WorkspaceModel = types.model({
     get currentFileName() {
       return self.currentFilePath ? parseFilepath(self.currentFilePath).name : `New ${this.selectedShapeName}`;
     },
-    get titleBarText() {
+    get fileTitleFragment() {
       return `${this.selectedStoreIsSaved ? '' : '*'}${this.currentFileName}`;
+    },
+    get titleBarText() {
+      return `${this.selectedShapeName} ‖ ${this.fileTitleFragment}`;
     },
   }))
   .actions((self) => ({
     afterCreate() {
       // title bar changes for file status indication
       self.disposers.push(reaction(() => [self.titleBarText], () => {
-        // TODO: why can't this be coerced
-        // @ts-ignore
-        const currentWindow = (remote.getCurrentWindow() as CustomBrowserWindowType);
-        // TODO: having texture window title bar populated because it imports workspace model is a sloppy abstraction,
-        // scope this concern to the store for texture editor and only use this reaction for dieline editor
-        const fileTrackingFragment = currentWindow.route === WINDOWS.DIELINE_EDITOR ? `‖  ${
-          self.titleBarText}` : '';
-        currentWindow
-          .setTitle(`${self.selectedShapeName} ‖  ${startCase(currentWindow.route)}  ${fileTrackingFragment}`);
+        document.title = self.titleBarText;
       }, { fireImmediately: true }));
     },
     beforeDestroy() {

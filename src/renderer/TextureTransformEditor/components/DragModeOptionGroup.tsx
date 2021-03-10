@@ -8,7 +8,6 @@ import HeightIcon from '@material-ui/icons/Height';
 
 import React from 'react';
 import { observer } from 'mobx-react';
-import { useMst } from '../models';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { useStyles } from '../style';
 
@@ -19,11 +18,7 @@ const extraButtonProps = {
   style: { cursor: 'default' },
 };
 
-export const DragModeOptionsGroup = observer(() => {
-  const {
-    // @ts-ignore
-    modifierTracking: { dragMode } = {},
-  } = useMst();
+export const DragModeOptionsGroup = observer(({ dragMode }) => {
   const classes = useStyles();
   return (
     <ToggleButtonGroup

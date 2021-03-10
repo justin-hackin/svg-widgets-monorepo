@@ -7,7 +7,7 @@ const fsPromises = require('fs').promises;
 
 const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
 
-enum MAIN_EVENTS {
+export enum EVENTS {
   SAVE_SVG = 'save-svg',
   SAVE_JSON = 'save-json',
   SAVE_GLB = 'save-glb',
@@ -21,34 +21,10 @@ enum MAIN_EVENTS {
   SELECT_TEXTURE = 'select-texture',
 }
 
-enum ROUTED_EVENTS {
-  REQUEST_SHAPE_UPDATE = 'request-shape-update',
-  UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION = 'update-texture-editor-texture',
-  UPDATE_TEXTURE_EDITOR_BORDER_DATA = 'update-texture-editor-border-data',
-  UPDATE_DIELINE_VIEWER = 'update-dieline-viewer',
-  REQUEST_SHAPE_CHANGE = 'request-shape-change',
-}
-
-export enum WINDOWS {
+export enum ROUTES {
   TEXTURE_EDITOR = 'texture-editor',
   DIELINE_EDITOR = 'dieline-editor'
 }
-
-export const ROUTED_EVENT_MAP: Record<WINDOWS, ROUTED_EVENTS[]> = {
-  [WINDOWS.DIELINE_EDITOR]: [
-    ROUTED_EVENTS.REQUEST_SHAPE_UPDATE,
-    ROUTED_EVENTS.UPDATE_DIELINE_VIEWER,
-    ROUTED_EVENTS.REQUEST_SHAPE_CHANGE,
-  ],
-  [WINDOWS.TEXTURE_EDITOR]: [
-    ROUTED_EVENTS.UPDATE_TEXTURE_EDITOR_SHAPE_DECORATION,
-    ROUTED_EVENTS.UPDATE_TEXTURE_EDITOR_BORDER_DATA,
-  ],
-};
-
-export const EVENTS = {
-  ...MAIN_EVENTS, ...ROUTED_EVENTS,
-};
 
 const svgFilters = [{ name: 'SVG - Scalable Vector Graphics', extensions: ['svg'] }];
 const textureFilters = [{ name: 'Vector/bitmap file', extensions: ['svg', 'jpg', 'png'] }];

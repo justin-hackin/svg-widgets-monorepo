@@ -3,9 +3,10 @@ import { observer } from 'mobx-react';
 
 import { RawPoint, scalePoint } from '../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
-import { useMst } from '../models';
 import { IImageFaceDecorationPatternModel } from '../../common/models/ImageFaceDecorationPatternModel';
 import { IPathFaceDecorationPatternModel } from '../../common/models/PathFaceDecorationPatternModel';
+import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
+import { IPyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';
@@ -26,7 +27,7 @@ export const TextureSvgUnobserved = ({
     faceBoundary,
     faceFittingScale,
     placementAreaDimensions,
-  } = store || useMst();
+  } = store || (useWorkspaceMst().selectedStore as IPyramidNetPluginModel).textureEditor;
   const isOnScreen = !store;
   const materialColor = isOnScreen ? MUTED_WHITE : WHITE;
 

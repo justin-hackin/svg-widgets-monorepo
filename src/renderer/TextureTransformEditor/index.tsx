@@ -10,24 +10,24 @@ import { Box } from '@material-ui/core';
 import darkTheme from '../DielineViewer/data/material-ui-dark-theme';
 import { ShapePreview } from './components/ShapePreview';
 import { TextureControls } from './components/TextureControls';
-import { EVENTS } from '../../main/ipc';
-import {
-  useMst, Provider, textureTransformEditorStore,
-} from './models';
 import { useStyles } from './style';
 import { TextureArrangement } from './components/TextureArrangement';
+import { useWorkspaceMst } from '../DielineViewer/models/WorkspaceModel';
+import { IPyramidNetPluginModel } from '../DielineViewer/models/PyramidNetMakerStore';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 // TODO: make router wrap with styles
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
 
-const TextureTransformEditorLOC = observer(() => {
+export const TextureTransformEditor = observer(() => {
+  const workspaceStore = useWorkspaceMst();
+  const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;
   const classes = useStyles();
   // ==================================================================================================================
   const {
     placementAreaDimensions, setPlacementAreaDimensions, decorationBoundary,
-  } = useMst();
+  } = pyramidNetPluginStore.textureEditor;
 
   // Init
   useEffect(() => {
@@ -37,7 +37,6 @@ const TextureTransformEditorLOC = observer(() => {
     };
 
     window.addEventListener('resize', resizeHandler);
-    globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_UPDATE);
     resizeHandler();
 
     return () => {
@@ -63,9 +62,3 @@ const TextureTransformEditorLOC = observer(() => {
     </ThemeProvider>
   );
 });
-
-export const TextureTransformEditor = () => (
-  <Provider value={textureTransformEditorStore}>
-    <TextureTransformEditorLOC />
-  </Provider>
-);

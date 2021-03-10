@@ -13,11 +13,11 @@ import SaveIcon from '@material-ui/icons/Save';
 import PublishIcon from '@material-ui/icons/Publish';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
+import Link from 'react-router-dom';
 import clsx from 'clsx';
 
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
-import { EVENTS } from '../../../main/ipc';
-import { useMst } from '../models';
+import { EVENTS, ROUTES } from '../../../main/ipc';
 import { HistoryButtons } from
   '../../DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useStyles } from '../style';
@@ -25,6 +25,8 @@ import { DEFAULT_SLIDER_STEP } from '../../common/constants';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { PanelSliderComponent } from '../../common/components/PanelSliderComponent';
 import { ShapeSelect } from '../../common/components/ShapeSelect';
+import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
+import { IPyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -44,15 +46,19 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 );
 
 export const TextureControls = observer(() => {
-  const store = useMst();
+  const workspaceStore = useWorkspaceMst();
+  const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
+
   const {
-    texture, sendTexture, saveTextureArrangement, openTextureArrangement, decorationBoundary,
+    texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement, decorationBoundary,
     selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     history, shapePreview: { downloadShapeGLTF },
     setTexturePath, setTextureImage,
     shapeName,
-  } = store;
+    modifierTracking: { dragMode = undefined } = {},
+  } = pluginModel.textureEditor;
+
   const classes = useStyles();
   const { pattern, rotate: textureRotate, hasPathPattern } = texture || {};
   const numFaceSides = decorationBoundary.vertices.length;
@@ -152,7 +158,7 @@ export const TextureControls = observer(() => {
           isCompactDisplay
           value={shapeName}
           onChange={(e) => {
-            globalThis.ipcRenderer.send(EVENTS.REQUEST_SHAPE_CHANGE, e.target.value);
+            pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
           }}
           name="polyhedron-shape"
         />
@@ -199,7 +205,7 @@ export const TextureControls = observer(() => {
                 label="Node selection"
               />
               <PanelSliderComponent
-                node={store}
+                node={pluginModel.textureEditor}
                 property="nodeScaleMux"
                 className={classes.nodeScaleMuxSlider}
                 label="Node size"
@@ -317,7 +323,7 @@ export const TextureControls = observer(() => {
                 </MenuItem>
               ))}
             </Menu>
-            <DragModeOptionsGroup />
+            <DragModeOptionsGroup dragMode={dragMode} />
             <Tooltip title="Download 3D model GLTF" arrow>
               <span>
                 <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
@@ -327,9 +333,17 @@ export const TextureControls = observer(() => {
             </Tooltip>
             <Tooltip title="Send shape decoration to Dieline Editor" arrow>
               <span>
-                <IconButton onClick={() => { sendTexture(); }} aria-label="send texture" component="span">
-                  <TelegramIcon fontSize="large" />
-                </IconButton>
+                <Link to={`/${ROUTES.DIELINE_EDITOR}`}>
+                  <IconButton
+                    onClick={() => {
+                      sendTextureToDielineEditor();
+                    }}
+                    aria-label="send texture"
+                    component="span"
+                  >
+                    <TelegramIcon fontSize="large" />
+                  </IconButton>
+                </Link>
               </span>
             </Tooltip>
           </>

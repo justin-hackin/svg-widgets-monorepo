@@ -1,12 +1,12 @@
 import React from 'react';
 import { IPreferencesModel } from '../../models/PreferencesModel';
-import { IPyramidNetFactoryModel } from '../../models/PyramidNetMakerStore';
+import { IPyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { boundingViewBoxAttrs } from '../../../../common/util/svg';
 
 export const PyramidNetTestTabs = ({
   widgetStore, preferencesStore,
 }:{
-  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetFactoryModel,
+  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetPluginModel,
 }) => {
   const { scoreProps, cutProps } = preferencesStore;
   const { pyramidNetSpec: { testAscendantTab, testBaseTab } } = widgetStore;

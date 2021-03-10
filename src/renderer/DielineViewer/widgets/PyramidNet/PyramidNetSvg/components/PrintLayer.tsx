@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { getType } from 'mobx-state-tree';
 import React from 'react';
 import { IPreferencesModel } from '../../../../models/PreferencesModel';
-import { IPyramidNetFactoryModel } from '../../../../models/PyramidNetMakerStore';
+import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { theme } from '../../../../../TextureTransformEditor';
 import { closedPolygonPath } from '../../../../util/shapes/generic';
 import {
@@ -24,7 +24,7 @@ const PrintGroup = ({ children }) => (
 export const PrintLayer = observer(({
   widgetStore, preferencesStore,
 }: {
-  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetFactoryModel,
+  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetPluginModel,
 }) => {
   if (!preferencesStore || !widgetStore) {
     return null;

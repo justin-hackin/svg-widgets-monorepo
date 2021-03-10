@@ -2,13 +2,16 @@ import React from 'react';
 import { observer } from 'mobx-react';
 // @ts-ignore
 import { PathData } from '../../DielineViewer/util/PathData';
-import { useMst } from '../models';
 import { useStyles } from '../style';
+import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
+import { ITextureEditorModel } from '../models/TextureEditorModel';
 
 export const TexturePathNodes = observer(() => {
+  const workspaceStore = useWorkspaceMst();
+  const store:ITextureEditorModel = workspaceStore.selectedStore.textureEditor;
   const {
     texture, selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, imageCoverScale, nodeScaleMux,
-  } = useMst();
+  } = store;
   const classes = useStyles();
 
   if (!texture || !texture.hasPathPattern || !showNodes) { return null; }
