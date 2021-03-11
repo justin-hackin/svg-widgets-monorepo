@@ -2,8 +2,9 @@
 import {
   getParent, getType, Instance, resolveIdentifier, types,
 } from 'mobx-state-tree';
-import { chunk, flatten, range } from 'lodash';
-
+import {
+  chunk, flatten, range, isInteger,
+} from 'lodash';
 import { polyhedra } from '../data/polyhedra';
 import {
   hingedPlot,
@@ -37,6 +38,20 @@ import { IRawFaceDecorationModel, RawFaceDecorationModel } from './RawFaceDecora
 
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 
+const getDivisors = (num) => {
+  if (!isInteger(num)) {
+    throw new Error(`getDivisors expects integer as parameter but received: ${num}`);
+  }
+  // yes there are more efficient algorithms but input num unlikely to be a large number here
+  // package integer-divisors emits regeneratorRuntime errors
+  const divisors = [];
+  // eslint-disable-next-line for-direction
+  for (let div = num; div >= 1; div -= 1) {
+    if (isInteger(num / div)) { divisors.push(div); }
+  }
+  return divisors;
+};
+
 const applyFlap = (
   path: PathData, flapDirectionIsUp: boolean,
   handleFlapDepth: number, testTabHandleFlapRounding: number,
@@ -63,9 +78,9 @@ export const PyramidModel = types.model({
   // allows multiple nets to build a single pyramid e.g. one face per net
   get netsPerPyramidOptions() {
     // TODO: re-enable this as integer divisors of face count, integer-divisor npm emits regeneratorRuntime errors
-    return [1];
+    return getDivisors(this.geometry.faceCount)
     // can't apply ascendant edge tabs to a single non-symmetrical face because male & female edge lengths not equal
-    // .filter((divisor) => this.faceIsSymmetrical || divisor !== this.geometry.faceCount);
+      .filter((divisor) => this.faceIsSymmetrical || divisor !== this.geometry.faceCount);
   },
   get facesPerNet() {
     return this.geometry.faceCount / self.netsPerPyramid;
