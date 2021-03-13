@@ -57,7 +57,7 @@ export const TextureEditorModel = types
     placementAreaDimensions: types.maybe(DimensionsModel),
     viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
     history: types.optional(UndoManagerWithGroupState, {}),
-    modifierTracking: types.optional(ModifierTrackingModel, {}),
+    modifierTracking: types.optional(types.late(() => ModifierTrackingModel), {}),
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     shapePreview: types.optional(types.late(() => ShapePreviewModel), {}),
   })
@@ -184,7 +184,7 @@ export const TextureEditorModel = types
       self.showNodes = false;
       self.selectedTextureNodeIndex = null;
     },
-    setTexture(pattern) {
+    setTextureFromPattern(pattern) {
       this.resetNodesEditor();
 
       self.texture = TextureModel.create({
@@ -198,13 +198,17 @@ export const TextureEditorModel = types
       this.repositionOriginOverCorner(0);
     },
 
+    setTexture(snapshot) {
+      self.texture = snapshot;
+    },
+
     setTexturePath(pathD, sourceFileName) {
-      this.setTexture(PathFaceDecorationPatternModel.create({
+      this.setTextureFromPattern(PathFaceDecorationPatternModel.create({
         pathD, sourceFileName, isPositive: DEFAULT_IS_POSITIVE,
       }));
     },
     setTextureImage(imageData, dimensions, sourceFileName) {
-      this.setTexture(ImageFaceDecorationPatternModel.create({
+      this.setTextureFromPattern(ImageFaceDecorationPatternModel.create({
         imageData, dimensions, sourceFileName,
       }));
     },

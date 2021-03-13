@@ -1,6 +1,6 @@
 import { Instance, types } from 'mobx-state-tree';
 
-export const PathFaceDecorationPatternModel = types.model({
+export const PathFaceDecorationPatternModel = types.model('PathFaceDecorationPattern', {
   pathD: types.string,
   sourceFileName: types.string,
   isPositive: types.boolean,

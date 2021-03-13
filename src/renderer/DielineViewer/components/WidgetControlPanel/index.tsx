@@ -107,7 +107,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   };
 
   return (
-    <div className={classes.root}>
+    <div className={classes.textureEditorRoot}>
       <Fab
         color="inherit"
         aria-label="open drawer"

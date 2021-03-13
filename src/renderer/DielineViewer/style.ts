@@ -26,7 +26,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
       backgroundColor: theme.palette.grey.A400,
     },
   },
-  root: {
+  dielineEditorRoot: {
     display: 'flex',
   },
   simpleDialog: {
@@ -158,5 +158,68 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexDirection: 'row',
     padding: '2px 1px',
+  },
+  //  TEXTURE EDITOR
+  textureEditorRoot: {
+    backgroundColor:
+      '#333',
+    display: 'block',
+    width: '100%',
+    height: '50%%',
+    top: '50%',
+    position: 'absolute',
+    color: '#fff',
+  },
+  select: {
+    display: 'flex', position: 'absolute', top: 0, right: 0,
+  },
+  rotationInput: {
+    width: '6.5em',
+  },
+  rotateButton: {
+    transform: 'rotate(90deg)',
+  },
+  loadingContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#fff',
+    zIndex: 100,
+  },
+  checkboxControlLabel: {
+    color: '#fff',
+  },
+  textureNodeHighlight: {
+    fill: 'rgba(255, 0, 255, 0.00001)',
+    '&:hover': {
+      fill: 'rgba(255, 0, 255, 0.3)',
+    },
+    '&.selected': {
+      fill: 'none',
+    },
+  },
+  textureNode: {
+    fill: '#00A9F4',
+    '&.selected': {
+      fill: '#ff00ff',
+    },
+  },
+  nodeScaleMuxSlider: {
+    width: theme.spacing(10),
+  },
+  textureToolbar: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    position: 'initial',
+  },
+  textureToolbarWithTexture: {
+    [theme.breakpoints.down('md')]: {
+      justifyContent: 'space-around',
+    },
   },
 }));

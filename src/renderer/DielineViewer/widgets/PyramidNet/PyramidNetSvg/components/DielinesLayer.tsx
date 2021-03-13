@@ -90,15 +90,15 @@ export const DielinesLayer = observer(({
 
         {faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => {
           const isMirrored = !!(index % 2) && !faceIsSymmetrical;
-
+          const key = `${index}-base-tab`;
           return index === 0
             ? (
-              <g id={BASE_TAB_ID}>
+              <g key={key} id={BASE_TAB_ID}>
                 <path d={masterBaseTabCut.getD()} {...cutProps} />
                 <path d={masterBaseTabScore.getD()} {...scoreProps} />
               </g>
             ) : (
-              <g key={`${index}-base-tab`} transform={cloneTransformMatrix.toString()}>
+              <g key={key} transform={cloneTransformMatrix.toString()}>
                 <use
                   xlinkHref={`#${BASE_TAB_ID}`}
                   transform={matrixWithTransformOrigin(

@@ -2,7 +2,7 @@ import { Instance, types } from 'mobx-state-tree';
 
 import { DimensionsModel } from './DimensionsModel';
 
-export const ImageFaceDecorationPatternModel = types.model({
+export const ImageFaceDecorationPatternModel = types.model('ImageFaceDecorationPattern', {
   imageData: types.string,
   dimensions: DimensionsModel,
   sourceFileName: types.string,

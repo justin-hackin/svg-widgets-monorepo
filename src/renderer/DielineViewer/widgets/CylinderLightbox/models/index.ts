@@ -209,7 +209,7 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
 
 export interface ICylinderLightboxDataModel extends Instance<typeof CylinderLightboxDataModel> {}
 
-export const CylinderLightBoxModel = types.model({
+export const CylinderLightBoxModel = types.model('CylinderLightBox', {
   history: types.optional(UndoManagerWithGroupState, {}),
   shapeDefinition: types.optional(CylinderLightboxDataModel, {}),
 }).actions(() => ({

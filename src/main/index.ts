@@ -6,13 +6,13 @@ const { format } = require('url');
 const debug = require('electron-debug');
 
 const {
-  setupIpc, EVENTS, ROUTES,
+  setupIpc, EVENTS,
 } = require('./ipc');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // for debugging prod build, temporarily add isEnabled: true
-debug({ showDevTools: false });
+debug({ showDevTools: false, isEnabled: true });
 
 // @ts-ignore
 const icon = nativeImage.createFromPath(`${path.resolve(__static, '..')}/build/icons/256x256.png`);
@@ -60,14 +60,13 @@ app.on('ready', async () => {
   browserWindow.on('minimize', sendResetDragMode);
   browserWindow.on('hide', sendResetDragMode);
 
-  const DEFAULT_HASH_FRAGMENT = `#/${ROUTES.TEXTURE_EDITOR}`;
   await browserWindow.loadURL(isDevelopment
-    ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}${DEFAULT_HASH_FRAGMENT}`
-    : `${format({
+    ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
+    : format({
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file',
       slashes: true,
-    })}${DEFAULT_HASH_FRAGMENT}`);
+    }));
 });
 
 app.on('window-all-closed', app.quit);

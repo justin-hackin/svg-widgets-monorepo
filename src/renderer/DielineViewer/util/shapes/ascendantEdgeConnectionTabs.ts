@@ -14,7 +14,7 @@ import { IDashPatternModel, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
 
-export const AscendantEdgeTabsModel = types.model({
+export const AscendantEdgeTabsModel = types.model('AscendantEdgeTabs', {
   flapRoundingDistanceRatio: types.optional(types.number, 1),
   holeFlapTaperAngle: types.optional(types.number, 0.5),
   holeReachToTabDepth: types.optional(types.number, 0.1),

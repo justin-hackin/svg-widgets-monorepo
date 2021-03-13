@@ -25,6 +25,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
   return (
     <>
+      {/* NEW */}
       <MenuItem onClick={async () => {
         await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderDecorationBoundaryToString(), {
           message: DOWNLOAD_TEMPLATE_TXT,
@@ -38,6 +39,8 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         </ListItemIcon>
         <Typography variant="inherit">{DOWNLOAD_TEMPLATE_TXT}</Typography>
       </MenuItem>
+
+      {/* OPEN RAW SVG FACE DECORATION */}
       <MenuItem onClick={async () => {
         await globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
           .then((svgString) => {
@@ -52,6 +55,8 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         </ListItemIcon>
         <Typography variant="inherit">{IMPORT_SVG_DECORATION_TXT}</Typography>
       </MenuItem>
+
+      {/* LOAD TEXTURE JSON */}
       <MenuItem onClick={async () => {
         const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
           message: IMPORT_TEXTURE_TXT,
@@ -81,6 +86,8 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         </ListItemIcon>
         <Typography variant="inherit">{IMPORT_TEXTURE_TXT}</Typography>
       </MenuItem>
+
+      {/* DOWNLOAD TAB TEST */}
       <MenuItem onClick={async () => {
         await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderTestTabsToString(store, preferencesStore), {
           message: DOWNLOAD_TAB_TESTER_TXT,

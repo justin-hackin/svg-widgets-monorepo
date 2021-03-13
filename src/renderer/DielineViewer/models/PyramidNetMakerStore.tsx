@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file,no-param-reassign */
 import {
-  Instance, types, tryResolve, applySnapshot,
+  Instance, types, tryResolve, applySnapshot, getSnapshot,
 } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
@@ -31,7 +31,7 @@ export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetPluginModel
 
 export const PyramidNetPluginModel = types.model('PyramidNetFactory', {
   pyramidNetSpec: types.optional(PyramidNetModel, {}),
-  textureEditor: types.optional(TextureEditorModel, {}),
+  textureEditor: types.optional(types.late(() => TextureEditorModel), {}),
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   dashPatterns: types.optional(DashPatternsModel, dashPatterns),
   // TODO: make a prototype with history as property and use on all undoable models
@@ -78,7 +78,7 @@ export const PyramidNetPluginModel = types.model('PyramidNetFactory', {
     const shouldUpdateTextureEditor = self.pyramidNetSpec.faceDecoration
       && textureIsFromTextureEditor(self.pyramidNetSpec.faceDecoration);
     if (shouldUpdateTextureEditor) {
-      self.textureEditor.setTexture(self.pyramidNetSpec.faceDecoration);
+      self.textureEditor.setTexture(getSnapshot(self.pyramidNetSpec.faceDecoration));
     }
   },
 }));

@@ -4,7 +4,7 @@ import { PathFaceDecorationPatternModel } from '../../common/models/PathFaceDeco
 import { ImageFaceDecorationPatternModel } from '../../common/models/ImageFaceDecorationPatternModel';
 import { getTextureTransformMatrix, RawPoint } from '../../common/util/geom';
 
-export const TextureFaceDecorationModel = types.model({
+export const TextureFaceDecorationModel = types.model('TextureFaceDecorationModel', {
   pattern: types.union(PathFaceDecorationPatternModel, ImageFaceDecorationPatternModel),
   transformOrigin: types.frozen<RawPoint>(),
   translate: types.frozen<RawPoint>(),

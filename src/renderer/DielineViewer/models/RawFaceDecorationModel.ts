@@ -1,7 +1,7 @@
 // from file menu template upload
 import { Instance, types } from 'mobx-state-tree';
 
-export const RawFaceDecorationModel = types.model({
+export const RawFaceDecorationModel = types.model('RawFaceDecoration', {
   dValue: types.string,
 });
 

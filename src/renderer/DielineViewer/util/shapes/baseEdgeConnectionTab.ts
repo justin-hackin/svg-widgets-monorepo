@@ -29,12 +29,12 @@ TODO: use of qualifier *Ratio is inconsistent remove all instances,
  in order to qualify properties, use property metadata which accurately describes
  property relationships and displays as tooltip on controls
 */
-const BendGuideValleyModel = types.model({
+const BendGuideValleyModel = types.model('BendGuideValley', {
   depthRatio: types.optional(types.number, 0.9),
   theta: types.optional(types.number, Math.PI / 4),
 });
 
-export const BaseEdgeTabsModel = types.model({
+export const BaseEdgeTabsModel = types.model('BaseEdgeTabs', {
   finDepthToTabDepth: types.optional(types.number, 1.1),
   finOffsetRatio: types.optional(types.number, 0.75),
   holeBreadthToHalfWidth: types.optional(types.number, 0.25),

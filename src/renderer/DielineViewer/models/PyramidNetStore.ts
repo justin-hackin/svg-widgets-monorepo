@@ -65,7 +65,7 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-export const PyramidModel = types.model({
+export const PyramidModel = types.model('Pyramid', {
   shapeName: types.optional(types.string, 'small-triambic-icosahedron'),
   netsPerPyramid: types.optional(types.integer, 1),
 }).views((self) => ({
@@ -79,8 +79,8 @@ export const PyramidModel = types.model({
   get netsPerPyramidOptions() {
     // TODO: re-enable this as integer divisors of face count, integer-divisor npm emits regeneratorRuntime errors
     return getDivisors(this.geometry.faceCount)
-    // can't apply ascendant edge tabs to a single non-symmetrical face because male & female edge lengths not equal
-      .filter((divisor) => this.faceIsSymmetrical || divisor !== this.geometry.faceCount);
+    // can't apply ascendant edge tabs to an odd number of faces because male & female edge lengths not equal
+      .filter((divisor) => this.faceIsSymmetrical || (divisor % 2 !== 0 || divisor === 1));
   },
   get facesPerNet() {
     return this.geometry.faceCount / self.netsPerPyramid;

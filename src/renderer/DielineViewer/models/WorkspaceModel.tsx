@@ -24,7 +24,7 @@ const getPreferencesStore = () => {
   return preferencesStore;
 };
 
-export const WorkspaceModel = types.model({
+export const WorkspaceModel = types.model('Workspace', {
   widgetOptions: types.frozen({
     'polyhedral-net': PyramidNetOptionsInfo,
     'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,

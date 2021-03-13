@@ -32,7 +32,7 @@ import { TextureEditorModel } from './TextureEditorModel';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
-export const ShapePreviewModel = types.model({})
+export const ShapePreviewModel = types.model('ShapePreview', {})
   .volatile(() => ({
     gltfExporter: new GLTFExporter(),
     gltfLoader: new GLTFLoader(),

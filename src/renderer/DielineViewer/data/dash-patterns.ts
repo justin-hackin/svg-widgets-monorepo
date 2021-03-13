@@ -13,7 +13,7 @@ import { chunk, uniq } from 'lodash';
 
 const dasharrayLabelMap = (dasharray) => chunk(dasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
 
-export const StrokeDashPathPatternModel = types.model({
+export const StrokeDashPathPatternModel = types.model('StrokeDashPathPattern', {
   id: types.identifier,
   relativeStrokeDasharray: types.frozen(),
   labelOverride: types.maybe(types.string),
