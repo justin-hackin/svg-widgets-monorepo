@@ -28,7 +28,6 @@ export const TextureArrangement = observer(() => {
     setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
     reconcileTranslateDiff, reconcileRotateDiff, reconcileScaleDiff, reconcileTransformOriginDiff,
   } = texture || {};
-
   // Init
   const textureTranslationUseDrag = useDrag(({ movement, down }) => {
     // early exit not possible before hooks
@@ -106,16 +105,16 @@ export const TextureArrangement = observer(() => {
       }
     },
   });
+  if (!placementAreaDimensions || !decorationBoundary) { return null; }
+
   return (
     <Paper
       // @ts-ignore
       component="svg"
       square
       elevation={5}
-      className="svg-container"
-      width="50%"
+      width="100%"
       height="100%"
-      style={{ overflow: 'hidden', position: 'relative' }}
       {...viewUseWheel()}
     >
       <svg

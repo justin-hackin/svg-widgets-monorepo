@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -21,18 +21,21 @@ export const theme = createMuiTheme(darkTheme);
 
 export const TextureTransformEditor = observer(() => {
   const workspaceStore = useWorkspaceMst();
+  const mainAreaRef = useRef();
   const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;
   if (!pyramidNetPluginStore || !pyramidNetPluginStore.textureEditor) { return null; }
   // ==================================================================================================================
   const {
-    placementAreaDimensions, setPlacementAreaDimensions, decorationBoundary,
+    setPlacementAreaDimensions,
   } = pyramidNetPluginStore.textureEditor;
 
   const classes = useStyles();
   // Init
   useEffect(() => {
     const resizeHandler = () => {
-      const { outerWidth: width, outerHeight: height } = window;
+      if (!mainAreaRef.current) { return; }
+      // @ts-ignore
+      const { width, height } = mainAreaRef.current.getBoundingClientRect();
       setPlacementAreaDimensions({ width: width / 2, height });
     };
 
@@ -47,16 +50,16 @@ export const TextureTransformEditor = observer(() => {
   // TODO: drag and drop functionality, removed in fd71f4aba9dd4a698e5a2667595cff82c8fb5cf5
   // see commit message for rationale
 
-  if (!placementAreaDimensions || !decorationBoundary) { return null; }
+  // if (!placementAreaDimensions || !decorationBoundary) { return null; }
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   return (
     <Box className={classes.textureEditorRoot}>
       <TextureControls />
-      <div style={{ position: 'absolute', left: '50%' }}>
+      <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
+        <TextureArrangement />
         <ShapePreview />
       </div>
-      <TextureArrangement />
     </Box>
   );
 });

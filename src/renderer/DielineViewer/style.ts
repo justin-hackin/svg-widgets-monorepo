@@ -159,16 +159,21 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     flexDirection: 'row',
     padding: '2px 1px',
   },
-  //  TEXTURE EDITOR
+  // ======================== TEXTURE EDITOR ========================
   textureEditorRoot: {
-    backgroundColor:
-      '#333',
-    display: 'block',
-    width: '100%',
-    height: '50%%',
-    top: '50%',
-    position: 'absolute',
+    backgroundColor: '#333',
+    display: 'flex',
+    flexFlow: 'column',
+    height: '100%',
     color: '#fff',
+  },
+  textureEditorMainArea: {
+    flex: '1 1 auto',
+    display: 'grid',
+    gridTemplateColumns: '50% 50%',
+    gridTemplateRows: '100%',
+    height: '100%',
+    width: '100%',
   },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
