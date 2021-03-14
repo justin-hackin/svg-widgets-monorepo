@@ -1,4 +1,4 @@
-import { getParentOfType, types } from 'mobx-state-tree';
+import { getEnv, types } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import npot from 'nearest-power-of-two';
@@ -28,7 +28,6 @@ import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
 import { EVENTS } from '../../../main/ipc';
 import requireStatic from '../../requireStatic';
-import { TextureEditorModel } from './TextureEditorModel';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -65,7 +64,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       } : undefined;
     },
     get parentTextureEditor() {
-      return getParentOfType(self, TextureEditorModel);
+      return getEnv(self).textureEditorModel;
     },
     get cameraRadius() {
       return self.IDEAL_RADIUS * 3.1;

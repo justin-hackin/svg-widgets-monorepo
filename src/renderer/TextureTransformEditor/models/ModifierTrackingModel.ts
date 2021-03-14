@@ -1,7 +1,6 @@
-import { getParentOfType, types } from 'mobx-state-tree';
+import { types } from 'mobx-state-tree';
 import { includes, flatten } from 'lodash';
 import { EVENTS } from '../../../main/ipc';
-import { TextureEditorModel } from './TextureEditorModel';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',
@@ -18,10 +17,7 @@ const keyTrackingModelFactory = (keysToTrack, target = window) => {
     return acc;
   }, {})).actions((self) => ({
     set(key, value) {
-      const { history } = getParentOfType(self, TextureEditorModel);
-      history.withoutUndo(() => {
-        self[key] = value;
-      });
+      self[key] = value;
     },
   }));
 
@@ -42,7 +38,7 @@ const keyTrackingModelFactory = (keysToTrack, target = window) => {
       };
 
       return {
-        afterCreate() {
+        afterAttach() {
           self.target.addEventListener('keyup', keyupHandler);
           self.target.addEventListener('keydown', keydownHandler);
         },
@@ -89,7 +85,7 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
       return defaultMode;
     },
   })).actions((self) => ({
-    afterCreate() {
+    afterAttach() {
       globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, () => {
         self.releaseHeldKeys();
       });
