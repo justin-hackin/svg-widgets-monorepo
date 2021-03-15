@@ -13,7 +13,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import PublishIcon from '@material-ui/icons/Publish';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
-import Link from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
