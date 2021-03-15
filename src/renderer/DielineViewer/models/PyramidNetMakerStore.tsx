@@ -31,12 +31,13 @@ export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetPluginModel
 
 export const PyramidNetPluginModel = types.model('PyramidNetFactory', {
   pyramidNetSpec: types.optional(PyramidNetModel, {}),
-  textureEditor: types.optional(types.late(() => TextureEditorModel), {}),
   polyhedraPyramidGeometries: types.frozen(polyhedra),
   dashPatterns: types.optional(DashPatternsModel, dashPatterns),
   // TODO: make a prototype with history as property and use on all undoable models
   history: types.optional(UndoManagerWithGroupState, {}),
-}).views((self) => ({
+}).volatile((self) => ({
+  textureEditor: TextureEditorModel.create({}, { pyramidNetPluginModel: self }),
+})).views((self) => ({
   get shapeDefinition() {
     return self.pyramidNetSpec;
   },

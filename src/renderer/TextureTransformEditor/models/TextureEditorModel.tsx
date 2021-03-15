@@ -1,7 +1,7 @@
 import { inRange } from 'lodash';
 import {
   getParentOfType,
-  getSnapshot, Instance, resolvePath, types,
+  getSnapshot, Instance, resolvePath, types, getEnv,
 } from 'mobx-state-tree';
 
 import { BoundaryModel } from './BoundaryModel';
@@ -57,11 +57,13 @@ export const TextureEditorModel = types
     placementAreaDimensions: types.maybe(DimensionsModel),
     viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
     history: types.optional(UndoManagerWithGroupState, {}),
-    modifierTracking: types.optional(types.late(() => ModifierTrackingModel), {}),
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    shapePreview: types.optional(types.late(() => ShapePreviewModel), {}),
   })
-  .volatile(() => ({
+  .volatile((self) => ({
+    // volatile properties can't access parents but
+    // if shapePreview and modiferTracking are in model, their actions will be tracked by undo middleware
+    // hence, use dependency injection instead of mst getParent*
+    shapePreview: ShapePreviewModel.create({}, { textureEditorModel: self }),
+    modifierTracking: ModifierTrackingModel.create({}, { textureEditorModel: self }),
     // amount of scaling required to make the decoration area match the size of the face boundary
     borderToInsetRatio: null,
     // translation required to bring the decoration area first corner to the face boundary first corner
@@ -77,7 +79,7 @@ export const TextureEditorModel = types
   }))
   .views((self) => ({
     get parentPyramidNetPluginModel() {
-      return getParentOfType(self, PyramidNetPluginModel);
+      return getEnv(self).pyramidNetPluginModel;
     },
     get shapeName() {
       return this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName;
@@ -184,11 +186,11 @@ export const TextureEditorModel = types
       self.showNodes = false;
       self.selectedTextureNodeIndex = null;
     },
-    setTextureFromPattern(pattern) {
+    setTextureFromPattern(patternSnapshot) {
       this.resetNodesEditor();
 
       self.texture = TextureModel.create({
-        pattern,
+        pattern: patternSnapshot,
         scale: 1,
         rotate: 0,
         translate: getOriginPoint(),
@@ -203,14 +205,14 @@ export const TextureEditorModel = types
     },
 
     setTexturePath(pathD, sourceFileName) {
-      this.setTextureFromPattern(PathFaceDecorationPatternModel.create({
+      this.setTextureFromPattern({
         pathD, sourceFileName, isPositive: DEFAULT_IS_POSITIVE,
-      }));
+      });
     },
     setTextureImage(imageData, dimensions, sourceFileName) {
-      this.setTextureFromPattern(ImageFaceDecorationPatternModel.create({
+      this.setTextureFromPattern({
         imageData, dimensions, sourceFileName,
-      }));
+      });
     },
     // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
     getFileBasename() {

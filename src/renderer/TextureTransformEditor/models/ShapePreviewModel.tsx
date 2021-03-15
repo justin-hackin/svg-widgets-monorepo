@@ -1,4 +1,4 @@
-import { getParentOfType, types } from 'mobx-state-tree';
+import { flow, getEnv, types } from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import npot from 'nearest-power-of-two';
@@ -32,6 +32,10 @@ import { EVENTS } from '../../../common/constants';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
+const resolveSceneFromModelPath = (gltfLoader, path) => (new Promise((resolve, reject) => {
+  gltfLoader.load(path, ({ scene }) => { resolve(scene); }, null, (e) => { reject(e); });
+}));
+
 export const ShapePreviewModel = types.model('ShapePreview', {})
   .volatile(() => ({
     gltfExporter: new GLTFExporter(),
@@ -42,7 +46,6 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
     ambientLight: null,
     castSphere: null,
     renderer: null,
-    shapeScene: null,
     shapeMesh: null,
     shapeMaterialMap: null,
     camera: null,
@@ -65,7 +68,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       } : undefined;
     },
     get parentTextureEditor() {
-      return getParentOfType(self, TextureEditorModel);
+      return getEnv(self).textureEditorModel;
     },
     get cameraRadius() {
       return self.IDEAL_RADIUS * 3.1;
@@ -87,8 +90,97 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.texture;
     },
   }))
-  .actions((self) => ({
-    setup(rendererContainer) {
+  .actions((self) => {
+    const setShapeTexture = (imageBitmap) => {
+      if (!self.shapeMesh) {
+        throw new Error('setShapeTexture: shapeMesh does not exist');
+      }
+      const { material }: { material: MeshPhongMaterial } = self.shapeMesh;
+      material.map.image = imageBitmap;
+      material.map.needsUpdate = true;
+    };
+    return {
+      setShapeTexture,
+      setMaterialMap(map) { self.shapeMaterialMap = map; },
+      setShapeMesh(shape) { self.shapeMesh = shape; },
+      applyTextureToMesh: flow(function* () {
+        const {
+          shapeMesh,
+          parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
+        } = self;
+        if (!shapeMesh || !viewBoxAttrs) {
+          return;
+        }
+        const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
+        const ctx = textureCanvas.getContext('2d');
+        const svgStr = ReactDOMServer.renderToString(
+          React.createElement(TextureSvgUnobserved, {
+            viewBox: viewBoxAttrsToString(viewBoxAttrs),
+            store: self.parentTextureEditor,
+          }),
+        );
+        const v = yield Canvg.from(ctx, svgStr, presets.offscreen());
+        const {
+          width: vbWidth,
+          height: vbHeight,
+        } = viewBoxAttrs;
+        v.resize(
+          npot(vbWidth * self.TEXTURE_BITMAP_SCALE),
+          npot(vbHeight * self.TEXTURE_BITMAP_SCALE), 'none',
+        );
+        yield v.render();
+        setShapeTexture(textureCanvas.transferToImageBitmap());
+      }),
+    };
+  })
+  .actions((self) => {
+    const alphaOnChange = () => {
+      if (self.useAlpha) {
+        self.shapeMesh.material = new MeshPhongMaterial({
+          map: self.shapeMaterialMap,
+          alphaMap: self.shapeMaterialMap,
+          side: DoubleSide,
+          alphaTest: 0.5,
+          transparent: true,
+        });
+
+        // will this be exported? customDepthMaterial is not
+        // eslint-disable-next-line max-len
+        // see https://stackoverflow.com/questions/64973079/threejs-customdepthmaterial-property-on-mesh-not-included-in-scene-tojson-outp
+        self.shapeMesh.customDistanceMaterial = new MeshDistanceMaterial({
+          alphaMap: self.shapeMesh.material.alphaMap,
+          alphaTest: self.shapeMesh.material.alphaTest,
+        });
+        self.shapeMesh.castShadow = true;
+        self.shapeMesh.material.needsUpdate = true;
+        self.scene.add(self.castSphere);
+        self.scene.add(self.internalLight);
+      } else {
+        self.shapeMesh.material = new MeshBasicMaterial({ map: self.shapeMaterialMap, side: DoubleSide });
+        self.shapeMesh.customDistanceMaterial = undefined;
+        //  if useAlphaTexturePreview initially false, we remove something that's not in the scene already on 1st call
+        self.scene.remove(self.castSphere);
+        self.scene.remove(self.internalLight);
+      }
+      self.shapeMesh.castShadow = self.useAlpha;
+    };
+    const setShape = flow(function* (shapeName) {
+      const modelUrl = requireStatic(`models/${shapeName}.gltf`);
+      const importScene = yield resolveSceneFromModelPath(self.gltfLoader, modelUrl);
+      // @ts-ignore
+      const meshChild:Mesh = importScene.children.find((child) => (child as Mesh).isMesh);
+      const normalizingScale = self.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
+      meshChild.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
+      if (self.shapeMesh) {
+        self.scene.remove(self.shapeMesh);
+      }
+      // @ts-ignore
+      self.setMaterialMap(meshChild.material.map as Texture);
+      self.setShapeMesh(meshChild);
+      self.scene.add(meshChild);
+      alphaOnChange();
+    });
+    const setup = (rendererContainer) => {
       self.renderer = new WebGLRenderer({
         alpha: true,
         antialias: true,
@@ -114,6 +206,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       self.castSphere = new Mesh(sphereGeometry, sphereMaterial);
       self.castSphere.receiveShadow = true;
 
+      // this will only be added to the scene if useAlpha === true
       self.internalLight = new PointLight(self.lightColor, 3, 20);
       self.internalLight.castShadow = true;
       self.internalLight.shadow.camera.near = 1;
@@ -149,7 +242,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
 
       // shape change
       self.disposers.push(reaction(() => [self.parentTextureEditor.shapeName], () => {
-        this.setShape(self.parentTextureEditor.shapeName);
+        setShape(self.parentTextureEditor.shapeName);
       }, { fireImmediately: true }));
 
       // texture change
@@ -196,13 +289,13 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
               npot(vbHeight * self.TEXTURE_BITMAP_SCALE), 'none',
             );
             await v.render();
-            this.setShapeTexture(textureCanvas.transferToImageBitmap());
+            self.setShapeTexture(textureCanvas.transferToImageBitmap());
           });
       }));
 
       // use alpha change
       self.disposers.push(reaction(() => [self.resolvedUseAlphaTexturePreview, self.useAlpha], () => {
-        this.alphaOnChange();
+        alphaOnChange();
       }));
 
       self.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
@@ -213,92 +306,27 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         };
         return animate;
       })(self.renderer, self.controls, self.camera, self.scene));
-    },
-    beforeDestroy() {
-      if (self.animationFrame) {
-        cancelAnimationFrame(self.animationFrame);
-      }
-      for (const disposer of self.disposers) {
-        disposer();
-      }
-    },
-    setMaterialMap(map) {
-      self.shapeMaterialMap = map;
-    },
-    async downloadShapeGLTF() {
-      return self.gltfExporter
-        .parse(self.shapeMesh, (shapeGLTF) => {
-          globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLB, shapeGLTF, {
-            message: 'Save shape preview',
-            defaultPath: `${self.parentTextureEditor.getFileBasename()}.glb`,
-          });
-        }, { binary: true });
-    },
-    setShapeMesh(shape) {
-      self.shapeMesh = shape;
-    },
-    setShapeScene(scene) {
-      self.shapeScene = scene;
-    },
-    alphaOnChange() {
-      if (self.useAlpha) {
-        self.shapeMesh.material = new MeshPhongMaterial({
-          map: self.shapeMaterialMap,
-          alphaMap: self.shapeMaterialMap,
-          side: DoubleSide,
-          alphaTest: 0.5,
-          transparent: true,
-        });
-
-        // will this be exported? customDepthMaterial is not
-        // eslint-disable-next-line max-len
-        // see https://stackoverflow.com/questions/64973079/threejs-customdepthmaterial-property-on-mesh-not-included-in-scene-tojson-outp
-        self.shapeMesh.customDistanceMaterial = new MeshDistanceMaterial({
-          alphaMap: self.shapeMesh.material.alphaMap,
-          alphaTest: self.shapeMesh.material.alphaTest,
-        });
-        self.shapeMesh.castShadow = true;
-        self.shapeMesh.material.needsUpdate = true;
-        self.scene.add(self.castSphere);
-        self.shapeScene.add(self.internalLight);
-      } else {
-        self.shapeMesh.material = new MeshBasicMaterial({ map: self.shapeMaterialMap, side: DoubleSide });
-        self.shapeMesh.customDistanceMaterial = undefined;
-        //  if useAlphaTexturePreview initially false, we remove something that's not in the scene already on 1st call
-        self.scene.remove(self.castSphere);
-        self.scene.remove(self.internalLight);
-      }
-      self.shapeMesh.castShadow = self.useAlpha;
-    },
-    setShape(shapeName) {
-      const modelUrl = requireStatic(`models/${shapeName}.gltf`);
-      self.gltfLoader.load(
-        // resource URL
-        modelUrl,
-        ({ scene: importScene }) => {
-          if (self.shapeScene) {
-            self.scene.remove(self.shapeScene);
-          }
-          self.scene.add(importScene);
-          this.setShapeScene(importScene);
-
-          // @ts-ignore
-          const meshChild:Mesh = importScene.children.find((child) => (child as Mesh).isMesh);
-          const normalizingScale = self.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
-          meshChild.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
-          // @ts-ignore
-          this.setMaterialMap(meshChild.material.map as Texture);
-          this.setShapeMesh(meshChild);
-          this.alphaOnChange();
-        },
-      );
-    },
-    setShapeTexture(imageBitmap) {
-      if (!self.shapeMesh) {
-        throw new Error('setShapeTexture: shapeMesh does not exist');
-      }
-      const { material }: { material: MeshPhongMaterial } = self.shapeMesh;
-      material.map.image = imageBitmap;
-      material.map.needsUpdate = true;
-    },
-  }));
+    };
+    return {
+      alphaOnChange,
+      setShape,
+      setup,
+      beforeDestroy() {
+        if (self.animationFrame) {
+          cancelAnimationFrame(self.animationFrame);
+        }
+        for (const disposer of self.disposers) {
+          disposer();
+        }
+      },
+      async downloadShapeGLTF() {
+        return self.gltfExporter
+          .parse(self.shapeMesh, (shapeGLTF) => {
+            globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLB, shapeGLTF, {
+              message: 'Save shape preview',
+              defaultPath: `${self.parentTextureEditor.getFileBasename()}.glb`,
+            });
+          }, { binary: true });
+      },
+    };
+  });
