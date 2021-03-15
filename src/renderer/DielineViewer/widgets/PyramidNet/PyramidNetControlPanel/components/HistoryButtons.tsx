@@ -12,9 +12,7 @@ export const HistoryButtons = observer(({ history }) => (
           color="inherit"
           aria-label="Undo"
           disabled={!history.canUndo}
-          onClick={() => {
-            history.undo();
-          }}
+          onClick={() => { history.undo(); }}
         >
           <UndoIcon />
         </IconButton>
@@ -26,9 +24,7 @@ export const HistoryButtons = observer(({ history }) => (
           color="inherit"
           aria-label="Redo"
           disabled={!history.canRedo}
-          onClick={() => {
-            history.redo();
-          }}
+          onClick={() => { history.redo(); }}
         >
           <RedoIcon />
         </IconButton>
