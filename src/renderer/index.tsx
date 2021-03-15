@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  MemoryRouter,
-  Switch,
-  Route,
-} from 'react-router-dom';
+import { MemoryRouter, Route, Switch } from 'react-router-dom';
 import { render } from 'react-dom';
 
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -18,22 +14,29 @@ import { ROUTES } from '../common/constants';
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
 
-const App = () => (
-  <ThemeProvider theme={theme}>
-    <WorkspaceStoreProvider>
-      <MemoryRouter initialEntries={[`/${ROUTES.TEXTURE_EDITOR}`]} initialIndex={0}>
-        <Switch>
-          <Route path={`/${ROUTES.TEXTURE_EDITOR}`}>
-            <TextureTransformEditor />
-          </Route>
-          <Route path={`/${ROUTES.DIELINE_EDITOR}`}>
-            <DielineViewer />
-          </Route>
-        </Switch>
-      </MemoryRouter>
-    </WorkspaceStoreProvider>
-  </ThemeProvider>
+const ProviderWrapper = ({ children }) => (
+  <WorkspaceStoreProvider>
+    <ThemeProvider theme={theme}>
+      {children}
+    </ThemeProvider>
+  </WorkspaceStoreProvider>
 );
+
+const App = () => (
+  <MemoryRouter initialEntries={[`/${ROUTES.TEXTURE_EDITOR}`]} initialIndex={0}>
+    <ProviderWrapper>
+      <Switch>
+        <Route path={`/${ROUTES.TEXTURE_EDITOR}`}>
+          <TextureTransformEditor />
+        </Route>
+        <Route path={`/${ROUTES.DIELINE_EDITOR}`}>
+          <DielineViewer />
+        </Route>
+      </Switch>
+    </ProviderWrapper>
+  </MemoryRouter>
+);
+
 render(
   (<App />),
   document.getElementById('app'),
