@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  MemoryRouter,
+  BrowserRouter,
   Switch,
   Route,
 } from 'react-router-dom';
@@ -17,22 +17,26 @@ import darkTheme from './DielineViewer/data/material-ui-dark-theme';
 
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
-
-const App = () => (
+const ProviderWrapper = ({ children }) => (
   <ThemeProvider theme={theme}>
     <WorkspaceStoreProvider>
-      <MemoryRouter initialEntries={[`/${ROUTES.TEXTURE_EDITOR}`]} initialIndex={0}>
-        <Switch>
-          <Route path={`/${ROUTES.TEXTURE_EDITOR}`}>
-            <TextureTransformEditor />
-          </Route>
-          <Route path={`/${ROUTES.DIELINE_EDITOR}`}>
-            <DielineViewer />
-          </Route>
-        </Switch>
-      </MemoryRouter>
+      {children}
     </WorkspaceStoreProvider>
   </ThemeProvider>
+);
+const App = () => (
+  <ProviderWrapper>
+    <BrowserRouter>
+      <Switch>
+        <Route path={ROUTES.TEXTURE_EDITOR}>
+          <TextureTransformEditor />
+        </Route>
+        <Route path={ROUTES.DIELINE_EDITOR}>
+          <DielineViewer />
+        </Route>
+      </Switch>
+    </BrowserRouter>
+  </ProviderWrapper>
 );
 render(
   (<App />),

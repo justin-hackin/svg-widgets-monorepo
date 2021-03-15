@@ -22,8 +22,8 @@ export enum EVENTS {
 }
 
 export enum ROUTES {
-  TEXTURE_EDITOR = 'texture-editor',
-  DIELINE_EDITOR = 'dieline-editor'
+  TEXTURE_EDITOR = '/texture-editor',
+  DIELINE_EDITOR = '/'
 }
 
 const svgFilters = [{ name: 'SVG - Scalable Vector Graphics', extensions: ['svg'] }];

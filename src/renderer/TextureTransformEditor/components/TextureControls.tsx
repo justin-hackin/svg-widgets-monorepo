@@ -333,17 +333,16 @@ export const TextureControls = observer(() => {
             </Tooltip>
             <Tooltip title="Send shape decoration to Dieline Editor" arrow>
               <span>
-                <Link to={`/${ROUTES.DIELINE_EDITOR}`}>
-                  <IconButton
-                    onClick={() => {
-                      sendTextureToDielineEditor();
-                    }}
-                    aria-label="send texture"
-                    component="span"
-                  >
-                    <TelegramIcon fontSize="large" />
-                  </IconButton>
-                </Link>
+                <IconButton
+                  onClick={() => {
+                    sendTextureToDielineEditor();
+                  }}
+                  aria-label="send texture"
+                  component="span"
+                >
+                  <TelegramIcon fontSize="large" />
+                </IconButton>
+                <Link to={ROUTES.DIELINE_EDITOR}>Dieline</Link>
               </span>
             </Tooltip>
           </>
