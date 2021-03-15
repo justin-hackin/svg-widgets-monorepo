@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  BrowserRouter,
+  MemoryRouter,
   Switch,
   Route,
 } from 'react-router-dom';
@@ -25,14 +25,14 @@ const ProviderWrapper = ({ children }) => (
   </ThemeProvider>
 );
 const App = () => (
-  <BrowserRouter>
+  <MemoryRouter>
     <ProviderWrapper>
       <Switch>
-        <Route path={ROUTES.TEXTURE_EDITOR} component={TextureTransformEditor} />
-        <Route path={ROUTES.DIELINE_EDITOR} component={DielineViewer} />
+        <Route path={ROUTES.TEXTURE_EDITOR} component={() => (<TextureTransformEditor />)} />
+        <Route path={ROUTES.DIELINE_EDITOR} component={() => (<DielineViewer />)} />
       </Switch>
     </ProviderWrapper>
-  </BrowserRouter>
+  </MemoryRouter>
 );
 render(
   (<App />),
