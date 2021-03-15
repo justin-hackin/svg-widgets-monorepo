@@ -41,7 +41,7 @@
     "lodash": "^4.17.19",
     "mobx": "^5.15.4",
     "mobx-devtools-mst": "^0.9.22",
-    "mobx-react": "^6.2.2",
+    "mobx-react": "^6.3.1",
     "mobx-state-tree": "^3.17.2",
     "mst-middlewares": "^3.17.2",
     "mst-persist": "^0.1.3",

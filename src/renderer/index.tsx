@@ -25,18 +25,14 @@ const ProviderWrapper = ({ children }) => (
   </ThemeProvider>
 );
 const App = () => (
-  <ProviderWrapper>
-    <BrowserRouter>
+  <BrowserRouter>
+    <ProviderWrapper>
       <Switch>
-        <Route path={ROUTES.TEXTURE_EDITOR}>
-          <TextureTransformEditor />
-        </Route>
-        <Route path={ROUTES.DIELINE_EDITOR}>
-          <DielineViewer />
-        </Route>
+        <Route path={ROUTES.TEXTURE_EDITOR} component={TextureTransformEditor} />
+        <Route path={ROUTES.DIELINE_EDITOR} component={DielineViewer} />
       </Switch>
-    </BrowserRouter>
-  </ProviderWrapper>
+    </ProviderWrapper>
+  </BrowserRouter>
 );
 render(
   (<App />),
