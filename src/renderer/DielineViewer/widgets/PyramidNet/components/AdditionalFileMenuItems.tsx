@@ -8,9 +8,9 @@ import { startCase } from 'lodash';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
-import { EVENTS } from '../../../../../main/ipc';
 import { extractCutHolesFromSvgString } from '../../../../../common/util/svg';
 import { useStyles } from '../../../style';
+import { EVENTS } from '../../../../../common/constants';
 
 const DOWNLOAD_TEMPLATE_TXT = 'Download face template SVG (current shape)';
 const IMPORT_SVG_DECORATION_TXT = 'Import face cut pattern from SVG';

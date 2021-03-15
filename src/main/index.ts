@@ -1,3 +1,5 @@
+import { EVENTS } from '../common/constants';
+
 const {
   app, BrowserWindow, nativeImage, nativeTheme, ipcMain, screen: electronScreen,
 } = require('electron');
@@ -5,9 +7,7 @@ const path = require('path');
 const { format } = require('url');
 const debug = require('electron-debug');
 
-const {
-  setupIpc, EVENTS,
-} = require('./ipc');
+const { setupIpc } = require('./ipc');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 

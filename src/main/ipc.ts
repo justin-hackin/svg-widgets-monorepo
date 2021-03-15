@@ -5,26 +5,9 @@ const sizeOfImage = require('image-size');
 const path = require('path');
 const fsPromises = require('fs').promises;
 
+const { EVENTS } = require('../common/constants');
+
 const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
-
-export enum EVENTS {
-  SAVE_SVG = 'save-svg',
-  SAVE_JSON = 'save-json',
-  SAVE_GLB = 'save-glb',
-  DIALOG_SAVE_MODEL_WITH_SVG = 'dialog-save-model-with-svg',
-  SAVE_MODEL_WITH_SVG = 'save-model-with-svg',
-  DIALOG_LOAD_JSON = 'dialog-load-json',
-  OPEN_SVG = 'open-svg',
-  OPEN_TEXTURE_WINDOW = 'open-texture-window',
-  RESET_DRAG_MODE = 'reset-drag-mode',
-  GET_TEXTURE_FILE_PATH = 'get-texture-file-path',
-  SELECT_TEXTURE = 'select-texture',
-}
-
-export enum ROUTES {
-  TEXTURE_EDITOR = 'texture-editor',
-  DIELINE_EDITOR = 'dieline-editor'
-}
 
 const svgFilters = [{ name: 'SVG - Scalable Vector Graphics', extensions: ['svg'] }];
 const textureFilters = [{ name: 'Vector/bitmap file', extensions: ['svg', 'jpg', 'png'] }];

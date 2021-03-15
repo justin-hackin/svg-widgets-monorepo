@@ -21,12 +21,12 @@ import {
 import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 
 import { useStyles } from '../../style';
-import { EVENTS } from '../../../../main/ipc';
 import { HistoryButtons } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { SimpleDialog } from '../../../common/components/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
+import { EVENTS } from '../../../../common/constants';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';

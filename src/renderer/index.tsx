@@ -11,9 +11,9 @@ import { ThemeProvider } from '@material-ui/styles';
 import { TextureTransformEditor } from './TextureTransformEditor';
 import { DielineViewer } from './DielineViewer';
 import './common/style/index.css';
-import { ROUTES } from '../main/ipc';
 import { WorkspaceStoreProvider } from './DielineViewer/models/WorkspaceModel';
 import darkTheme from './DielineViewer/data/material-ui-dark-theme';
+import { ROUTES } from '../common/constants';
 
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);

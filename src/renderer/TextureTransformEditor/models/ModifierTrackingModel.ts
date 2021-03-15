@@ -1,7 +1,7 @@
 import { getParentOfType, types } from 'mobx-state-tree';
 import { includes, flatten } from 'lodash';
-import { EVENTS } from '../../../main/ipc';
 import { TextureEditorModel } from './TextureEditorModel';
+import { EVENTS } from '../../../common/constants';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',

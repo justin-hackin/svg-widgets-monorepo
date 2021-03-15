@@ -26,9 +26,9 @@ import React from 'react';
 
 import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
-import { EVENTS } from '../../../main/ipc';
 import requireStatic from '../../requireStatic';
 import { TextureEditorModel } from './TextureEditorModel';
+import { EVENTS } from '../../../common/constants';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 

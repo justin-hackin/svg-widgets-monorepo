@@ -17,7 +17,6 @@ import Link from 'react-router-dom';
 import clsx from 'clsx';
 
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
-import { EVENTS, ROUTES } from '../../../main/ipc';
 import { HistoryButtons } from
   '../../DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { DEFAULT_SLIDER_STEP } from '../../common/constants';
@@ -27,6 +26,7 @@ import { ShapeSelect } from '../../common/components/ShapeSelect';
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../DielineViewer/style';
+import { EVENTS, ROUTES } from '../../../common/constants';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat

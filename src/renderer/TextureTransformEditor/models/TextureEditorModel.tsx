@@ -7,7 +7,6 @@ import {
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
 import { DimensionsModel } from '../../common/models/DimensionsModel';
-import { EVENTS } from '../../../main/ipc';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset,
@@ -24,6 +23,7 @@ import {
 import { PathFaceDecorationPatternModel } from '../../common/models/PathFaceDecorationPatternModel';
 import { ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
+import { EVENTS } from '../../../common/constants';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
