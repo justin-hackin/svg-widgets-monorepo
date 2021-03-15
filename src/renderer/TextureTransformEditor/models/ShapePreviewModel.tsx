@@ -45,7 +45,6 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
     ambientLight: null,
     castSphere: null,
     renderer: null,
-    shapeScene: null,
     shapeMesh: null,
     shapeMaterialMap: null,
     camera: null,
@@ -90,11 +89,49 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.texture;
     },
   }))
-  .actions((self) => ({
-    setMaterialMap(map) { self.shapeMaterialMap = map; },
-    setShapeMesh(shape) { self.shapeMesh = shape; },
-    setShapeScene(scene) { self.shapeScene = scene; },
-  }))
+  .actions((self) => {
+    const setShapeTexture = (imageBitmap) => {
+      if (!self.shapeMesh) {
+        throw new Error('setShapeTexture: shapeMesh does not exist');
+      }
+      const { material }: { material: MeshPhongMaterial } = self.shapeMesh;
+      material.map.image = imageBitmap;
+      material.map.needsUpdate = true;
+    };
+    return {
+      setShapeTexture,
+      setMaterialMap(map) { self.shapeMaterialMap = map; },
+      setShapeMesh(shape) { self.shapeMesh = shape; },
+      applyTextureToMesh: flow(function* () {
+        const {
+          shapeMesh,
+          parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
+        } = self;
+        if (!shapeMesh || !viewBoxAttrs) {
+          return;
+        }
+        const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
+        const ctx = textureCanvas.getContext('2d');
+        const svgStr = ReactDOMServer.renderToString(
+          React.createElement(TextureSvgUnobserved, {
+            viewBox: viewBoxAttrsToString(viewBoxAttrs),
+            store: self.parentTextureEditor,
+          }),
+        );
+        const v = yield Canvg.from(ctx, svgStr, presets.offscreen());
+        const {
+          width: vbWidth,
+          height: vbHeight,
+        } = viewBoxAttrs;
+        v.resize(
+          npot(vbWidth * self.TEXTURE_BITMAP_SCALE),
+          npot(vbHeight * self.TEXTURE_BITMAP_SCALE), 'none',
+        );
+        yield v.render();
+        setShapeTexture(textureCanvas.transferToImageBitmap());
+      }),
+    };
+  })
   .actions((self) => {
     const alphaOnChange = () => {
       if (self.useAlpha) {
@@ -116,7 +153,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         self.shapeMesh.castShadow = true;
         self.shapeMesh.material.needsUpdate = true;
         self.scene.add(self.castSphere);
-        self.shapeScene.add(self.internalLight);
+        self.scene.add(self.internalLight);
       } else {
         self.shapeMesh.material = new MeshBasicMaterial({ map: self.shapeMaterialMap, side: DoubleSide });
         self.shapeMesh.customDistanceMaterial = undefined;
@@ -126,30 +163,20 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       }
       self.shapeMesh.castShadow = self.useAlpha;
     };
-    const setShapeTexture = (imageBitmap) => {
-      if (!self.shapeMesh) {
-        throw new Error('setShapeTexture: shapeMesh does not exist');
-      }
-      const { material }: { material: MeshPhongMaterial } = self.shapeMesh;
-      material.map.image = imageBitmap;
-      material.map.needsUpdate = true;
-    };
     const setShape = flow(function* (shapeName) {
       const modelUrl = requireStatic(`models/${shapeName}.gltf`);
       const importScene = yield resolveSceneFromModelPath(self.gltfLoader, modelUrl);
-      if (self.shapeScene) {
-        self.scene.remove(self.shapeScene);
-      }
-      self.scene.add(importScene);
-      self.setShapeScene(importScene);
-
       // @ts-ignore
       const meshChild:Mesh = importScene.children.find((child) => (child as Mesh).isMesh);
       const normalizingScale = self.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
       meshChild.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
+      if (self.shapeMesh) {
+        self.scene.remove(self.shapeMesh);
+      }
       // @ts-ignore
       self.setMaterialMap(meshChild.material.map as Texture);
       self.setShapeMesh(meshChild);
+      self.scene.add(meshChild);
       alphaOnChange();
     });
     const setup = (rendererContainer) => {
@@ -178,6 +205,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       self.castSphere = new Mesh(sphereGeometry, sphereMaterial);
       self.castSphere.receiveShadow = true;
 
+      // this will only be added to the scene if useAlpha === true
       self.internalLight = new PointLight(self.lightColor, 3, 20);
       self.internalLight.castShadow = true;
       self.internalLight.shadow.camera.near = 1;
@@ -234,34 +262,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
           self.shapeMesh, scale, rotate, translate, boundaryPathD, isPositive, patternPathD, imageData, isBordered,
         ];
       }, () => {
-        const {
-          shapeMesh,
-          parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
-        } = self;
-        if (!shapeMesh || !viewBoxAttrs) {
-          return;
-        }
-        const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
-        const ctx = textureCanvas.getContext('2d');
-        const svgStr = ReactDOMServer.renderToString(
-          React.createElement(TextureSvgUnobserved, {
-            viewBox: viewBoxAttrsToString(viewBoxAttrs),
-            store: self.parentTextureEditor,
-          }),
-        );
-        Canvg.from(ctx, svgStr, presets.offscreen())
-          .then(async (v) => {
-            const {
-              width: vbWidth,
-              height: vbHeight,
-            } = viewBoxAttrs;
-            v.resize(
-              npot(vbWidth * self.TEXTURE_BITMAP_SCALE),
-              npot(vbHeight * self.TEXTURE_BITMAP_SCALE), 'none',
-            );
-            await v.render();
-            setShapeTexture(textureCanvas.transferToImageBitmap());
-          });
+        self.applyTextureToMesh();
       }));
 
       // use alpha change
@@ -281,7 +282,6 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
     return {
       alphaOnChange,
       setShape,
-      setShapeTexture,
       setup,
       beforeDestroy() {
         if (self.animationFrame) {
