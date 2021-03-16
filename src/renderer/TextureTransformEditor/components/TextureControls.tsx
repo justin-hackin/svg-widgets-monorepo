@@ -96,6 +96,7 @@ export const TextureControls = observer(() => {
   // TODO: add whitespace, improve button definition and input alignment
   return (
     <AppBar color="inherit" position="relative">
+      <Link to={ROUTES.DIELINE_EDITOR}>Dieline</Link>
       <Toolbar
         className={clsx({
           [classes.textureToolbar]: true,
@@ -342,7 +343,6 @@ export const TextureControls = observer(() => {
                 >
                   <TelegramIcon fontSize="large" />
                 </IconButton>
-                <Link to={ROUTES.DIELINE_EDITOR}>Dieline</Link>
               </span>
             </Tooltip>
           </>
