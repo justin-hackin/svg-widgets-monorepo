@@ -27,7 +27,6 @@ import React from 'react';
 import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
 import requireStatic from '../../requireStatic';
-import { TextureEditorModel } from './TextureEditorModel';
 import { EVENTS } from '../../../common/constants';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
@@ -40,7 +39,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
   .volatile(() => ({
     gltfExporter: new GLTFExporter(),
     gltfLoader: new GLTFLoader(),
-    scene: new Scene(),
+    scene: null,
     lightColor: 0x404040,
     internalLight: null,
     ambientLight: null,
@@ -186,6 +185,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         antialias: true,
         preserveDrawingBuffer: true,
       });
+      self.scene = new Scene();
       self.renderer.shadowMap.enabled = true;
       self.renderer.shadowMap.type = BasicShadowMap;
       rendererContainer.appendChild(self.renderer.domElement);
@@ -221,6 +221,11 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       self.controls = new OrbitControls(self.camera, self.renderer.domElement);
       self.controls.enablePan = false;
       self.controls.maxDistance = self.maxCameraRadius;
+
+      if (self.shapeMesh) {
+        // runs when the shape has already been loaded because the router leaves and returns to texture editor
+        alphaOnChange();
+      }
 
       // update renderer dimensions
       self.disposers.push(reaction(() => [self.canvasDimensions, self.renderer], () => {
@@ -311,13 +316,16 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       alphaOnChange,
       setShape,
       setup,
-      beforeDestroy() {
+      tearDown() {
         if (self.animationFrame) {
           cancelAnimationFrame(self.animationFrame);
         }
         for (const disposer of self.disposers) {
           disposer();
         }
+      },
+      beforeDestroy() {
+        this.tearDown();
       },
       async downloadShapeGLTF() {
         return self.gltfExporter
