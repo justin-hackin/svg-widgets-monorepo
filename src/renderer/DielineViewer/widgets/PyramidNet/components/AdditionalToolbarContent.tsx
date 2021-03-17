@@ -5,8 +5,15 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../../../common/constants';
 
 export const AdditionalToolbarContent = () => (
-  <Link
-    to={ROUTES.TEXTURE_EDITOR}
-    component={<span>LOOOL</span>}
-  />
+  <>
+    <Tooltip title="Open/reveal texture editor" arrow>
+      <Button
+        color="inherit"
+        startIcon={<OpenInNewIcon />}
+      >
+        Texture
+      </Button>
+    </Tooltip>
+    <Link to={ROUTES.TEXTURE_EDITOR}>Texture</Link>
+  </>
 );
