@@ -1,29 +1,23 @@
 // import { useQueryParam, StringParam, JsonParam } from 'use-query-params';
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
-import { ThemeProvider } from '@material-ui/styles';
 import {
-  createMuiTheme, Dialog, Fab, List, ListItem, ListItemText, DialogTitle, ListItemAvatar, Avatar,
+  Dialog, Fab, List, ListItem, ListItemText, DialogTitle, ListItemAvatar, Avatar,
 } from '@material-ui/core';
 import BuildIcon from '@material-ui/icons/Build';
 import { startCase } from 'lodash';
 
-import darkTheme from './data/material-ui-dark-theme';
 import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
-import {
-  useWorkspaceMst, WorkspaceStoreProvider,
-} from './models/WorkspaceModel';
+import { useWorkspaceMst } from './models/WorkspaceModel';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
 import { useStyles } from './style';
 import requireStatic from '../requireStatic';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
 const patternId = 'grid-pattern';
-// @ts-ignore
-const theme = createMuiTheme(darkTheme);
 
-export const DielineViewerLOC = observer(() => {
+export const DielineViewer = observer(() => {
   const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
   const {
     preferences: { dielineDocumentDimensions },
@@ -96,11 +90,3 @@ export const DielineViewerLOC = observer(() => {
     </>
   );
 });
-
-export const DielineViewer = observer(() => (
-  <ThemeProvider theme={theme}>
-    <WorkspaceStoreProvider>
-      <DielineViewerLOC />
-    </WorkspaceStoreProvider>
-  </ThemeProvider>
-));
