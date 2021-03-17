@@ -23,18 +23,14 @@ const ProviderWrapper = ({ children }) => (
 );
 
 const App = () => (
-  <MemoryRouter initialEntries={[ROUTES.DIELINE_EDITOR]} initialIndex={0}>
-    <ProviderWrapper>
+  <ProviderWrapper>
+    <MemoryRouter initialEntries={[ROUTES.DIELINE_EDITOR]} initialIndex={0}>
       <Switch>
-        <Route path={ROUTES.TEXTURE_EDITOR}>
-          <TextureTransformEditor />
-        </Route>
-        <Route path={ROUTES.DIELINE_EDITOR}>
-          <DielineViewer />
-        </Route>
+        <Route path={ROUTES.TEXTURE_EDITOR} component={TextureTransformEditor} />
+        <Route path={ROUTES.DIELINE_EDITOR} component={DielineViewer} />
       </Switch>
-    </ProviderWrapper>
-  </MemoryRouter>
+    </MemoryRouter>
+  </ProviderWrapper>
 );
 
 render(
