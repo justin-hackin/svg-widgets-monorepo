@@ -23,13 +23,13 @@ const ProviderWrapper = ({ children }) => (
 );
 
 const App = () => (
-  <MemoryRouter initialEntries={[`/${ROUTES.TEXTURE_EDITOR}`]} initialIndex={0}>
+  <MemoryRouter initialEntries={[ROUTES.TEXTURE_EDITOR]} initialIndex={0}>
     <ProviderWrapper>
       <Switch>
-        <Route path={`/${ROUTES.TEXTURE_EDITOR}`}>
+        <Route path={ROUTES.TEXTURE_EDITOR}>
           <TextureTransformEditor />
         </Route>
-        <Route path={`/${ROUTES.DIELINE_EDITOR}`}>
+        <Route path={ROUTES.DIELINE_EDITOR}>
           <DielineViewer />
         </Route>
       </Switch>
