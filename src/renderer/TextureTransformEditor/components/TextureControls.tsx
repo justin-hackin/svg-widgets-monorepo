@@ -7,13 +7,14 @@ import { observer } from 'mobx-react';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 import CachedIcon from '@material-ui/icons/Cached';
 import TelegramIcon from '@material-ui/icons/Telegram';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import PublishIcon from '@material-ui/icons/Publish';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import clsx from 'clsx';
 
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
@@ -26,7 +27,7 @@ import { ShapeSelect } from '../../common/components/ShapeSelect';
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../DielineViewer/style';
-import { EVENTS, ROUTES } from '../../../common/constants';
+import { EVENTS } from '../../../common/constants';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -46,9 +47,10 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 );
 
 export const TextureControls = observer(() => {
+  const browserHistory = useHistory();
+  const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
   const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
-
   const {
     texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement, decorationBoundary,
     selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
@@ -58,8 +60,6 @@ export const TextureControls = observer(() => {
     shapeName,
     modifierTracking: { dragMode = undefined } = {},
   } = pluginModel.textureEditor;
-
-  const classes = useStyles();
   const { pattern, rotate: textureRotate, hasPathPattern } = texture || {};
   const numFaceSides = decorationBoundary.vertices.length;
 
@@ -96,7 +96,6 @@ export const TextureControls = observer(() => {
   // TODO: add whitespace, improve button definition and input alignment
   return (
     <AppBar color="inherit" position="relative">
-      <Link to={ROUTES.DIELINE_EDITOR}>Dieline</Link>
       <Toolbar
         className={clsx({
           [classes.textureToolbar]: true,
@@ -104,6 +103,15 @@ export const TextureControls = observer(() => {
         })}
         variant="dense"
       >
+        <IconButton
+          onClick={() => {
+            browserHistory.goBack();
+          }}
+          aria-label="send texture"
+          component="span"
+        >
+          <ArrowBackIcon fontSize="large" />
+        </IconButton>
         <IconButton
           onClick={async () => {
             const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.SELECT_TEXTURE);
@@ -337,6 +345,7 @@ export const TextureControls = observer(() => {
                 <IconButton
                   onClick={() => {
                     sendTextureToDielineEditor();
+                    browserHistory.goBack();
                   }}
                   aria-label="send texture"
                   component="span"
