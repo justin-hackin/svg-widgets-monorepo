@@ -14,7 +14,6 @@ import SaveIcon from '@material-ui/icons/Save';
 import PublishIcon from '@material-ui/icons/Publish';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
-import { useHistory } from 'react-router-dom';
 import clsx from 'clsx';
 
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
@@ -27,7 +26,7 @@ import { ShapeSelect } from '../../common/components/ShapeSelect';
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../DielineViewer/style';
-import { EVENTS } from '../../../common/constants';
+import { EVENTS, ROUTES } from '../../../common/constants';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -47,7 +46,6 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 );
 
 export const TextureControls = observer(() => {
-  const browserHistory = useHistory();
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
   const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
@@ -105,7 +103,7 @@ export const TextureControls = observer(() => {
       >
         <IconButton
           onClick={() => {
-            browserHistory.goBack();
+            workspaceStore.setCurrentRoute(ROUTES.DIELINE_EDITOR);
           }}
           aria-label="send texture"
           component="span"
@@ -345,7 +343,7 @@ export const TextureControls = observer(() => {
                 <IconButton
                   onClick={() => {
                     sendTextureToDielineEditor();
-                    browserHistory.goBack();
+                    workspaceStore.setCurrentRoute(ROUTES.DIELINE_EDITOR);
                   }}
                   aria-label="send texture"
                   component="span"

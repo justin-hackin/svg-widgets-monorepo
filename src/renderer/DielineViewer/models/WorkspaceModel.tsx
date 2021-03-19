@@ -17,6 +17,7 @@ import { PreferencesModel, defaultPreferences } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../widgets/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../widgets/CylinderLightbox';
 import { PyramidNetTestTabsOptionsInfo } from '../widgets/PyramidNetTestTabs';
+import { ROUTES } from '../../../common/constants';
 
 const getPreferencesStore = () => {
   const preferencesStore = PreferencesModel.create(defaultPreferences);
@@ -33,6 +34,7 @@ export const WorkspaceModel = types.model('Workspace', {
   selectedWidgetName: 'polyhedral-net',
 })
   .volatile(() => ({
+    currentRoute: ROUTES.TEXTURE_EDITOR,
     preferences: getPreferencesStore(),
     savedSnapshot: undefined,
     currentFilePath: undefined,
@@ -50,6 +52,9 @@ export const WorkspaceModel = types.model('Workspace', {
     },
     get selectedControlPanelProps() {
       return this.selectedWidgetInfo.controlPanelProps;
+    },
+    get selectedAdditionalRoutes() {
+      return this.selectedWidgetInfo.additionalRoutes;
     },
     get selectedStoreIsSaved() {
       // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,
@@ -97,6 +102,12 @@ export const WorkspaceModel = types.model('Workspace', {
     setSelectedWidgetName(name) {
       self.selectedWidgetName = name;
       this.clearCurrentFileData();
+    },
+    setCurrentRoute(route) {
+      if (route !== ROUTES.DIELINE_EDITOR && !self.selectedAdditionalRoutes[route]) {
+        throw new Error(`unexpected route: ${route}`);
+      }
+      self.currentRoute = route;
     },
     renderWidgetToString() {
       const { SelectedRawSvgComponent } = self;
