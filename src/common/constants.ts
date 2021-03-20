@@ -12,6 +12,6 @@ export enum EVENTS {
 }
 
 export enum ROUTES {
-  TEXTURE_EDITOR = '/texture-editor',
-  DIELINE_EDITOR = '/dieline-editor'
+  DIELINE_EDITOR,
+  TEXTURE_EDITOR,
 }
