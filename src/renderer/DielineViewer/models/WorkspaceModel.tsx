@@ -34,7 +34,7 @@ export const WorkspaceModel = types.model('Workspace', {
   selectedWidgetName: 'polyhedral-net',
 })
   .volatile(() => ({
-    currentRoute: ROUTES.DIELINE_EDITOR,
+    currentRoute: ROUTES.TEXTURE_EDITOR,
     preferences: getPreferencesStore(),
     savedSnapshot: undefined,
     currentFilePath: undefined,

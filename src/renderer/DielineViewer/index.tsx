@@ -33,10 +33,7 @@ export const DielineViewer = observer(() => {
   }
   return (
     <>
-      <div style={{
-        width: '100%', height: '100%', position: 'absolute', overflow: 'hidden',
-      }}
-      >
+      <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
         <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
           <svg {...dielineDocumentDimensions}>
             <GridPattern patternId={patternId} />

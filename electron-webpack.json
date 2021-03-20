@@ -3,7 +3,7 @@
     "chokidar",
     "react-refresh",
     "@pmmmwh/react-refresh-webpack-plugin",
-    "react-dom", "react", "react-router-dom", "react-page-scroller",
+    "react-dom", "react", "react-router-dom",
     "@material-ui/core", "@material-ui/styles" , "@material-ui/lab", "@material-ui/icons",
     "react-moveable", "react-use-gesture", "react-router-static", "mobx-react"
   ],

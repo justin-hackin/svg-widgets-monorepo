@@ -39,7 +39,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   menuButton: {
     top: theme.spacing(1),
     right: theme.spacing(1),
-    position: 'absolute',
+    position: 'fixed',
   },
   listItemIcon: {
     minWidth: theme.spacing(4),
@@ -63,7 +63,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   widgetButton: {
     bottom: theme.spacing(1),
     left: theme.spacing(1),
-    position: 'absolute',
+    position: 'fixed',
   },
   widgetAvatar: {
     width: 160,

@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import { observer } from 'mobx-react';
 import clsx from 'clsx';
 import { useTheme } from '@material-ui/core/styles';
@@ -34,7 +34,6 @@ const SAVE_TXT = 'Save';
 export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, AdditionalToolbarContent, PanelContent }) => {
   // @ts-ignore
   const classes = useStyles();
-  const rootRef = useRef();
   useTheme();
   const workspaceStore = useWorkspaceMst();
   const pyramidNetPluginStore = workspaceStore.selectedStore as IPyramidNetPluginModel;
@@ -108,7 +107,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   };
 
   return (
-    <div ref={rootRef} className={classes.textureEditorRoot}>
+    <div className={classes.textureEditorRoot}>
       <Fab
         color="inherit"
         aria-label="open drawer"
@@ -126,7 +125,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
           paper: classes.drawerPaper,
         }}
       >
-        <AppBar position="relative">
+        <AppBar position="sticky">
           <Toolbar className={classes.toolbar} variant="dense">
             <Tooltip title="File ..." arrow>
               <Button
