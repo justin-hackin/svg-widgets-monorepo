@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import React, { useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -19,7 +19,7 @@ import { useStyles } from '../DielineViewer/style';
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
 
-export const TextureTransformEditor = observer(() => {
+const TextureTransformEditorRaw = forwardRef((props, ref) => {
   const workspaceStore = useWorkspaceMst();
   const mainAreaRef = useRef();
   const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;
@@ -54,12 +54,19 @@ export const TextureTransformEditor = observer(() => {
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   return (
-    <Box className={classes.textureEditorRoot}>
-      <TextureControls />
-      <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
-        <TextureArrangement />
-        <ShapePreview />
-      </div>
+    /* @ts-ignore */
+    <Box ref={ref} className={classes.textureEditorRoot} {...props}>
+      {pyramidNetPluginStore && pyramidNetPluginStore.textureEditor && (
+      <>
+        <TextureControls />
+        <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
+          <TextureArrangement />
+          <ShapePreview />
+        </div>
+      </>
+      )}
     </Box>
   );
 });
+
+export const TextureTransformEditor = observer(TextureTransformEditorRaw);
