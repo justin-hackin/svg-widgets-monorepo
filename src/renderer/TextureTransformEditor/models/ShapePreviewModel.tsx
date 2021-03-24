@@ -1,4 +1,6 @@
-import { flow, getEnv, types } from 'mobx-state-tree';
+import {
+  flow, getParentOfType, types,
+} from 'mobx-state-tree';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import npot from 'nearest-power-of-two';
@@ -28,6 +30,7 @@ import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { viewBoxAttrsToString } from '../../../common/util/svg';
 import requireStatic from '../../requireStatic';
 import { EVENTS } from '../../../common/constants';
+import { TextureEditorModel } from './TextureEditorModel';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -57,17 +60,15 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
   }))
   .views((self) => ({
     get canvasDimensions() {
+      // defaults allow camera to be initialized before placementAreaDimensions have been defined
       const {
-        width,
-        height,
+        width = 1,
+        height = 1,
       } = this.parentTextureEditor.placementAreaDimensions || {};
-      return width ? {
-        width,
-        height,
-      } : undefined;
+      return { width, height };
     },
     get parentTextureEditor() {
-      return getEnv(self).textureEditorModel;
+      return getParentOfType(self, TextureEditorModel);
     },
     get cameraRadius() {
       return self.IDEAL_RADIUS * 3.1;

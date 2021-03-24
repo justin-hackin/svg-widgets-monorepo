@@ -112,9 +112,10 @@ export const TextureArrangement = observer(() => {
       // @ts-ignore
       component="svg"
       square
-      elevation={5}
+      elevation={10}
       width="100%"
       height="100%"
+      style={{ overflow: 'hidden' }}
       {...viewUseWheel()}
     >
       <svg

@@ -39,7 +39,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   menuButton: {
     top: theme.spacing(1),
     right: theme.spacing(1),
-    position: 'fixed',
+    position: 'absolute',
   },
   listItemIcon: {
     minWidth: theme.spacing(4),
@@ -63,7 +63,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   widgetButton: {
     bottom: theme.spacing(1),
     left: theme.spacing(1),
-    position: 'fixed',
+    position: 'absolute',
   },
   widgetAvatar: {
     width: 160,
@@ -96,6 +96,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   drawerPaper: {
     width: drawerWidth,
     overflowY: 'unset',
+    position: 'absolute',
   },
   tabContent: {
     display: 'flex',
@@ -166,6 +167,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     flexFlow: 'column',
     height: '100%',
     color: '#fff',
+  },
+  textureEditorPaper: {
+    width: '100%',
+    overflowY: 'unset',
+    position: 'absolute',
   },
   textureEditorMainArea: {
     flex: '1 1 auto',

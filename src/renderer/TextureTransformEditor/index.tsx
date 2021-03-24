@@ -1,9 +1,9 @@
 /* eslint-disable no-param-reassign */
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 
 import { createMuiTheme } from '@material-ui/core/styles';
-import { Box } from '@material-ui/core';
+import { Drawer } from '@material-ui/core';
 
 // @ts-ignore
 import darkTheme from '../DielineViewer/data/material-ui-dark-theme';
@@ -19,7 +19,7 @@ import { useStyles } from '../DielineViewer/style';
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
 
-const TextureTransformEditorRaw = forwardRef((props, ref) => {
+export const TextureTransformEditor = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const mainAreaRef = useRef();
   const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;
@@ -54,19 +54,18 @@ const TextureTransformEditorRaw = forwardRef((props, ref) => {
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   return (
-    /* @ts-ignore */
-    <Box ref={ref} className={classes.textureEditorRoot} {...props}>
-      {pyramidNetPluginStore && pyramidNetPluginStore.textureEditor && (
-      <>
-        <TextureControls />
-        <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
-          <TextureArrangement />
-          <ShapePreview />
-        </div>
-      </>
-      )}
-    </Box>
+    <Drawer
+      className={classes.textureEditorRoot}
+      anchor="left"
+      variant="persistent"
+      open={pyramidNetPluginStore.textureEditorOpen}
+      classes={{ paper: classes.textureEditorPaper }}
+    >
+      <TextureControls />
+      <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
+        <TextureArrangement />
+        <ShapePreview />
+      </div>
+    </Drawer>
   );
 });
-
-export const TextureTransformEditor = observer(TextureTransformEditorRaw);

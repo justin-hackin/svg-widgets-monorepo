@@ -1,6 +1,7 @@
 import {
-  applyPatch, getPath, getRoot, joinJsonPath,
+  applyPatch, getParent, getPath, getType, isRoot, isValidReference, joinJsonPath,
 } from 'mobx-state-tree';
+import { IUndoManagerWithGroupState, UndoManagerWithGroupState } from '../components/UndoManagerWithGroupState';
 
 export const mstDataToProps = (node, property) => {
   const value = node[property];
@@ -20,5 +21,12 @@ export const mstDataToProps = (node, property) => {
   };
 };
 
-// @ts-ignore
-export const getHistory: IUndoManagerWithGroupState = (node) => getRoot(node).history;
+export function getHistory(node): IUndoManagerWithGroupState {
+  if (!isValidReference(() => node) || isRoot(node)) { return null; }
+  if (node.history && getType(node.history) === UndoManagerWithGroupState) {
+    return node.history;
+  }
+  const parent:any = getParent(node);
+  if (!parent) { return null; }
+  return getHistory(parent);
+}

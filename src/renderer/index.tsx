@@ -4,12 +4,10 @@ import { observer } from 'mobx-react';
 
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
-import { Slide } from '@material-ui/core';
 import { DielineViewer } from './DielineViewer';
 import './common/style/index.css';
 import { useWorkspaceMst, WorkspaceStoreProvider } from './DielineViewer/models/WorkspaceModel';
 import darkTheme from './DielineViewer/data/material-ui-dark-theme';
-import { ROUTES } from '../common/constants';
 
 // @ts-ignore
 export const theme = createMuiTheme(darkTheme);
@@ -24,15 +22,11 @@ const ProviderWrapper = ({ children }) => (
 
 const AllRoutes = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const { currentRoute, selectedAdditionalRoutes } = workspaceStore;
+  const { selectedAdditionalMainContent: AdditionalMainContent } = workspaceStore;
   return (
     <>
-      {Object.keys(selectedAdditionalRoutes).map((route) => (
-        <Slide key={route} direction="left" in={route === currentRoute}>
-          {React.createElement(selectedAdditionalRoutes[route])}
-        </Slide>
-      ))}
       <DielineViewer />
+      <AdditionalMainContent />
     </>
   );
 });

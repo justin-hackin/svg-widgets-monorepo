@@ -6,7 +6,6 @@ import {
   pointFromPolar, sumPoints,
 } from '../../../../common/util/geom';
 import { DestinationCommand, PathData } from '../../../util/PathData';
-import { UndoManagerWithGroupState } from '../../../../common/components/UndoManagerWithGroupState';
 import { closedPolygonPath } from '../../../util/shapes/generic';
 import { subtractDValues, unifyDValues } from '../../../../common/util/path-boolean';
 import { PIXELS_PER_CM, radToDeg } from '../../../../common/util/units';
@@ -210,7 +209,6 @@ const CylinderLightboxDataModel = types.model('Cylinder Lightbox', {
 export interface ICylinderLightboxDataModel extends Instance<typeof CylinderLightboxDataModel> {}
 
 export const CylinderLightBoxModel = types.model('CylinderLightBox', {
-  history: types.optional(UndoManagerWithGroupState, {}),
   shapeDefinition: types.optional(CylinderLightboxDataModel, {}),
 }).actions(() => ({
   getFileBasename() {

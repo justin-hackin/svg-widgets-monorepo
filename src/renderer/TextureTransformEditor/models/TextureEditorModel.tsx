@@ -1,12 +1,11 @@
 import { inRange } from 'lodash';
 import {
   getParentOfType,
-  getSnapshot, Instance, resolvePath, types, getEnv,
+  getSnapshot, Instance, resolvePath, types,
 } from 'mobx-state-tree';
 
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
-import { DimensionsModel } from '../../common/models/DimensionsModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset,
@@ -15,15 +14,14 @@ import {
   sumPoints,
   transformPoint,
 } from '../../common/util/geom';
-import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
+// import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
 import {
   IImageFaceDecorationPatternModel,
-  ImageFaceDecorationPatternModel,
 } from '../../common/models/ImageFaceDecorationPatternModel';
-import { PathFaceDecorationPatternModel } from '../../common/models/PathFaceDecorationPatternModel';
 import { ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 import { EVENTS } from '../../../common/constants';
+import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -51,19 +49,16 @@ const getFitScale = (bounds, image) => {
 };
 
 export const TextureEditorModel = types
-  .model('TextureTransformEditor', {
+  .model('Texture Editor', {
     texture: types.maybe(TextureModel),
     // since both controls and matrix function require degrees, use degrees as unit instead of radians
-    placementAreaDimensions: types.maybe(DimensionsModel),
     viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
-    history: types.optional(UndoManagerWithGroupState, {}),
+    shapePreview: types.optional(ShapePreviewModel, {}),
   })
   .volatile((self) => ({
-    // volatile properties can't access parents but
-    // if shapePreview and modiferTracking are in model, their actions will be tracked by undo middleware
-    // hence, use dependency injection instead of mst getParent*
-    shapePreview: ShapePreviewModel.create({}, { textureEditorModel: self }),
-    modifierTracking: ModifierTrackingModel.create({}, { textureEditorModel: self }),
+    modifierTracking: ModifierTrackingModel.create({}),
+    history: UndoManagerWithGroupState.create({}, { targetStore: self }),
+    placementAreaDimensions: null,
     // amount of scaling required to make the decoration area match the size of the face boundary
     borderToInsetRatio: null,
     // translation required to bring the decoration area first corner to the face boundary first corner
@@ -79,7 +74,7 @@ export const TextureEditorModel = types
   }))
   .views((self) => ({
     get parentPyramidNetPluginModel() {
-      return getEnv(self).pyramidNetPluginModel;
+      return getParentOfType(self, PyramidNetPluginModel);
     },
     get shapeName() {
       return this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName;
@@ -143,13 +138,11 @@ export const TextureEditorModel = types
     },
   })).actions((self) => ({
     setPlacementAreaDimensions(placementAreaDimensions) {
-      self.history.withoutUndo(() => {
-        self.placementAreaDimensions = placementAreaDimensions;
-      });
+      self.placementAreaDimensions = placementAreaDimensions;
     },
     setViewScaleDiff(mux) {
       if (inRange(mux * self.viewScale, self.MIN_VIEW_SCALE, self.MAX_VIEW_SCALE)) {
-        self.history.withoutUndo(() => { self.viewScaleDiff = mux; });
+        self.viewScaleDiff = mux;
       }
     },
     reconcileViewScaleDiff() {

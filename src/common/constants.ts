@@ -10,8 +10,3 @@ export enum EVENTS {
   GET_TEXTURE_FILE_PATH = 'get-texture-file-path',
   SELECT_TEXTURE = 'select-texture',
 }
-
-export enum ROUTES {
-  TEXTURE_EDITOR = '/texture-editor',
-  DIELINE_EDITOR = '/dieline-editor'
-}

@@ -35,6 +35,7 @@ import {
 } from '../../common/models/PathFaceDecorationPatternModel';
 import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from './TextureFaceDecorationModel';
 import { IRawFaceDecorationModel, RawFaceDecorationModel } from './RawFaceDecorationModel';
+import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
 
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 
@@ -98,9 +99,10 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   baseScoreDashSpec: types.maybe(DashPatternModel),
   interFaceScoreDashSpec: types.maybe(DashPatternModel),
 })
-  .volatile(() => ({
+  .volatile((self) => ({
     testTabHandleFlapDepth: 2,
     testTabHandleFlapRounding: 0.5,
+    history: UndoManagerWithGroupState.create({}, { targetStore: self }),
   }))
   .views((self) => ({
     get tabIntervalRatios() {

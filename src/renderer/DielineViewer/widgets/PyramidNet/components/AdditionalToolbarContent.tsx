@@ -1,20 +1,25 @@
 import { Button, Tooltip } from '@material-ui/core';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import React from 'react';
-import { ROUTES } from '../../../../../common/constants';
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
+import { HistoryButtons } from '../PyramidNetControlPanel/components/HistoryButtons';
 
 export const AdditionalToolbarContent = () => {
   const workspaceStore = useWorkspaceMst();
+  const { pyramidNetSpec: { history }, setTextureEditorOpen } = workspaceStore.selectedStore;
   return (
-    <Tooltip title="Open/reveal texture editor" arrow>
-      <Button
-        color="inherit"
-        startIcon={<OpenInNewIcon />}
-        onClick={() => { workspaceStore.setCurrentRoute(ROUTES.TEXTURE_EDITOR); }}
-      >
-        Texture
-      </Button>
-    </Tooltip>
+    <>
+      <HistoryButtons history={history} />
+
+      <Tooltip title="Open texture editor" arrow>
+        <Button
+          color="inherit"
+          startIcon={<OpenInNewIcon />}
+          onClick={() => { setTextureEditorOpen(true); }}
+        >
+          Texture
+        </Button>
+      </Tooltip>
+    </>
   );
 };

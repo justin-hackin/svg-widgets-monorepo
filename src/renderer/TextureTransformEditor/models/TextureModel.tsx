@@ -1,8 +1,7 @@
-import { Instance, getParentOfType, getType } from 'mobx-state-tree';
+import { Instance, getType, getParentOfType } from 'mobx-state-tree';
 
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import { PathData } from '../../DielineViewer/util/PathData';
-import { TextureEditorModel } from './TextureEditorModel';
 import {
   calculateTransformOriginChangeOffset, getOriginPoint,
   getTextureTransformMatrix,
@@ -15,6 +14,7 @@ import {
   PathFaceDecorationPatternModel,
 } from '../../common/models/PathFaceDecorationPatternModel';
 import { TextureFaceDecorationModel } from '../../DielineViewer/models/TextureFaceDecorationModel';
+import { TextureEditorModel } from './TextureEditorModel';
 
 const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);

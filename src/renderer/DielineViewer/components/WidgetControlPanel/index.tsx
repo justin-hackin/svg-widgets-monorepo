@@ -21,7 +21,6 @@ import {
 import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 
 import { useStyles } from '../../style';
-import { HistoryButtons } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { SimpleDialog } from '../../../common/components/SimpleDialog';
@@ -51,7 +50,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
 
   const newHandler = () => {
     workspaceStore.resetModelToDefault();
-    pyramidNetPluginStore.history.clear();
+    // pyramidNetPluginStore.pyramidNetSpec.history.clear();
     workspaceStore.clearCurrentFileData();
     resetFileMenuRef();
   };
@@ -125,7 +124,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
           paper: classes.drawerPaper,
         }}
       >
-        <AppBar position="sticky">
+        <AppBar position="relative">
           <Toolbar className={classes.toolbar} variant="dense">
             <Tooltip title="File ..." arrow>
               <Button
@@ -143,9 +142,6 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
                thus span wrapping required by tooltip for disabled buttons
             */}
             {AdditionalToolbarContent && <AdditionalToolbarContent />}
-            <HistoryButtons
-              history={pyramidNetPluginStore.history}
-            />
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={newHandler}>
                 <ListItemIcon className={classes.listItemIcon}>

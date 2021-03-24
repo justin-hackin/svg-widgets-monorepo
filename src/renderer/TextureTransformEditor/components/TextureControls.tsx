@@ -26,7 +26,7 @@ import { ShapeSelect } from '../../common/components/ShapeSelect';
 import { useWorkspaceMst } from '../../DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../DielineViewer/style';
-import { EVENTS, ROUTES } from '../../../common/constants';
+import { EVENTS } from '../../../common/constants';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -53,12 +53,15 @@ export const TextureControls = observer(() => {
     texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement, decorationBoundary,
     selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
-    history, shapePreview: { downloadShapeGLTF },
+    shapePreview: { downloadShapeGLTF },
     setTexturePath, setTextureImage,
     shapeName,
     modifierTracking: { dragMode = undefined } = {},
+    history,
   } = pluginModel.textureEditor;
-  const { pattern, rotate: textureRotate, hasPathPattern } = texture || {};
+  const {
+    pattern, rotate: textureRotate, hasPathPattern,
+  } = texture || {};
   const numFaceSides = decorationBoundary.vertices.length;
 
   // when truthy, snap menu is open
@@ -103,9 +106,9 @@ export const TextureControls = observer(() => {
       >
         <IconButton
           onClick={() => {
-            workspaceStore.setCurrentRoute(ROUTES.DIELINE_EDITOR);
+            pluginModel.setTextureEditorOpen(false);
           }}
-          aria-label="send texture"
+          aria-label="close texture editor"
           component="span"
         >
           <ArrowBackIcon fontSize="large" />
@@ -129,7 +132,7 @@ export const TextureControls = observer(() => {
         >
           <PublishIcon fontSize="large" />
         </IconButton>
-        <HistoryButtons history={history} />
+        {history && (<HistoryButtons history={history} />)}
         {pattern && !hasPathPattern && (
           <FormControlLabel
             className={classes.checkboxControlLabel}
@@ -343,7 +346,7 @@ export const TextureControls = observer(() => {
                 <IconButton
                   onClick={() => {
                     sendTextureToDielineEditor();
-                    workspaceStore.setCurrentRoute(ROUTES.DIELINE_EDITOR);
+                    pluginModel.setTextureEditorOpen(false);
                   }}
                   aria-label="send texture"
                   component="span"
