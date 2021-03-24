@@ -38,7 +38,7 @@ const keyTrackingModelFactory = (keysToTrack, target = window) => {
       };
 
       return {
-        afterAttach() {
+        afterCreate() {
           self.target.addEventListener('keyup', keyupHandler);
           self.target.addEventListener('keydown', keydownHandler);
         },
@@ -85,7 +85,7 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
       return defaultMode;
     },
   })).actions((self) => ({
-    afterAttach() {
+    afterCreate() {
       globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, () => {
         self.releaseHeldKeys();
       });
