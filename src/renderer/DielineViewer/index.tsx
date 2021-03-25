@@ -49,7 +49,7 @@ export const DielineViewer = observer(() => {
           onClick={() => {
             setWidgetPickerOpen(true);
           }}
-          className={classes.widgetButton}
+          className={classes.widgetFab}
         >
           <BuildIcon />
         </Fab>

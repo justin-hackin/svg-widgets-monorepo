@@ -1,13 +1,13 @@
 import React from 'react';
 import {
   TextField, InputAdornment,
-  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar, Tooltip,
+  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar, Tooltip, Divider,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 import CachedIcon from '@material-ui/icons/Cached';
 import TelegramIcon from '@material-ui/icons/Telegram';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
@@ -111,8 +111,10 @@ export const TextureControls = observer(() => {
           aria-label="close texture editor"
           component="span"
         >
-          <ArrowBackIcon fontSize="large" />
+          <ArrowForwardIcon fontSize="large" />
         </IconButton>
+        <Divider />
+        {/* ************************************************************* */}
         <IconButton
           onClick={async () => {
             const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.SELECT_TEXTURE);

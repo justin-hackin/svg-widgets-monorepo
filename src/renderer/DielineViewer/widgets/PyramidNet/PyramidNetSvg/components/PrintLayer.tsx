@@ -1,15 +1,16 @@
 import { observer } from 'mobx-react';
 import { getType } from 'mobx-state-tree';
 import React from 'react';
+
 import { IPreferencesModel } from '../../../../models/PreferencesModel';
 import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { theme } from '../../../../../TextureTransformEditor';
 import { closedPolygonPath } from '../../../../util/shapes/generic';
 import {
   IImageFaceDecorationPatternModel,
   ImageFaceDecorationPatternModel,
 } from '../../../../../common/models/ImageFaceDecorationPatternModel';
 import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from '../../../../models/TextureFaceDecorationModel';
+import { theme } from '../../../../../index';
 
 const PrintGroup = ({ children }) => (
   <g {...{

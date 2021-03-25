@@ -31,7 +31,6 @@ const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
 
 export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, AdditionalToolbarContent, PanelContent }) => {
-  // @ts-ignore
   const classes = useStyles();
   useTheme();
   const workspaceStore = useWorkspaceMst();
@@ -50,7 +49,6 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
 
   const newHandler = () => {
     workspaceStore.resetModelToDefault();
-    // pyramidNetPluginStore.pyramidNetSpec.history.clear();
     workspaceStore.clearCurrentFileData();
     resetFileMenuRef();
   };
@@ -111,7 +109,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
         color="inherit"
         aria-label="open drawer"
         onClick={handleDrawerOpen}
-        className={clsx(classes.menuButton, drawerIsOpen && classes.hide)}
+        className={clsx(classes.dielinePanelFab, drawerIsOpen && classes.hide)}
       >
         <MenuIcon />
       </Fab>
@@ -128,7 +126,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
           <Toolbar className={classes.toolbar} variant="dense">
             <Tooltip title="File ..." arrow>
               <Button
-                color="inherit"
+                className={classes.dielinePanelButton}
                 startIcon={<FolderIcon />}
                 onClick={(e) => {
                   setFileMenuRef(e.currentTarget);
@@ -173,7 +171,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
               {AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
             </Menu>
             <IconButton
-              color="inherit"
+              className={classes.dielinePanelButton}
               onClick={handleSettingsDialogOpen}
             >
               <SettingsIcon />
@@ -182,8 +180,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
               <PreferencesControls />
             </SimpleDialog>
             <IconButton
-              color="inherit"
-              className={classes.closeDielineControlsIcon}
+              className={clsx(classes.closeDielineControlsIcon, classes.dielinePanelButton)}
               onClick={handleDrawerClose}
             >
               <CloseSharpIcon />

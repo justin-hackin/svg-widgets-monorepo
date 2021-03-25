@@ -1,4 +1,9 @@
-export default {
+import { ThemeOptions } from '@material-ui/core';
+// TODO: rename file
+
+// This theme was extracted from the Material UI website dark theme via dev tools
+// commented lines violate typescript types, did type defs schema change?
+export const darkThemeOptions: ThemeOptions = {
   mixins: {
     toolbar: {
       minHeight: 56,
@@ -57,14 +62,14 @@ export default {
       secondary: 'rgba(255, 255, 255, 0.7)',
       disabled: 'rgba(255, 255, 255, 0.5)',
       hint: 'rgba(255, 255, 255, 0.5)',
-      icon: 'rgba(255, 255, 255, 0.5)',
+      // icon: 'rgba(255, 255, 255, 0.5)',
     },
     divider: 'rgba(255, 255, 255, 0.12)',
     background: {
       paper: '#424242',
       default: '#121212',
-      level2: '#333',
-      level1: '#212121',
+      // level2: '#333',
+      // level1: '#212121',
     },
     action: {
       active: '#fff',
@@ -233,7 +238,7 @@ export default {
     snackbar: 1400,
     tooltip: 1500,
   },
-  nprogress: {
-    color: '#fff',
-  },
+  // nprogress: {
+  //   color: '#fff',
+  // },
 };

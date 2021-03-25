@@ -36,10 +36,16 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     overflow: 'auto',
     padding: theme.spacing(1),
   },
-  menuButton: {
+  dielinePanelFab: {
     top: theme.spacing(1),
     right: theme.spacing(1),
     position: 'absolute',
+  },
+  dielinePanelButton: {
+    color: 'inherit',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    },
   },
   listItemIcon: {
     minWidth: theme.spacing(4),
@@ -60,7 +66,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
   sliderTextInputToggle: {
     flex: '0 0 0',
   },
-  widgetButton: {
+  widgetFab: {
     bottom: theme.spacing(1),
     left: theme.spacing(1),
     position: 'absolute',

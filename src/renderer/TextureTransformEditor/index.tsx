@@ -1,12 +1,9 @@
 /* eslint-disable no-param-reassign */
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
-
-import { createMuiTheme } from '@material-ui/core/styles';
+import { useTheme } from '@material-ui/styles';
 import { Drawer } from '@material-ui/core';
 
-// @ts-ignore
-import darkTheme from '../DielineViewer/data/material-ui-dark-theme';
 import { ShapePreview } from './components/ShapePreview';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
@@ -15,9 +12,6 @@ import { IPyramidNetPluginModel } from '../DielineViewer/models/PyramidNetMakerS
 import { useStyles } from '../DielineViewer/style';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
-// TODO: make router wrap with styles
-// @ts-ignore
-export const theme = createMuiTheme(darkTheme);
 
 export const TextureTransformEditor = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -28,7 +22,7 @@ export const TextureTransformEditor = observer(() => {
   const {
     setPlacementAreaDimensions,
   } = pyramidNetPluginStore.textureEditor;
-
+  useTheme();
   const classes = useStyles();
   // Init
   useEffect(() => {
@@ -56,10 +50,11 @@ export const TextureTransformEditor = observer(() => {
   return (
     <Drawer
       className={classes.textureEditorRoot}
-      anchor="left"
+      anchor="right"
       variant="persistent"
       open={pyramidNetPluginStore.textureEditorOpen}
       classes={{ paper: classes.textureEditorPaper }}
+      transitionDuration={500}
     >
       <TextureControls />
       <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
