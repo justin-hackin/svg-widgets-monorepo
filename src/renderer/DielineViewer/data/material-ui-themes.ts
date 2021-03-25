@@ -1,5 +1,4 @@
 import { ThemeOptions } from '@material-ui/core';
-// TODO: rename file
 
 // This theme was extracted from the Material UI website dark theme via dev tools
 // commented lines violate typescript types, did type defs schema change?

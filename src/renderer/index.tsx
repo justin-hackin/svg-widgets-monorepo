@@ -7,7 +7,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import { DielineViewer } from './DielineViewer';
 import './common/style/index.css';
 import { useWorkspaceMst, WorkspaceStoreProvider } from './DielineViewer/models/WorkspaceModel';
-import { darkThemeOptions } from './DielineViewer/data/material-ui-dark-theme';
+import { darkThemeOptions } from './DielineViewer/data/material-ui-themes';
 
 export const theme = createMuiTheme(darkThemeOptions);
 

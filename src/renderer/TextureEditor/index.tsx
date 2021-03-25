@@ -13,7 +13,7 @@ import { useStyles } from '../DielineViewer/style';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 
-export const TextureTransformEditor = observer(() => {
+export const TextureEditor = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const mainAreaRef = useRef();
   const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;

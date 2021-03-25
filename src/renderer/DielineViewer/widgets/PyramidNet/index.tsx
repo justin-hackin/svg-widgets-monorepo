@@ -3,7 +3,7 @@ import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { AdditionalToolbarContent } from './components/AdditionalToolbarContent';
 import { AdditionalFileMenuItems } from './components/AdditionalFileMenuItems';
 import { PanelContent } from './components/PanelContent';
-import { TextureTransformEditor } from '../../../TextureTransformEditor';
+import { TextureEditor } from '../../../TextureEditor';
 
 export const PyramidNetOptionsInfo = {
   RawSvgComponent: PyramidNet,
@@ -13,5 +13,5 @@ export const PyramidNetOptionsInfo = {
     PanelContent,
   },
   WidgetModel: PyramidNetPluginModel,
-  additionalMainContent: TextureTransformEditor,
+  additionalMainContent: TextureEditor,
 };

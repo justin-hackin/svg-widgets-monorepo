@@ -31,7 +31,6 @@ export const TextureSvgUnobserved = ({
   const isOnScreen = !store;
   const materialColor = isOnScreen ? MUTED_WHITE : WHITE;
 
-  // TODO: consider if passing props from parent is more apt than useMst
   if (!decorationBoundaryPathD) { return null; }
   const {
     scale: textureScale, transformOriginDragged, transformMatrixDraggedStr, hasPathPattern, pattern,
