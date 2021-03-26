@@ -25,7 +25,7 @@ export const AscendantEdgeTabsControls = observer(() => {
         property="tabDepthToTraversalLength"
         min={0.03}
         max={0.05}
-        step={DEFAULT_SLIDER_STEP}
+        step={0.0001}
       />
       <PanelSliderOrTextInput
         node={ascendantEdgeTabsSpec}

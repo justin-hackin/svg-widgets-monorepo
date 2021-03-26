@@ -4,10 +4,9 @@ import { Instance, types } from 'mobx-state-tree';
 
 import { PathData } from '../PathData';
 import {
-  distanceFromOrigin, hingedPlot,
+  hingedPlot,
   lineLerp,
   RawPoint,
-  subtractPoints,
   symmetricHingePlotByProjectionDistance,
 } from '../../../common/util/geom';
 import { IDashPatternModel, strokeDashPathRatios } from './strokeDashPath';
@@ -33,12 +32,12 @@ export interface IAscendantEdgeTabsModel extends Instance<typeof AscendantEdgeTa
 
 export const ascendantEdgeConnectionTabs = (
   start: RawPoint, end: RawPoint,
-  tabSpec: IAscendantEdgeTabsModel, scoreDashSpec: IDashPatternModel, tabIntervalRatios, tabGapIntervalRatios,
+  tabSpec: IAscendantEdgeTabsModel, scoreDashSpec: IDashPatternModel,
+  tabIntervalRatios, tabGapIntervalRatios, tabDepth: number,
 ): AscendantEdgeConnectionPaths => {
   const {
     holeFlapTaperAngle,
     holeReachToTabDepth,
-    tabDepthToTraversalLength,
     tabsCount,
     tabControlPointsProtrusion,
     tabControlPointsAngle,
@@ -60,9 +59,7 @@ export const ascendantEdgeConnectionTabs = (
       score: (new PathData()),
     },
   };
-  const vector = subtractPoints(end, start);
-  const vectorLength = distanceFromOrigin(vector);
-  const tabDepth = tabDepthToTraversalLength * vectorLength;
+
   range(0, tabsCount).forEach((tabNum) => {
     const [tabBaseStart, tabBaseEnd] = getTabBaseInterval(tabNum);
     const [holeEdgeStart, holeEdgeEnd] = symmetricHingePlotByProjectionDistance(

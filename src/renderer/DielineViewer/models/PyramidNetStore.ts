@@ -174,7 +174,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
 
     get ascendantEdgeTabDepth() {
       const { ascendantEdgeTabsSpec: { tabDepthToTraversalLength } } = self;
-      return this.actualFaceEdgeLengths[0] * tabDepthToTraversalLength;
+      return this.traversalLength * tabDepthToTraversalLength * 0.6;
     },
 
     get borderToInsetRatio() {
@@ -232,6 +232,10 @@ export const PyramidNetModel = types.model('Pyramid Net', {
         self.testTabHandleFlapDepth * this.baseTabDepth, self.testTabHandleFlapRounding);
       return { cut, score };
     },
+    // length of first 2 face edges
+    get traversalLength() {
+      return this.actualFaceEdgeLengths[0] + this.actualFaceEdgeLengths[1];
+    },
 
     get testAscendantTab(): AscendantEdgeConnectionPaths {
       const startPt = this.faceBoundaryPoints[0];
@@ -239,7 +243,9 @@ export const PyramidNetModel = types.model('Pyramid Net', {
 
       const { male, female } = ascendantEdgeConnectionTabs(
         startPt, endPt,
-        self.ascendantEdgeTabsSpec, self.interFaceScoreDashSpec, this.tabIntervalRatios, this.tabGapIntervalRatios,
+        self.ascendantEdgeTabsSpec, self.interFaceScoreDashSpec,
+        this.tabIntervalRatios, this.tabGapIntervalRatios,
+        this.ascendantEdgeTabDepth,
       );
       female.cut
         .concatPath(this.testTabFemaleAscendantFlap);
@@ -294,6 +300,7 @@ export const PyramidNetModel = types.model('Pyramid Net', {
       const ascendantTabs = ascendantEdgeConnectionTabs(
         this.faceBoundaryPoints[1], this.faceBoundaryPoints[0],
         self.ascendantEdgeTabsSpec, self.interFaceScoreDashSpec, this.tabIntervalRatios, this.tabGapIntervalRatios,
+        this.ascendantEdgeTabDepth,
       );
       const rotationMatrix = `rotate(${radToDeg(-self.pyramid.facesPerNet * this.faceInteriorAngles[2])})`;
       ascendantTabs.male.cut.transform(rotationMatrix);
