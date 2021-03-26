@@ -35,15 +35,15 @@ const BendGuideValleyModel = types.model('BendGuideValley', {
 });
 
 export const BaseEdgeTabsModel = types.model('BaseEdgeTabs', {
-  finDepthToTabDepth: types.optional(types.number, 1.1),
-  finOffsetRatio: types.optional(types.number, 0.75),
-  holeBreadthToHalfWidth: types.optional(types.number, 0.25),
+  finDepthToTabDepth: types.optional(types.number, 1.3),
+  finOffsetRatio: types.optional(types.number, 0.75), // set by applyShapeBasedDefaults
+  holeBreadthToHalfWidth: types.optional(types.number, 0.25), // set by applyShapeBasedDefaults
   holeDepthToTabDepth: types.optional(types.number, 0.5),
-  holeTaper: types.optional(types.number, 0.7),
+  holeTaper: types.optional(types.number, 0.97),
   scoreTabMidline: types.optional(types.boolean, false),
-  roundingDistanceRatio: types.optional(types.number, 0.1),
+  roundingDistanceRatio: types.optional(types.number, 0.9),
   tabDepthToAscendantTabDepth: types.optional(types.number, 1.5),
-  holeTabClearance: types.optional(types.number, 0.05),
+  holeTabClearance: types.optional(types.number, 0.1),
   bendGuideValley: types.maybe(BendGuideValleyModel),
   tabConjunctionClearance: types.optional(types.number, 0.1),
 }).actions((self) => ({

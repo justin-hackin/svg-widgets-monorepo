@@ -16,14 +16,14 @@ import { connectedLineSegments } from './generic';
 
 export const AscendantEdgeTabsModel = types.model('AscendantEdgeTabs', {
   flapRoundingDistanceRatio: types.optional(types.number, 1),
-  holeFlapTaperAngle: types.optional(types.number, 0.5),
+  holeFlapTaperAngle: types.optional(types.number, 0.31),
   holeReachToTabDepth: types.optional(types.number, 0.1),
-  holeWidthRatio: types.optional(types.number, 0.4),
+  holeWidthRatio: types.optional(types.number, 0.5),
   midpointDepthToTabDepth: types.optional(types.number, 0.5),
-  tabDepthToTraversalLength: types.optional(types.number, 0.05),
+  tabDepthToTraversalLength: types.optional(types.number, 0.0375),
   tabStartGapToTabDepth: types.optional(types.number, 1),
-  tabControlPointsProtrusion: types.optional(types.number, 0.6),
-  tabControlPointsAngle: types.optional(types.number, 0.5),
+  tabControlPointsProtrusion: types.optional(types.number, 0.93),
+  tabControlPointsAngle: types.optional(types.number, 0.8),
   tabEdgeEndpointsIndentation: types.optional(types.number, 1),
   tabsCount: types.optional(types.integer, 3),
 });
