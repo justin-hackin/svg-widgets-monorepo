@@ -57,7 +57,7 @@ export const BaseEdgeTabControls = observer(() => {
       <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}
         property="holeBreadthToHalfWidth"
-        {...{ ...ratioSliderProps, min: 0.05 }}
+        {...{ ...ratioSliderProps, min: 0.05, max: 0.95 }}
       />
       <PanelSliderOrTextInput
         node={baseEdgeTabsSpec}

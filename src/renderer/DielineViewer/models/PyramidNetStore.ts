@@ -399,11 +399,29 @@ export const PyramidNetModel = types.model('Pyramid Net', {
   //  =========================================================
   }))
   .actions((self) => ({
+    afterCreate() {
+      this.applyShapeBasedDefaults();
+    },
     setPyramidShapeName(name: string) {
       self.faceDecoration = undefined;
       self.pyramid.shapeName = name;
       // all geometries have 1 as option, but different shapes have different divisors > 1
       self.pyramid.netsPerPyramid = 1;
+      this.applyShapeBasedDefaults();
+    },
+    applyShapeBasedDefaults() {
+      // the taller the face triangle, the larger the holeBreadthToHalfWidth value
+      const rangeTraversalRatio = (min, max, value) => (value - min) / (max - min);
+      const interpolateBetween = (min, max, ratio) => (min + ratio * (max - min));
+      const MAX_INVERSE_ASPECT = 2;
+      const MIN_INVERSE_ASPECT = 0.5;
+      const MIN_BREADTH = 0.3;
+      const MAX_BREADTH = 0.6;
+      const actualInverseAspect = self.faceBoundaryPoints[1].y / self.actualFaceEdgeLengths[1];
+      const clampedInverseAspect = Math.min(Math.max(actualInverseAspect, MIN_INVERSE_ASPECT), MAX_INVERSE_ASPECT);
+      const inverseAspectRatio = rangeTraversalRatio(MIN_INVERSE_ASPECT, MAX_INVERSE_ASPECT, clampedInverseAspect);
+      self.baseEdgeTabsSpec.holeBreadthToHalfWidth = interpolateBetween(MIN_BREADTH, MAX_BREADTH, inverseAspectRatio);
+      self.baseEdgeTabsSpec.finOffsetRatio = interpolateBetween(0, 0.8, 1 - inverseAspectRatio);
     },
 
     setRawFaceDecoration(d) {
