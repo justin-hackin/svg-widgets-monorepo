@@ -252,23 +252,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       }, { fireImmediately: true }));
 
       // texture change
-      self.disposers.push(reaction(() => {
-        const {
-          texture: {
-            scale = undefined, rotate = undefined, translate = undefined,
-            faceBoundary: { pathD: boundaryPathD = undefined } = {},
-            pattern: {
-              isPositive = undefined,
-              pathD: patternPathD = undefined,
-              imageData = undefined,
-              isBordered = undefined,
-            } = {},
-          } = {},
-        } = self.parentTextureEditor;
-        return [
-          self.shapeMesh, scale, rotate, translate, boundaryPathD, isPositive, patternPathD, imageData, isBordered,
-        ];
-      }, () => {
+      self.disposers.push(reaction(() => [self.parentTextureEditor.texture.transformMatrixDraggedStr], () => {
         const {
           shapeMesh,
           parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
