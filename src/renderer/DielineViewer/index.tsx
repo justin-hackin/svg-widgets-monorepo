@@ -53,6 +53,7 @@ export const DielineViewer = observer(() => {
         >
           <BuildIcon />
         </Fab>
+        {/* @ts-ignore */}
         <WidgetControlPanel {...selectedControlPanelProps} />
       </div>
       <Dialog

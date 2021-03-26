@@ -14,7 +14,6 @@ import {
   sumPoints,
   transformPoint,
 } from '../../common/util/geom';
-// import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
 import {
   IImageFaceDecorationPatternModel,
 } from '../../common/models/ImageFaceDecorationPatternModel';
@@ -47,6 +46,9 @@ const getFitScale = (bounds, image) => {
     scale: widthIsClamp ? bounds.width / image.width : bounds.height / image.height,
   };
 };
+
+const specFileExtension = 'pnst';
+const specFileExtensionName = 'Texture for Pyramid Net Spec';
 
 export const TextureEditorModel = types
   .model('Texture Editor', {
@@ -279,8 +281,8 @@ export const TextureEditorModel = types
       };
       globalThis.ipcRenderer.invoke(EVENTS.SAVE_JSON, fileData, {
         message: 'Save texture arrangement',
-        defaultPath: `${self.shapeName}__${self.texture.pattern.sourceFileName}--TEXTURE.json`,
-      });
+        defaultPath: `${self.shapeName}__${self.texture.pattern.sourceFileName}.${specFileExtension}`,
+      }, specFileExtension, specFileExtensionName);
     },
     setTextureFromSnapshot(textureSnapshot) {
       self.texture = TextureModel.create(textureSnapshot);
@@ -288,7 +290,7 @@ export const TextureEditorModel = types
     openTextureArrangement() {
       globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
         message: 'Import texture arrangement',
-      }).then((res) => {
+      }, specFileExtension, specFileExtensionName).then((res) => {
         // TODO: snackbar error alerts
         if (!res) { return; }
 

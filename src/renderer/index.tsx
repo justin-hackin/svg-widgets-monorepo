@@ -21,11 +21,11 @@ const ProviderWrapper = ({ children }) => (
 
 const AllRoutes = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const { selectedAdditionalMainContent: AdditionalMainContent } = workspaceStore;
+  const { SelectedAdditionalMainContent } = workspaceStore;
   return (
     <>
       <DielineViewer />
-      <AdditionalMainContent />
+      <SelectedAdditionalMainContent />
     </>
   );
 });

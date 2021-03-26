@@ -8,4 +8,5 @@ export const CylinderLightboxWidgetOptionsInfo = {
   controlPanelProps: {
     PanelContent: CylinderLightboxPanelContent,
   },
+  specFileExtension: 'cyl',
 };

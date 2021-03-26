@@ -4,8 +4,9 @@ import { AdditionalToolbarContent } from './components/AdditionalToolbarContent'
 import { AdditionalFileMenuItems } from './components/AdditionalFileMenuItems';
 import { PanelContent } from './components/PanelContent';
 import { TextureEditor } from '../../../TextureEditor';
+import { WidgetOptions } from '../../models/WorkspaceModel';
 
-export const PyramidNetOptionsInfo = {
+export const PyramidNetOptionsInfo: WidgetOptions = {
   RawSvgComponent: PyramidNet,
   controlPanelProps: {
     AdditionalToolbarContent,
@@ -13,5 +14,7 @@ export const PyramidNetOptionsInfo = {
     PanelContent,
   },
   WidgetModel: PyramidNetPluginModel,
-  additionalMainContent: TextureEditor,
+  AdditionalMainContent: TextureEditor,
+  specFileExtension: 'pns',
+  specFileExtensionName: 'Pyramid net spec',
 };

@@ -34,6 +34,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   const classes = useStyles();
   useTheme();
   const workspaceStore = useWorkspaceMst();
+  const { selectedWidgetOptions: { specFileExtension, specFileExtensionName } } = workspaceStore;
   const pyramidNetPluginStore = workspaceStore.selectedStore as IPyramidNetPluginModel;
 
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
@@ -56,7 +57,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   const openSpecHandler = async () => {
     const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
       message: OPEN_TXT,
-    });
+    }, specFileExtension, specFileExtensionName);
     if (res) {
       const { fileData, filePath } = res;
       if (workspaceStore.selectedStore.onFileOpen) {
@@ -75,7 +76,11 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
       EVENTS.DIALOG_SAVE_MODEL_WITH_SVG,
       workspaceStore.renderWidgetToString(),
       snapshot,
-      { message: 'Save widget svg with json data', defaultPath: `${pyramidNetPluginStore.getFileBasename()}` },
+      {
+        message: 'Save widget svg with json data',
+        defaultPath: `${pyramidNetPluginStore.getFileBasename()}.${specFileExtension}`,
+      },
+      specFileExtension, specFileExtensionName,
     );
     if (filePath) {
       workspaceStore.setCurrentFileData(filePath, snapshot);
@@ -95,6 +100,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
       snapshot,
       workspaceStore.currentFilePath,
       { message: SAVE_TXT },
+      specFileExtension, specFileExtensionName,
     );
 
     if (filePath) {

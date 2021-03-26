@@ -7,6 +7,5 @@ export enum EVENTS {
   DIALOG_LOAD_JSON = 'dialog-load-json',
   OPEN_SVG = 'open-svg',
   RESET_DRAG_MODE = 'reset-drag-mode',
-  GET_TEXTURE_FILE_PATH = 'get-texture-file-path',
   SELECT_TEXTURE = 'select-texture',
 }

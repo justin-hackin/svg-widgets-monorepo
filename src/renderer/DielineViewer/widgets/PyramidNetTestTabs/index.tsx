@@ -3,8 +3,9 @@ import { AdditionalToolbarContent } from '../PyramidNet/components/AdditionalToo
 import { AdditionalFileMenuItems } from '../PyramidNet/components/AdditionalFileMenuItems';
 import { PanelContent } from '../PyramidNet/components/PanelContent';
 import { PyramidNetTestTabs } from './PyramidNetTestTabsSvg';
+import { WidgetOptions } from '../../models/WorkspaceModel';
 
-export const PyramidNetTestTabsOptionsInfo = {
+export const PyramidNetTestTabsOptionsInfo: WidgetOptions = {
   RawSvgComponent: PyramidNetTestTabs,
   controlPanelProps: {
     AdditionalToolbarContent,
@@ -12,4 +13,5 @@ export const PyramidNetTestTabsOptionsInfo = {
     PanelContent,
   },
   WidgetModel: PyramidNetPluginModel,
+  specFileExtension: 'pns',
 };

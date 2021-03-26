@@ -2,7 +2,9 @@ import {
   applySnapshot, getSnapshot, getType, Instance, types,
 } from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
-import React, { createContext, useContext } from 'react';
+import React, {
+  createContext, FC, MutableRefObject, useContext,
+} from 'react';
 import persist from 'mst-persist';
 import { connectReduxDevtools } from 'mst-middlewares';
 import makeInspectable from 'mobx-devtools-mst';
@@ -11,12 +13,14 @@ import remotedev from 'remotedev';
 import parseFilepath from 'parse-filepath';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
+import { IAnyModelType } from 'mobx-state-tree/dist/types/complex-types/model';
 
 import { SVGWrapper } from '../data/SVGWrapper';
-import { PreferencesModel, defaultPreferences } from './PreferencesModel';
+import { PreferencesModel, defaultPreferences, IPreferencesModel } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../widgets/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../widgets/CylinderLightbox';
 import { PyramidNetTestTabsOptionsInfo } from '../widgets/PyramidNetTestTabs';
+import { IPyramidNetPluginModel } from './PyramidNetMakerStore';
 
 const getPreferencesStore = () => {
   const preferencesStore = PreferencesModel.create(defaultPreferences);
@@ -24,35 +28,65 @@ const getPreferencesStore = () => {
   return preferencesStore;
 };
 
+export interface RawSvgComponentProps {
+  preferencesStore?: IPreferencesModel, widgetStore: IPyramidNetPluginModel,
+}
+
+export interface AdditionalFileMenuItemsProps {
+  resetFileMenuRef: MutableRefObject<undefined>,
+}
+
+export interface WidgetOptions {
+  RawSvgComponent: FC<RawSvgComponentProps>,
+  controlPanelProps: {
+    AdditionalToolbarContent?: FC,
+    AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>,
+    PanelContent: FC,
+  },
+  WidgetModel: IAnyModelType,
+  AdditionalMainContent?: FC,
+  specFileExtension: string,
+  specFileExtensionName?: string,
+}
+
+interface WidgetOptionsCollection {
+  [propName: string]: WidgetOptions,
+}
+
+const widgetOptions: WidgetOptionsCollection = {
+  'polyhedral-net': PyramidNetOptionsInfo,
+  'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
+  'polyhedral-net-test-tabs': PyramidNetTestTabsOptionsInfo,
+};
+
 export const WorkspaceModel = types.model('Workspace', {
-  widgetOptions: types.frozen({
-    'polyhedral-net': PyramidNetOptionsInfo,
-    'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
-    'polyhedral-net-test-tabs': PyramidNetTestTabsOptionsInfo,
-  }),
   selectedWidgetName: 'polyhedral-net',
 })
   .volatile(() => ({
+    widgetOptions,
     preferences: getPreferencesStore(),
     savedSnapshot: undefined,
     currentFilePath: undefined,
     disposers: [],
   }))
   .views((self) => ({
-    get selectedWidgetInfo() {
+    get selectedWidgetOptions() {
       return self.widgetOptions[self.selectedWidgetName];
     },
     get SelectedRawSvgComponent() {
-      return this.selectedWidgetInfo.RawSvgComponent;
+      return this.selectedWidgetOptions.RawSvgComponent;
     },
     get selectedStore() {
-      return this.selectedWidgetInfo.WidgetModel.create({});
+      return this.selectedWidgetOptions.WidgetModel.create({});
     },
     get selectedControlPanelProps() {
-      return this.selectedWidgetInfo.controlPanelProps;
+      return this.selectedWidgetOptions.controlPanelProps;
     },
-    get selectedAdditionalMainContent() {
-      return this.selectedWidgetInfo.additionalMainContent;
+    get SelectedAdditionalMainContent() {
+      return this.selectedWidgetOptions.AdditionalMainContent;
+    },
+    get selectedSpecFileExtension() {
+      return this.selectedWidgetOptions.specFileExtension;
     },
     get selectedStoreIsSaved() {
       // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,
@@ -62,9 +96,6 @@ export const WorkspaceModel = types.model('Workspace', {
       const currentSnapshot = getSnapshot(this.selectedStore.shapeDefinition);
       // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
       return JSON.stringify(self.savedSnapshot) === JSON.stringify(currentSnapshot);
-    },
-    get SelectedControlPanelComponent() {
-      return this.selectedWidgetInfo.ControlPanelComponent;
     },
     get SelectedControlledSvgComponent() {
       const ObservedSvgComponent = observer(this.SelectedRawSvgComponent);

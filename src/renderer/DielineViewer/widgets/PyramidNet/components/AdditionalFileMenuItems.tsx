@@ -19,6 +19,7 @@ const DOWNLOAD_TAB_TESTER_TXT = 'Download tab tester SVG';
 
 export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const workspaceStore = useWorkspaceMst();
+  const { selectedWidgetOptions: { specFileExtension, specFileExtensionName = undefined } } = workspaceStore;
   const preferencesStore = workspaceStore.preferences;
   const classes = useStyles();
   const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
@@ -60,7 +61,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       <MenuItem onClick={async () => {
         const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
           message: IMPORT_TEXTURE_TXT,
-        });
+        }, specFileExtension, specFileExtensionName);
         const currentShapeName = store.pyramidNetSpec.pyramid.shapeName;
         resetFileMenuRef();
         if (!res) {
