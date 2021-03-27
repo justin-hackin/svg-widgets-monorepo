@@ -20,7 +20,7 @@ import {
   DoubleSide,
   MeshBasicMaterial,
   MeshDistanceMaterial,
-  BasicShadowMap,
+  BasicShadowMap, LineSegments, WireframeGeometry, Object3D,
 } from 'three';
 import { reaction } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
@@ -49,12 +49,14 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
     castSphere: null,
     renderer: null,
     shapeMesh: null,
+    shapeWireframe: null,
     shapeMaterialMap: null,
     camera: null,
     controls: null,
     animationFrame: null,
+    // TODO: make this value adjustable with alpha texture on (changes result in loss of shadows)
     IDEAL_RADIUS: 6,
-    TEXTURE_BITMAP_SCALE: 0.2,
+    TEXTURE_BITMAP_SCALE: 0.5,
     MARGIN: 1,
     disposers: [],
   }))
@@ -103,6 +105,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       setShapeTexture,
       setMaterialMap(map) { self.shapeMaterialMap = map; },
       setShapeMesh(shape) { self.shapeMesh = shape; },
+      setShapeWireframe(wireframe) { self.shapeWireframe = wireframe; },
       applyTextureToMesh: flow(function* () {
         const {
           shapeMesh,
@@ -170,14 +173,30 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       // @ts-ignore
       const meshChild:Mesh = importScene.children.find((child) => (child as Mesh).isMesh);
       const normalizingScale = self.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
-      meshChild.scale.fromArray([normalizingScale, normalizingScale, normalizingScale]);
+      // move transforms into mesh so wireframe is similarly aligned
+      meshChild.scale.setScalar(normalizingScale);
+
       if (self.shapeMesh) {
         self.scene.remove(self.shapeMesh);
+        self.scene.remove(self.shapeWireframe);
       }
       // @ts-ignore
       self.setMaterialMap(meshChild.material.map as Texture);
       self.setShapeMesh(meshChild);
       self.scene.add(meshChild);
+      const wireframe = new WireframeGeometry(self.shapeMesh.geometry);
+      const wireframeLineSegments = new LineSegments(wireframe);
+      const wireframeMaterial:any = wireframeLineSegments.material;
+      wireframeMaterial.depthTest = true;
+      const shapeWireframe = new Object3D();
+      shapeWireframe.add(wireframeLineSegments);
+      shapeWireframe.scale.copy(meshChild.scale);
+      // push wireframe out just a tiny bit so it is always infront of the textured mesh
+      shapeWireframe.scale.multiplyScalar(1.001);
+      shapeWireframe.rotation.copy(meshChild.rotation);
+
+      self.scene.add(shapeWireframe);
+      self.setShapeWireframe(shapeWireframe);
       alphaOnChange();
     });
     const setup = (rendererContainer) => {
