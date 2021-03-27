@@ -23,7 +23,7 @@ import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 import { useStyles } from '../../style';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
-import { SimpleDialog } from '../../../common/components/SimpleDialog';
+import { SimpleDialog } from '../../../../common/components/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
 import { EVENTS } from '../../../../common/constants';
 

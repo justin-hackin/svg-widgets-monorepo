@@ -4,7 +4,7 @@ import svgpath from 'svgpath';
 import { reverse } from 'svg-path-reverse';
 import {
   castCoordToRawPoint, Coord, PointLike, pointsAreEqual, RawPoint, rawPointToString,
-} from '../../common/util/geom';
+} from '../../../common/util/geom';
 import { roundedEdgePath } from './shapes/generic';
 
 /* eslint-disable no-param-reassign */

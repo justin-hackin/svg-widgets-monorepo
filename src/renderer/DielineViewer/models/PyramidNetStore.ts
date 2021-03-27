@@ -15,7 +15,7 @@ import {
   scalePoint,
   sumPoints,
   triangleAnglesGivenSides,
-} from '../../common/util/geom';
+} from '../../../common/util/geom';
 import { closedPolygonPath, roundedEdgePath } from '../util/shapes/generic';
 import {
   AscendantEdgeConnectionPaths,
@@ -26,16 +26,16 @@ import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../util/shapes/baseEdg
 import { DashPatternModel, defaultStrokeDashSpec, strokeDashPath } from '../util/shapes/strokeDashPath';
 import { boundingViewBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
-import { getBoundedTexturePathD } from '../../common/util/path-boolean';
+import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
-import { degToRad, PIXELS_PER_CM, radToDeg } from '../../common/util/units';
+import { degToRad, PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
 import {
   IPathFaceDecorationPatternModel,
   PathFaceDecorationPatternModel,
-} from '../../common/models/PathFaceDecorationPatternModel';
+} from '../../../common/models/PathFaceDecorationPatternModel';
 import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from './TextureFaceDecorationModel';
 import { IRawFaceDecorationModel, RawFaceDecorationModel } from './RawFaceDecorationModel';
-import { UndoManagerWithGroupState } from '../../common/components/UndoManagerWithGroupState';
+import { UndoManagerWithGroupState } from '../../../common/components/UndoManagerWithGroupState';
 
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 

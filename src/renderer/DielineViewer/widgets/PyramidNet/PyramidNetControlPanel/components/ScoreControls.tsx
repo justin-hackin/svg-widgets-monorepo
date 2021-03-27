@@ -1,13 +1,13 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { UncontrolledPanelSelect } from '../../../../../common/components/PanelSelect';
-import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
+import { UncontrolledPanelSelect } from '../../../../../../common/components/PanelSelect';
+import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
 import { ratioSliderProps } from './constants';
-import { PanelSwitchUncontrolled } from '../../../../../common/components/PanelSwitch';
-import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
+import { PanelSwitchUncontrolled } from '../../../../../../common/components/PanelSwitch';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
 
 const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 

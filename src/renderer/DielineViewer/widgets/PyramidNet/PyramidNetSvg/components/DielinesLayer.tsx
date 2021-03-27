@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { IPreferencesModel } from '../../../../models/PreferencesModel';
 import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { lineLerp, matrixWithTransformOrigin } from '../../../../../common/util/geom';
+import { lineLerp, matrixWithTransformOrigin } from '../../../../../../common/util/geom';
 
 const DielineGroup = ({ children }) => (
   <g {...{

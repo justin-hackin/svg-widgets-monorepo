@@ -8,7 +8,7 @@ import {
   lineLerp,
   RawPoint,
   symmetricHingePlotByProjectionDistance,
-} from '../../../common/util/geom';
+} from '../../../../common/util/geom';
 import { IDashPatternModel, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';

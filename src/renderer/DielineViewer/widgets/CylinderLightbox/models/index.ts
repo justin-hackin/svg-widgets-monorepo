@@ -4,11 +4,11 @@ import {
   angleRelativeToOrigin,
   getOriginPoint, lineLerp,
   pointFromPolar, sumPoints,
-} from '../../../../common/util/geom';
+} from '../../../../../common/util/geom';
 import { DestinationCommand, PathData } from '../../../util/PathData';
 import { closedPolygonPath } from '../../../util/shapes/generic';
-import { subtractDValues, unifyDValues } from '../../../../common/util/path-boolean';
-import { PIXELS_PER_CM, radToDeg } from '../../../../common/util/units';
+import { subtractDValues, unifyDValues } from '../../../../../common/util/path-boolean';
+import { PIXELS_PER_CM, radToDeg } from '../../../../../common/util/units';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },

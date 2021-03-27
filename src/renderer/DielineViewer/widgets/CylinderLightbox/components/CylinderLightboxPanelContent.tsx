@@ -2,11 +2,11 @@ import React from 'react';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { ICylinderLightBoxModel } from '../models';
-import { PanelSliderOrTextInput } from '../../../../common/components/PanelSliderOrTextInput';
-import { PanelSliderComponent } from '../../../../common/components/PanelSliderComponent';
-import { DEFAULT_SLIDER_STEP } from '../../../../common/constants';
+import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
+import { PanelSliderComponent } from '../../../../../common/components/PanelSliderComponent';
 import { useStyles } from '../../../style';
-import { PIXELS_PER_CM } from '../../../../common/util/units';
+import { PIXELS_PER_CM } from '../../../../../common/util/units';
+import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 
 export const CylinderLightboxPanelContent = () => {
   const workspaceStore = useWorkspaceMst();

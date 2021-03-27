@@ -12,7 +12,7 @@ import { boundingViewBoxAttrs, pathDToViewBoxStr } from '../../../common/util/sv
 import { dashPatterns, DashPatternsModel } from '../data/dash-patterns';
 import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTestTabsSvg';
 import { SVGWrapper } from '../data/SVGWrapper';
-import { TextureEditorModel } from '../../TextureEditor/models/TextureEditorModel';
+import { TextureEditorModel } from '../../../common/components/TextureEditor/models/TextureEditorModel';
 import { ITextureFaceDecorationModel } from './TextureFaceDecorationModel';
 
 export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetPluginModel }) => {

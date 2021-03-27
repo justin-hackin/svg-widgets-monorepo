@@ -1,12 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
+import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
 import { ratioSliderProps } from './constants';
-import { PanelSwitch, PanelSwitchUncontrolled } from '../../../../../common/components/PanelSwitch';
-import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
+import { PanelSwitch, PanelSwitchUncontrolled } from '../../../../../../common/components/PanelSwitch';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();

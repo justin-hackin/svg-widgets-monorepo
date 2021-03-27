@@ -1,7 +1,7 @@
 import {
   distanceBetweenPoints,
   hingedPlot, PointLike, RawPoint,
-} from '../../../common/util/geom';
+} from '../../../../common/util/geom';
 import { PathData } from '../PathData';
 
 interface RoundPoint {

@@ -8,10 +8,10 @@ import {
   hingedPlotLerp,
   getLineLineIntersection,
   RawPoint, symmetricHingePlotByProjectionDistance,
-} from '../../../common/util/geom';
+} from '../../../../common/util/geom';
 import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
 import { arrowTabPlots } from './symmetricRoundedTab';
-import { VERY_LARGE_NUMBER } from '../../../common/constants';
+import { VERY_LARGE_NUMBER } from '../../../../common/constants';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,

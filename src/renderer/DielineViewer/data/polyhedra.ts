@@ -1,4 +1,4 @@
-import { PHI } from '../../common/util/geom';
+import { PHI } from '../../../common/util/geom';
 
 export interface PyramidGeometrySpec {
   // if there are only 2 lengths then this triangle is symmetric and the third side is equal to the first side

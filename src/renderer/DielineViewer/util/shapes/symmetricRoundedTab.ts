@@ -4,7 +4,7 @@ import {
   symmetricHingePlot,
   hingedPlotByProjectionDistance,
   distanceFromOrigin, subtractPoints,
-} from '../../../common/util/geom';
+} from '../../../../common/util/geom';
 import { connectedLineSegments, roundedEdgePath } from './generic';
 import { PathData } from '../PathData';
 import { strokeDashPath } from './strokeDashPath';

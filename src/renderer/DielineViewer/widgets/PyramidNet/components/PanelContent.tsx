@@ -9,10 +9,10 @@ import { useStyles } from '../../../style';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
-import { ShapeSelect } from '../../../../common/components/ShapeSelect';
-import { PanelSliderOrTextInput } from '../../../../common/components/PanelSliderOrTextInput';
-import { PIXELS_PER_CM } from '../../../../common/util/units';
-import { PanelSelect } from '../../../../common/components/PanelSelect';
+import { ShapeSelect } from '../../../../../common/components/ShapeSelect';
+import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
+import { PIXELS_PER_CM } from '../../../../../common/util/units';
+import { PanelSelect } from '../../../../../common/components/PanelSelect';
 
 const controlsTabs = [
   {

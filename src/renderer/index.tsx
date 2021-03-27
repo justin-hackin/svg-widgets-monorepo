@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import { DielineViewer } from './DielineViewer';
-import './common/style/index.css';
+import '../common/style/index.css';
 import { useWorkspaceMst, WorkspaceStoreProvider } from './DielineViewer/models/WorkspaceModel';
 import { darkThemeOptions } from './DielineViewer/data/material-ui-themes';
 

@@ -1,6 +1,6 @@
 import { types, Instance, SnapshotIn } from 'mobx-state-tree';
-import { PIXELS_PER_CM, UNITS } from '../../common/util/units';
-import { DimensionsModel } from '../../common/models/DimensionsModel';
+import { PIXELS_PER_CM, UNITS } from '../../../common/util/units';
+import { DimensionsModel } from '../../../common/models/DimensionsModel';
 
 // reassignment of a mst-persist store will cause undisposed onSnapshot
 // see: https://github.com/agilgur5/mst-persist/issues/20

@@ -3,7 +3,7 @@ import { Instance, types } from 'mobx-state-tree';
 
 import {
   distanceFromOrigin, lineLerp, PointLike, subtractPoints,
-} from '../../../common/util/geom';
+} from '../../../../common/util/geom';
 import { PathData } from '../PathData';
 import { StrokeDashPathPatternModel } from '../../data/dash-patterns';
 

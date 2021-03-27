@@ -2,13 +2,13 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@material-ui/core';
 
-import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
-import { PanelColorPicker } from '../../../../../common/components/PanelColorPicker';
+import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
+import { PanelColorPicker } from '../../../../../../common/components/PanelColorPicker';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { PanelSwitch } from '../../../../../common/components/PanelSwitch';
-import { PanelTextInput } from '../../../../../common/components/PanelTextInput';
-import { PanelRadio } from '../../../../../common/components/PanelRadio';
-import { UNITS } from '../../../../../common/util/units';
+import { PanelSwitch } from '../../../../../../common/components/PanelSwitch';
+import { PanelTextInput } from '../../../../../../common/components/PanelTextInput';
+import { PanelRadio } from '../../../../../../common/components/PanelRadio';
+import { UNITS } from '../../../../../../common/util/units';
 
 export const PreferencesControls = observer(() => {
   const { preferences, resetPreferences } = useWorkspaceMst();

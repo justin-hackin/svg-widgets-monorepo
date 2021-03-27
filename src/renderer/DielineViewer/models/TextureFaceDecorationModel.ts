@@ -1,8 +1,8 @@
 // from texture editor send
 import { Instance, types } from 'mobx-state-tree';
-import { PathFaceDecorationPatternModel } from '../../common/models/PathFaceDecorationPatternModel';
-import { ImageFaceDecorationPatternModel } from '../../common/models/ImageFaceDecorationPatternModel';
-import { getTextureTransformMatrix, RawPoint } from '../../common/util/geom';
+import { PathFaceDecorationPatternModel } from '../../../common/models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../../../common/models/ImageFaceDecorationPatternModel';
+import { getTextureTransformMatrix, RawPoint } from '../../../common/util/geom';
 
 export const TextureFaceDecorationModel = types.model('TextureFaceDecorationModel', {
   pattern: types.union(PathFaceDecorationPatternModel, ImageFaceDecorationPatternModel),

@@ -8,7 +8,7 @@ import { closedPolygonPath } from '../../../../util/shapes/generic';
 import {
   IImageFaceDecorationPatternModel,
   ImageFaceDecorationPatternModel,
-} from '../../../../../common/models/ImageFaceDecorationPatternModel';
+} from '../../../../../../common/models/ImageFaceDecorationPatternModel';
 import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from '../../../../models/TextureFaceDecorationModel';
 import { theme } from '../../../../../index';
 
