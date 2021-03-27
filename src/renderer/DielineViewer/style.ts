@@ -26,6 +26,9 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
       backgroundColor: theme.palette.grey.A400,
     },
   },
+  fullPage: {
+    width: '100%', height: '100%', position: 'absolute', overflow: 'hidden',
+  },
   dielineEditorRoot: {
     display: 'flex',
   },

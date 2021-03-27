@@ -45,7 +45,7 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   />
 );
 
-export const TextureControls = observer(() => {
+export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
   const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
@@ -104,6 +104,8 @@ export const TextureControls = observer(() => {
         })}
         variant="dense"
       >
+        {/* web app uses texture editor as standalone component without drawer */}
+        {hasCloseButton && (
         <IconButton
           onClick={() => {
             pluginModel.setTextureEditorOpen(false);
@@ -113,7 +115,7 @@ export const TextureControls = observer(() => {
         >
           <ArrowForwardIcon fontSize="large" />
         </IconButton>
-        <Divider />
+        )}
         {/* ************************************************************* */}
         <IconButton
           onClick={async () => {

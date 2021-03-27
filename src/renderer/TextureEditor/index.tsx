@@ -13,9 +13,9 @@ import { useStyles } from '../DielineViewer/style';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 
-export const TextureEditor = observer(() => {
+export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
-  const mainAreaRef = useRef();
+  const mainAreaRef = useRef<HTMLDivElement>();
   const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;
   if (!pyramidNetPluginStore || !pyramidNetPluginStore.textureEditor) { return null; }
   // ==================================================================================================================
@@ -28,7 +28,6 @@ export const TextureEditor = observer(() => {
   useEffect(() => {
     const resizeHandler = () => {
       if (!mainAreaRef.current) { return; }
-      // @ts-ignore
       const { width, height } = mainAreaRef.current.getBoundingClientRect();
       setPlacementAreaDimensions({ width: width / 2, height });
     };
@@ -48,6 +47,22 @@ export const TextureEditor = observer(() => {
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   return (
+    <div className={classes.fullPage}>
+      <TextureControls hasCloseButton={hasCloseButton} />
+      <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
+        <TextureArrangement />
+        <ShapePreview />
+      </div>
+    </div>
+  );
+});
+
+export const TextureEditorDrawer = observer(() => {
+  const workspaceStore = useWorkspaceMst();
+  const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;
+
+  const classes = useStyles();
+  return (
     <Drawer
       className={classes.textureEditorRoot}
       anchor="right"
@@ -56,11 +71,7 @@ export const TextureEditor = observer(() => {
       classes={{ paper: classes.textureEditorPaper }}
       transitionDuration={500}
     >
-      <TextureControls />
-      <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
-        <TextureArrangement />
-        <ShapePreview />
-      </div>
+      <TextureEditor hasCloseButton />
     </Drawer>
   );
 });

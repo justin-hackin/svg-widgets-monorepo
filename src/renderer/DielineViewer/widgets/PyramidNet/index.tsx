@@ -3,7 +3,7 @@ import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { AdditionalToolbarContent } from './components/AdditionalToolbarContent';
 import { AdditionalFileMenuItems } from './components/AdditionalFileMenuItems';
 import { PanelContent } from './components/PanelContent';
-import { TextureEditor } from '../../../TextureEditor';
+import { TextureEditorDrawer } from '../../../TextureEditor';
 import { WidgetOptions } from '../../models/WorkspaceModel';
 
 export const PyramidNetOptionsInfo: WidgetOptions = {
@@ -14,7 +14,7 @@ export const PyramidNetOptionsInfo: WidgetOptions = {
     PanelContent,
   },
   WidgetModel: PyramidNetPluginModel,
-  AdditionalMainContent: TextureEditor,
+  AdditionalMainContent: TextureEditorDrawer,
   specFileExtension: 'pns',
   specFileExtensionName: 'Pyramid net spec',
 };
