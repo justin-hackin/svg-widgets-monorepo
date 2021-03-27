@@ -275,34 +275,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         self.parentTextureEditor.texture ? self.parentTextureEditor.texture.transformMatrixDraggedStr : null,
         self.shapeMaterialMap,
       ], () => {
-        const {
-          shapeMesh,
-          parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
-        } = self;
-        if (!shapeMesh || !viewBoxAttrs) {
-          return;
-        }
-        const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
-        const ctx = textureCanvas.getContext('2d');
-        const svgStr = ReactDOMServer.renderToString(
-          React.createElement(TextureSvgUnobserved, {
-            viewBox: viewBoxAttrsToString(viewBoxAttrs),
-            store: self.parentTextureEditor,
-          }),
-        );
-        Canvg.from(ctx, svgStr, presets.offscreen())
-          .then(async (v) => {
-            const {
-              width: vbWidth,
-              height: vbHeight,
-            } = viewBoxAttrs;
-            v.resize(
-              npot(vbWidth * self.TEXTURE_BITMAP_SCALE),
-              npot(vbHeight * self.TEXTURE_BITMAP_SCALE), 'none',
-            );
-            await v.render();
-            self.setShapeTexture(textureCanvas.transferToImageBitmap());
-          });
+        self.applyTextureToMesh();
       }));
 
       // use alpha change
