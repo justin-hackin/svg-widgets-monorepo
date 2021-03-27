@@ -5,7 +5,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import { ChromePicker } from 'react-color';
 
-import { useStyles } from '../../renderer/DielineViewer/style';
+import { useStyles } from '../style/style';
 import { mstDataToProps } from '../util/mst';
 
 export const PanelColorPicker = ({

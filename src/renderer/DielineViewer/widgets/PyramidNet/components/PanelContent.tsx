@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
-import { useStyles } from '../../../style';
+import { useStyles } from '../../../../../common/style/style';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';

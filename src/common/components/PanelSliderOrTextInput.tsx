@@ -6,7 +6,7 @@ import TuneIcon from '@material-ui/icons/Tune';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 import { observer } from 'mobx-react';
 
-import { useStyles } from '../../renderer/DielineViewer/style';
+import { useStyles } from '../style/style';
 import { SubmittableTextInput } from './SubmittableTextInput';
 import { mstDataToProps } from '../util/mst';
 import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';

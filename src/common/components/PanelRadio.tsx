@@ -6,7 +6,7 @@ import {
   FormControlLabel, FormLabel, Radio, RadioGroup,
 } from '@material-ui/core';
 import { startCase } from 'lodash';
-import { useStyles } from '../../renderer/DielineViewer/style';
+import { useStyles } from '../style/style';
 import { mstDataToProps } from '../util/mst';
 
 export const UncontrolledPanelRadio = observer(({

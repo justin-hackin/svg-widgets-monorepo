@@ -9,7 +9,7 @@ import { startCase } from 'lodash';
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../../../common/util/svg';
-import { useStyles } from '../../../style';
+import { useStyles } from '../../../../../common/style/style';
 import { EVENTS } from '../../../../../common/constants';
 
 const DOWNLOAD_TEMPLATE_TXT = 'Download face template SVG (current shape)';

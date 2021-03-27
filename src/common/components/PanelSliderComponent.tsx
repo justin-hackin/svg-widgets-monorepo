@@ -5,7 +5,7 @@ import { startCase } from 'lodash';
 
 import { observer } from 'mobx-react';
 import { getHistory, mstDataToProps } from '../util/mst';
-import { useStyles } from '../../renderer/DielineViewer/style';
+import { useStyles } from '../style/style';
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
 import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../util/units';
 

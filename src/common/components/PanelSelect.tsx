@@ -7,7 +7,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { startCase } from 'lodash';
-import { useStyles } from '../../renderer/DielineViewer/style';
+import { useStyles } from '../style/style';
 import { mstDataToProps } from '../util/mst';
 
 export const UncontrolledPanelSelect = observer(({

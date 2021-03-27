@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { HistoryButtons } from '../PyramidNetControlPanel/components/HistoryButtons';
-import { useStyles } from '../../../style';
+import { useStyles } from '../../../../../common/style/style';
 
 export const AdditionalToolbarContent = () => {
   const workspaceStore = useWorkspaceMst();

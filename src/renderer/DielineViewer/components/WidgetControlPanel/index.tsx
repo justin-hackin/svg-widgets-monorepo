@@ -20,7 +20,7 @@ import {
 } from '@material-ui/core';
 import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 
-import { useStyles } from '../../style';
+import { useStyles } from '../../../../common/style/style';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { SimpleDialog } from '../../../../common/components/SimpleDialog';

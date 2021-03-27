@@ -9,7 +9,7 @@ import HeightIcon from '@material-ui/icons/Height';
 import React from 'react';
 import { observer } from 'mobx-react';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
-import { useStyles } from '../../../../renderer/DielineViewer/style';
+import { useStyles } from '../../../style/style';
 
 // TODO: remove hover effects
 const extraButtonProps = {

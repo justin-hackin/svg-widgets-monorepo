@@ -4,7 +4,7 @@ import { useTheme } from '@material-ui/styles';
 
 import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { useStyles } from '../../../renderer/DielineViewer/style';
+import { useStyles } from '../../style/style';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';

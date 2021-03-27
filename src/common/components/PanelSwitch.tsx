@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { Switch } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
-import { useStyles } from '../../renderer/DielineViewer/style';
+import { useStyles } from '../style/style';
 import { mstDataToProps } from '../util/mst';
 
 export const PanelSwitchUncontrolled = observer(({

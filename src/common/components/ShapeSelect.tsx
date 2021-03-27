@@ -10,7 +10,7 @@ import {
 import { startCase, sortBy } from 'lodash';
 import { observer } from 'mobx-react';
 
-import { useStyles } from '../../renderer/DielineViewer/style';
+import { useStyles } from '../style/style';
 import { polyhedra } from '../../renderer/DielineViewer/data/polyhedra';
 import requireStatic from '../../renderer/requireStatic';
 

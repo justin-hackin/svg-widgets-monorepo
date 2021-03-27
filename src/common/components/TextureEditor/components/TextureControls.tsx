@@ -24,7 +24,7 @@ import { PanelSliderComponent } from '../../PanelSliderComponent';
 import { ShapeSelect } from '../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { useStyles } from '../../../../renderer/DielineViewer/style';
+import { useStyles } from '../../../style/style';
 import { DEFAULT_SLIDER_STEP, EVENTS } from '../../../constants';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (

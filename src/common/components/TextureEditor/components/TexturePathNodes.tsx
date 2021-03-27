@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { PathData } from '../../../../renderer/DielineViewer/util/PathData';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { ITextureEditorModel } from '../models/TextureEditorModel';
-import { useStyles } from '../../../../renderer/DielineViewer/style';
+import { useStyles } from '../../../style/style';
 
 export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();

@@ -4,7 +4,7 @@ import Dialog from '@material-ui/core/Dialog';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import { Typography } from '@material-ui/core';
-import { useStyles } from '../../renderer/DielineViewer/style';
+import { useStyles } from '../style/style';
 
 export const SimpleDialog = ({
   isOpen, handleClose, title, children,

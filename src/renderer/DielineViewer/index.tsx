@@ -11,7 +11,7 @@ import { GridPattern } from './components/ResizableZoomPan/components/GridPatter
 import { ResizableZoomPan } from './components/ResizableZoomPan';
 import { useWorkspaceMst } from './models/WorkspaceModel';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
-import { useStyles } from './style';
+import { useStyles } from '../../common/style/style';
 import requireStatic from '../requireStatic';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';

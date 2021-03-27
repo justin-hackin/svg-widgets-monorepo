@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { Drawer } from '@material-ui/core';
 import { useWorkspaceMst } from '../DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../DielineViewer/models/PyramidNetMakerStore';
-import { useStyles } from '../DielineViewer/style';
+import { useStyles } from '../../common/style/style';
 import { TextureEditor } from '../../common/components/TextureEditor';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin

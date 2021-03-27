@@ -10,7 +10,7 @@ import {
   ImageFaceDecorationPatternModel,
 } from '../../../../../../common/models/ImageFaceDecorationPatternModel';
 import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from '../../../../models/TextureFaceDecorationModel';
-import { theme } from '../../../../../index';
+import { theme } from '../../../../../../common/style/style';
 
 const PrintGroup = ({ children }) => (
   <g {...{
