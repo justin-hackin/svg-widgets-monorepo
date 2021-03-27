@@ -4,7 +4,6 @@ import { DimensionsModel } from '../../common/models/DimensionsModel';
 
 // reassignment of a mst-persist store will cause undisposed onSnapshot
 // see: https://github.com/agilgur5/mst-persist/issues/20
-// TODO: avoid types.optional for defaults and define separately so preferences can be reset
 
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 export interface IPreferencesModel extends Instance<typeof PreferencesModel> {}

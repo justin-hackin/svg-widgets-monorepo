@@ -252,7 +252,10 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       }, { fireImmediately: true }));
 
       // texture change
-      self.disposers.push(reaction(() => [self.parentTextureEditor.texture.transformMatrixDraggedStr], () => {
+      self.disposers.push(reaction(() => [
+        self.parentTextureEditor.texture ? self.parentTextureEditor.texture.transformMatrixDraggedStr : null,
+        self.shapeMaterialMap,
+      ], () => {
         const {
           shapeMesh,
           parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
