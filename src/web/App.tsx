@@ -1,6 +1,3 @@
-import './imposterIpcRenderer';
-
-// eslint-disable-next-line import/order
 import { ProvidersWrapper } from '../common/components/ProvidersWrapper';
 import { render } from 'react-dom';
 import React from 'react';
