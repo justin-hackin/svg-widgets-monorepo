@@ -28,7 +28,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
     <>
       {/* NEW */}
       <MenuItem onClick={async () => {
-        await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderDecorationBoundaryToString(), {
+        await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_SVG, store.renderDecorationBoundaryToString(), {
           message: DOWNLOAD_TEMPLATE_TXT,
           defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
         });
@@ -43,7 +43,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
       {/* OPEN RAW SVG FACE DECORATION */}
       <MenuItem onClick={async () => {
-        await globalThis.ipcRenderer.invoke(EVENTS.OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
+        await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
           .then((svgString) => {
             const d = extractCutHolesFromSvgString(svgString);
             store.pyramidNetSpec.setRawFaceDecoration(d);
@@ -59,7 +59,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
       {/* LOAD TEXTURE JSON */}
       <MenuItem onClick={async () => {
-        const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
+        const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
           message: IMPORT_TEXTURE_TXT,
         }, specFileExtension, specFileExtensionName);
         const currentShapeName = store.pyramidNetSpec.pyramid.shapeName;
@@ -90,7 +90,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
       {/* DOWNLOAD TAB TEST */}
       <MenuItem onClick={async () => {
-        await globalThis.ipcRenderer.invoke(EVENTS.SAVE_SVG, store.renderTestTabsToString(store, preferencesStore), {
+        await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_SVG, store.renderTestTabsToString(store, preferencesStore), {
           message: DOWNLOAD_TAB_TESTER_TXT,
           defaultPath: `${store.getFileBasename()}--test-tabs.svg`,
         });

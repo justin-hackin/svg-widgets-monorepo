@@ -1,13 +1,13 @@
 export enum EVENTS {
-  SAVE_SVG = 'save-svg',
-  SAVE_JSON = 'save-json',
-  SAVE_GLB = 'save-glb',
+  DIALOG_SAVE_SVG = 'dialog-save-svg',
+  DIALOG_SAVE_JSON = 'dialog-save-json',
+  DIALOG_SAVE_GLB = 'dialog-save-glb',
   DIALOG_SAVE_MODEL_WITH_SVG = 'dialog-save-model-with-svg',
   SAVE_MODEL_WITH_SVG = 'save-model-with-svg',
-  DIALOG_LOAD_JSON = 'dialog-load-json',
-  OPEN_SVG = 'open-svg',
+  DIALOG_OPEN_JSON = 'dialog-open-json',
+  DIALOG_OPEN_SVG = 'dialog-open-svg',
+  DIALOG_OPEN_TEXTURE_IMAGE = 'dialog-open-texture-image',
   RESET_DRAG_MODE = 'reset-drag-mode',
-  SELECT_TEXTURE = 'select-texture',
 }
 
 export const DEFAULT_SLIDER_STEP = 0.01;

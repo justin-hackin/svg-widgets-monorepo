@@ -323,7 +323,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       async downloadShapeGLTF() {
         return self.gltfExporter
           .parse(self.shapeMesh, (shapeGLTF) => {
-            globalThis.ipcRenderer.invoke(EVENTS.SAVE_GLB, shapeGLTF, {
+            globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_GLB, shapeGLTF, {
               message: 'Save shape preview',
               defaultPath: `${self.parentTextureEditor.getFileBasename()}.glb`,
             });
