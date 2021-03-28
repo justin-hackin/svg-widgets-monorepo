@@ -6,7 +6,7 @@ export enum EVENTS {
   SAVE_MODEL_WITH_SVG = 'save-model-with-svg',
   DIALOG_OPEN_JSON = 'dialog-open-json',
   DIALOG_OPEN_SVG = 'dialog-open-svg',
-  DIALOG_OPEN_TEXTURE_IMAGE = 'dialog-open-texture-image',
+  DIALOG_ACQUIRE_PATTERN_INFO = 'dialog-acquire-pattern-info',
   RESET_DRAG_MODE = 'reset-drag-mode',
 }
 
