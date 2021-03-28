@@ -89,7 +89,7 @@ export const setupIpc = (ipcMain) => {
     (_, svgContent, modelData, filePath) => writeModelAndSvg(svgContent, modelData, filePath));
 
   ipcMain.handle(EVENTS.DIALOG_OPEN_JSON, (e,
-                                           dialogOptions, extension, extensionName) => resolveStringDataFromDialog(
+    dialogOptions, extension, extensionName) => resolveStringDataFromDialog(
     { ...dialogOptions, filters: [{ name: extensionName || extension, extensions: [extension] }] },
   ).then((res) => {
     if (!res) { return undefined; }
@@ -106,7 +106,7 @@ export const setupIpc = (ipcMain) => {
   }));
 
   // TODO: make widget-agnostic
-  ipcMain.handle(EVENTS.DIALOG_OPEN_TEXTURE_IMAGE, async () => {
+  ipcMain.handle(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO, async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       message: 'Open texture path',
       filters: textureFilters,

@@ -118,7 +118,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         {/* ************************************************************* */}
         <IconButton
           onClick={async () => {
-            const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_TEXTURE_IMAGE);
+            const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
             if (patternInfo) {
               if (patternInfo.isPath) {
                 const { svgString, sourceFileName } = patternInfo;
