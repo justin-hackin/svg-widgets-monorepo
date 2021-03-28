@@ -30,7 +30,7 @@ const glbFilters = [{ name: 'GLB 3D model', extensions: ['glb'] }];
 // TODO: type safety between invoke and handle parameters
 
 export const setupIpc = (ipcMain) => {
-  ipcMain.handle(EVENTS.SAVE_SVG, (e, fileContent, dialogOptions) => dialog.showSaveDialog({
+  ipcMain.handle(EVENTS.DIALOG_SAVE_SVG, (e, fileContent, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,
     filters: svgFilters,
   }).then(({ canceled, filePath }) => {
@@ -38,7 +38,7 @@ export const setupIpc = (ipcMain) => {
     return fsPromises.writeFile(filePath, fileContent);
   }));
 
-  ipcMain.handle(EVENTS.SAVE_JSON, (e, jsonData, dialogOptions, extension, extensionName) => dialog.showSaveDialog({
+  ipcMain.handle(EVENTS.DIALOG_SAVE_JSON, (e, jsonData, dialogOptions, extension, extensionName) => dialog.showSaveDialog({
     ...dialogOptions,
     filters: [{ name: extensionName || extension, extensions: [extension] }],
   }).then(({ canceled, filePath }) => {
@@ -47,7 +47,7 @@ export const setupIpc = (ipcMain) => {
     return fsPromises.writeFile(resolvedFilePath, JSON.stringify(jsonData));
   }));
 
-  ipcMain.handle(EVENTS.SAVE_GLB, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
+  ipcMain.handle(EVENTS.DIALOG_SAVE_GLB, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,
     filters: glbFilters,
   }).then(({ canceled, filePath }) => {
@@ -88,8 +88,8 @@ export const setupIpc = (ipcMain) => {
   ipcMain.handle(EVENTS.SAVE_MODEL_WITH_SVG,
     (_, svgContent, modelData, filePath) => writeModelAndSvg(svgContent, modelData, filePath));
 
-  ipcMain.handle(EVENTS.DIALOG_LOAD_JSON, (e,
-    dialogOptions, extension, extensionName) => resolveStringDataFromDialog(
+  ipcMain.handle(EVENTS.DIALOG_OPEN_JSON, (e,
+                                           dialogOptions, extension, extensionName) => resolveStringDataFromDialog(
     { ...dialogOptions, filters: [{ name: extensionName || extension, extensions: [extension] }] },
   ).then((res) => {
     if (!res) { return undefined; }
@@ -100,13 +100,13 @@ export const setupIpc = (ipcMain) => {
     };
   }));
 
-  ipcMain.handle(EVENTS.OPEN_SVG, async (e, message) => resolveStringDataFromDialog({
+  ipcMain.handle(EVENTS.DIALOG_OPEN_SVG, async (e, message) => resolveStringDataFromDialog({
     message,
     filters: svgFilters,
   }));
 
   // TODO: make widget-agnostic
-  ipcMain.handle(EVENTS.SELECT_TEXTURE, async () => {
+  ipcMain.handle(EVENTS.DIALOG_OPEN_TEXTURE_IMAGE, async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       message: 'Open texture path',
       filters: textureFilters,

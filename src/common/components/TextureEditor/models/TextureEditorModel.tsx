@@ -279,7 +279,7 @@ export const TextureEditorModel = types
         shapeName: self.shapeName,
         textureSnapshot: getSnapshot(self.texture),
       };
-      globalThis.ipcRenderer.invoke(EVENTS.SAVE_JSON, fileData, {
+      globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_JSON, fileData, {
         message: 'Save texture arrangement',
         defaultPath: `${self.shapeName}__${self.texture.pattern.sourceFileName}.${specFileExtension}`,
       }, specFileExtension, specFileExtensionName);
@@ -288,7 +288,7 @@ export const TextureEditorModel = types
       self.texture = TextureModel.create(textureSnapshot);
     },
     openTextureArrangement() {
-      globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
+      globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
         message: 'Import texture arrangement',
       }, specFileExtension, specFileExtensionName).then((res) => {
         // TODO: snackbar error alerts

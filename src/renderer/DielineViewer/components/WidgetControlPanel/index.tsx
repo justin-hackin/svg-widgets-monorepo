@@ -55,7 +55,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   };
 
   const openSpecHandler = async () => {
-    const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_LOAD_JSON, {
+    const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
       message: OPEN_TXT,
     }, specFileExtension, specFileExtensionName);
     if (res) {
