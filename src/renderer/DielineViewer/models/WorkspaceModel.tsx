@@ -180,6 +180,9 @@ export function useWorkspaceMst() {
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  connectReduxDevtools(remotedev, workspaceStore);
+  if (process.env.BUILD_ENV === 'electron') {
+    // TODO: why is this causing SocketProtocolError on web build
+    connectReduxDevtools(remotedev, workspaceStore);
+  }
   makeInspectable(workspaceStore);
 }

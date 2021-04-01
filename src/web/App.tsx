@@ -1,16 +1,20 @@
-import { render } from 'react-dom';
 import React from 'react';
+
+import '../common/style/index.css';
 
 import { ProvidersWrapper } from '../common/components/ProvidersWrapper';
 import { TextureEditor } from '../common/components/TextureEditor';
 
-const App = () => (
+if (process.env.BUILD_ENV === 'web') {
+  window.globalThis.ipcRenderer = {
+    on: () => {},
+    invoke: () => {},
+  };
+}
+
+declare let module: Record<string, unknown>;
+export const App = () => (
   <ProvidersWrapper>
     <TextureEditor />
   </ProvidersWrapper>
-);
-
-render(
-  (<App />),
-  document.getElementById('app'),
 );

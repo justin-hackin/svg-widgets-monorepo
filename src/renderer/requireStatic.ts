@@ -9,6 +9,9 @@ import * as url from 'url';
  * @return {string} - filepath that can be required
  */
 export default function requireStatic(resourcePath) {
+  if (process.env.BUILD_ENV === 'web') {
+    return `static/${resourcePath}`;
+  }
   if (process.env.NODE_ENV === 'production') {
     // @ts-ignore
     return path.resolve(__static, resourcePath);
