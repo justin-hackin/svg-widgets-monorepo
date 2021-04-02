@@ -86,8 +86,10 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
     },
   })).actions((self) => ({
     afterCreate() {
-      globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, () => {
-        self.releaseHeldKeys();
-      });
+      if (process.env.BUILD_ENV === 'electron') {
+        globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, () => {
+          self.releaseHeldKeys();
+        });
+      }
     },
   }));

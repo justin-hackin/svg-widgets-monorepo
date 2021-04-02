@@ -5,3 +5,19 @@ export const circularSlice = (array, start, elements) => {
   }
   return slice;
 };
+
+export const toBase64 = (file) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = (error) => reject(error);
+});
+
+export const resolveImageDimensionsFromBase64 = (base64) => (new Promise((resolve) => {
+  const img = new Image();
+  // @ts-ignore
+  img.onload = ({ target: { width, height } }) => {
+    resolve({ width, height });
+  };
+  img.src = base64;
+}));

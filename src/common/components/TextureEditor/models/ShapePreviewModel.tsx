@@ -22,6 +22,7 @@ import {
   MeshDistanceMaterial,
   BasicShadowMap, LineSegments, WireframeGeometry, Object3D,
 } from 'three';
+import fileDownload from 'js-file-download';
 import { reaction } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
@@ -29,8 +30,8 @@ import React from 'react';
 import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { viewBoxAttrsToString } from '../../../util/svg';
 import requireStatic from '../../../../renderer/requireStatic';
-import { EVENTS } from '../../../constants';
 import { TextureEditorModel } from './TextureEditorModel';
+import { EVENTS } from '../../../constants';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -288,7 +289,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
           self.shapeMesh, boundaryPathD, isPositive, patternPathD, imageData, isBordered, transformMatrixDraggedStr,
         ];
       }, () => {
-        self.applyTextureToMesh();
+        // self.applyTextureToMesh();
       }));
 
       // use alpha change
@@ -321,12 +322,19 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         this.tearDown();
       },
       async downloadShapeGLTF() {
+        const defaultPath = `${self.parentTextureEditor.getFileBasename()}.glb`;
         return self.gltfExporter
-          .parse(self.shapeMesh, (shapeGLTF) => {
-            globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_GLB, shapeGLTF, {
-              message: 'Save shape preview',
-              defaultPath: `${self.parentTextureEditor.getFileBasename()}.glb`,
-            });
+        // @ts-ignore
+          .parse(self.shapeMesh, (shapeGLTF: ArrayBuffer) => {
+            if (process.env.BUILD_ENV === 'electron') {
+              globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_GLB, shapeGLTF, {
+                message: 'Save shape preview',
+                defaultPath,
+              });
+            }
+            if (process.env.BUILD_ENV === 'web') {
+              fileDownload(new Blob([shapeGLTF]), defaultPath);
+            }
           }, { binary: true });
       },
     };

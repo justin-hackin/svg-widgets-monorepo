@@ -2,7 +2,7 @@
   "extends": "./node_modules/electron-webpack/tsconfig-base.json",
   "compilerOptions": {
     "jsx": "react",
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
@@ -13,6 +13,8 @@
     "strictFunctionTypes": true,
     "noImplicitAny": false,
     "noImplicitReturns": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
   },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
