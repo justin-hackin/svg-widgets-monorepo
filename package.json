@@ -9,12 +9,12 @@
     "compile": "electron-webpack",
     "lint": "eslint src/**/*.ts{,x} --fix",
     "start": "node node_modules/electron/cli.js .",
-    "release": "npm run compile && electron-builder",
-    "web-build": "npm run web-clean-dist && webpack --config=src/web/webpack/prod.js",
-    "web-clean-dist": "npx rimraf dist/*",
-    "web-start": "npm run web-start-dev",
-    "web-start-dev": "npx webpack serve --config=src/web/webpack/dev.js",
-    "web-start-prod": "yarn run build && node express.js"
+    "release": "yarn compile && electron-builder",
+    "web-build": "yarn web-clean-dist && webpack --config=src/web/webpack.config.js --mode production",
+    "web-clean-dist": "rimraf web-build/*",
+    "web-start": "yarn web-start-dev",
+    "web-start-dev": "webpack-dev-server --config=src/web/webpack.config.js --mode development",
+    "web-start-prod": "yarn web-build && http-server web-build/ -p 3000"
   },
   "keywords": [
     "react"
@@ -99,9 +99,9 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "express": "^4.17.1",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^4.5.2",
+    "http-server": "^0.12.3",
     "image-webpack-loader": "^7.0.1",
     "parcel": "^2.0.0-beta.2",
     "postcss": "^8.2.9",
@@ -110,8 +110,10 @@
     "sass-loader": "^9.0.3",
     "style-loader": "^2.0.0",
     "typescript": "^3.9.8",
-    "webpack": "^4.46.0",
-    "webpack-cli": "^4.6.0",
-    "webpack-merge": "^5.7.3"
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3",
+    "webpack-merge": "^5.7.3",
+    "yarn": "^1.22.10"
   }
 }
