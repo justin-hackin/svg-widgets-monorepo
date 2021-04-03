@@ -3,7 +3,7 @@
 .idea/
 .cache/
 dist/
-web-build/
+dist-web/
 node_modules/
 **/.DS_Store
 .parcel-cache/

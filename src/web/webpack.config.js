@@ -29,7 +29,7 @@ const devConfig = {
 const prodConfig = {
   output: {
     filename: 'js/bundle.[contenthash].min.js',
-    path: resolve(context, 'web-build'),
+    path: resolve(context, 'dist-web'),
     publicPath: '/',
   },
   devtool: 'source-map',

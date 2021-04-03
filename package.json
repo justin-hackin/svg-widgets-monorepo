@@ -11,10 +11,10 @@
     "start": "node node_modules/electron/cli.js .",
     "release": "yarn compile && electron-builder",
     "web-build": "yarn web-clean-dist && webpack --config=src/web/webpack.config.js --mode production",
-    "web-clean-dist": "rimraf web-build/*",
+    "web-clean-dist": "rimraf dist-web/*",
     "web-start": "yarn web-start-dev",
     "web-start-dev": "webpack-dev-server --config=src/web/webpack.config.js --mode development",
-    "web-start-prod": "yarn web-build && http-server web-build/ -p 3000"
+    "web-start-prod": "yarn web-build && http-server dist-web/ -p 3000"
   },
   "keywords": [
     "react"
