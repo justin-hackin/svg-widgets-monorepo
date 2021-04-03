@@ -64,7 +64,6 @@
     "react-resize-detector": "^4.2.3",
     "react-router-dom": "^5.2.0",
     "react-svg-pan-zoom": "^3.10.0",
-    "react-tiger-transition": "^4.1.2",
     "react-transition-group": "^4.4.1",
     "react-use-gesture": "^7.0.15",
     "source-map-support": "^0.5.19",
