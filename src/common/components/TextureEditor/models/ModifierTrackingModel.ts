@@ -84,12 +84,33 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
       }
       return defaultMode;
     },
-  })).actions((self) => ({
-    afterCreate() {
-      if (process.env.BUILD_ENV === 'electron') {
-        globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, () => {
-          self.releaseHeldKeys();
-        });
-      }
-    },
-  }));
+  })).actions((self) => {
+    if (process.env.BUILD_ENV === 'electron') {
+      const ipcResetHandler = () => {
+        self.releaseHeldKeys();
+      };
+      return {
+        afterCreate() {
+          globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, ipcResetHandler);
+        },
+        beforeDestroy() {
+          globalThis.ipcRenderer.removeListener(EVENTS.RESET_DRAG_MODE, ipcResetHandler);
+        },
+      };
+    }
+    if (process.env.BUILD_ENV === 'web') {
+      const documentBlurHandler = () => {
+        self.releaseHeldKeys();
+      };
+
+      return {
+        afterCreate() {
+          window.addEventListener('blur', documentBlurHandler);
+        },
+        beforeDestroy() {
+          window.removeEventListener('blur', documentBlurHandler);
+        },
+      };
+    }
+    throw new Error('unexpected BUILD_ENV, should be "electron" or "web"');
+  });
