@@ -115,7 +115,9 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         if (!shapeMesh || !viewBoxAttrs) {
           return;
         }
-        const textureCanvas = new window.OffscreenCanvas(viewBoxAttrs.width, viewBoxAttrs.height);
+        const textureCanvas = document.createElement('canvas');
+        textureCanvas.setAttribute('width', viewBoxAttrs.width);
+        textureCanvas.setAttribute('height', viewBoxAttrs.height);
         const ctx = textureCanvas.getContext('2d');
         const svgStr = ReactDOMServer.renderToString(
           React.createElement(TextureSvgUnobserved, {
@@ -123,17 +125,21 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
             store: self.parentTextureEditor,
           }),
         );
-        const v = yield Canvg.from(ctx, svgStr, presets.offscreen());
         const {
           width: vbWidth,
           height: vbHeight,
         } = viewBoxAttrs;
-        v.resize(
-          npot(vbWidth * self.TEXTURE_BITMAP_SCALE),
-          npot(vbHeight * self.TEXTURE_BITMAP_SCALE), 'none',
-        );
+        const scaleWidth = npot(vbWidth * self.TEXTURE_BITMAP_SCALE);
+        const scaleHeight = npot(vbHeight * self.TEXTURE_BITMAP_SCALE);
+        const v = yield Canvg.from(ctx, svgStr, {
+          ignoreAnimation: true,
+          ignoreMouse: true,
+          enableRedraw: false,
+        });
+        // scaleWidth and scaleHeight are options but can't set the perserveAspectRatio as in here
+        v.resize(scaleWidth, scaleHeight, 'none');
         yield v.render();
-        setShapeTexture(textureCanvas.transferToImageBitmap());
+        setShapeTexture(ctx.getImageData(0, 0, scaleWidth, scaleHeight));
       }),
     };
   })
@@ -289,7 +295,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
           self.shapeMesh, boundaryPathD, isPositive, patternPathD, imageData, isBordered, transformMatrixDraggedStr,
         ];
       }, () => {
-        // self.applyTextureToMesh();
+        self.applyTextureToMesh();
       }));
 
       // use alpha change
