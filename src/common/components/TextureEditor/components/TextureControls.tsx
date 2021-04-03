@@ -25,7 +25,7 @@ import { ShapeSelect } from '../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../../style/style';
-import { DEFAULT_SLIDER_STEP, EVENTS } from '../../../constants';
+import { DEFAULT_SLIDER_STEP, EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
 import { ITextureEditorModel } from '../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../util/data';
 
@@ -146,36 +146,40 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           }
           if (process.env.BUILD_ENV === 'web') {
             return (
-              <FilePicker onFilePicked={async (file) => {
-                if (file) {
-                  if (file.type === 'image/svg+xml') {
-                    const svgString = await file.text();
-                    assignTextureFromPatternInfo({
-                      isPath: true,
-                      svgString,
-                      sourceFileName: file.name,
-                    });
-                  } else if (file.type === 'image/png' || file.type === 'image/jpg') {
-                    //  file is either png or jpg
-                    const imageData = await toBase64(file);
-                    const dimensions = await resolveImageDimensionsFromBase64(imageData);
-                    assignTextureFromPatternInfo({
-                      isPath: false,
-                      pattern: {
-                        imageData,
-                        dimensions,
+              <FilePicker
+                extensions={['.jpg', '.jpeg', '.png', '.svg']}
+                onFilePicked={async (file) => {
+                  if (file) {
+                    if (file.type === 'image/svg+xml') {
+                      const svgString = await file.text();
+                      assignTextureFromPatternInfo({
+                        isPath: true,
+                        svgString,
                         sourceFileName: file.name,
-                      },
-                    });
-                  }
+                      });
+                    } else if (file.type === 'image/png' || file.type === 'image/jpg') {
+                    //  file is either png or jpg
+                      const imageData = await toBase64(file);
+                      const dimensions = await resolveImageDimensionsFromBase64(imageData);
+                      assignTextureFromPatternInfo({
+                        isPath: false,
+                        pattern: {
+                          imageData,
+                          dimensions,
+                          sourceFileName: file.name,
+                        },
+                      });
+                    }
+
                   // TODO: user can still pick non-image, emit snackbar error in this case
-                }
-              }}
+                  }
+                }}
               >
                 <UploadButton />
               </FilePicker>
             );
           }
+          throw new Error(INVALID_BUILD_ENV_ERROR);
         })()}
         {history && (<HistoryButtons history={history} />)}
         <Tooltip title="Download 3D model GLTF" arrow>

@@ -12,3 +12,5 @@ export enum EVENTS {
 
 export const DEFAULT_SLIDER_STEP = 0.01;
 export const VERY_LARGE_NUMBER = 1000000000000000;
+
+export const INVALID_BUILD_ENV_ERROR = 'unexpected BUILD_ENV, should be "electron" or "web"';

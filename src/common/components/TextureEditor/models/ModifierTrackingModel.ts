@@ -1,6 +1,6 @@
 import { types } from 'mobx-state-tree';
 import { includes, flatten } from 'lodash';
-import { EVENTS } from '../../../constants';
+import { EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',
@@ -112,5 +112,5 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
         },
       };
     }
-    throw new Error('unexpected BUILD_ENV, should be "electron" or "web"');
+    throw new Error(INVALID_BUILD_ENV_ERROR);
   });
