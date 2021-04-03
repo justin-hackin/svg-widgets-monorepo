@@ -5,7 +5,7 @@ import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import npot from 'nearest-power-of-two';
 import OrbitControls from 'threejs-orbit-controls';
-import Canvg, { presets } from 'canvg';
+import Canvg from 'canvg';
 import {
   AmbientLight,
   Mesh,
@@ -115,10 +115,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         if (!shapeMesh || !viewBoxAttrs) {
           return;
         }
-        const textureCanvas = document.createElement('canvas');
-        textureCanvas.setAttribute('width', viewBoxAttrs.width);
-        textureCanvas.setAttribute('height', viewBoxAttrs.height);
-        const ctx = textureCanvas.getContext('2d');
+
         const svgStr = ReactDOMServer.renderToString(
           React.createElement(TextureSvgUnobserved, {
             viewBox: viewBoxAttrsToString(viewBoxAttrs),
@@ -131,13 +128,17 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         } = viewBoxAttrs;
         const scaleWidth = npot(vbWidth * self.TEXTURE_BITMAP_SCALE);
         const scaleHeight = npot(vbHeight * self.TEXTURE_BITMAP_SCALE);
+        const textureCanvas = document.createElement('canvas');
+        textureCanvas.setAttribute('width', vbWidth);
+        textureCanvas.setAttribute('height', vbHeight);
+        const ctx = textureCanvas.getContext('2d');
         const v = yield Canvg.from(ctx, svgStr, {
           ignoreAnimation: true,
           ignoreMouse: true,
           enableRedraw: false,
+          scaleWidth,
+          scaleHeight,
         });
-        // scaleWidth and scaleHeight are options but can't set the perserveAspectRatio as in here
-        v.resize(scaleWidth, scaleHeight, 'none');
         yield v.render();
         setShapeTexture(ctx.getImageData(0, 0, scaleWidth, scaleHeight));
       }),
