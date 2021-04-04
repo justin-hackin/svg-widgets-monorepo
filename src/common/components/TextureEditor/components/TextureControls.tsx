@@ -194,7 +194,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         </Tooltip>
         {pattern && !hasPathPattern && (
           <FormControlLabel
-            className={classes.checkboxControlLabel}
             labelPlacement="top"
             control={(
               <Switch
@@ -210,7 +209,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         )}
 
         <FormControlLabel
-          className={classes.checkboxControlLabel}
           labelPlacement="top"
           control={(
             <Switch
@@ -260,7 +258,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             {hasPathPattern && (
             <>
               <FormControlLabel
-                className={classes.checkboxControlLabel}
                 labelPlacement="top"
                 control={(
                   <Switch
@@ -283,7 +280,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 step={DEFAULT_SLIDER_STEP}
               />
               <FormControlLabel
-                className={classes.checkboxControlLabel}
                 labelPlacement="top"
                 control={(
                   <Switch
@@ -297,7 +293,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 label="Fill is positive"
               />
               <FormControlLabel
-                className={classes.checkboxControlLabel}
                 labelPlacement="top"
                 control={(
                   <Switch
