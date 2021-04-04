@@ -30,8 +30,17 @@ export const TextureArrangement = observer(() => {
   } = texture || {};
   // Init
   const textureTransformationUseDrag = useDrag(({ movement, down }) => {
-    if (!texture) { return; }
     const movementPt = castCoordToRawPoint(movement);
+
+    if (dragMode === DRAG_MODES.SCALE_VIEW) {
+      if (down) {
+        setViewScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
+      } else {
+        reconcileViewScaleDiff();
+      }
+    }
+
+    if (!texture) { return; }
     if (
       dragMode === DRAG_MODES.TRANSLATE
       || dragMode === DRAG_MODES.TRANSLATE_HORIZONTAL
