@@ -29,8 +29,7 @@ export const TextureArrangement = observer(() => {
     reconcileTranslateDiff, reconcileRotateDiff, reconcileScaleDiff, reconcileTransformOriginDiff,
   } = texture || {};
   // Init
-  const textureTranslationUseDrag = useDrag(({ movement, down }) => {
-    // early exit not possible before hooks
+  const textureTransformationUseDrag = useDrag(({ movement, down }) => {
     const movementPt = castCoordToRawPoint(movement);
     if (
       dragMode === DRAG_MODES.TRANSLATE
@@ -117,6 +116,7 @@ export const TextureArrangement = observer(() => {
       height="100%"
       style={{ overflow: 'hidden' }}
       {...viewUseWheel()}
+      {...textureTransformationUseDrag()}
     >
       <svg
         x={viewScaleCenterPercentStr}
@@ -126,12 +126,7 @@ export const TextureArrangement = observer(() => {
         className="root-svg"
         viewBox={viewBoxAttrsToString(decorationBoundary.viewBoxAttrs)}
       >
-        <TextureSvg
-          {...{
-            textureTranslationUseDrag,
-            transformOriginUseDrag,
-          }}
-        />
+        <TextureSvg {...{ transformOriginUseDrag }} />
       </svg>
     </Paper>
   );

@@ -125,7 +125,6 @@ export const TextureSvgUnobserved = ({
                 const { pathD, isPositive } = pattern as IPathFaceDecorationPatternModel;
                 return (
                   <path
-                    pointerEvents="bounding-box"
                     {...textureTranslationUseDrag()}
                     fill={isPositive ? materialColor : HOLES_COLOR}
                     d={pathD}
@@ -136,7 +135,6 @@ export const TextureSvgUnobserved = ({
               return (
                 <image
                   xlinkHref={imageData}
-                  pointerEvents="bounding-box"
                   {...dimensions}
                   {...textureTranslationUseDrag()}
                 />
