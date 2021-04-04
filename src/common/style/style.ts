@@ -4,9 +4,24 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { darkThemeOptions } from '../../renderer/DielineViewer/data/material-ui-themes';
 
 const drawerWidth = 500;
-
 export const useStyles = makeStyles((theme: Theme) => createStyles({
   '@global': {
+    body: {
+      margin: 0,
+      padding: 0,
+      'font-family': 'sans-serif',
+      /* prevents bounce on scroll, see https://stackoverflow.com/a/28181319 */
+      overflow: 'hidden',
+    },
+    '#app': {
+      height: '100%',
+      width: '100%',
+      overflow: 'hidden',
+      position: 'absolute',
+    },
+    'svg, symbol': {
+      overflow: 'visible',
+    },
     // borrowed from https://github.com/mui-org/material-ui/issues/22594#issue-701034896
     scrollbarColor: `${theme.palette.grey['700']}  ${theme.palette.grey.A400}`,
     '*::-webkit-scrollbar': {
@@ -172,12 +187,17 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     padding: '2px 1px',
   },
   // ======================== TEXTURE EDITOR ========================
+  shapePreviewContainer: {
+    background: 'url(../../static/images/space.jpg) no-repeat center center fixed',
+    '-webkit-background-size': 'cover',
+    '-moz-background-size': 'cover',
+    '-o-background-size': 'cover',
+    'background-size': 'cover',
+  },
   textureEditorRoot: {
-    backgroundColor: '#333',
-    display: 'flex',
-    flexFlow: 'column',
+    backgroundColor: theme.palette.grey.A400,
     height: '100%',
-    color: '#fff',
+    color: theme.palette.grey['300'],
   },
   textureEditorPaper: {
     width: '100%',
@@ -212,9 +232,6 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     justifyContent: 'center',
     color: '#fff',
     zIndex: 100,
-  },
-  checkboxControlLabel: {
-    color: '#fff',
   },
   textureNodeHighlight: {
     fill: 'rgba(255, 0, 255, 0.00001)',

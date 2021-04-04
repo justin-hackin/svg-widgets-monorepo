@@ -110,7 +110,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   };
 
   return (
-    <div className={classes.textureEditorRoot}>
+    <>
       <Fab
         color="inherit"
         aria-label="open drawer"
@@ -195,6 +195,6 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
         </AppBar>
         <PanelContent />
       </Drawer>
-    </div>
+    </>
   );
 });

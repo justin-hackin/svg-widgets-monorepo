@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@material-ui/styles';
+import clsx from 'clsx';
 
 import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
@@ -30,11 +31,11 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
       }
       const {
         width,
-        height
+        height,
       } = mainAreaRef.current.getBoundingClientRect();
       setPlacementAreaDimensions({
         width: width / 2,
-        height
+        height,
       });
     };
 
@@ -53,11 +54,11 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
 
   return (
-    <div className={classes.fullPage}>
-      <TextureControls hasCloseButton={hasCloseButton}/>
+    <div className={clsx(classes.fullPage, classes.textureEditorRoot)}>
+      <TextureControls hasCloseButton={hasCloseButton} />
       <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
-        <TextureArrangement/>
-        <ShapePreview/>
+        <TextureArrangement />
+        <ShapePreview />
       </div>
     </div>
   );

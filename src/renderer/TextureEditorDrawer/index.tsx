@@ -16,7 +16,6 @@ export const TextureEditorDrawer = observer(() => {
   const classes = useStyles();
   return (
     <Drawer
-      className={classes.textureEditorRoot}
       anchor="right"
       variant="persistent"
       open={pyramidNetPluginStore.textureEditorOpen}
