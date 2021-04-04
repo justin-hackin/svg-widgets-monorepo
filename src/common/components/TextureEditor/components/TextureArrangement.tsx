@@ -30,6 +30,7 @@ export const TextureArrangement = observer(() => {
   } = texture || {};
   // Init
   const textureTransformationUseDrag = useDrag(({ movement, down }) => {
+    if (!texture) { return; }
     const movementPt = castCoordToRawPoint(movement);
     if (
       dragMode === DRAG_MODES.TRANSLATE
