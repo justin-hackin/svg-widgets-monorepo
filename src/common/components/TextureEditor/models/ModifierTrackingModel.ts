@@ -1,6 +1,6 @@
 import { types } from 'mobx-state-tree';
 import { includes, flatten } from 'lodash';
-import { EVENTS } from '../../../constants';
+import { EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',
@@ -84,10 +84,33 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
       }
       return defaultMode;
     },
-  })).actions((self) => ({
-    afterCreate() {
-      globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, () => {
+  })).actions((self) => {
+    if (process.env.BUILD_ENV === 'electron') {
+      const ipcResetHandler = () => {
         self.releaseHeldKeys();
-      });
-    },
-  }));
+      };
+      return {
+        afterCreate() {
+          globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, ipcResetHandler);
+        },
+        beforeDestroy() {
+          globalThis.ipcRenderer.removeListener(EVENTS.RESET_DRAG_MODE, ipcResetHandler);
+        },
+      };
+    }
+    if (process.env.BUILD_ENV === 'web') {
+      const documentBlurHandler = () => {
+        self.releaseHeldKeys();
+      };
+
+      return {
+        afterCreate() {
+          window.addEventListener('blur', documentBlurHandler);
+        },
+        beforeDestroy() {
+          window.removeEventListener('blur', documentBlurHandler);
+        },
+      };
+    }
+    throw new Error(INVALID_BUILD_ENV_ERROR);
+  });

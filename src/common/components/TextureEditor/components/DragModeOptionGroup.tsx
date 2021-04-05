@@ -36,7 +36,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
         <OpenWithIcon />
       </ToggleButton>
       <ToggleButton
-        title="drag"
+        title="ctrl + shift + drag"
         value={DRAG_MODES.TRANSLATE_VERTICAL}
         aria-label={DRAG_MODES.TRANSLATE_VERTICAL}
         {...extraButtonProps}
@@ -44,7 +44,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
         <HeightIcon />
       </ToggleButton>
       <ToggleButton
-        title="drag"
+        title="ctrl + alt + drag"
         value={DRAG_MODES.TRANSLATE_HORIZONTAL}
         aria-label={DRAG_MODES.TRANSLATE_HORIZONTAL}
         {...extraButtonProps}

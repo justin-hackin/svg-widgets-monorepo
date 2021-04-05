@@ -129,7 +129,6 @@ export const PrintLayer = observer(({
                     <g clipPath={`url(#${CLIP_PATH_ID})`}>
                       <image
                         xlinkHref={imageData}
-                        pointerEvents="bounding-box"
                         {...dimensions}
                         transform={
                           (new DOMMatrixReadOnly())

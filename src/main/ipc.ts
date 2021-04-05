@@ -38,14 +38,15 @@ export const setupIpc = (ipcMain) => {
     return fsPromises.writeFile(filePath, fileContent);
   }));
 
-  ipcMain.handle(EVENTS.DIALOG_SAVE_JSON, (e, jsonData, dialogOptions, extension, extensionName) => dialog.showSaveDialog({
-    ...dialogOptions,
-    filters: [{ name: extensionName || extension, extensions: [extension] }],
-  }).then(({ canceled, filePath }) => {
-    if (canceled) { return undefined; }
-    const resolvedFilePath = castToFilePathWithExtension(filePath, extension);
-    return fsPromises.writeFile(resolvedFilePath, JSON.stringify(jsonData));
-  }));
+  ipcMain.handle(EVENTS.DIALOG_SAVE_JSON,
+    (e, jsonData, dialogOptions, extension, extensionName) => dialog.showSaveDialog({
+      ...dialogOptions,
+      filters: [{ name: extensionName || extension, extensions: [extension] }],
+    }).then(({ canceled, filePath }) => {
+      if (canceled) { return undefined; }
+      const resolvedFilePath = castToFilePathWithExtension(filePath, extension);
+      return fsPromises.writeFile(resolvedFilePath, JSON.stringify(jsonData));
+    }));
 
   ipcMain.handle(EVENTS.DIALOG_SAVE_GLB, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,

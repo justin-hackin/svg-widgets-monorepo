@@ -12,20 +12,22 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import PublishIcon from '@material-ui/icons/Publish';
+import FilePicker from '@mavedev/react-file-picker';
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
 import { HistoryButtons } from
-    '../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
-import { extractCutHolesFromSvgString } from '../../../util/svg';
+  '../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { PanelSliderComponent } from '../../PanelSliderComponent';
 import { ShapeSelect } from '../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../../style/style';
-import { DEFAULT_SLIDER_STEP, EVENTS } from '../../../constants';
+import { DEFAULT_SLIDER_STEP, EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
+import { ITextureEditorModel } from '../models/TextureEditorModel';
+import { resolveImageDimensionsFromBase64, toBase64 } from '../../../util/data';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -44,6 +46,16 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   />
 );
 
+const UploadButton = ({ onClick = undefined }) => (
+  <IconButton
+    onClick={onClick}
+    aria-label="send texture"
+    component="span"
+  >
+    <PublishIcon fontSize="large" />
+  </IconButton>
+);
+
 export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
@@ -53,11 +65,11 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     shapePreview: { downloadShapeGLTF },
-    setTexturePath, setTextureImage,
+    assignTextureFromPatternInfo,
     shapeName,
     modifierTracking: { dragMode = undefined } = {},
     history,
-  } = pluginModel.textureEditor;
+  } = pluginModel.textureEditor as ITextureEditorModel;
   const {
     pattern, rotate: textureRotate, hasPathPattern,
   } = texture || {};
@@ -105,40 +117,83 @@ export const TextureControls = observer(({ hasCloseButton }) => {
       >
         {/* web app uses texture editor as standalone component without drawer */}
         {hasCloseButton && (
-        <IconButton
-          onClick={() => {
-            pluginModel.setTextureEditorOpen(false);
-          }}
-          aria-label="close texture editor"
-          component="span"
-        >
-          <ArrowForwardIcon fontSize="large" />
-        </IconButton>
+          <>
+            <IconButton
+              onClick={() => {
+                pluginModel.setTextureEditorOpen(false);
+              }}
+              aria-label="close texture editor"
+              component="span"
+            >
+              <ArrowForwardIcon fontSize="large" />
+            </IconButton>
+            <Divider />
+          </>
         )}
+
         {/* ************************************************************* */}
-        <IconButton
-          onClick={async () => {
-            const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
-            if (patternInfo) {
-              if (patternInfo.isPath) {
-                const { svgString, sourceFileName } = patternInfo;
-                const pathD = extractCutHolesFromSvgString(svgString);
-                setTexturePath(pathD, sourceFileName);
-              } else {
-                const { imageData, dimensions, sourceFileName } = patternInfo.pattern;
-                setTextureImage(imageData, dimensions, sourceFileName);
-              }
-            }
-          }}
-          aria-label="send texture"
-          component="span"
-        >
-          <PublishIcon fontSize="large" />
-        </IconButton>
+
+        {/*  @ts-ignore */}
+        {(() => { // eslint-disable-line consistent-return
+          if (process.env.BUILD_ENV === 'electron') {
+            return (
+              <UploadButton onClick={async () => {
+                const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
+                assignTextureFromPatternInfo(patternInfo);
+              }}
+              />
+            );
+          }
+          if (process.env.BUILD_ENV === 'web') {
+            return (
+              <FilePicker
+                extensions={['.jpg', '.jpeg', '.png', '.svg']}
+                onFilePicked={async (file) => {
+                  if (file) {
+                    if (file.type === 'image/svg+xml') {
+                      const svgString = await file.text();
+                      assignTextureFromPatternInfo({
+                        isPath: true,
+                        svgString,
+                        sourceFileName: file.name,
+                      });
+                    } else if (file.type === 'image/png' || file.type === 'image/jpg') {
+                    //  file is either png or jpg
+                      const imageData = await toBase64(file);
+                      const dimensions = await resolveImageDimensionsFromBase64(imageData);
+                      assignTextureFromPatternInfo({
+                        isPath: false,
+                        pattern: {
+                          imageData,
+                          dimensions,
+                          sourceFileName: file.name,
+                        },
+                      });
+                    }
+
+                  // TODO: user can still pick non-image, emit snackbar error in this case
+                  }
+                }}
+              >
+                <UploadButton />
+              </FilePicker>
+            );
+          }
+          throw new Error(INVALID_BUILD_ENV_ERROR);
+        })()}
         {history && (<HistoryButtons history={history} />)}
+        <Tooltip title="Download 3D model GLTF" arrow>
+          <span>
+            <IconButton
+              onClick={() => { downloadShapeGLTF(); }}
+              component="span"
+            >
+              <GetAppIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
         {pattern && !hasPathPattern && (
           <FormControlLabel
-            className={classes.checkboxControlLabel}
             labelPlacement="top"
             control={(
               <Switch
@@ -154,7 +209,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         )}
 
         <FormControlLabel
-          className={classes.checkboxControlLabel}
           labelPlacement="top"
           control={(
             <Switch
@@ -186,6 +240,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             </IconButton>
           </span>
         </Tooltip>
+        <DragModeOptionsGroup dragMode={dragMode} />
         {texture && (
           <>
             <Tooltip title="Save texture arrangement" arrow>
@@ -204,7 +259,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             {hasPathPattern && (
             <>
               <FormControlLabel
-                className={classes.checkboxControlLabel}
                 labelPlacement="top"
                 control={(
                   <Switch
@@ -227,7 +281,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 step={DEFAULT_SLIDER_STEP}
               />
               <FormControlLabel
-                className={classes.checkboxControlLabel}
                 labelPlacement="top"
                 control={(
                   <Switch
@@ -241,7 +294,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 label="Fill is positive"
               />
               <FormControlLabel
-                className={classes.checkboxControlLabel}
                 labelPlacement="top"
                 control={(
                   <Switch
@@ -336,14 +388,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 </MenuItem>
               ))}
             </Menu>
-            <DragModeOptionsGroup dragMode={dragMode} />
-            <Tooltip title="Download 3D model GLTF" arrow>
-              <span>
-                <IconButton onClick={() => { downloadShapeGLTF(); }} component="span">
-                  <GetAppIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
+
             <Tooltip title="Send shape decoration to Dieline Editor" arrow>
               <span>
                 <IconButton

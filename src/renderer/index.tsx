@@ -2,7 +2,6 @@ import React from 'react';
 import { render } from 'react-dom';
 import { observer } from 'mobx-react';
 import { DielineViewer } from './DielineViewer';
-import '../common/style/index.css';
 import { useWorkspaceMst } from './DielineViewer/models/WorkspaceModel';
 import { ProvidersWrapper } from '../common/components/ProvidersWrapper';
 

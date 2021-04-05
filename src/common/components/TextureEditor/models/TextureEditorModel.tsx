@@ -1,7 +1,7 @@
 import { inRange } from 'lodash';
 import {
   getParentOfType,
-  getSnapshot, Instance, resolvePath, types,
+  getSnapshot, Instance, tryResolve, types,
 } from 'mobx-state-tree';
 
 import { BoundaryModel } from './BoundaryModel';
@@ -19,8 +19,9 @@ import {
 } from '../../../models/ImageFaceDecorationPatternModel';
 import { ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { EVENTS } from '../../../constants';
 import { UndoManagerWithGroupState } from '../../UndoManagerWithGroupState';
+import { extractCutHolesFromSvgString } from '../../../util/svg';
+import { EVENTS } from '../../../constants';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -209,9 +210,10 @@ export const TextureEditorModel = types
         imageData, dimensions, sourceFileName,
       });
     },
+
     // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
     getFileBasename() {
-      return `${self.shapeName || 'shape'}__${resolvePath(self, '/texture/pattern/sourceFileName') || 'undecorated'}`;
+      return `${self.shapeName || 'shape'}__${tryResolve(self, '/texture/pattern/sourceFileName') || 'undecorated'}`;
     },
 
     // TODO: add limits for view scale and
@@ -287,22 +289,35 @@ export const TextureEditorModel = types
     setTextureFromSnapshot(textureSnapshot) {
       self.texture = TextureModel.create(textureSnapshot);
     },
-    openTextureArrangement() {
-      globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
+    // TODO: ts type the patternInfo
+    assignTextureFromPatternInfo(patternInfo) {
+      if (patternInfo) {
+        if (patternInfo.isPath) {
+          const { svgString, sourceFileName } = patternInfo;
+          const pathD = extractCutHolesFromSvgString(svgString);
+          this.setTexturePath(pathD, sourceFileName);
+        } else {
+          const { imageData, dimensions, sourceFileName } = patternInfo.pattern;
+          this.setTextureImage(imageData, dimensions, sourceFileName);
+        }
+      }
+    },
+    async openTextureArrangement() {
+      const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
         message: 'Import texture arrangement',
-      }, specFileExtension, specFileExtensionName).then((res) => {
-        // TODO: snackbar error alerts
-        if (!res) { return; }
+      }, specFileExtension, specFileExtensionName);
+      // TODO: snackbar error alerts
+      if (!res) { return; }
 
-        const { fileData: { shapeName, textureSnapshot } } = res;
-        if (!textureSnapshot) {
-          return;
-        }
-        if (shapeName !== self.shapeName) {
-          self.parentPyramidNetPluginModel.pyramidNetSpec.setPyramidShapeName(shapeName);
-        }
-        this.setTextureFromSnapshot(textureSnapshot);
-      });
+      // @ts-ignore
+      const { fileData: { shapeName, textureSnapshot } } = res;
+      if (!textureSnapshot) {
+        return;
+      }
+      if (shapeName !== self.shapeName) {
+        self.parentPyramidNetPluginModel.pyramidNetSpec.setPyramidShapeName(shapeName);
+      }
+      this.setTextureFromSnapshot(textureSnapshot);
     },
   }));
 

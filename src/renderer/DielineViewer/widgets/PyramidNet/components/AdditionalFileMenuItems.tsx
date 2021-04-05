@@ -28,10 +28,12 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
     <>
       {/* NEW */}
       <MenuItem onClick={async () => {
-        await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_SVG, store.renderDecorationBoundaryToString(), {
-          message: DOWNLOAD_TEMPLATE_TXT,
-          defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
-        });
+        if (process.env.BUILD_ENV === 'electron') {
+          await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_SVG, store.renderDecorationBoundaryToString(), {
+            message: DOWNLOAD_TEMPLATE_TXT,
+            defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
+          });
+        }
         resetFileMenuRef();
       }}
       >
@@ -43,11 +45,13 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
       {/* OPEN RAW SVG FACE DECORATION */}
       <MenuItem onClick={async () => {
-        await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
-          .then((svgString) => {
-            const d = extractCutHolesFromSvgString(svgString);
-            store.pyramidNetSpec.setRawFaceDecoration(d);
-          });
+        if (process.env.BUILD_ENV === 'electron') {
+          await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
+            .then((svgString) => {
+              const d = extractCutHolesFromSvgString(svgString);
+              store.pyramidNetSpec.setRawFaceDecoration(d);
+            });
+        }
         resetFileMenuRef();
       }}
       >
@@ -90,10 +94,11 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
       {/* DOWNLOAD TAB TEST */}
       <MenuItem onClick={async () => {
-        await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_SVG, store.renderTestTabsToString(store, preferencesStore), {
-          message: DOWNLOAD_TAB_TESTER_TXT,
-          defaultPath: `${store.getFileBasename()}--test-tabs.svg`,
-        });
+        await globalThis.ipcRenderer
+          .invoke(EVENTS.DIALOG_SAVE_SVG, store.renderTestTabsToString(store, preferencesStore), {
+            message: DOWNLOAD_TAB_TESTER_TXT,
+            defaultPath: `${store.getFileBasename()}--test-tabs.svg`,
+          });
         resetFileMenuRef();
       }}
       >

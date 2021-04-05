@@ -15,9 +15,7 @@ export const extractCutHolesFromSvgString = (svgString:string):string => {
 };
 
 export const extractViewBoxFromSvg = (svgString:string) => {
-  const doc = parseString(svgString);
-  // TODO: error handling
-  // @ts-ignore
+  const doc:Document = parseString(svgString);
   return doc.querySelector('svg').getAttribute('viewBox');
 };
 

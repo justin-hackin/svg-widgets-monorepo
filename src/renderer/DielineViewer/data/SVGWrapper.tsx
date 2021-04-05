@@ -20,6 +20,6 @@ const namedviewAttributes = {
 export const SVGWrapper = ({ children, ...rest }) => (
   <svg {...rest} {...svgNamespaceAttributes}>
     <SodipodiNamedview {...namedviewAttributes} />
-    {...children}
+    {children}
   </svg>
 );
