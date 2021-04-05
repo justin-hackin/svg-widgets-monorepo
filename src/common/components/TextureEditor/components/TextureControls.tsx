@@ -240,6 +240,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             </IconButton>
           </span>
         </Tooltip>
+        <DragModeOptionsGroup dragMode={dragMode} />
         {texture && (
           <>
             <Tooltip title="Save texture arrangement" arrow>
@@ -387,7 +388,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 </MenuItem>
               ))}
             </Menu>
-            <DragModeOptionsGroup dragMode={dragMode} />
 
             <Tooltip title="Send shape decoration to Dieline Editor" arrow>
               <span>
