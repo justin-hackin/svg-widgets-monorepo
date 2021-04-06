@@ -3,29 +3,20 @@
   "version": "1.0.0",
   "description": "A desktop application for the fabrication of flat-pack interlocking pyramids that form 3D stars and domes (geometric polyhedra)",
   "homepage": "http://example.com",
-  "main": "dist/main/main.js",
   "scripts": {
     "dev": "electron-webpack dev",
     "compile": "electron-webpack",
     "lint": "eslint src/**/*.ts{,x} --fix",
     "start": "node node_modules/electron/cli.js .",
-    "release": "yarn compile && electron-builder",
-    "web-build": "yarn web-clean-dist && webpack --config=src/web/webpack.config.js --mode production",
+    "release": "npm run compile && electron-builder",
+    "web-build": "npm run web-clean-dist && webpack --config=src/web/webpack.config.js --mode production",
     "web-clean-dist": "rimraf dist-web/*",
-    "web-start": "yarn web-start-dev",
+    "web-start": "npm run web-start-dev",
     "web-start-dev": "webpack-dev-server --config=src/web/webpack.config.js --mode development",
-    "web-start-prod": "yarn web-build && http-server dist-web/ -p 3000"
+    "web-start-prod": "npm run web-build && http-server dist-web/ -p 3000"
   },
-  "keywords": [
-    "react"
-  ],
   "author": "“Justin Barca <“justin.barca@protonmail.com”>",
   "license": "MIT",
-  "cmake-js": {
-    "runtime": "electron",
-    "runtimeVersion": "6.1.0",
-    "arch": "ia32"
-  },
   "dependencies": {
     "@flatten-js/boolean-op": "^1.1.4",
     "@flatten-js/core": "^1.2.20",
@@ -112,7 +103,6 @@
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3",
-    "webpack-merge": "^5.7.3",
-    "yarn": "^1.22.10"
+    "webpack-merge": "^5.7.3"
   }
 }
