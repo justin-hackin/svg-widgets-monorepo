@@ -25,8 +25,8 @@ import { ShapeSelect } from '../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../../style/style';
-import { DEFAULT_SLIDER_STEP, EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
-import { ITextureEditorModel, TOUR_ELEMENT_CLASSES } from '../models/TextureEditorModel';
+import { DEFAULT_SLIDER_STEP, EVENTS, INVALID_BUILD_ENV_ERROR, TOUR_ELEMENT_CLASSES } from '../../../constants';
+import { ITextureEditorModel} from '../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../util/data';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (

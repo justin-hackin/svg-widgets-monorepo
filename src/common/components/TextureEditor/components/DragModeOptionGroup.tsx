@@ -10,7 +10,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { useStyles } from '../../../style/style';
-import { TOUR_ELEMENT_CLASSES } from '../models/TextureEditorModel';
+import { TOUR_ELEMENT_CLASSES } from '../../../constants';
 
 // TODO: remove hover effects
 const extraButtonProps = {

@@ -10,7 +10,7 @@ import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { castCoordToRawPoint } from '../../../util/geom';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { ANALYTICS_BUFFERED_EVENTS } from '../models/TextureEditorModel';
+import { ANALYTICS_BUFFERED_EVENTS } from '../../../constants';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();
