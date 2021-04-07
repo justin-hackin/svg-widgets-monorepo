@@ -100,8 +100,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     fontSize: '2em',
   },
   shapeAvatar: {
-    width: 100,
-    height: 'auto',
+    // why does Electron build not need this extra specificity but web build does require
+    '&.MuiAvatar-root': {
+      width: 100,
+      height: 'auto',
+    },
   },
   shapeName: {
     marginLeft: theme.spacing(2),
@@ -136,7 +139,9 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexDirection: 'column',
   },
-  shapeSelect: {},
+  shapeSelect: {
+    marginTop: theme.spacing(1),
+  },
   compactShapeSelect: {},
   shapeSelectDisplay: {
     display: 'flex',
@@ -162,11 +167,13 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexDirection: 'column',
     '&$shapeSelect': {
-      marginBottom: theme.spacing(3),
       '&$compactShapeSelect': {
         width: '75px',
       },
     },
+  },
+  shapeHeightFormControl: {
+    marginTop: theme.spacing(3),
   },
   panelChromePicker: {
     alignSelf: 'flex-end',

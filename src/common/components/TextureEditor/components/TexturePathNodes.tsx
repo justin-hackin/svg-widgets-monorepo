@@ -1,6 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 // @ts-ignore
+import clsx from 'clsx';
 import { PathData } from '../../../../renderer/DielineViewer/util/PathData';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { ITextureEditorModel } from '../models/TextureEditorModel';
@@ -26,7 +27,7 @@ export const TexturePathNodes = observer(() => {
             <g key={`${index}--${cx},${cy}`}>
               <circle
                 {...{ cx, cy }}
-                className={`${classes.textureNode} ${selectedTextureNodeIndex === index ? 'selected' : ''}`}
+                className={clsx(classes.textureNode, (selectedTextureNodeIndex === index) && 'selected')}
                 stroke="none"
                 r={(nodeScaleMux * longerTextureSideLength) / 500}
               />

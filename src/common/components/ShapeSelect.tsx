@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 import { startCase, sortBy } from 'lodash';
 import { observer } from 'mobx-react';
+import clsx from 'clsx';
 
 import { useStyles } from '../style/style';
 import { polyhedra } from '../../renderer/DielineViewer/data/polyhedra';
@@ -27,16 +28,17 @@ export const ShapeSelect = observer(({
     displayEmpty,
     onChange,
   };
-
-  const optionalCompactClass = isCompactDisplay ? classes.compactShapeSelect : undefined;
-  const selectDisplayClassName = `${classes.shapeSelectDisplay} ${
-    optionalCompactClass}`;
+  const classNames = clsx(
+    className, classes.shapeSelect, classes.formControl, isCompactDisplay && classes.compactShapeSelect,
+  );
   return (
-    <FormControl className={`${className} ${classes.shapeSelect} ${classes.formControl} ${optionalCompactClass}`}>
+    <FormControl className={classNames}>
       { !isCompactDisplay && <InputLabel id={labelId}>{ label }</InputLabel>}
       <Select
         {...selectProps}
-        SelectDisplayProps={{ className: selectDisplayClassName }}
+        SelectDisplayProps={{
+          className: clsx(classes.shapeSelectDisplay, isCompactDisplay && classes.compactShapeSelect),
+        }}
       >
         {sortBy(Object.keys(polyhedra)).map((shapeName, i) => (
           <MenuItem key={i} value={shapeName}>

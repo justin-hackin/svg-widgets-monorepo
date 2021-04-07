@@ -109,10 +109,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   return (
     <AppBar color="inherit" position="relative">
       <Toolbar
-        className={clsx({
-          [classes.textureToolbar]: true,
-          [classes.textureToolbarWithTexture]: !!texture,
-        })}
+        className={clsx(classes.textureToolbar, texture && classes.textureToolbarWithTexture)}
         variant="dense"
       >
         {/* web app uses texture editor as standalone component without drawer */}

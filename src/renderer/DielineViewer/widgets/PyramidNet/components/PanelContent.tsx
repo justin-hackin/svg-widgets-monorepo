@@ -59,6 +59,7 @@ export const PanelContent = observer(() => {
           name="polyhedron-shape"
         />
         <PanelSliderOrTextInput
+          className={classes.shapeHeightFormControl}
           node={pyramidNetSpec}
           property="shapeHeight"
           min={20 * PIXELS_PER_CM}

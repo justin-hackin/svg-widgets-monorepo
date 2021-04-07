@@ -5,6 +5,7 @@ import { FormControl, IconButton, Typography } from '@material-ui/core';
 import TuneIcon from '@material-ui/icons/Tune';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 import { observer } from 'mobx-react';
+import clsx from 'clsx';
 
 import { useStyles } from '../style/style';
 import { SubmittableTextInput } from './SubmittableTextInput';
@@ -26,7 +27,7 @@ export const PanelSliderOrTextInput = observer(({
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
 
   return (
-    <FormControl className={`${classes.formControl} ${className}`}>
+    <FormControl className={clsx(classes.formControl, className)}>
       <Typography id={labelId} gutterBottom>
         {resolvedLabel}
       </Typography>
