@@ -10,6 +10,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { useStyles } from '../../../style/style';
+import { TOUR_ELEMENT_CLASSES } from '../models/TextureEditorModel';
 
 // TODO: remove hover effects
 const extraButtonProps = {
@@ -22,6 +23,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
   const classes = useStyles();
   return (
     <ToggleButtonGroup
+      className={TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR}
       value={dragMode}
       style={{ height: 'fit-content', margin: '0.5em' }}
       exclusive

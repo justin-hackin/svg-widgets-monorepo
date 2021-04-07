@@ -4,10 +4,12 @@ import RedoIcon from '@material-ui/icons/Redo';
 import UndoIcon from '@material-ui/icons/Undo';
 import { observer } from 'mobx-react';
 
+import { TOUR_ELEMENT_CLASSES } from '../../../../../../common/components/TextureEditor/models/TextureEditorModel';
+
 export const HistoryButtons = observer(({ history }) => (
   <>
     <Tooltip title="Undo" arrow>
-      <span>
+      <span className={TOUR_ELEMENT_CLASSES.HISTORY_BUTTONS}>
         <IconButton
           color="inherit"
           aria-label="Undo"

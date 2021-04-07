@@ -39,6 +39,23 @@ export enum ANALYTICS_BUFFERED_EVENTS {
   SCROLL_SCALE_VIEW = 'scroll-scale-view',
 }
 
+export enum TOUR_ELEMENT_CLASSES {
+  SHAPE_SELECT = 'shape-select--tour',
+  ROTATE_3D = 'rotate-3d--tour',
+  UPLOAD_IMAGE = 'upload-image--tour',
+  HISTORY_BUTTONS = 'history-buttons--tour',
+  DOWNLOAD_3D = 'download-3d--tour',
+  IS_BORDERED = 'is-bordered--tour',
+  DRAG_MODE_INDICATOR = 'drag-mode-indicator--tour',
+  OPEN_TEXTURE_ARRANGEMENT = 'open-texture-arrangement--tour',
+  SAVE_TEXTURE_ARRANGEMENT = 'save-texture-arrangement--tour',
+  SNAP_MENU = 'snap-menu--tour',
+  NODE_INPUTS = 'node-inputs--tour',
+  FILL_IS_POSITIVE = 'fill-is-positive--tour',
+  USE_ALPHA_TEXTURE = 'use-alpha-texture--tour',
+  ROTATE_INPUT = 'rotate-input--tour',
+}
+
 const getCoverScale = (bounds, image) => {
   const widthScale = bounds.width / image.width;
   const heightScale = bounds.height / image.height;

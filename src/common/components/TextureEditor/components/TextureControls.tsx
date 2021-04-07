@@ -26,7 +26,7 @@ import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/Works
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../../style/style';
 import { DEFAULT_SLIDER_STEP, EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
-import { ITextureEditorModel } from '../models/TextureEditorModel';
+import { ITextureEditorModel, TOUR_ELEMENT_CLASSES } from '../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../util/data';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
@@ -48,6 +48,7 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
 
 const UploadButton = ({ onClick = undefined }) => (
   <IconButton
+    className={TOUR_ELEMENT_CLASSES.UPLOAD_IMAGE}
     onClick={onClick}
     aria-label="send texture"
     component="span"
@@ -128,6 +129,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           </>
         )}
         <ShapeSelect
+          className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
           isCompactDisplay
           value={shapeName}
           onChange={(e) => {
@@ -136,6 +138,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           name="polyhedron-shape"
         />
         <FormControlLabel
+          className={TOUR_ELEMENT_CLASSES.ROTATE_3D}
           labelPlacement="top"
           control={(
             <Switch
@@ -202,6 +205,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         <Tooltip title="Download 3D model GLTF" arrow>
           <span>
             <IconButton
+              className={TOUR_ELEMENT_CLASSES.DOWNLOAD_3D}
               onClick={() => { downloadShapeGLTF(); }}
               component="span"
             >
@@ -212,6 +216,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         <DragModeOptionsGroup dragMode={dragMode} />
         {pattern && !hasPathPattern && (
           <FormControlLabel
+            className={TOUR_ELEMENT_CLASSES.IS_BORDERED}
             labelPlacement="top"
             control={(
               <Switch
@@ -229,6 +234,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         <Tooltip title="Open texture arrangement" arrow>
           <span>
             <IconButton
+              className={TOUR_ELEMENT_CLASSES.OPEN_TEXTURE_ARRANGEMENT}
               onClick={() => { openTextureArrangement(); }}
               aria-label="open texture"
               component="span"
@@ -242,6 +248,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             <Tooltip title="Save texture arrangement" arrow>
               <span>
                 <IconButton
+                  className={TOUR_ELEMENT_CLASSES.SAVE_TEXTURE_ARRANGEMENT}
                   onClick={() => {
                     saveTextureArrangement();
                   }}
@@ -253,6 +260,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               </span>
             </Tooltip>
             <Button
+              className={TOUR_ELEMENT_CLASSES.SNAP_MENU}
               startIcon={<TrackChangesIcon />}
               aria-controls="simple-menu"
               aria-haspopup="true"
@@ -263,29 +271,32 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             {/* menu content at bottom section */}
             {hasPathPattern && (
               <>
+                <span className={TOUR_ELEMENT_CLASSES.NODE_INPUTS}>
+                  <FormControlLabel
+                    labelPlacement="top"
+                    control={(
+                      <Switch
+                        checked={showNodes}
+                        onChange={(e) => {
+                          setShowNodes(e.target.checked);
+                        }}
+                        color="primary"
+                      />
+                    )}
+                    label="Node selection"
+                  />
+                  <PanelSliderComponent
+                    node={pluginModel.textureEditor}
+                    property="nodeScaleMux"
+                    className={classes.nodeScaleMuxSlider}
+                    label="Node size"
+                    min={0.1}
+                    max={10}
+                    step={DEFAULT_SLIDER_STEP}
+                  />
+                </span>
                 <FormControlLabel
-                  labelPlacement="top"
-                  control={(
-                    <Switch
-                      checked={showNodes}
-                      onChange={(e) => {
-                        setShowNodes(e.target.checked);
-                      }}
-                      color="primary"
-                    />
-                  )}
-                  label="Node selection"
-                />
-                <PanelSliderComponent
-                  node={pluginModel.textureEditor}
-                  property="nodeScaleMux"
-                  className={classes.nodeScaleMuxSlider}
-                  label="Node size"
-                  min={0.1}
-                  max={10}
-                  step={DEFAULT_SLIDER_STEP}
-                />
-                <FormControlLabel
+                  className={TOUR_ELEMENT_CLASSES.FILL_IS_POSITIVE}
                   labelPlacement="top"
                   control={(
                     <Switch
@@ -299,6 +310,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                   label="Fill is positive"
                 />
                 <FormControlLabel
+                  className={TOUR_ELEMENT_CLASSES.USE_ALPHA_TEXTURE}
                   labelPlacement="top"
                   control={(
                     <Switch
@@ -315,7 +327,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             )}
 
             <TextField
-              className={classes.rotationInput}
+              className={clsx(classes.rotationInput, TOUR_ELEMENT_CLASSES.ROTATE_INPUT)}
               label="Rotate"
               value={textureRotate}
               onChange={({ target: { value } = {} }) => {
