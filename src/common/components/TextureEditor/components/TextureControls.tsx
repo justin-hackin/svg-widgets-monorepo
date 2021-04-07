@@ -127,6 +127,27 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             <Divider />
           </>
         )}
+        <ShapeSelect
+          isCompactDisplay
+          value={shapeName}
+          onChange={(e) => {
+            pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
+          }}
+          name="polyhedron-shape"
+        />
+        <FormControlLabel
+          labelPlacement="top"
+          control={(
+            <Switch
+              checked={autoRotatePreview}
+              onChange={(e) => {
+                setAutoRotatePreview(e.target.checked);
+              }}
+              color="primary"
+            />
+          )}
+          label="Rotate 3D"
+        />
 
         {/* ************************************************************* */}
 
@@ -167,7 +188,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                         },
                       });
                     }
-
                   // TODO: user can still pick non-image, emit snackbar error in this case
                   }
                 }}
@@ -189,6 +209,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             </IconButton>
           </span>
         </Tooltip>
+        <DragModeOptionsGroup dragMode={dragMode} />
         {pattern && !hasPathPattern && (
           <FormControlLabel
             labelPlacement="top"
@@ -205,27 +226,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           />
         )}
 
-        <FormControlLabel
-          labelPlacement="top"
-          control={(
-            <Switch
-              checked={autoRotatePreview}
-              onChange={(e) => {
-                setAutoRotatePreview(e.target.checked);
-              }}
-              color="primary"
-            />
-          )}
-          label="Auto-rotate preview"
-        />
-        <ShapeSelect
-          isCompactDisplay
-          value={shapeName}
-          onChange={(e) => {
-            pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
-          }}
-          name="polyhedron-shape"
-        />
         <Tooltip title="Open texture arrangement" arrow>
           <span>
             <IconButton
@@ -237,7 +237,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             </IconButton>
           </span>
         </Tooltip>
-        <DragModeOptionsGroup dragMode={dragMode} />
         {texture && (
           <>
             <Tooltip title="Save texture arrangement" arrow>
@@ -253,57 +252,66 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 </IconButton>
               </span>
             </Tooltip>
+            <Button
+              startIcon={<TrackChangesIcon />}
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleCornerSnapMenuClick}
+            >
+              Snap
+            </Button>
+            {/* menu content at bottom section */}
             {hasPathPattern && (
-            <>
-              <FormControlLabel
-                labelPlacement="top"
-                control={(
-                  <Switch
-                    checked={showNodes}
-                    onChange={(e) => {
-                      setShowNodes(e.target.checked);
-                    }}
-                    color="primary"
-                  />
-              )}
-                label="Node selection"
-              />
-              <PanelSliderComponent
-                node={pluginModel.textureEditor}
-                property="nodeScaleMux"
-                className={classes.nodeScaleMuxSlider}
-                label="Node size"
-                min={0.1}
-                max={10}
-                step={DEFAULT_SLIDER_STEP}
-              />
-              <FormControlLabel
-                labelPlacement="top"
-                control={(
-                  <Switch
-                    checked={pattern.isPositive}
-                    onChange={(e) => {
-                      pattern.setIsPositive(e.target.checked);
-                    }}
-                    color="primary"
-                  />
-                )}
-                label="Fill is positive"
-              />
-              <FormControlLabel
-                labelPlacement="top"
-                control={(
-                  <Switch
-                    checked={pattern.useAlphaTexturePreview}
-                    onChange={(e) => {
-                      pattern.setUseAlphaTexturePreview(e.target.checked);
-                    }}
-                    color="primary"
-                  />
-                )}
-                label="Use Alpha Texture"
-              />
-            </>
+              <>
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={(
+                    <Switch
+                      checked={showNodes}
+                      onChange={(e) => {
+                        setShowNodes(e.target.checked);
+                      }}
+                      color="primary"
+                    />
+                  )}
+                  label="Node selection"
+                />
+                <PanelSliderComponent
+                  node={pluginModel.textureEditor}
+                  property="nodeScaleMux"
+                  className={classes.nodeScaleMuxSlider}
+                  label="Node size"
+                  min={0.1}
+                  max={10}
+                  step={DEFAULT_SLIDER_STEP}
+                />
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={(
+                    <Switch
+                      checked={pattern.isPositive}
+                      onChange={(e) => {
+                        pattern.setIsPositive(e.target.checked);
+                      }}
+                      color="primary"
+                    />
+                  )}
+                  label="Fill is positive"
+                />
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={(
+                    <Switch
+                      checked={pattern.useAlphaTexturePreview}
+                      onChange={(e) => {
+                        pattern.setUseAlphaTexturePreview(e.target.checked);
+                      }}
+                      color="primary"
+                    />
+                  )}
+                  label="Use Alpha Texture"
+                />
+              </>
             )}
 
             <TextField
@@ -329,14 +337,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               }}
               variant="filled"
             />
-            <Button
-              startIcon={<TrackChangesIcon />}
-              aria-controls="simple-menu"
-              aria-haspopup="true"
-              onClick={handleCornerSnapMenuClick}
-            >
-              Snap
-            </Button>
+            {/* ===================== SNAP MENU ===================== */}
             <Menu
               id="simple-menu"
               anchorEl={positionSnapMenuAnchorEl}
