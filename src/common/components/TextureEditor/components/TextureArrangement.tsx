@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGesture, useDrag } from 'react-use-gesture';
+import { useDrag, useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash';
 import { Paper } from '@material-ui/core';
 import { observer } from 'mobx-react';
@@ -10,6 +10,7 @@ import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { castCoordToRawPoint } from '../../../util/geom';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { ANALYTICS_BUFFERED_EVENTS } from '../models/TextureEditorModel';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -23,9 +24,10 @@ export const TextureArrangement = observer(() => {
     minImageScale, maxImageScale,
     viewScaleDiff, setViewScaleDiff, reconcileViewScaleDiff,
     modifierTracking: { dragMode = undefined } = {},
+    incrementTransformsBuffer,
   } = pyramidNetPluginStore.textureEditor || {};
   const {
-    setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
+    translateDiff, setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
     reconcileTranslateDiff, reconcileRotateDiff, reconcileScaleDiff, reconcileTransformOriginDiff,
   } = texture || {};
   // Init
@@ -37,6 +39,7 @@ export const TextureArrangement = observer(() => {
         setViewScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
       } else {
         reconcileViewScaleDiff();
+        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.DRAG_SCALE_VIEW);
       }
     }
 
@@ -56,6 +59,11 @@ export const TextureArrangement = observer(() => {
           setTranslateDiff({ x: svgMovement.x, y: 0 });
         }
       } else {
+        // could lead to false categorization but it's unlikely that the drag diff would be exactly 0 for either axis
+        // if dragMode is TRANSLATE
+        const translateType = (translateDiff.x === 0 || translateDiff.y === 0)
+          ? ANALYTICS_BUFFERED_EVENTS.DRAG_TRANSLATE_AXIS : ANALYTICS_BUFFERED_EVENTS.DRAG_TRANSLATE;
+        incrementTransformsBuffer(translateType);
         reconcileTranslateDiff();
       }
     } else if (dragMode === DRAG_MODES.ROTATE) {
@@ -63,12 +71,14 @@ export const TextureArrangement = observer(() => {
         setRotateDiff((movementPt.y / placementAreaDimensions.height) * 360);
       } else {
         reconcileRotateDiff();
+        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.DRAG_ROTATE);
       }
     } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
       if (down) {
         setScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
       } else {
         reconcileScaleDiff();
+        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.DRAG_SCALE_TEXTURE);
       }
     }
   });
@@ -81,6 +91,7 @@ export const TextureArrangement = observer(() => {
       setTransformOriginDiff(castCoordToRawPoint(relDelta));
     } else {
       reconcileTransformOriginDiff();
+      incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.DRAG_ORIGIN);
     }
   });
 
@@ -105,12 +116,15 @@ export const TextureArrangement = observer(() => {
       if (!placementAreaDimensions || !decorationBoundary) { return; }
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
         reconcileViewScaleDiff();
+        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.SCROLL_SCALE_VIEW);
       }
       if (!texture) { return; }
       if (dragMode === DRAG_MODES.ROTATE) {
         reconcileRotateDiff();
+        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.SCROLL_ROTATE);
       } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
         reconcileScaleDiff();
+        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.SCROLL_SCALE_TEXTURE);
       }
     },
   });

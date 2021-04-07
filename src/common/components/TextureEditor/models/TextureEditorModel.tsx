@@ -27,6 +27,18 @@ import { EVENTS } from '../../../constants';
 const DEFAULT_IS_POSITIVE = true;
 const DEFAULT_VIEW_SCALE = 0.8;
 
+export enum ANALYTICS_BUFFERED_EVENTS {
+  DRAG_TRANSLATE = 'drag-translate',
+  DRAG_TRANSLATE_AXIS = 'drag-translate-axis',
+  DRAG_ROTATE = 'drag-rotate',
+  DRAG_SCALE_TEXTURE = 'drag-scale-texture',
+  DRAG_SCALE_VIEW = 'drag-scale-view',
+  DRAG_ORIGIN ='drag-origin',
+  SCROLL_ROTATE = 'scroll-rotate',
+  SCROLL_SCALE_TEXTURE ='scroll-scale-texture',
+  SCROLL_SCALE_VIEW = 'scroll-scale-view',
+}
+
 const getCoverScale = (bounds, image) => {
   const widthScale = bounds.width / image.width;
   const heightScale = bounds.height / image.height;
@@ -319,6 +331,46 @@ export const TextureEditorModel = types
       }
       this.setTextureFromSnapshot(textureSnapshot);
     },
-  }));
+  }))
+  .actions(() => {
+    // ======== ANALYTICS TRACkING ========
+    if (process.env.BUILD_ENV !== 'web' || process.env.NODE_ENV === 'development') {
+      // reduces the number of env checks in call sites while preserving type safety
+      return {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        incrementTransformsBuffer(type: ANALYTICS_BUFFERED_EVENTS) {},
+      };
+    }
+
+    const numTransformsByType = Object.keys(ANALYTICS_BUFFERED_EVENTS)
+      .reduce((acc, type) => {
+        acc[type] = 0;
+        return acc;
+      }, {});
+
+    let sendAnaylticsBuffersInterval;
+    const sendAnalytics = () => {
+      Object.keys(numTransformsByType).forEach((type) => {
+        if (numTransformsByType[type]) {
+          // TODO: why doesn't typescript respect globals
+          // @ts-ignore
+          dataLayer.push({ [type]: numTransformsByType[type] });
+          numTransformsByType[type] = 0;
+        }
+      });
+    };
+    return {
+      afterCreate() {
+        sendAnaylticsBuffersInterval = setInterval(sendAnalytics, 60000);
+      },
+      beforeDestroy() {
+        sendAnalytics();
+        clearInterval(sendAnaylticsBuffersInterval);
+      },
+      incrementTransformsBuffer(type: ANALYTICS_BUFFERED_EVENTS) {
+        numTransformsByType[type] += 1;
+      },
+    };
+  });
 
 export interface ITextureEditorModel extends Instance<typeof TextureEditorModel> {}

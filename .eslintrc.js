@@ -40,5 +40,6 @@ module.exports = {
   },
   globals: {
     __static: true,
+    dataLayer: true,
   },
 };
