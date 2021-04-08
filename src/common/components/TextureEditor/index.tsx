@@ -10,7 +10,7 @@ import { useStyles } from '../../style/style';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
-import { TOUR_STEPS } from '../../constants';
+import { TOUR_STEPS } from '../../util/analytics';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();

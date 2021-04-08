@@ -4,7 +4,7 @@ import RedoIcon from '@material-ui/icons/Redo';
 import UndoIcon from '@material-ui/icons/Undo';
 import { observer } from 'mobx-react';
 
-import { TOUR_ELEMENT_CLASSES } from '../../../../../../common/constants';
+import { TOUR_ELEMENT_CLASSES } from '../../../../../../common/util/analytics';
 
 export const HistoryButtons = observer(({ history }) => (
   <>

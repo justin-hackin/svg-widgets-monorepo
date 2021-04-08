@@ -18,7 +18,8 @@ import { ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { UndoManagerWithGroupState } from '../../UndoManagerWithGroupState';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
-import { ANALYTICS_BUFFERED_EVENTS, EVENTS } from '../../../constants';
+import { EVENTS } from '../../../constants';
+import { ANALYTICS_BUFFERED_EVENTS } from '../../../util/analytics';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
