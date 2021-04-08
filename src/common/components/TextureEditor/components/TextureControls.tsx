@@ -271,7 +271,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             {/* menu content at bottom section */}
             {hasPathPattern && (
               <>
-                <span className={TOUR_ELEMENT_CLASSES.NODE_INPUTS}>
+                <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.textureEditorNodeInputs)}>
                   <FormControlLabel
                     labelPlacement="top"
                     control={(

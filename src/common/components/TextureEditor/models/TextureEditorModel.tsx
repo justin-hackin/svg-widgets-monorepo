@@ -1,5 +1,7 @@
 import { inRange } from 'lodash';
-import { getParentOfType, getSnapshot, Instance, tryResolve, types, } from 'mobx-state-tree';
+import {
+  getParentOfType, getSnapshot, Instance, tryResolve, types,
+} from 'mobx-state-tree';
 
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
@@ -11,7 +13,7 @@ import {
   sumPoints,
   transformPoint,
 } from '../../../util/geom';
-import { IImageFaceDecorationPatternModel, } from '../../../models/ImageFaceDecorationPatternModel';
+import { IImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
 import { ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { UndoManagerWithGroupState } from '../../UndoManagerWithGroupState';

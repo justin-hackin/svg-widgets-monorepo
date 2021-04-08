@@ -30,7 +30,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
       aria-label="drag mode"
     >
       <ToggleButton
-        title="drag"
+        title="translate: drag"
         value={DRAG_MODES.TRANSLATE}
         aria-label={DRAG_MODES.TRANSLATE}
         {...extraButtonProps}
@@ -38,7 +38,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
         <OpenWithIcon />
       </ToggleButton>
       <ToggleButton
-        title="ctrl + shift + drag"
+        title="translate vertically: ctrl + shift + drag"
         value={DRAG_MODES.TRANSLATE_VERTICAL}
         aria-label={DRAG_MODES.TRANSLATE_VERTICAL}
         {...extraButtonProps}
@@ -46,7 +46,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
         <HeightIcon />
       </ToggleButton>
       <ToggleButton
-        title="ctrl + alt + drag"
+        title="translate horizontally: ctrl + alt + drag"
         value={DRAG_MODES.TRANSLATE_HORIZONTAL}
         aria-label={DRAG_MODES.TRANSLATE_HORIZONTAL}
         {...extraButtonProps}
@@ -54,7 +54,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
         <HeightIcon classes={{ root: classes.rotateButton }} />
       </ToggleButton>
       <ToggleButton
-        title="shift + drag/wheel"
+        title="rotate: shift + drag/wheel"
         value={DRAG_MODES.ROTATE}
         aria-label={DRAG_MODES.ROTATE}
         {...extraButtonProps}
@@ -62,7 +62,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
         <CachedIcon />
       </ToggleButton>
       <ToggleButton
-        title="ctrl + drag/wheel"
+        title="scale texture: ctrl + drag/wheel"
         value={DRAG_MODES.SCALE_TEXTURE}
         aria-label={DRAG_MODES.SCALE_TEXTURE}
         {...extraButtonProps}
@@ -70,7 +70,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
         <ZoomOutMapIcon />
       </ToggleButton>
       <ToggleButton
-        title="alt + drag/wheel"
+        title="zoom in/out: alt + drag/wheel"
         value={DRAG_MODES.SCALE_VIEW}
         aria-label={DRAG_MODES.SCALE_VIEW}
         {...extraButtonProps}

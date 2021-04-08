@@ -2,6 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@material-ui/styles';
 import clsx from 'clsx';
+import Joyride from 'react-joyride';
 
 import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
@@ -9,6 +10,7 @@ import { useStyles } from '../../style/style';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
+import { TOUR_STEPS } from '../../constants';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
@@ -55,6 +57,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
 
   return (
     <div className={clsx(classes.fullPage, classes.textureEditorRoot)}>
+      <Joyride steps={TOUR_STEPS} showSkipButton continuous disableCloseOnEsc disableOverlayClose />
       <TextureControls hasCloseButton={hasCloseButton} />
       <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
         <TextureArrangement />

@@ -268,6 +268,9 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
       justifyContent: 'space-around',
     },
   },
+  textureEditorNodeInputs: {
+    display: 'contents',
+  },
 }));
 
 export const theme = createMuiTheme(darkThemeOptions);
