@@ -179,7 +179,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                         svgString,
                         sourceFileName: file.name,
                       });
-                    } else if (file.type === 'image/png' || file.type === 'image/jpg') {
+                    } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
                     //  file is either png or jpg
                       const imageData = await toBase64(file);
                       const dimensions = await resolveImageDimensionsFromBase64(imageData);
