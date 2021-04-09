@@ -1,9 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
+import clsx from 'clsx';
 import { ITextureEditorModel } from '../models/TextureEditorModel';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { useStyles } from '../../../style/style';
+import { TOUR_ELEMENT_CLASSES } from '../../../util/analytics';
 
 const { useEffect, useRef } = React;
 
@@ -22,5 +24,10 @@ export const ShapePreview = observer(() => {
     return (() => { tearDown(); });
   }, [threeContainerRef]);
 
-  return (<div ref={threeContainerRef} className={classes.shapePreviewContainer} />);
+  return (
+    <div
+      ref={threeContainerRef}
+      className={clsx(classes.shapePreviewContainer, TOUR_ELEMENT_CLASSES.SHAPE_PREVIEW_AREA)}
+    />
+  );
 });
