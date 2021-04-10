@@ -6,7 +6,7 @@ import Joyride, { EVENTS } from 'react-joyride';
 
 import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { useStyles } from '../../style/style';
+import { theme, useStyles } from '../../style/style';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
@@ -88,6 +88,13 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
         steps={TOUR_STEPS}
         stepIndex={stepIndex}
         callback={joyrideCallback}
+        styles={{
+          options: {
+            backgroundColor: theme.palette.grey.A400,
+            arrowColor: theme.palette.grey.A400,
+            textColor: theme.palette.grey['300'],
+          },
+        }}
         run={needsTour}
         showSkipButton
         continuous

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Step } from 'react-joyride';
+import { theme } from '../style/style';
 
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable max-len */
@@ -33,6 +34,8 @@ export enum STEP_ACTIONS {
   ADD_IMAGE_TEXTURE,
 }
 
+// TODO: consider custom component for tour using Material UI Popper
+const linkStyle = { color: theme.palette.primary.main };
 export const TOUR_STEPS: MyStep[] = [
   {
     target: 'body',
@@ -82,19 +85,21 @@ export const TOUR_STEPS: MyStep[] = [
           disable ctrl+scroll in Chrome with
           {' '}
           <a
+            style={linkStyle}
             href="https://chrome.google.com/webstore/detail/disable-ctrl-%20-scroll-whe/mdpfkohgfpidohkakdbpmnngaocglmhl"
           >
             this extension
           </a>
           or with
           {' '}
-          <a href="https://duntuk.com/disable-scroll-wheel-zoom-firefox">a setting in Firefox</a>
+          <a style={linkStyle} href="https://duntuk.com/disable-scroll-wheel-zoom-firefox">a setting in Firefox</a>
           .
         </p>
         <p>
           A must for KDE Linux users: disable alt+drag window move feature (see
           {' '}
           <a
+            style={linkStyle}
             href="https://superuser.com/questions/584730/how-can-i-disable-alt-mouse-default-behavior-in-kde"
           >
             this question
@@ -134,7 +139,7 @@ export const TOUR_STEPS: MyStep[] = [
         Like what you see? This button will let you download the 3D model in .glb format.
         Not sure what to do with a .glb file? Why not drag and drop it into a virtual meeting room on
         {' '}
-        <a target="_blank" href="http://hubs.mozilla.com" rel="noreferrer">http://hubs.mozilla.com</a>
+        <a style={linkStyle} target="_blank" href="http://hubs.mozilla.com" rel="noreferrer">http://hubs.mozilla.com</a>
         {' '}
         and invite your friends to come see your creation.
       </>
@@ -201,31 +206,32 @@ export const TOUR_STEPS: MyStep[] = [
         <p>
           This app is a work-in-progress so your feedback would be greatly appreciated. You can report bugs and make feature suggestions by emailing
           {' '}
-          <a href="mailto:playful.geometer@protonmail.com">Playful Geometer</a>
+          <a style={linkStyle} href="mailto:playful.geometer@protonmail.com">Playful Geometer</a>
           .
         </p>
         <p>
           If you would also like to try building a sample model from pyramid net dielines, you can take a look at
           {' '}
           <a
+            style={linkStyle}
             href="https://www.hylo.com/groups/stellar-coinciders/post/37875"
           >
             this post
           </a>
           . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and join a participatory design community, please reach out in order to join the alpha test group. Playful Geometer aspires to assemble a team of artists, product/graphic designers, coders, crafters, gifters and community animators. A model of organization being explored:
           {' '}
-          <a href="https://disco.coop/">disco.coop</a>
+          <a style={linkStyle} href="https://disco.coop/">disco.coop</a>
           .
         </p>
         <p>
-          If you are interested in using exported 3D models for commercial purposes, please request permission by email before doing so.
+          If you are interested in using exported 3D models for commercial purposes, please obtain permission by email before doing so.
         </p>
         <p>
           Disclosure: this app anonymously logs the frequency of drag, scroll, and image upload, and shape change operations but all image data and file names remain private. Logged data will be used to improve the user experience of this app. Disabling any ad blockers you may have on this site will allow you to contribute to the enhancement of this app.
         </p>
         <p />
         <p>
-          Should you need to revisit this tour, you can do so by pressing ❓ button in the toolbar. Enjoy!
+          Should you need to revisit this tour, you can do so by pressing ❔ button in the toolbar. Enjoy!
         </p>
       </>
     ),
