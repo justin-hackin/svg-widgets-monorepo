@@ -132,8 +132,11 @@ export const TextureSvgUnobserved = ({
                 );
               }
               const { imageData, dimensions } = pattern as IImageFaceDecorationPatternModel;
+              // pointerEvents: 'none' solves problem of ghost-drag image
+              // see: https://stackoverflow.com/a/26792179/2780052
               return (
                 <image
+                  style={{ pointerEvents: 'none' }}
                   xlinkHref={imageData}
                   {...dimensions}
                   {...textureTranslationUseDrag()}
