@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { ITextureEditorModel } from '../models/TextureEditorModel';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { useStyles } from '../../../style/style';
-import { TOUR_ELEMENT_CLASSES } from '../../../util/analytics';
+import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
 
 const { useEffect, useRef } = React;
 

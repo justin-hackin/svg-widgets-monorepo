@@ -269,7 +269,7 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     },
   },
   textureEditorNodeInputs: {
-    display: 'contents',
+    display: 'inline-flex',
   },
 }));
 

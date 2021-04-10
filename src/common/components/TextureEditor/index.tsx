@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@material-ui/styles';
 import clsx from 'clsx';
 import Joyride, { EVENTS } from 'react-joyride';
@@ -11,12 +11,15 @@ import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
 import {
-  SAMPLE_PATH_D, SAMPLE_IMAGE_DATA, TOUR_ELEMENT_CLASSES, TOUR_STEPS, STEP_ACTIONS,
-} from '../../util/analytics';
+  MyStep, SAMPLE_IMAGE_SNAPSHOT, SAMPLE_PATH_SNAPSHOT, STEP_ACTIONS, TOUR_STEPS,
+} from '../../util/tour';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
   const { needsTour, setNeedsTour } = workspaceStore.preferences;
+  const [stepIndex, setStepIndex] = useState<number>(0);
+  const incrementStepIndex = (index) => { setStepIndex(index + 1); };
+  const resetStepIndex = () => { setStepIndex(0); };
   const mainAreaRef = useRef<HTMLDivElement>();
   const pyramidNetPluginStore: IPyramidNetPluginModel = workspaceStore.selectedStore;
   if (!pyramidNetPluginStore || !pyramidNetPluginStore.textureEditor) {
@@ -24,7 +27,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   }
   // ==================================================================================================================
   const {
-    setPlacementAreaDimensions, setTexturePath, setTextureImage,
+    setPlacementAreaDimensions, setTextureFromPattern,
   } = pyramidNetPluginStore.textureEditor;
   useTheme();
   const classes = useStyles();
@@ -55,17 +58,26 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   // TODO: drag and drop functionality, removed in fd71f4aba9dd4a698e5a2667595cff82c8fb5cf5
   // see commit message for rationale
 
-  // if (!placementAreaDimensions || !decorationBoundary) { return null; }
-  // const { height: screenHeight = 0, width: screenWidth = 0 } = screenDimensions;
-  const joyrideCallback = ({ type, step }) => {
+  const joyrideCallback = ({ type, step, index }: { type: string, step: MyStep, index: number }) => {
     if (type === EVENTS.TOUR_END) {
       setNeedsTour(false);
-      return;
-    }
-    if (step.action === STEP_ACTIONS.ADD_PATH_TEXTURE) {
-      setTexturePath(SAMPLE_PATH_D, 'sample_svg');
-    } else if (step.target === `.${TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR}`) {
-      setTextureImage(SAMPLE_IMAGE_DATA, 'sample_png');
+      // the user could re-activate the tour, rewind
+      resetStepIndex();
+    } else if (type === EVENTS.STEP_AFTER) {
+      if (step.nextAction === STEP_ACTIONS.ADD_PATH_TEXTURE) {
+        setTextureFromPattern(SAMPLE_PATH_SNAPSHOT);
+        incrementStepIndex(index);
+      } else if (step.nextAction === STEP_ACTIONS.ADD_IMAGE_TEXTURE) {
+        setTextureFromPattern(SAMPLE_IMAGE_SNAPSHOT);
+        setTimeout(() => {
+          incrementStepIndex(index);
+        }, 500);
+      } else {
+        incrementStepIndex(index);
+      }
+    } else if (type === EVENTS.TARGET_NOT_FOUND) {
+      // this should never happen but if it does, it will prevent inability of advancement
+      incrementStepIndex(index);
     }
   };
 
@@ -73,12 +85,14 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
     <div className={clsx(classes.fullPage, classes.textureEditorRoot)}>
       <Joyride
         steps={TOUR_STEPS}
+        stepIndex={stepIndex}
         callback={joyrideCallback}
         run={needsTour}
         showSkipButton
         continuous
         disableCloseOnEsc
         disableOverlay
+        hideBackButton
       />
       <TextureControls hasCloseButton={hasCloseButton} />
       <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
