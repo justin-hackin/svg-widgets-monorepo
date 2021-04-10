@@ -85,7 +85,8 @@ export const TextureArrangement = observer(() => {
   });
 
   // ORIGIN
-  const transformOriginUseDrag = useDrag(({ movement, down }) => {
+  const transformOriginUseDrag = useDrag(({ movement, down, event }) => {
+    event.stopPropagation();
     // accommodates the scale of svg so that the texture stays under the mouse
     const relDelta = translateAbsoluteCoordsToRelative(castCoordToRawPoint(movement));
     if (down) {
