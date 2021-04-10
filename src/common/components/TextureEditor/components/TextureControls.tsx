@@ -13,6 +13,8 @@ import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import PublishIcon from '@material-ui/icons/Publish';
 import FilePicker from '@mavedev/react-file-picker';
+import HelpIcon from '@material-ui/icons/Help';
+
 import { range, isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
@@ -61,6 +63,7 @@ const UploadButton = ({ onClick = undefined }) => (
 export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
+  const { setNeedsTour } = workspaceStore.preferences;
   const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
   const {
     texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement, decorationBoundary,
@@ -416,6 +419,15 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             </Tooltip>
           </>
         )}
+        <IconButton
+          onClick={() => {
+            setNeedsTour(true);
+          }}
+          aria-label="send texture"
+          component="span"
+        >
+          <HelpIcon fontSize="large" />
+        </IconButton>
       </Toolbar>
     </AppBar>
   );

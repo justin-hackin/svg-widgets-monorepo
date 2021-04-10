@@ -1,6 +1,7 @@
 import React from 'react';
 import { Step } from 'react-joyride';
 
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/quotes */
 
@@ -36,7 +37,16 @@ export const TOUR_STEPS: MyStep[] = [
   {
     target: 'body',
     title: 'Welcome to Polyhedral Decoration Studio!',
-    content: `This app allows you to decorate the faces of various polyhedra with either bitmap images or svg vector graphics. It is a tool that was developed to facilitate the creation of polyhedral lanterns as shared by Playful Geometer. Polyhedral Decoration Studio is one part of a 2-part desktop application called Polyhedral Net Studio.  The other part of the desktop application, the dieline editor, generates a cutout pattern than can be folded into a pyramid and interconnected with other pyramids to form the shapes you see.  It applies an image or a cropped svg path to the faces of this pyramid net (a net is a flat cutout that can be folded into a 3D shape).`,
+    content: (
+      <>
+        <p>
+          This app allows you to decorate the faces of various polyhedra with either bitmap images or svg vector graphics. It is a tool that was developed to facilitate the creation of polyhedral lanterns as shared by Playful Geometer.
+        </p>
+        <p>
+          Polyhedral Decoration Studio is one part of a 2-part desktop application called Polyhedral Net Studio.  The other part of the desktop application, the dieline editor, generates a cutout pattern than can be folded into pyramids which interconnect to form the shapes you see.  Within the desktop app, this tool applies an image or a cropped svg path to the faces of the pyramid net (a net is a flat cutout that can be folded into a 3D shape).
+        </p>
+      </>
+    ),
     placement: 'center',
   },
   {
@@ -52,7 +62,7 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.SHAPE_PREVIEW_AREA}`,
-    content: 'and here you can see the path as shadow-casting faces of a lantern made with this cut pattern.',
+    content: 'and here you can see the path as shadow-casting faces of a lantern made with this cut pattern. You can drag here to rotate it or scroll to zoom in/out.',
     placement: 'left',
   },
   {
@@ -79,7 +89,10 @@ export const TOUR_STEPS: MyStep[] = [
           or with
           {' '}
           <a href="https://duntuk.com/disable-scroll-wheel-zoom-firefox">a setting in Firefox</a>
-          . A must for KDE Linux users: disable alt+drag window move feature (see
+          .
+        </p>
+        <p>
+          A must for KDE Linux users: disable alt+drag window move feature (see
           {' '}
           <a
             href="https://superuser.com/questions/584730/how-can-i-disable-alt-mouse-default-behavior-in-kde"
@@ -99,7 +112,7 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.NODE_INPUTS}`,
-    content: 'You can use the geometry of your svg file to align a particular path node to any of the triangle corners. Flip the switch and adjust the node size if necessary. Then click on any of the dots to select it and proceed to...',
+    content: 'You can use the geometry of your svg file to align a particular path node to any of the triangle corners. Flip the switch and adjust the node size if the nodes are too small or are overlapping. To select a node, click on any of the node markers in the texture arrangement area and proceed to...',
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.SNAP_MENU}`,
@@ -107,7 +120,7 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}`,
-    content: 'The drag/scroll mode is active in this region.  Notice you don\'t need to click down on the image or path fill in order to change the position/rotation/scale. Except for in translation modes, only the up-down motion of dragging changes the mode property. The red circle represents the "transform origin" about which scale and rotation of the image happens; it can be repositioned by dragging it.',
+    content: 'The drag/scroll mode is active in this region.  Notice you don\'t need to click down on the image or path fill in order to change the position/rotation/scale. Except for in translation modes, only the up-down motion of dragging changes the mode property. The red circle represents the "transform origin" about which scale and rotation of the image happens. It can be dragged in order to reposition.',
     placement: 'right',
   },
   {
@@ -147,7 +160,16 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.USE_ALPHA_TEXTURE}`,
-    content: `The alpha texture lets you see through the cut holes in the shape preview pane. This feature requires more computer resources so you can turn it off in order to improve performance on older computers. This feature is only present with svg path textures. There is one input that is only present with an image texture.  Click "Next" to apply an image texture to the texture arrangement area.`,
+    content: (
+      <>
+        <p>
+          The alpha texture lets you see through the cut holes in the shape preview pane. This feature requires more computer resources so you can turn it off in order to improve performance on older computers. This feature is only present with svg path textures.
+        </p>
+        <p>
+          There is one input that is only present with an image texture,  Click "Next" to apply an image texture.
+        </p>
+      </>
+    ),
     nextAction: STEP_ACTIONS.ADD_IMAGE_TEXTURE,
   },
   {
@@ -160,7 +182,53 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.ROTATE_3D}`,
-    content: 'This will let you enjoy a hypnotizing twirl, allowing you to see the shape from different angles. Enjoy!',
+    content: 'This will let you enjoy a hypnotizing twirl, allowing you to see the shape from different angles.',
+  },
+  {
+    target: 'body',
+    placement: 'center',
+    title: 'All done',
+    styles: {
+      options: {
+        width: 640,
+      },
+    },
+    content: (
+      <>
+        <p>
+          This concludes your tour of Polyhedral Decoration Studio. The sample texture will be cleared upon exit.
+        </p>
+        <p>
+          This app is a work-in-progress so your feedback would be greatly appreciated. You can report bugs and make feature suggestions by emailing
+          {' '}
+          <a href="mailto:playful.geometer@protonmail.com">Playful Geometer</a>
+          .
+        </p>
+        <p>
+          If you would also like to try building a sample model from pyramid net dielines, you can take a look at
+          {' '}
+          <a
+            href="https://www.hylo.com/groups/stellar-coinciders/post/37875"
+          >
+            this post
+          </a>
+          . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and join a participatory design community, please reach out in order to join the alpha test group. Playful Geometer aspires to assemble a team of artists, product/graphic designers, coders, crafters, gifters and community animators. A model of organization being explored:
+          {' '}
+          <a href="https://disco.coop/">disco.coop</a>
+          .
+        </p>
+        <p>
+          If you are interested in using exported 3D models for commercial purposes, please request permission by email before doing so.
+        </p>
+        <p>
+          Disclosure: this app anonymously logs the frequency of drag, scroll, and image upload, and shape change operations but all image data and file names remain private. Logged data will be used to improve the user experience of this app. Disabling any ad blockers you may have on this site will allow you to contribute to the enhancement of this app.
+        </p>
+        <p />
+        <p>
+          Should you need to revisit this tour, you can do so by pressing ❓ button in the toolbar. Enjoy!
+        </p>
+      </>
+    ),
   },
 ];
 

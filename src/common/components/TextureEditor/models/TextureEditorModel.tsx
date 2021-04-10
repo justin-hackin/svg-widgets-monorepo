@@ -180,6 +180,9 @@ export const TextureEditorModel = types
       self.showNodes = false;
       self.selectedTextureNodeIndex = null;
     },
+    clearTexture() {
+      self.texture = undefined;
+    },
     setTextureFromPattern(patternSnapshot) {
       this.resetNodesEditor();
 
