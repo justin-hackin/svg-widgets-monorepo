@@ -59,6 +59,7 @@ export const TextureEditorModel = types
   .volatile((self) => ({
     modifierTracking: ModifierTrackingModel.create({}),
     history: UndoManagerWithGroupState.create({}, { targetStore: self }),
+    shapePreviewIsFullScreen: false,
     placementAreaDimensions: null,
     // amount of scaling required to make the decoration area match the size of the face boundary
     borderToInsetRatio: null,
@@ -99,6 +100,12 @@ export const TextureEditorModel = types
         return undefined;
       }
       return getFitScale(self.placementAreaDimensions, this.decorationBoundary.viewBoxAttrs);
+    },
+    get shapePreviewDimensions() {
+      if (!self.placementAreaDimensions) { return null; }
+      return self.shapePreviewIsFullScreen
+        ? { width: window.innerWidth, height: window.innerHeight }
+        : self.placementAreaDimensions;
     },
     get minImageScale() {
       return this.imageCoverScale && (0.1 * this.imageCoverScale.scale);
@@ -210,6 +217,10 @@ export const TextureEditorModel = types
       this.setTextureFromPattern({
         imageData, dimensions, sourceFileName,
       });
+    },
+
+    setShapePreviewIsFullScreen(isFullScreen) {
+      self.shapePreviewIsFullScreen = isFullScreen;
     },
 
     // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows

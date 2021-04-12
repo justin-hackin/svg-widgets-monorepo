@@ -63,11 +63,11 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
   }))
   .views((self) => ({
     get canvasDimensions() {
-      // defaults allow camera to be initialized before placementAreaDimensions have been defined
+      // defaults allow camera to be initialized before shapePreviewDimensions have been defined
       const {
         width = 1,
         height = 1,
-      } = this.parentTextureEditor.placementAreaDimensions || {};
+      } = this.parentTextureEditor.shapePreviewDimensions || {};
       return { width, height };
     },
     get parentTextureEditor() {

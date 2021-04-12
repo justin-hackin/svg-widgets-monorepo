@@ -201,6 +201,13 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     '-o-background-size': 'cover',
     'background-size': 'cover',
   },
+  enterFullScreenButton: {
+    '&.MuiButtonBase-root': {
+      bottom: theme.spacing(1),
+      right: theme.spacing(1),
+      position: 'absolute',
+    },
+  },
   textureEditorRoot: {
     backgroundColor: theme.palette.grey.A400,
     height: '100%',
