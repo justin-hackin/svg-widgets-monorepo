@@ -112,7 +112,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
   // TODO: add whitespace, improve button definition and input alignment
   return (
-    <AppBar color="inherit" position="relative">
+    <AppBar className={classes.textureEditorControls} color="inherit" position="relative">
       <Toolbar
         className={clsx(classes.textureToolbar, texture && classes.textureToolbarWithTexture)}
         variant="dense"

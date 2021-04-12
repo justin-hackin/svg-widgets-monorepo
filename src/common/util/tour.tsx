@@ -194,9 +194,7 @@ export const TOUR_STEPS: MyStep[] = [
     placement: 'center',
     title: 'All done',
     styles: {
-      options: {
-        width: 640,
-      },
+      options: { width: 720 },
     },
     content: (
       <>
