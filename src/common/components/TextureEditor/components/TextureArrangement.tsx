@@ -10,7 +10,7 @@ import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { castCoordToRawPoint } from '../../../util/geom';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { ANALYTICS_BUFFERED_EVENTS} from '../../../util/analytics';
+import { ANALYTICS_BUFFERED_EVENTS } from '../../../util/analytics';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
 
 export const TextureArrangement = observer(() => {
