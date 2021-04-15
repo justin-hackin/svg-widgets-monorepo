@@ -54,7 +54,7 @@ export const TOUR_STEPS: MyStep[] = [
   {
     target: `.${TOUR_ELEMENT_CLASSES.UPLOAD_IMAGE}`,
     content: `To get started, click here to upload a bitmap or vector graphic image to the texture arrangement area. 
-    Supported file types: .png, .jpg, .svg.  Click "Next" and this wizard will add a sample svg path.`,
+    Supported file types: .png, .jpg, .svg. Keep in mind, when uploading SVG files, this application only reads path elements and imports only the topmost path. Be sure to convert/merge all required content into a single path and send it to the top of the document. Click "Next" and this wizard will add a sample svg path.`,
     nextAction: STEP_ACTIONS.ADD_PATH_TEXTURE,
   },
   {
@@ -111,7 +111,7 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}`,
-    content: `You're invited to test out all of the drag modes here now.`,
+    content: 'The drag/scroll mode is active in this region.  Notice you don\'t need to click down on the image or path fill in order to change the position/rotation/scale. Except for in translation modes, only the up-down motion of dragging changes the mode property. The red circle represents the "transform origin" about which scale and rotation of the image happens. It can be dragged in order to reposition.',
     placement: 'right',
   },
   {
@@ -121,11 +121,6 @@ export const TOUR_STEPS: MyStep[] = [
   {
     target: `.${TOUR_ELEMENT_CLASSES.SNAP_MENU}`,
     content: `...the snap menu, which you can click to open. Now you can choose one of the "Selected node to corner" options therein. Node selection is for snapping alone so once you're done it's best to turn it off to improve performance. With this menu, you can also move the image so the origin is positioned over one of the corners or you can snap the origin alone to any corner. Feel free to give it a try.`,
-  },
-  {
-    target: `.${TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}`,
-    content: 'The drag/scroll mode is active in this region.  Notice you don\'t need to click down on the image or path fill in order to change the position/rotation/scale. Except for in translation modes, only the up-down motion of dragging changes the mode property. The red circle represents the "transform origin" about which scale and rotation of the image happens. It can be dragged in order to reposition.',
-    placement: 'right',
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.HISTORY_BUTTONS}`,
