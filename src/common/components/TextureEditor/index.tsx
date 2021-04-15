@@ -28,7 +28,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   }
   // ==================================================================================================================
   const {
-    setPlacementAreaDimensions, setTextureFromPattern, clearTexture,
+    setPlacementAreaDimensions, setTextureFromPattern, clearTexture, history,
   } = pyramidNetPluginStore.textureEditor;
   useTheme();
   const classes = useStyles();
@@ -65,6 +65,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
       // the user could re-activate the tour, rewind
       resetStepIndex();
       clearTexture();
+      history.clear();
     } else if (type === EVENTS.STEP_AFTER) {
       if (step.nextAction === STEP_ACTIONS.ADD_PATH_TEXTURE) {
         setTextureFromPattern(SAMPLE_PATH_SNAPSHOT);
