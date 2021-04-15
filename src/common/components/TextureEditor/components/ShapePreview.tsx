@@ -38,7 +38,7 @@ export const ShapePreview = observer(() => {
   return (process.env.BUILD_ENV === 'electron') ? previewContainer : (
     <>
       <IconButton
-        className={classes.enterFullScreenButton}
+        className={clsx(classes.enterFullScreenButton, TOUR_ELEMENT_CLASSES.FULL_SCREEN_BUTTON)}
         onClick={handle.enter}
         component="span"
       >

@@ -21,6 +21,7 @@ export enum TOUR_ELEMENT_CLASSES {
   FILL_IS_POSITIVE = 'fill-is-positive--tour',
   USE_ALPHA_TEXTURE = 'use-alpha-texture--tour',
   ROTATE_INPUT = 'rotate-input--tour',
+  FULL_SCREEN_BUTTON = 'full-screen-button--tour',
   TEXTURE_ARRANGEMENT_AREA = 'texture-arrangement-area--tour',
   SHAPE_PREVIEW_AREA = 'shape-preview-area',
 }
@@ -190,6 +191,10 @@ export const TOUR_STEPS: MyStep[] = [
     content: 'This will let you enjoy a hypnotizing twirl, allowing you to see the shape from different angles.',
   },
   {
+    target: `.${TOUR_ELEMENT_CLASSES.FULL_SCREEN_BUTTON}`,
+    content: `Here you can make the shape preview full-screen for your aesthetic enjoyment.`,
+  },
+  {
     target: 'body',
     placement: 'center',
     title: 'All done',
@@ -216,10 +221,7 @@ export const TOUR_STEPS: MyStep[] = [
           >
             this post
           </a>
-          . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and join a participatory design community, please reach out in order to join the alpha test group. Playful Geometer aspires to assemble a team of artists, product/graphic designers, coders, crafters, gifters and community animators. A model of organization being explored:
-          {' '}
-          <a style={linkStyle} href="https://disco.coop/">disco.coop</a>
-          .
+          . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and co-create a participatory design community, please reach out in order to join the alpha test group. Playful Geometer is exploring the possibility of assembling a team of artists, product/graphic designers, coders, crafters, gifters and community animators. Only with engagement can this dream come alive.
         </p>
         <p>
           If you are interested in using exported 3D models for commercial purposes, please obtain permission by email before doing so.
