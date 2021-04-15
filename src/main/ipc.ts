@@ -45,7 +45,7 @@ export const setupIpc = (ipcMain) => {
     }).then(({ canceled, filePath }) => {
       if (canceled) { return undefined; }
       const resolvedFilePath = castToFilePathWithExtension(filePath, extension);
-      return fsPromises.writeFile(resolvedFilePath, JSON.stringify(jsonData), 'application/json');
+      return fsPromises.writeFile(resolvedFilePath, JSON.stringify(jsonData));
     }));
 
   ipcMain.handle(EVENTS.DIALOG_SAVE_GLB, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
