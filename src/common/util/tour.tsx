@@ -11,11 +11,9 @@ export enum TOUR_ELEMENT_CLASSES {
   ROTATE_3D = 'rotate-3d--tour',
   UPLOAD_IMAGE = 'upload-image--tour',
   HISTORY_BUTTONS = 'history-buttons--tour',
-  DOWNLOAD_3D = 'download-3d--tour',
   IS_BORDERED = 'is-bordered--tour',
   DRAG_MODE_INDICATOR = 'drag-mode-indicator--tour',
-  OPEN_TEXTURE_ARRANGEMENT = 'open-texture-arrangement--tour',
-  SAVE_TEXTURE_ARRANGEMENT = 'save-texture-arrangement--tour',
+  TEXTURE_EDITOR_FILE_MENU = 'texture-editor-file--tour',
   SNAP_MENU = 'snap-menu--tour',
   NODE_INPUTS = 'node-inputs--tour',
   FILL_IS_POSITIVE = 'fill-is-positive--tour',
@@ -134,25 +132,22 @@ export const TOUR_STEPS: MyStep[] = [
     content: 'Getting textures in just the right spot can be tricky so these undo/redo buttons will offer you some forgiveness in your tinkering.',
   },
   {
-    target: `.${TOUR_ELEMENT_CLASSES.DOWNLOAD_3D}`,
+    target: `.${TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU}`,
     content: (
       <>
-        Like what you see? This button will let you download the 3D model in .glb format.
-        Not sure what to do with a .glb file? Why not drag and drop it into a virtual meeting room on
-        {' '}
-        <a style={linkStyle} target="_blank" href="http://hubs.mozilla.com" rel="noreferrer">http://hubs.mozilla.com</a>
-        {' '}
-        and invite your friends to come see your creation.
+        <p>
+          This menu lets you save and reopen the image data along with its arrangement on the shape as a .pnst file (pyramid net specification texture). The file you save can then be imported into the Polyhedral Net Studio desktop application. It can construct a cutable/printable/buildable svg design from your arrangement. If you want to delegate the production of the design you've created, this file will be your ticket.
+        </p>
+        <p>
+          This menu also allows you to download a 3D model of the sape in .glb format.
+          Not sure what to do with a .glb file? Why not drag and drop it into a virtual meeting room on
+          {' '}
+          <a style={linkStyle} target="_blank" href="http://hubs.mozilla.com" rel="noreferrer">http://hubs.mozilla.com</a>
+          {' '}
+          and invite your friends to come see your creation.
+        </p>
       </>
     ),
-  },
-  {
-    target: `.${TOUR_ELEMENT_CLASSES.SAVE_TEXTURE_ARRANGEMENT}`,
-    content: 'You can save the image data with its arrangement on the shape with this button. The file you save can then be imported into the Polyhedral Net Studio desktop application which can construct a cutable/printable/buildable svg design. If you want to delegate the production of the design you\'ve created, this file will be your ticket.',
-  },
-  {
-    target: `.${TOUR_ELEMENT_CLASSES.OPEN_TEXTURE_ARRANGEMENT}`,
-    content: 'If you made a mistake you can open your file again here and re-save.',
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.FILL_IS_POSITIVE}`,

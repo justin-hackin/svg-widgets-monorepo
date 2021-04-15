@@ -2,6 +2,7 @@ import { inRange } from 'lodash';
 import {
   getParentOfType, getSnapshot, Instance, tryResolve, types,
 } from 'mobx-state-tree';
+import fileDownload from 'js-file-download';
 
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
@@ -18,7 +19,13 @@ import { ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { UndoManagerWithGroupState } from '../../UndoManagerWithGroupState';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
-import { EVENTS, IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../constants';
+import {
+  EVENTS,
+  IS_DEVELOPMENT_BUILD,
+  IS_ELECTRON_BUILD,
+  IS_WEB_BUILD,
+  TEXTURE_ARRANGEMENT_FILE_EXTENSION,
+} from '../../../constants';
 import { ANALYTICS_BUFFERED_EVENTS } from '../../../util/analytics';
 
 // TODO: put in preferences
@@ -46,7 +53,6 @@ const getFitScale = (bounds, image) => {
   };
 };
 
-const specFileExtension = 'pnst';
 const specFileExtensionName = 'Texture for Pyramid Net Spec';
 
 export const TextureEditorModel = types
@@ -293,10 +299,17 @@ export const TextureEditorModel = types
         shapeName: self.shapeName,
         textureSnapshot: getSnapshot(self.texture),
       };
-      globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_JSON, fileData, {
-        message: 'Save texture arrangement',
-        defaultPath: `${self.shapeName}__${self.texture.pattern.sourceFileName}.${specFileExtension}`,
-      }, specFileExtension, specFileExtensionName);
+      const defaultPath = `${self.shapeName
+      }__${self.texture.pattern.sourceFileName}.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`;
+      if (IS_ELECTRON_BUILD) {
+        globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_JSON, fileData, {
+          message: 'Save texture arrangement',
+          defaultPath,
+        }, TEXTURE_ARRANGEMENT_FILE_EXTENSION, specFileExtensionName);
+      }
+      if (IS_WEB_BUILD) {
+        fileDownload(JSON.stringify(fileData), defaultPath, 'application/json');
+      }
     },
     setTextureFromSnapshot(textureSnapshot) {
       self.texture = TextureModel.create(textureSnapshot);
@@ -314,15 +327,8 @@ export const TextureEditorModel = types
         }
       }
     },
-    async openTextureArrangement() {
-      const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
-        message: 'Import texture arrangement',
-      }, specFileExtension, specFileExtensionName);
-      // TODO: snackbar error alerts
-      if (!res) { return; }
-
-      // @ts-ignore
-      const { fileData: { shapeName, textureSnapshot } } = res;
+    setTextureArrangementFromFileData(fileData) {
+      const { shapeName, textureSnapshot } = fileData;
       if (!textureSnapshot) {
         return;
       }
@@ -330,6 +336,17 @@ export const TextureEditorModel = types
         self.parentPyramidNetPluginModel.pyramidNetSpec.setPyramidShapeName(shapeName);
       }
       this.setTextureFromSnapshot(textureSnapshot);
+    },
+    async openTextureArrangement() {
+      const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
+        message: 'Import texture arrangement',
+      }, TEXTURE_ARRANGEMENT_FILE_EXTENSION, specFileExtensionName);
+      // TODO: snackbar error alerts
+      if (!res) { return; }
+
+      // @ts-ignore
+      const { fileData } = res;
+      this.setTextureArrangementFromFileData(fileData);
     },
   }))
   .actions(() => {
