@@ -13,6 +13,7 @@ import { ShapePreview } from './components/ShapePreview';
 import {
   MyStep, SAMPLE_IMAGE_SNAPSHOT, SAMPLE_PATH_SNAPSHOT, STEP_ACTIONS, TOUR_STEPS,
 } from '../../util/tour';
+import { IS_WEB_BUILD } from '../../constants';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
@@ -95,7 +96,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
             textColor: theme.palette.grey['300'],
           },
         }}
-        run={needsTour}
+        run={IS_WEB_BUILD && needsTour}
         showSkipButton
         continuous
         disableCloseOnEsc

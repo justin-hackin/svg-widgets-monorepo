@@ -21,6 +21,7 @@ import { PyramidNetOptionsInfo } from '../widgets/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../widgets/CylinderLightbox';
 import { PyramidNetTestTabsOptionsInfo } from '../widgets/PyramidNetTestTabs';
 import { IPyramidNetPluginModel } from './PyramidNetMakerStore';
+import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../common/constants';
 
 const getPreferencesStore = () => {
   const preferencesStore = PreferencesModel.create(defaultPreferences);
@@ -179,8 +180,8 @@ export function useWorkspaceMst() {
   return useContext(WorkspaceStoreContext);
 }
 
-if (process.env.NODE_ENV !== 'production') {
-  if (process.env.BUILD_ENV === 'electron') {
+if (IS_DEVELOPMENT_BUILD) {
+  if (IS_ELECTRON_BUILD) {
     // TODO: why is this causing SocketProtocolError on web build
     connectReduxDevtools(remotedev, workspaceStore);
   }

@@ -19,8 +19,7 @@ export const defaultPreferences: SnapshotIn<IPreferencesModel> = {
     width: PIXELS_PER_CM * 49.5,
     height: PIXELS_PER_CM * 27.9,
   },
-  // Tour is only designed for web build currently (texture editor not shown initially in electron)
-  needsTour: (process.env.BUILD_ENV === 'web'),
+  needsTour: true,
 };
 
 export const PreferencesModel = types.model('Preferences', {

@@ -31,7 +31,7 @@ import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { viewBoxAttrsToString } from '../../../util/svg';
 import requireStatic from '../../../../renderer/requireStatic';
 import { TextureEditorModel } from './TextureEditorModel';
-import { EVENTS } from '../../../constants';
+import { EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../constants';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -333,13 +333,13 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         return self.gltfExporter
         // @ts-ignore
           .parse(self.shapeMesh, (shapeGLTF: ArrayBuffer) => {
-            if (process.env.BUILD_ENV === 'electron') {
+            if (IS_ELECTRON_BUILD) {
               globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_GLB, shapeGLTF, {
                 message: 'Save shape preview',
                 defaultPath,
               });
             }
-            if (process.env.BUILD_ENV === 'web') {
+            if (IS_WEB_BUILD) {
               fileDownload(new Blob([shapeGLTF]), defaultPath);
             }
           }, { binary: true });

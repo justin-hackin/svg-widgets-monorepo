@@ -18,7 +18,7 @@ import { ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { UndoManagerWithGroupState } from '../../UndoManagerWithGroupState';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
-import { EVENTS } from '../../../constants';
+import { EVENTS, IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../constants';
 import { ANALYTICS_BUFFERED_EVENTS } from '../../../util/analytics';
 
 // TODO: put in preferences
@@ -334,7 +334,8 @@ export const TextureEditorModel = types
   }))
   .actions(() => {
     // ======== ANALYTICS TRACkING ========
-    if (process.env.BUILD_ENV !== 'web' || process.env.NODE_ENV === 'development') {
+    if (IS_ELECTRON_BUILD || IS_DEVELOPMENT_BUILD) {
+      // stub the function for non-tracking builds
       // reduces the number of env checks in call sites while preserving type safety
       return {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

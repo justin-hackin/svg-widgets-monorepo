@@ -10,7 +10,7 @@ import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../../../common/util/svg';
 import { useStyles } from '../../../../../common/style/style';
-import { EVENTS } from '../../../../../common/constants';
+import { EVENTS, IS_ELECTRON_BUILD } from '../../../../../common/constants';
 
 const DOWNLOAD_TEMPLATE_TXT = 'Download face template SVG (current shape)';
 const IMPORT_SVG_DECORATION_TXT = 'Import face cut pattern from SVG';
@@ -28,7 +28,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
     <>
       {/* NEW */}
       <MenuItem onClick={async () => {
-        if (process.env.BUILD_ENV === 'electron') {
+        if (IS_ELECTRON_BUILD) {
           await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_SVG, store.renderDecorationBoundaryToString(), {
             message: DOWNLOAD_TEMPLATE_TXT,
             defaultPath: `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
@@ -45,7 +45,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
       {/* OPEN RAW SVG FACE DECORATION */}
       <MenuItem onClick={async () => {
-        if (process.env.BUILD_ENV === 'electron') {
+        if (IS_ELECTRON_BUILD) {
           await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
             .then((svgString) => {
               const d = extractCutHolesFromSvgString(svgString);

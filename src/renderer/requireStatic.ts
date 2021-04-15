@@ -1,5 +1,6 @@
 import path from 'path';
 import * as url from 'url';
+import { IS_PRODUCTION_BUILD, IS_WEB_BUILD } from '../common/constants';
 
 /**
  * Takes a file path and returns either a local filesystem path in production, or a localhost url in development.
@@ -9,10 +10,10 @@ import * as url from 'url';
  * @return {string} - filepath that can be required
  */
 export default function requireStatic(resourcePath) {
-  if (process.env.BUILD_ENV === 'web') {
+  if (IS_WEB_BUILD) {
     return `static/${resourcePath}`;
   }
-  if (process.env.NODE_ENV === 'production') {
+  if (IS_PRODUCTION_BUILD) {
     // @ts-ignore
     return path.resolve(__static, resourcePath);
   }

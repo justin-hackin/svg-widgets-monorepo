@@ -27,7 +27,13 @@ import { ShapeSelect } from '../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../../style/style';
-import { DEFAULT_SLIDER_STEP, EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
+import {
+  DEFAULT_SLIDER_STEP,
+  EVENTS,
+  INVALID_BUILD_ENV_ERROR,
+  IS_ELECTRON_BUILD,
+  IS_WEB_BUILD,
+} from '../../../constants';
 import { ITextureEditorModel } from '../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
@@ -160,7 +166,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
         {/*  @ts-ignore */}
         {(() => { // eslint-disable-line consistent-return
-          if (process.env.BUILD_ENV === 'electron') {
+          if (IS_ELECTRON_BUILD) {
             return (
               <UploadButton onClick={async () => {
                 const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
@@ -169,7 +175,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               />
             );
           }
-          if (process.env.BUILD_ENV === 'web') {
+          if (IS_WEB_BUILD) {
             return (
               <FilePicker
                 extensions={['.jpg', '.jpeg', '.png', '.svg']}

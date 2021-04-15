@@ -9,11 +9,12 @@ import { ITextureEditorModel } from '../models/TextureEditorModel';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { useStyles } from '../../../style/style';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
+import { IS_ELECTRON_BUILD } from '../../../constants';
 
 const { useEffect, useRef } = React;
 
 export const ShapePreview = observer(() => {
-  const handle = (process.env.BUILD_ENV === 'electron') ? null : useFullScreenHandle();
+  const handle = IS_ELECTRON_BUILD ? null : useFullScreenHandle();
   const workspaceStore = useWorkspaceMst();
   const classes = useStyles();
 
@@ -35,7 +36,7 @@ export const ShapePreview = observer(() => {
       className={clsx(classes.shapePreviewContainer, TOUR_ELEMENT_CLASSES.SHAPE_PREVIEW_AREA)}
     />
   );
-  return (process.env.BUILD_ENV === 'electron') ? previewContainer : (
+  return IS_ELECTRON_BUILD ? previewContainer : (
     <>
       <IconButton
         className={clsx(classes.enterFullScreenButton, TOUR_ELEMENT_CLASSES.FULL_SCREEN_BUTTON)}
