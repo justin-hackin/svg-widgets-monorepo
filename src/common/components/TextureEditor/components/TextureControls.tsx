@@ -201,6 +201,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               return (
                 <OpenTextureArrangementMenuItem onClick={() => {
                   openTextureArrangement();
+                  resetFileMenuRef();
                 }}
                 />
               );
@@ -217,8 +218,8 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 <ListItemIcon><SaveIcon fontSize="small" /></ListItemIcon>
                 <Typography variant="inherit">Save texture arrangement </Typography>
               </MenuItem>
-              <MenuItem onClick={() => {
-                downloadShapeGLTF();
+              <MenuItem onClick={async () => {
+                await downloadShapeGLTF();
                 resetFileMenuRef();
               }}
               >
