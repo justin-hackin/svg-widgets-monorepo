@@ -425,6 +425,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             </Tooltip>
           </>
         )}
+        { IS_WEB_BUILD && (
         <IconButton
           onClick={() => {
             setNeedsTour(true);
@@ -434,6 +435,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         >
           <HelpIcon fontSize="large" />
         </IconButton>
+        )}
       </Toolbar>
     </AppBar>
   );
