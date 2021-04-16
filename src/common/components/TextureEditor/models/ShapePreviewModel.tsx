@@ -43,6 +43,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
   .volatile(() => ({
     gltfExporter: new GLTFExporter(),
     gltfLoader: new GLTFLoader(),
+    textureCanvas: document.createElement('canvas'),
     scene: null,
     lightColor: 0x404040,
     internalLight: null,
@@ -128,10 +129,9 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         } = viewBoxAttrs;
         const scaleWidth = npot(vbWidth * self.TEXTURE_BITMAP_SCALE);
         const scaleHeight = npot(vbHeight * self.TEXTURE_BITMAP_SCALE);
-        const textureCanvas = document.createElement('canvas');
-        textureCanvas.setAttribute('width', vbWidth);
-        textureCanvas.setAttribute('height', vbHeight);
-        const ctx = textureCanvas.getContext('2d');
+        self.textureCanvas.setAttribute('width', vbWidth);
+        self.textureCanvas.setAttribute('height', vbHeight);
+        const ctx = self.textureCanvas.getContext('2d');
         const v = yield Canvg.from(ctx, svgStr, {
           ignoreAnimation: true,
           ignoreMouse: true,
