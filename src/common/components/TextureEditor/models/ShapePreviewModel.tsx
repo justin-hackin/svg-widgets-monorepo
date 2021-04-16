@@ -136,11 +136,10 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
           ignoreAnimation: true,
           ignoreMouse: true,
           enableRedraw: false,
-          scaleWidth,
-          scaleHeight,
         });
+        v.resize(scaleWidth, scaleHeight, 'none');
         yield v.render();
-        setShapeTexture(ctx.getImageData(0, 0, scaleWidth, scaleHeight));
+        setShapeTexture(ctx.canvas);
       }),
     };
   })
