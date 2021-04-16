@@ -26,7 +26,7 @@ import {
   IS_WEB_BUILD,
   TEXTURE_ARRANGEMENT_FILE_EXTENSION,
 } from '../../../constants';
-import { ANALYTICS_BUFFERED_EVENTS } from '../../../util/analytics';
+import { ANALYTICS_BUFFERED_EVENTS, BUFFERED_SUM_VARIABLE } from '../../../util/analytics';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -372,7 +372,10 @@ export const TextureEditorModel = types
         if (numTransformsByType[type]) {
           // TODO: why doesn't typescript respect globals
           // @ts-ignore
-          dataLayer.push({ [type]: numTransformsByType[type] });
+          dataLayer.push({
+            event: type,
+            [BUFFERED_SUM_VARIABLE]: numTransformsByType[type],
+          });
           numTransformsByType[type] = 0;
         }
       });
