@@ -114,7 +114,8 @@ export const WorkspaceModel = types.model('Workspace', {
       return `${this.selectedStoreIsSaved ? '' : '*'}${this.currentFileName}`;
     },
     get titleBarText() {
-      return `${this.selectedShapeName} ‖ ${this.fileTitleFragment}`;
+      return IS_ELECTRON_BUILD
+        ? `${this.selectedShapeName} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
     },
   }))
   .actions((self) => ({
