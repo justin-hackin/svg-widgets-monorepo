@@ -94,55 +94,47 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.texture;
     },
   }))
-  .actions((self) => {
-    const setShapeTexture = (imageBitmap) => {
-      if (!self.shapeMesh) {
-        throw new Error('setShapeTexture: shapeMesh does not exist');
+  .actions((self) => ({
+    setMaterialMap(map) {
+      self.shapeMaterialMap = map;
+      self.shapeMaterialMap.image = self.textureCanvas;
+    },
+    setShapeMesh(shape) { self.shapeMesh = shape; },
+    setShapeWireframe(wireframe) { self.shapeWireframe = wireframe; },
+    applyTextureToMesh: flow(function* () {
+      const {
+        shapeMesh,
+        parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
+      } = self;
+      if (!shapeMesh || !viewBoxAttrs) {
+        return;
       }
-      const { material }: { material: MeshPhongMaterial } = self.shapeMesh;
-      material.map.image = imageBitmap;
-      material.map.needsUpdate = true;
-    };
-    return {
-      setShapeTexture,
-      setMaterialMap(map) { self.shapeMaterialMap = map; },
-      setShapeMesh(shape) { self.shapeMesh = shape; },
-      setShapeWireframe(wireframe) { self.shapeWireframe = wireframe; },
-      applyTextureToMesh: flow(function* () {
-        const {
-          shapeMesh,
-          parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
-        } = self;
-        if (!shapeMesh || !viewBoxAttrs) {
-          return;
-        }
 
-        const svgStr = ReactDOMServer.renderToString(
-          React.createElement(TextureSvgUnobserved, {
-            viewBox: viewBoxAttrsToString(viewBoxAttrs),
-            store: self.parentTextureEditor,
-          }),
-        );
-        const {
-          width: vbWidth,
-          height: vbHeight,
-        } = viewBoxAttrs;
-        const scaleWidth = npot(vbWidth * self.TEXTURE_BITMAP_SCALE);
-        const scaleHeight = npot(vbHeight * self.TEXTURE_BITMAP_SCALE);
-        self.textureCanvas.setAttribute('width', vbWidth);
-        self.textureCanvas.setAttribute('height', vbHeight);
-        const ctx = self.textureCanvas.getContext('2d');
-        const v = yield Canvg.from(ctx, svgStr, {
-          ignoreAnimation: true,
-          ignoreMouse: true,
-          enableRedraw: false,
-        });
-        v.resize(scaleWidth, scaleHeight, 'none');
-        yield v.render();
-        setShapeTexture(ctx.canvas);
-      }),
-    };
-  })
+      const svgStr = ReactDOMServer.renderToString(
+        React.createElement(TextureSvgUnobserved, {
+          viewBox: viewBoxAttrsToString(viewBoxAttrs),
+          store: self.parentTextureEditor,
+        }),
+      );
+      const {
+        width: vbWidth,
+        height: vbHeight,
+      } = viewBoxAttrs;
+      const scaleWidth = npot(vbWidth * self.TEXTURE_BITMAP_SCALE);
+      const scaleHeight = npot(vbHeight * self.TEXTURE_BITMAP_SCALE);
+      self.textureCanvas.setAttribute('width', vbWidth);
+      self.textureCanvas.setAttribute('height', vbHeight);
+      const ctx = self.textureCanvas.getContext('2d');
+      const v = yield Canvg.from(ctx, svgStr, {
+        ignoreAnimation: true,
+        ignoreMouse: true,
+        enableRedraw: false,
+      });
+      v.resize(scaleWidth, scaleHeight, 'none');
+      yield v.render();
+      self.shapeMesh.material.map.needsUpdate = true;
+    }),
+  }))
   .actions((self) => {
     const alphaOnChange = () => {
       if (self.useAlpha) {
