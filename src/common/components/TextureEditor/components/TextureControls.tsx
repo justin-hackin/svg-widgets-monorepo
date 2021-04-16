@@ -208,26 +208,34 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             }
             throw new Error(INVALID_BUILD_ENV_ERROR);
           })()}
-          { texture && (
-            <>
-              <MenuItem onClick={() => {
-                saveTextureArrangement();
-                resetFileMenuRef();
-              }}
-              >
-                <ListItemIcon><SaveIcon fontSize="small" /></ListItemIcon>
-                <Typography variant="inherit">Save texture arrangement </Typography>
-              </MenuItem>
-              <MenuItem onClick={async () => {
-                await downloadShapeGLTF();
-                resetFileMenuRef();
-              }}
-              >
-                <ListItemIcon><GetAppIcon fontSize="small" /></ListItemIcon>
-                <Typography variant="inherit">Download 3D model GLB</Typography>
-              </MenuItem>
-            </>
-          )}
+          {/* Menu component emits error when child is React.Fragment */}
+          { texture
+            && [
+              (
+                <MenuItem
+                  key={0}
+                  onClick={() => {
+                    saveTextureArrangement();
+                    resetFileMenuRef();
+                  }}
+                >
+                  <ListItemIcon><SaveIcon fontSize="small" /></ListItemIcon>
+                  <Typography variant="inherit">Save texture arrangement </Typography>
+                </MenuItem>
+              ),
+              (
+                <MenuItem
+                  key={1}
+                  onClick={async () => {
+                    await downloadShapeGLTF();
+                    resetFileMenuRef();
+                  }}
+                >
+                  <ListItemIcon><GetAppIcon fontSize="small" /></ListItemIcon>
+                  <Typography variant="inherit">Download 3D model GLB</Typography>
+                </MenuItem>
+              ),
+            ]}
         </Menu>
         {/*  @ts-ignore */}
         {(() => { // eslint-disable-line consistent-return
