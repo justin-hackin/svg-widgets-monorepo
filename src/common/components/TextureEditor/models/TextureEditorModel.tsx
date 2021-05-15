@@ -30,7 +30,7 @@ import { ANALYTICS_BUFFERED_EVENTS, BUFFERED_SUM_VARIABLE } from '../../../util/
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
-const DEFAULT_VIEW_SCALE = 0.8;
+const DEFAULT_VIEW_SCALE = 0.7;
 
 const getCoverScale = (bounds, image) => {
   const widthScale = bounds.width / image.width;
