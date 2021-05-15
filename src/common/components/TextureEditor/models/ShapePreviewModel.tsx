@@ -228,7 +228,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       // this will only be added to the scene if useAlpha === true
       self.internalLight = new PointLight(self.lightColor, 3, 20);
       self.internalLight.castShadow = true;
-      self.internalLight.shadow.camera.near = 1;
+      self.internalLight.shadow.camera.near = 0.1;
       self.internalLight.shadow.camera.far = self.sphereRadius + self.MARGIN;
       self.internalLight.shadow.bias = -0.005;
 
