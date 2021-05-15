@@ -13,6 +13,7 @@ import { ShapePreview } from './components/ShapePreview';
 import {
   MyStep, SAMPLE_IMAGE_SNAPSHOT, SAMPLE_PATH_SNAPSHOT, STEP_ACTIONS, TOUR_STEPS,
 } from '../../util/tour';
+import { IS_WEB_BUILD } from '../../constants';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
@@ -27,7 +28,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   }
   // ==================================================================================================================
   const {
-    setPlacementAreaDimensions, setTextureFromPattern, clearTexture,
+    setPlacementAreaDimensions, setTextureFromPattern, clearTexture, history,
   } = pyramidNetPluginStore.textureEditor;
   useTheme();
   const classes = useStyles();
@@ -64,6 +65,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
       // the user could re-activate the tour, rewind
       resetStepIndex();
       clearTexture();
+      history.clear();
     } else if (type === EVENTS.STEP_AFTER) {
       if (step.nextAction === STEP_ACTIONS.ADD_PATH_TEXTURE) {
         setTextureFromPattern(SAMPLE_PATH_SNAPSHOT);
@@ -95,7 +97,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
             textColor: theme.palette.grey['300'],
           },
         }}
-        run={needsTour}
+        run={IS_WEB_BUILD && needsTour}
         showSkipButton
         continuous
         disableCloseOnEsc

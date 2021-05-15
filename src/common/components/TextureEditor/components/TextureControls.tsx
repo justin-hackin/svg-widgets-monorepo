@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { forwardRef, useState } from 'react';
 import {
-  TextField, InputAdornment,
-  Button, Switch, FormControlLabel, IconButton, Menu, MenuItem, Toolbar, AppBar, Tooltip, Divider,
+  TextField,
+  InputAdornment,
+  Button,
+  Switch,
+  FormControlLabel,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  AppBar,
+  Tooltip,
+  Divider,
+  ListItemIcon,
+  Typography,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
@@ -9,6 +21,7 @@ import CachedIcon from '@material-ui/icons/Cached';
 import TelegramIcon from '@material-ui/icons/Telegram';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import FolderIcon from '@material-ui/icons/Folder';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import PublishIcon from '@material-ui/icons/Publish';
@@ -27,7 +40,13 @@ import { ShapeSelect } from '../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../../style/style';
-import { DEFAULT_SLIDER_STEP, EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
+import {
+  DEFAULT_SLIDER_STEP,
+  EVENTS,
+  INVALID_BUILD_ENV_ERROR,
+  IS_ELECTRON_BUILD,
+  IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION,
+} from '../../../constants';
 import { ITextureEditorModel } from '../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
@@ -60,6 +79,19 @@ const UploadButton = ({ onClick = undefined }) => (
   </IconButton>
 );
 
+type OpenTextureArrangementMenuItemProps = { onClick?: () => void, };
+
+// TODO: what's the proper ref type
+//  "type OpenTextureArrangementMenuItemRef = typeof MenuItem;" not working
+const OpenTextureArrangementMenuItem = forwardRef<any, OpenTextureArrangementMenuItemProps>(
+  ({ onClick = undefined }, ref) => (
+    <MenuItem ref={ref} onClick={onClick}>
+      <ListItemIcon><FolderOpenIcon fontSize="small" /></ListItemIcon>
+      <Typography variant="inherit">Open texture arrangement </Typography>
+    </MenuItem>
+  ),
+);
+
 export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
@@ -71,6 +103,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     shapePreview: { downloadShapeGLTF },
     assignTextureFromPatternInfo,
+    setTextureArrangementFromFileData,
     shapeName,
     modifierTracking: { dragMode = undefined } = {},
     history,
@@ -81,7 +114,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const numFaceSides = decorationBoundary.vertices.length;
 
   // when truthy, snap menu is open
-  const [positionSnapMenuAnchorEl, setPositionSnapMenuAnchorEl] = React.useState(null);
+  const [positionSnapMenuAnchorEl, setPositionSnapMenuAnchorEl] = useState(null);
+  const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
+  const resetFileMenuRef = () => { setFileMenuRef(null); };
 
   const handleCornerSnapMenuClick = (event) => {
     setPositionSnapMenuAnchorEl(event.currentTarget);
@@ -110,9 +145,25 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     resetPositionSnapMenuAnchorEl();
   };
 
+  const ForwardRefdOpenMenuItem = forwardRef((_, ref) => (
+    <FilePicker
+      extensions={[`.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`]}
+      onFilePicked={async (file) => {
+        // TODO: why doesn't file.type match downloadFile mime type 'application/json'
+        if (file.type === '') {
+          setTextureArrangementFromFileData(JSON.parse(await file.text()));
+        }
+        resetFileMenuRef();
+        //  TODO: snack bar error if wrong type
+      }}
+    >
+      <OpenTextureArrangementMenuItem ref={ref} />
+    </FilePicker>
+  ));
+
   // TODO: add whitespace, improve button definition and input alignment
   return (
-    <AppBar color="inherit" position="relative">
+    <AppBar className={classes.textureEditorControls} color="inherit" position="relative">
       <Toolbar
         className={clsx(classes.textureToolbar, texture && classes.textureToolbarWithTexture)}
         variant="dense"
@@ -132,6 +183,107 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             <Divider />
           </>
         )}
+        <Button
+          className={clsx(classes.dielinePanelButton, TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU)}
+          startIcon={<FolderIcon />}
+          onClick={(e) => {
+            setFileMenuRef(e.currentTarget);
+          }}
+        >
+          File
+        </Button>
+        <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
+          {(() => {
+            if (IS_WEB_BUILD) {
+              return (<ForwardRefdOpenMenuItem />);
+            }
+            if (IS_ELECTRON_BUILD) {
+              return (
+                <OpenTextureArrangementMenuItem onClick={() => {
+                  openTextureArrangement();
+                  resetFileMenuRef();
+                }}
+                />
+              );
+            }
+            throw new Error(INVALID_BUILD_ENV_ERROR);
+          })()}
+          {/* Menu component emits error when child is React.Fragment */}
+          { texture
+            && [
+              (
+                <MenuItem
+                  key={0}
+                  onClick={() => {
+                    saveTextureArrangement();
+                    resetFileMenuRef();
+                  }}
+                >
+                  <ListItemIcon><SaveIcon fontSize="small" /></ListItemIcon>
+                  <Typography variant="inherit">Save texture arrangement </Typography>
+                </MenuItem>
+              ),
+              (
+                <MenuItem
+                  key={1}
+                  onClick={async () => {
+                    await downloadShapeGLTF();
+                    resetFileMenuRef();
+                  }}
+                >
+                  <ListItemIcon><GetAppIcon fontSize="small" /></ListItemIcon>
+                  <Typography variant="inherit">Download 3D model GLB</Typography>
+                </MenuItem>
+              ),
+            ]}
+        </Menu>
+        {/*  @ts-ignore */}
+        {(() => { // eslint-disable-line consistent-return
+          if (IS_ELECTRON_BUILD) {
+            return (
+              <UploadButton onClick={async () => {
+                const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
+                assignTextureFromPatternInfo(patternInfo);
+              }}
+              />
+            );
+          }
+          if (IS_WEB_BUILD) {
+            return (
+              <FilePicker
+                extensions={['.jpg', '.jpeg', '.png', '.svg']}
+                onFilePicked={async (file) => {
+                  if (file) {
+                    if (file.type === 'image/svg+xml') {
+                      const svgString = await file.text();
+                      assignTextureFromPatternInfo({
+                        isPath: true,
+                        svgString,
+                        sourceFileName: file.name,
+                      });
+                    } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
+                      //  file is either png or jpg
+                      const imageData = await toBase64(file);
+                      const dimensions = await resolveImageDimensionsFromBase64(imageData);
+                      assignTextureFromPatternInfo({
+                        isPath: false,
+                        pattern: {
+                          imageData,
+                          dimensions,
+                          sourceFileName: file.name,
+                        },
+                      });
+                    }
+                    // TODO: user can still pick non-image, emit snackbar error in this case
+                  }
+                }}
+              >
+                <UploadButton />
+              </FilePicker>
+            );
+          }
+          throw new Error(INVALID_BUILD_ENV_ERROR);
+        })()}
         <ShapeSelect
           className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
           isCompactDisplay
@@ -156,67 +308,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           label="Rotate 3D"
         />
 
-        {/* ************************************************************* */}
-
-        {/*  @ts-ignore */}
-        {(() => { // eslint-disable-line consistent-return
-          if (process.env.BUILD_ENV === 'electron') {
-            return (
-              <UploadButton onClick={async () => {
-                const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
-                assignTextureFromPatternInfo(patternInfo);
-              }}
-              />
-            );
-          }
-          if (process.env.BUILD_ENV === 'web') {
-            return (
-              <FilePicker
-                extensions={['.jpg', '.jpeg', '.png', '.svg']}
-                onFilePicked={async (file) => {
-                  if (file) {
-                    if (file.type === 'image/svg+xml') {
-                      const svgString = await file.text();
-                      assignTextureFromPatternInfo({
-                        isPath: true,
-                        svgString,
-                        sourceFileName: file.name,
-                      });
-                    } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
-                    //  file is either png or jpg
-                      const imageData = await toBase64(file);
-                      const dimensions = await resolveImageDimensionsFromBase64(imageData);
-                      assignTextureFromPatternInfo({
-                        isPath: false,
-                        pattern: {
-                          imageData,
-                          dimensions,
-                          sourceFileName: file.name,
-                        },
-                      });
-                    }
-                  // TODO: user can still pick non-image, emit snackbar error in this case
-                  }
-                }}
-              >
-                <UploadButton />
-              </FilePicker>
-            );
-          }
-          throw new Error(INVALID_BUILD_ENV_ERROR);
-        })()}
         {history && (<HistoryButtons history={history} />)}
-        <Tooltip title="Download 3D model GLTF" arrow>
-          <span>
-            <IconButton
-              className={TOUR_ELEMENT_CLASSES.DOWNLOAD_3D}
-              onClick={() => { downloadShapeGLTF(); }}
-              component="span"
-            >
-              <GetAppIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
         <DragModeOptionsGroup dragMode={dragMode} />
         {pattern && !hasPathPattern && (
           <FormControlLabel
@@ -235,34 +327,8 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           />
         )}
 
-        <Tooltip title="Open texture arrangement" arrow>
-          <span>
-            <IconButton
-              className={TOUR_ELEMENT_CLASSES.OPEN_TEXTURE_ARRANGEMENT}
-              onClick={() => { openTextureArrangement(); }}
-              aria-label="open texture"
-              component="span"
-            >
-              <FolderOpenIcon fontSize="large" />
-            </IconButton>
-          </span>
-        </Tooltip>
         {texture && (
           <>
-            <Tooltip title="Save texture arrangement" arrow>
-              <span>
-                <IconButton
-                  className={TOUR_ELEMENT_CLASSES.SAVE_TEXTURE_ARRANGEMENT}
-                  onClick={() => {
-                    saveTextureArrangement();
-                  }}
-                  aria-label="save texture"
-                  component="span"
-                >
-                  <SaveIcon fontSize="large" />
-                </IconButton>
-              </span>
-            </Tooltip>
             <Button
               className={TOUR_ELEMENT_CLASSES.SNAP_MENU}
               startIcon={<TrackChangesIcon />}
@@ -403,22 +469,25 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               ))}
             </Menu>
 
-            <Tooltip title="Send shape decoration to Dieline Editor" arrow>
-              <span>
-                <IconButton
-                  onClick={() => {
-                    sendTextureToDielineEditor();
-                    pluginModel.setTextureEditorOpen(false);
-                  }}
-                  aria-label="send texture"
-                  component="span"
-                >
-                  <TelegramIcon fontSize="large" />
-                </IconButton>
-              </span>
-            </Tooltip>
+            { IS_ELECTRON_BUILD && (
+              <Tooltip title="Send shape decoration to Dieline Editor" arrow>
+                <span>
+                  <IconButton
+                    onClick={() => {
+                      sendTextureToDielineEditor();
+                      pluginModel.setTextureEditorOpen(false);
+                    }}
+                    aria-label="send texture"
+                    component="span"
+                  >
+                    <TelegramIcon fontSize="large" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
           </>
         )}
+        { IS_WEB_BUILD && (
         <IconButton
           onClick={() => {
             setNeedsTour(true);
@@ -428,6 +497,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
         >
           <HelpIcon fontSize="large" />
         </IconButton>
+        )}
       </Toolbar>
     </AppBar>
   );

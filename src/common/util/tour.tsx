@@ -11,16 +11,15 @@ export enum TOUR_ELEMENT_CLASSES {
   ROTATE_3D = 'rotate-3d--tour',
   UPLOAD_IMAGE = 'upload-image--tour',
   HISTORY_BUTTONS = 'history-buttons--tour',
-  DOWNLOAD_3D = 'download-3d--tour',
   IS_BORDERED = 'is-bordered--tour',
   DRAG_MODE_INDICATOR = 'drag-mode-indicator--tour',
-  OPEN_TEXTURE_ARRANGEMENT = 'open-texture-arrangement--tour',
-  SAVE_TEXTURE_ARRANGEMENT = 'save-texture-arrangement--tour',
+  TEXTURE_EDITOR_FILE_MENU = 'texture-editor-file--tour',
   SNAP_MENU = 'snap-menu--tour',
   NODE_INPUTS = 'node-inputs--tour',
   FILL_IS_POSITIVE = 'fill-is-positive--tour',
   USE_ALPHA_TEXTURE = 'use-alpha-texture--tour',
   ROTATE_INPUT = 'rotate-input--tour',
+  FULL_SCREEN_BUTTON = 'full-screen-button--tour',
   TEXTURE_ARRANGEMENT_AREA = 'texture-arrangement-area--tour',
   SHAPE_PREVIEW_AREA = 'shape-preview-area',
 }
@@ -55,7 +54,7 @@ export const TOUR_STEPS: MyStep[] = [
   {
     target: `.${TOUR_ELEMENT_CLASSES.UPLOAD_IMAGE}`,
     content: `To get started, click here to upload a bitmap or vector graphic image to the texture arrangement area. 
-    Supported file types: .png, .jpg, .svg.  Click "Next" and this wizard will add a sample svg path.`,
+    Supported file types: .png, .jpg, .svg. Keep in mind, when uploading SVG files, this application only reads path elements and imports only the topmost path. Be sure to convert/merge all required content into a single path and send it to the top of the document. Click "Next" and this wizard will add a sample svg path.`,
     nextAction: STEP_ACTIONS.ADD_PATH_TEXTURE,
   },
   {
@@ -112,7 +111,7 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}`,
-    content: `You're invited to test out all of the drag modes here now.`,
+    content: 'The drag/scroll mode is active in this region.  Notice you don\'t need to click down on the image or path fill in order to change the position/rotation/scale. Except for in translation modes, only the up-down motion of dragging changes the mode property. The red circle represents the "transform origin" about which scale and rotation of the image happens. It can be dragged in order to reposition.',
     placement: 'right',
   },
   {
@@ -124,34 +123,26 @@ export const TOUR_STEPS: MyStep[] = [
     content: `...the snap menu, which you can click to open. Now you can choose one of the "Selected node to corner" options therein. Node selection is for snapping alone so once you're done it's best to turn it off to improve performance. With this menu, you can also move the image so the origin is positioned over one of the corners or you can snap the origin alone to any corner. Feel free to give it a try.`,
   },
   {
-    target: `.${TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}`,
-    content: 'The drag/scroll mode is active in this region.  Notice you don\'t need to click down on the image or path fill in order to change the position/rotation/scale. Except for in translation modes, only the up-down motion of dragging changes the mode property. The red circle represents the "transform origin" about which scale and rotation of the image happens. It can be dragged in order to reposition.',
-    placement: 'right',
-  },
-  {
     target: `.${TOUR_ELEMENT_CLASSES.HISTORY_BUTTONS}`,
     content: 'Getting textures in just the right spot can be tricky so these undo/redo buttons will offer you some forgiveness in your tinkering.',
   },
   {
-    target: `.${TOUR_ELEMENT_CLASSES.DOWNLOAD_3D}`,
+    target: `.${TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU}`,
     content: (
       <>
-        Like what you see? This button will let you download the 3D model in .glb format.
-        Not sure what to do with a .glb file? Why not drag and drop it into a virtual meeting room on
-        {' '}
-        <a style={linkStyle} target="_blank" href="http://hubs.mozilla.com" rel="noreferrer">http://hubs.mozilla.com</a>
-        {' '}
-        and invite your friends to come see your creation.
+        <p>
+          This menu lets you save and reopen the image data along with its arrangement on the shape as a .pnst file (pyramid net specification texture). The file you save can then be imported into the Polyhedral Net Studio desktop application. It can construct a cutable/printable/buildable svg design from your arrangement. If you want to delegate the production of the design you've created, this file will be your ticket.
+        </p>
+        <p>
+          This menu also allows you to download a 3D model of the sape in .glb format.
+          Not sure what to do with a .glb file? Why not drag and drop it into a virtual meeting room on
+          {' '}
+          <a style={linkStyle} target="_blank" href="http://hubs.mozilla.com" rel="noreferrer">http://hubs.mozilla.com</a>
+          {' '}
+          and invite your friends to come see your creation.
+        </p>
       </>
     ),
-  },
-  {
-    target: `.${TOUR_ELEMENT_CLASSES.SAVE_TEXTURE_ARRANGEMENT}`,
-    content: 'You can save the image data with its arrangement on the shape with this button. The file you save can then be imported into the Polyhedral Net Studio desktop application which can construct a cutable/printable/buildable svg design. If you want to delegate the production of the design you\'ve created, this file will be your ticket.',
-  },
-  {
-    target: `.${TOUR_ELEMENT_CLASSES.OPEN_TEXTURE_ARRANGEMENT}`,
-    content: 'If you made a mistake you can open your file again here and re-save.',
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.FILL_IS_POSITIVE}`,
@@ -190,13 +181,15 @@ export const TOUR_STEPS: MyStep[] = [
     content: 'This will let you enjoy a hypnotizing twirl, allowing you to see the shape from different angles.',
   },
   {
+    target: `.${TOUR_ELEMENT_CLASSES.FULL_SCREEN_BUTTON}`,
+    content: `Here you can make the shape preview full-screen for your aesthetic enjoyment.`,
+  },
+  {
     target: 'body',
     placement: 'center',
     title: 'All done',
     styles: {
-      options: {
-        width: 640,
-      },
+      options: { width: 720 },
     },
     content: (
       <>
@@ -218,10 +211,7 @@ export const TOUR_STEPS: MyStep[] = [
           >
             this post
           </a>
-          . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and join a participatory design community, please reach out in order to join the alpha test group. Playful Geometer aspires to assemble a team of artists, product/graphic designers, coders, crafters, gifters and community animators. A model of organization being explored:
-          {' '}
-          <a style={linkStyle} href="https://disco.coop/">disco.coop</a>
-          .
+          . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and co-create a participatory design community, please reach out in order to join the alpha test group. Playful Geometer is exploring the possibility of assembling a team of artists, product/graphic designers, coders, crafters, gifters and community animators. Only with engagement can this dream come alive.
         </p>
         <p>
           If you are interested in using exported 3D models for commercial purposes, please obtain permission by email before doing so.

@@ -1,4 +1,4 @@
-import { EVENTS } from '../common/constants';
+import { EVENTS, IS_DEVELOPMENT_BUILD } from '../common/constants';
 
 const {
   app, BrowserWindow, nativeImage, nativeTheme, ipcMain, screen: electronScreen,
@@ -9,15 +9,13 @@ const debug = require('electron-debug');
 
 const { setupIpc } = require('./ipc');
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
-
 // for debugging prod build, temporarily add isEnabled: true
 debug({ showDevTools: false, isEnabled: true });
 
 // @ts-ignore
 const icon = nativeImage.createFromPath(`${path.resolve(__static, '..')}/build/icons/256x256.png`);
 app.on('ready', async () => {
-  if (isDevelopment) {
+  if (IS_DEVELOPMENT_BUILD) {
     // electron-devtools-installer is a devDependency so don't import at top
     const {
       default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS,
@@ -60,7 +58,7 @@ app.on('ready', async () => {
   browserWindow.on('minimize', sendResetDragMode);
   browserWindow.on('hide', sendResetDragMode);
 
-  await browserWindow.loadURL(isDevelopment
+  await browserWindow.loadURL(IS_DEVELOPMENT_BUILD
     ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
     : format({
       pathname: path.join(__dirname, 'index.html'),

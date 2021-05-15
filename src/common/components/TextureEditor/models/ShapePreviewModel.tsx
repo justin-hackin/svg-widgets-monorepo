@@ -31,7 +31,7 @@ import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { viewBoxAttrsToString } from '../../../util/svg';
 import requireStatic from '../../../../renderer/requireStatic';
 import { TextureEditorModel } from './TextureEditorModel';
-import { EVENTS } from '../../../constants';
+import { EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../constants';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -43,6 +43,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
   .volatile(() => ({
     gltfExporter: new GLTFExporter(),
     gltfLoader: new GLTFLoader(),
+    textureCanvas: document.createElement('canvas'),
     scene: null,
     lightColor: 0x404040,
     internalLight: null,
@@ -93,57 +94,47 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.texture;
     },
   }))
-  .actions((self) => {
-    const setShapeTexture = (imageBitmap) => {
-      if (!self.shapeMesh) {
-        throw new Error('setShapeTexture: shapeMesh does not exist');
+  .actions((self) => ({
+    setMaterialMap(map) {
+      self.shapeMaterialMap = map;
+      self.shapeMaterialMap.image = self.textureCanvas;
+    },
+    setShapeMesh(shape) { self.shapeMesh = shape; },
+    setShapeWireframe(wireframe) { self.shapeWireframe = wireframe; },
+    applyTextureToMesh: flow(function* () {
+      const {
+        shapeMesh,
+        parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
+      } = self;
+      if (!shapeMesh || !viewBoxAttrs) {
+        return;
       }
-      const { material }: { material: MeshPhongMaterial } = self.shapeMesh;
-      material.map.image = imageBitmap;
-      material.map.needsUpdate = true;
-    };
-    return {
-      setShapeTexture,
-      setMaterialMap(map) { self.shapeMaterialMap = map; },
-      setShapeMesh(shape) { self.shapeMesh = shape; },
-      setShapeWireframe(wireframe) { self.shapeWireframe = wireframe; },
-      applyTextureToMesh: flow(function* () {
-        const {
-          shapeMesh,
-          parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
-        } = self;
-        if (!shapeMesh || !viewBoxAttrs) {
-          return;
-        }
 
-        const svgStr = ReactDOMServer.renderToString(
-          React.createElement(TextureSvgUnobserved, {
-            viewBox: viewBoxAttrsToString(viewBoxAttrs),
-            store: self.parentTextureEditor,
-          }),
-        );
-        const {
-          width: vbWidth,
-          height: vbHeight,
-        } = viewBoxAttrs;
-        const scaleWidth = npot(vbWidth * self.TEXTURE_BITMAP_SCALE);
-        const scaleHeight = npot(vbHeight * self.TEXTURE_BITMAP_SCALE);
-        const textureCanvas = document.createElement('canvas');
-        textureCanvas.setAttribute('width', vbWidth);
-        textureCanvas.setAttribute('height', vbHeight);
-        const ctx = textureCanvas.getContext('2d');
-        const v = yield Canvg.from(ctx, svgStr, {
-          ignoreAnimation: true,
-          ignoreMouse: true,
-          enableRedraw: false,
-          scaleWidth,
-          scaleHeight,
-        });
-        yield v.render();
-        setShapeTexture(ctx.getImageData(0, 0, scaleWidth, scaleHeight));
-      }),
-    };
-  })
+      const svgStr = ReactDOMServer.renderToString(
+        React.createElement(TextureSvgUnobserved, {
+          viewBox: viewBoxAttrsToString(viewBoxAttrs),
+          store: self.parentTextureEditor,
+        }),
+      );
+      const {
+        width: vbWidth,
+        height: vbHeight,
+      } = viewBoxAttrs;
+      const scaleWidth = npot(vbWidth * self.TEXTURE_BITMAP_SCALE);
+      const scaleHeight = npot(vbHeight * self.TEXTURE_BITMAP_SCALE);
+      self.textureCanvas.setAttribute('width', vbWidth);
+      self.textureCanvas.setAttribute('height', vbHeight);
+      const ctx = self.textureCanvas.getContext('2d');
+      const v = yield Canvg.from(ctx, svgStr, {
+        ignoreAnimation: true,
+        ignoreMouse: true,
+        enableRedraw: false,
+      });
+      v.resize(scaleWidth, scaleHeight, 'none');
+      yield v.render();
+      self.shapeMesh.material.map.needsUpdate = true;
+    }),
+  }))
   .actions((self) => {
     const alphaOnChange = () => {
       if (self.useAlpha) {
@@ -333,13 +324,13 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
         return self.gltfExporter
         // @ts-ignore
           .parse(self.shapeMesh, (shapeGLTF: ArrayBuffer) => {
-            if (process.env.BUILD_ENV === 'electron') {
+            if (IS_ELECTRON_BUILD) {
               globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_GLB, shapeGLTF, {
                 message: 'Save shape preview',
                 defaultPath,
               });
             }
-            if (process.env.BUILD_ENV === 'web') {
+            if (IS_WEB_BUILD) {
               fileDownload(new Blob([shapeGLTF]), defaultPath);
             }
           }, { binary: true });

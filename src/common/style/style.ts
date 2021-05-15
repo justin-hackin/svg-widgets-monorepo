@@ -226,6 +226,12 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     height: '100%',
     width: '100%',
   },
+  textureEditorControls: {
+    '&.MuiAppBar-root': {
+      // so that the toolbar goes under the tour tooltips
+      zIndex: 100,
+    },
+  },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
   },

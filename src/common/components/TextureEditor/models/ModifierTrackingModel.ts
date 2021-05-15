@@ -1,6 +1,6 @@
 import { types } from 'mobx-state-tree';
 import { includes, flatten } from 'lodash';
-import { EVENTS, INVALID_BUILD_ENV_ERROR } from '../../../constants';
+import { EVENTS, INVALID_BUILD_ENV_ERROR, IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../constants';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',
@@ -85,7 +85,7 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
       return defaultMode;
     },
   })).actions((self) => {
-    if (process.env.BUILD_ENV === 'electron') {
+    if (IS_ELECTRON_BUILD) {
       const ipcResetHandler = () => {
         self.releaseHeldKeys();
       };
@@ -98,7 +98,7 @@ export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
         },
       };
     }
-    if (process.env.BUILD_ENV === 'web') {
+    if (IS_WEB_BUILD) {
       const documentBlurHandler = () => {
         self.releaseHeldKeys();
       };
