@@ -34,6 +34,8 @@ export enum STEP_ACTIONS {
 }
 
 // TODO: consider custom component for tour using Material UI Popper
+
+// TODO: use MUI global style (scoped to tour elements) instead of linkStyle
 const linkStyle = { color: theme.palette.primary.main };
 export const TOUR_STEPS: MyStep[] = [
   {
@@ -59,7 +61,20 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}`,
-    content: 'Your image shows up here, superimposed upon the shape face triangle. Notice how dragging anywhere in the area moves the pattern (not just dragging within the path fill or bounding box).',
+    content: (
+      <>
+        <p>
+          Your image shows up here, superimposed upon the shape face triangle. The sample SVG path applied here is a member of a downloadable collection of
+          {' '}
+          <a style={linkStyle} target="_blank" href="https://github.com/justin-hackin/stroke-filled-regular-tilings" rel="noreferrer">Stroke-Filled Regular Tilings</a>
+          {' '}
+          that you can use to get started with polyhedral decoration.
+        </p>
+        <p>
+          Notice how dragging anywhere in the area moves the pattern (not just dragging within the path fill or bounding box).
+        </p>
+      </>
+    ),
     placement: 'right',
   },
   {
@@ -89,6 +104,7 @@ export const TOUR_STEPS: MyStep[] = [
           >
             this extension
           </a>
+          {' '}
           or with
           {' '}
           <a style={linkStyle} href="https://duntuk.com/disable-scroll-wheel-zoom-firefox">a setting in Firefox</a>
