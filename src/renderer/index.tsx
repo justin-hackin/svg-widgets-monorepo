@@ -11,7 +11,7 @@ const AllRoutes = observer(() => {
   return (
     <>
       <DielineViewer />
-      <SelectedAdditionalMainContent />
+      { SelectedAdditionalMainContent && (<SelectedAdditionalMainContent />)}
     </>
   );
 });
