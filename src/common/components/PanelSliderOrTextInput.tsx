@@ -27,7 +27,7 @@ export const PanelSliderOrTextInput = observer(({
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
 
   return (
-    <FormControl className={clsx(classes.formControl, className)}>
+    <FormControl className={clsx(className, classes.formControl)}>
       <Typography id={labelId} gutterBottom>
         {resolvedLabel}
       </Typography>

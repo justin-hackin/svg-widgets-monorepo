@@ -62,7 +62,10 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     position: 'absolute',
   },
   dielinePanelButton: {
-    color: 'inherit',
+    // additional specificity not needed in dev build but this style not applied in production build
+    '&.MuiButtonBase-root': {
+      color: 'inherit',
+    },
     '&:hover': {
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
     },
@@ -173,7 +176,10 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
     },
   },
   shapeHeightFormControl: {
-    marginTop: theme.spacing(3),
+    // additional specificity not needed in dev build but this style not applied in production build
+    '&.MuiFormControl-root': {
+      marginTop: theme.spacing(3),
+    },
   },
   panelChromePicker: {
     alignSelf: 'flex-end',
