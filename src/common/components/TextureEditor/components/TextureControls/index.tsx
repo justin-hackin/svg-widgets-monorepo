@@ -260,6 +260,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             value={shapeName}
             onChange={(e) => {
               pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
+              pluginModel.textureEditor.refitTextureToFace();
             }}
             name="polyhedron-shape"
           />

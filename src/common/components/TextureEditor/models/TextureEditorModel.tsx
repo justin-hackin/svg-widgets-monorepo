@@ -1,6 +1,5 @@
 import { inRange } from 'lodash';
 import {
-  castToSnapshot,
   getParentOfType, getSnapshot, Instance, tryResolve, types,
 } from 'mobx-state-tree';
 import fileDownload from 'js-file-download';
@@ -191,7 +190,9 @@ export const TextureEditorModel = types
       self.texture.scale = self.imageCoverScale.scale;
     },
     refitTextureToFace() {
-      this.setTextureFromPattern(self.texture.pattern);
+      if (self.texture) {
+        this.setTextureFromPattern(getSnapshot(self.texture.pattern));
+      }
     },
     resetNodesEditor() {
       self.showNodes = false;
@@ -200,11 +201,11 @@ export const TextureEditorModel = types
     clearTexture() {
       self.texture = undefined;
     },
-    setTextureFromPattern(patternSnapshotOrNode) {
+    setTextureFromPattern(patternSnapshot) {
       this.resetNodesEditor();
 
       self.texture = TextureModel.create({
-        pattern: castToSnapshot(patternSnapshotOrNode),
+        pattern: patternSnapshot,
         scale: 1,
         rotate: 0,
         translate: getOriginPoint(),
@@ -283,7 +284,7 @@ export const TextureEditorModel = types
       const diff = sumPoints(svgTextureNode, scalePoint(point, -1));
       self.texture.translate = sumPoints(scalePoint(diff, -1), self.texture.translate);
     },
-    repositionSelectedNodeOverCorner (vertexIndex) {
+    repositionSelectedNodeOverCorner(vertexIndex) {
       this.repositionSelectedNodeOverPoint(self.decorationBoundary.vertices[vertexIndex]);
     },
     repositionSelectedNodeOverFaceCenter() {
@@ -372,7 +373,7 @@ export const TextureEditorModel = types
       this.setTextureArrangementFromFileData(fileData);
     },
   }))
-  .actions(() => {
+  .actions((self) => {
     // ======== ANALYTICS TRACkING ========
     if (IS_ELECTRON_BUILD || IS_DEVELOPMENT_BUILD) {
       // stub the function for non-tracking builds
