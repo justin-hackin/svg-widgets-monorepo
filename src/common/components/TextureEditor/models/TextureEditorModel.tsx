@@ -9,7 +9,7 @@ import { TextureModel } from './TextureModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset,
-  getOriginPoint,
+  getOriginPoint, RawPoint,
   scalePoint,
   sumPoints,
   transformPoint,
@@ -290,12 +290,15 @@ export const TextureEditorModel = types
     repositionSelectedNodeOverFaceCenter() {
       this.repositionSelectedNodeOverPoint(self.decorationBoundary.centerPoint);
     },
-    repositionOriginOverPoint(point) {
+    repositionOriginOverPoint(point: RawPoint) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
-      const relVertex = transformPoint(self.texture.transformMatrix.inverse(), point);
-      const delta = scalePoint(sumPoints(scalePoint(relVertex, -1), self.texture.transformOrigin), -1);
+      this.repositionOriginOverRelativePoint(transformPoint(self.texture.transformMatrix.inverse(), point));
+    },
+
+    repositionOriginOverRelativePoint(pointRelativeToTexture: RawPoint) {
+      const delta = scalePoint(sumPoints(scalePoint(pointRelativeToTexture, -1), self.texture.transformOrigin), -1);
       const newTransformOrigin = sumPoints(delta, self.texture.transformOrigin);
       self.texture.translate = sumPoints(
         self.texture.translate,
@@ -311,6 +314,13 @@ export const TextureEditorModel = types
 
     repositionOriginOverFaceCenter() {
       this.repositionOriginOverPoint(self.decorationBoundary.centerPoint);
+    },
+
+    repositionOriginOverTextureCenter() {
+      if (self.texture) {
+        const { width, height } = self.texture.dimensions;
+        this.repositionOriginOverRelativePoint({ x: width / 2, y: height / 2 });
+      }
     },
 
     sendTextureToDielineEditor() {
@@ -373,7 +383,7 @@ export const TextureEditorModel = types
       this.setTextureArrangementFromFileData(fileData);
     },
   }))
-  .actions((self) => {
+  .actions(() => {
     // ======== ANALYTICS TRACkING ========
     if (IS_ELECTRON_BUILD || IS_DEVELOPMENT_BUILD) {
       // stub the function for non-tracking builds

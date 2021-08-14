@@ -21,6 +21,7 @@ export const SnapMenu = observer(() => {
     selectedTextureNodeIndex, showNodes,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
     repositionTextureWithOriginOverFaceCenter, repositionOriginOverFaceCenter, repositionSelectedNodeOverFaceCenter,
+    repositionOriginOverTextureCenter,
     refitTextureToFace,
   } = pluginModel.textureEditor as ITextureEditorModel;
 
@@ -55,6 +56,11 @@ export const SnapMenu = observer(() => {
 
   const originToFaceCenterSnapMenuOnclick = () => {
     repositionOriginOverFaceCenter();
+    resetPositionSnapMenuAnchorEl();
+  };
+
+  const originToTextureCenterSnapMenuOnclick = () => {
+    repositionOriginOverTextureCenter();
     resetPositionSnapMenuAnchorEl();
   };
 
@@ -132,6 +138,13 @@ export const SnapMenu = observer(() => {
           }}
         >
           Origin to face center
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            originToTextureCenterSnapMenuOnclick();
+          }}
+        >
+          Origin to texture center
         </MenuItem>
         {range(numFaceSides).map((index) => (
           <MenuItem
