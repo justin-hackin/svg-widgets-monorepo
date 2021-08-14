@@ -5,6 +5,7 @@ import OpenWithIcon from '@material-ui/icons/OpenWith';
 import AspectRatioIcon from '@material-ui/icons/AspectRatio';
 import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 import HeightIcon from '@material-ui/icons/Height';
+import clsx from 'clsx';
 
 import React from 'react';
 import { observer } from 'mobx-react';
@@ -23,9 +24,8 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
   const classes = useStyles();
   return (
     <ToggleButtonGroup
-      className={TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR}
+      className={clsx(TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR, classes.dragModeOptionsGroup)}
       value={dragMode}
-      style={{ height: 'fit-content', margin: '0.5em' }}
       exclusive
       aria-label="drag mode"
     >

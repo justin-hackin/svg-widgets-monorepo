@@ -132,13 +132,14 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
   // TODO: add whitespace, improve button definition and input alignment
   return (
-    <AppBar className={classes.textureEditorControls} color="inherit" position="relative">
-      <Toolbar
-        className={clsx(classes.textureToolbar, texture && classes.textureToolbarWithTexture)}
-        variant="dense"
-      >
-        {/* web app uses texture editor as standalone component without drawer */}
-        {hasCloseButton && (
+    <>
+      <AppBar className={classes.textureEditorControls} color="inherit" position="relative">
+        <Toolbar
+          className={clsx(classes.textureToolbar, texture && classes.textureToolbarWithTexture)}
+          variant="dense"
+        >
+          {/* web app uses texture editor as standalone component without drawer */}
+          {hasCloseButton && (
           <>
             <IconButton
               onClick={() => {
@@ -151,34 +152,34 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             </IconButton>
             <Divider />
           </>
-        )}
-        <Button
-          className={clsx(classes.dielinePanelButton, TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU)}
-          startIcon={<FolderIcon />}
-          onClick={(e) => {
-            setFileMenuRef(e.currentTarget);
-          }}
-        >
-          File
-        </Button>
-        <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
-          {(() => {
-            if (IS_WEB_BUILD) {
-              return (<ForwardRefdOpenMenuItem />);
-            }
-            if (IS_ELECTRON_BUILD) {
-              return (
-                <OpenTextureArrangementMenuItem onClick={() => {
-                  openTextureArrangement();
-                  resetFileMenuRef();
-                }}
-                />
-              );
-            }
-            throw new Error(INVALID_BUILD_ENV_ERROR);
-          })()}
-          {/* Menu component emits error when child is React.Fragment */}
-          { texture
+          )}
+          <Button
+            className={clsx(classes.dielinePanelButton, TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU)}
+            startIcon={<FolderIcon />}
+            onClick={(e) => {
+              setFileMenuRef(e.currentTarget);
+            }}
+          >
+            File
+          </Button>
+          <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
+            {(() => {
+              if (IS_WEB_BUILD) {
+                return (<ForwardRefdOpenMenuItem />);
+              }
+              if (IS_ELECTRON_BUILD) {
+                return (
+                  <OpenTextureArrangementMenuItem onClick={() => {
+                    openTextureArrangement();
+                    resetFileMenuRef();
+                  }}
+                  />
+                );
+              }
+              throw new Error(INVALID_BUILD_ENV_ERROR);
+            })()}
+            {/* Menu component emits error when child is React.Fragment */}
+            { texture
             && [
               (
                 <MenuItem
@@ -205,81 +206,81 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 </MenuItem>
               ),
             ]}
-        </Menu>
-        {/*  @ts-ignore */}
-        {(() => { // eslint-disable-line consistent-return
-          if (IS_ELECTRON_BUILD) {
-            return (
-              <UploadButton onClick={async () => {
-                const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
-                assignTextureFromPatternInfo(patternInfo);
-              }}
-              />
-            );
-          }
-          if (IS_WEB_BUILD) {
-            return (
-              <FilePicker
-                extensions={['.jpg', '.jpeg', '.png', '.svg']}
-                onFilePicked={async (file) => {
-                  if (file) {
-                    if (file.type === 'image/svg+xml') {
-                      const svgString = await file.text();
-                      assignTextureFromPatternInfo({
-                        isPath: true,
-                        svgString,
-                        sourceFileName: file.name,
-                      });
-                    } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
-                      //  file is either png or jpg
-                      const imageData = await toBase64(file);
-                      const dimensions = await resolveImageDimensionsFromBase64(imageData);
-                      assignTextureFromPatternInfo({
-                        isPath: false,
-                        pattern: {
-                          imageData,
-                          dimensions,
-                          sourceFileName: file.name,
-                        },
-                      });
-                    }
-                    // TODO: user can still pick non-image, emit snackbar error in this case
-                  }
+          </Menu>
+          {/*  @ts-ignore */}
+          {(() => { // eslint-disable-line consistent-return
+            if (IS_ELECTRON_BUILD) {
+              return (
+                <UploadButton onClick={async () => {
+                  const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
+                  assignTextureFromPatternInfo(patternInfo);
                 }}
-              >
-                <UploadButton />
-              </FilePicker>
-            );
-          }
-          throw new Error(INVALID_BUILD_ENV_ERROR);
-        })()}
-        <ShapeSelect
-          className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
-          isCompactDisplay
-          value={shapeName}
-          onChange={(e) => {
-            pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
-          }}
-          name="polyhedron-shape"
-        />
-        <FormControlLabel
-          className={TOUR_ELEMENT_CLASSES.ROTATE_3D}
-          labelPlacement="top"
-          control={(
-            <Switch
-              checked={autoRotatePreview}
-              onChange={(e) => {
-                setAutoRotatePreview(e.target.checked);
-              }}
-              color="primary"
-            />
+                />
+              );
+            }
+            if (IS_WEB_BUILD) {
+              return (
+                <FilePicker
+                  extensions={['.jpg', '.jpeg', '.png', '.svg']}
+                  onFilePicked={async (file) => {
+                    if (file) {
+                      if (file.type === 'image/svg+xml') {
+                        const svgString = await file.text();
+                        assignTextureFromPatternInfo({
+                          isPath: true,
+                          svgString,
+                          sourceFileName: file.name,
+                        });
+                      } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
+                        //  file is either png or jpg
+                        const imageData = await toBase64(file);
+                        const dimensions = await resolveImageDimensionsFromBase64(imageData);
+                        assignTextureFromPatternInfo({
+                          isPath: false,
+                          pattern: {
+                            imageData,
+                            dimensions,
+                            sourceFileName: file.name,
+                          },
+                        });
+                      }
+                      // TODO: user can still pick non-image, emit snackbar error in this case
+                    }
+                  }}
+                >
+                  <UploadButton />
+                </FilePicker>
+              );
+            }
+            throw new Error(INVALID_BUILD_ENV_ERROR);
+          })()}
+          <ShapeSelect
+            className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
+            isCompactDisplay
+            value={shapeName}
+            onChange={(e) => {
+              pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
+            }}
+            name="polyhedron-shape"
+          />
+          <FormControlLabel
+            className={TOUR_ELEMENT_CLASSES.ROTATE_3D}
+            labelPlacement="top"
+            control={(
+              <Switch
+                checked={autoRotatePreview}
+                onChange={(e) => {
+                  setAutoRotatePreview(e.target.checked);
+                }}
+                color="primary"
+              />
           )}
-          label="Rotate 3D"
-        />
+            label="Rotate 3D"
+          />
 
-        {history && (<HistoryButtons history={history} />)}
-        <DragModeOptionsGroup dragMode={dragMode} />
-        {pattern && !hasPathPattern && (
+          {history && (<HistoryButtons history={history} />)}
+
+          {pattern && !hasPathPattern && (
           <FormControlLabel
             className={TOUR_ELEMENT_CLASSES.IS_BORDERED}
             labelPlacement="top"
@@ -294,67 +295,67 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             )}
             label="Bordered"
           />
-        )}
+          )}
 
-        <SnapMenu />
-        {texture && (
+          <SnapMenu />
+          {texture && (
           <>
             {/* menu content at bottom section */}
             {hasPathPattern && (
-              <>
-                <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.textureEditorNodeInputs)}>
-                  <FormControlLabel
-                    labelPlacement="top"
-                    control={(
-                      <Switch
-                        checked={showNodes}
-                        onChange={(e) => {
-                          setShowNodes(e.target.checked);
-                        }}
-                        color="primary"
-                      />
+            <>
+              <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.textureEditorNodeInputs)}>
+                <FormControlLabel
+                  labelPlacement="top"
+                  control={(
+                    <Switch
+                      checked={showNodes}
+                      onChange={(e) => {
+                        setShowNodes(e.target.checked);
+                      }}
+                      color="primary"
+                    />
                     )}
-                    label="Node selection"
-                  />
-                  <PanelSliderComponent
-                    node={pluginModel.textureEditor}
-                    property="nodeScaleMux"
-                    className={classes.nodeScaleMuxSlider}
-                    label="Node size"
-                    min={0.1}
-                    max={10}
-                    step={DEFAULT_SLIDER_STEP}
-                  />
-                </span>
-                <FormControlLabel
-                  className={TOUR_ELEMENT_CLASSES.FILL_IS_POSITIVE}
-                  labelPlacement="top"
-                  control={(
-                    <Switch
-                      checked={pattern.isPositive}
-                      onChange={(e) => {
-                        pattern.setIsPositive(e.target.checked);
-                      }}
-                      color="primary"
-                    />
-                  )}
-                  label="Fill is positive"
+                  label="Node selection"
                 />
-                <FormControlLabel
-                  className={TOUR_ELEMENT_CLASSES.USE_ALPHA_TEXTURE}
-                  labelPlacement="top"
-                  control={(
-                    <Switch
-                      checked={pattern.useAlphaTexturePreview}
-                      onChange={(e) => {
-                        pattern.setUseAlphaTexturePreview(e.target.checked);
-                      }}
-                      color="primary"
-                    />
-                  )}
-                  label="Use Alpha Texture"
+                <PanelSliderComponent
+                  node={pluginModel.textureEditor}
+                  property="nodeScaleMux"
+                  className={classes.nodeScaleMuxSlider}
+                  label="Node size"
+                  min={0.1}
+                  max={10}
+                  step={DEFAULT_SLIDER_STEP}
                 />
-              </>
+              </span>
+              <FormControlLabel
+                className={TOUR_ELEMENT_CLASSES.FILL_IS_POSITIVE}
+                labelPlacement="top"
+                control={(
+                  <Switch
+                    checked={pattern.isPositive}
+                    onChange={(e) => {
+                      pattern.setIsPositive(e.target.checked);
+                    }}
+                    color="primary"
+                  />
+                  )}
+                label="Fill is positive"
+              />
+              <FormControlLabel
+                className={TOUR_ELEMENT_CLASSES.USE_ALPHA_TEXTURE}
+                labelPlacement="top"
+                control={(
+                  <Switch
+                    checked={pattern.useAlphaTexturePreview}
+                    onChange={(e) => {
+                      pattern.setUseAlphaTexturePreview(e.target.checked);
+                    }}
+                    color="primary"
+                  />
+                  )}
+                label="Use Alpha Texture"
+              />
+            </>
             )}
 
             <TextField
@@ -381,35 +382,37 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               variant="filled"
             />
             { IS_ELECTRON_BUILD && (
-              <Tooltip title="Send shape decoration to Dieline Editor" arrow>
-                <span>
-                  <IconButton
-                    onClick={() => {
-                      sendTextureToDielineEditor();
-                      pluginModel.setTextureEditorOpen(false);
-                    }}
-                    aria-label="send texture"
-                    component="span"
-                  >
-                    <TelegramIcon fontSize="large" />
-                  </IconButton>
-                </span>
-              </Tooltip>
+            <Tooltip title="Send shape decoration to Dieline Editor" arrow>
+              <span>
+                <IconButton
+                  onClick={() => {
+                    sendTextureToDielineEditor();
+                    pluginModel.setTextureEditorOpen(false);
+                  }}
+                  aria-label="send texture"
+                  component="span"
+                >
+                  <TelegramIcon fontSize="large" />
+                </IconButton>
+              </span>
+            </Tooltip>
             )}
           </>
-        )}
-        { IS_WEB_BUILD && (
-        <IconButton
-          onClick={() => {
-            setNeedsTour(true);
-          }}
-          aria-label="send texture"
-          component="span"
-        >
-          <HelpIcon fontSize="large" />
-        </IconButton>
-        )}
-      </Toolbar>
-    </AppBar>
+          )}
+          { IS_WEB_BUILD && (
+          <IconButton
+            onClick={() => {
+              setNeedsTour(true);
+            }}
+            aria-label="send texture"
+            component="span"
+          >
+            <HelpIcon fontSize="large" />
+          </IconButton>
+          )}
+        </Toolbar>
+      </AppBar>
+      <DragModeOptionsGroup dragMode={dragMode} />
+    </>
   );
 });

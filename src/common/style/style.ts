@@ -238,6 +238,11 @@ export const useStyles = makeStyles((theme: Theme) => createStyles({
       zIndex: 100,
     },
   },
+  dragModeOptionsGroup: {
+    height: 'fit-content',
+    margin: '0.5em',
+    position: 'fixed',
+  },
   select: {
     display: 'flex', position: 'absolute', top: 0, right: 0,
   },
