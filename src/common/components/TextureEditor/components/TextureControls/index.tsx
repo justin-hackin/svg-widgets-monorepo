@@ -16,7 +16,6 @@ import {
   Typography,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
-import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 import CachedIcon from '@material-ui/icons/Cached';
 import TelegramIcon from '@material-ui/icons/Telegram';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
@@ -28,28 +27,29 @@ import PublishIcon from '@material-ui/icons/Publish';
 import FilePicker from '@mavedev/react-file-picker';
 import HelpIcon from '@material-ui/icons/Help';
 
-import { range, isNumber, isNaN } from 'lodash';
+import { isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
-import { DragModeOptionsGroup } from './DragModeOptionGroup';
+import { DragModeOptionsGroup } from '../DragModeOptionGroup';
 import { HistoryButtons } from
-  '../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
-import { PanelSliderComponent } from '../../PanelSliderComponent';
-import { ShapeSelect } from '../../ShapeSelect';
-import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { useStyles } from '../../../style/style';
+  '../../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
+import { PanelSliderComponent } from '../../../PanelSliderComponent';
+import { ShapeSelect } from '../../../ShapeSelect';
+import { useWorkspaceMst } from '../../../../../renderer/DielineViewer/models/WorkspaceModel';
+import { IPyramidNetPluginModel } from '../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { useStyles } from '../../../../style/style';
 import {
   DEFAULT_SLIDER_STEP,
   EVENTS,
   INVALID_BUILD_ENV_ERROR,
   IS_ELECTRON_BUILD,
   IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION,
-} from '../../../constants';
-import { ITextureEditorModel } from '../models/TextureEditorModel';
-import { resolveImageDimensionsFromBase64, toBase64 } from '../../../util/data';
-import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
+} from '../../../../constants';
+import { ITextureEditorModel } from '../../models/TextureEditorModel';
+import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../util/data';
+import { TOUR_ELEMENT_CLASSES } from '../../../../util/tour';
+import { SnapMenu } from './components/SnapMenu';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -98,11 +98,8 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const { setNeedsTour } = workspaceStore.preferences;
   const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
   const {
-    texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement, decorationBoundary,
-    selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
-    repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
-    repositionTextureWithOriginOverFaceCenter, repositionOriginOverFaceCenter, repositionSelectedNodeOverFaceCenter,
-    refitTextureToFace,
+    texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement,
+    showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     shapePreview: { downloadShapeGLTF },
     assignTextureFromPatternInfo,
     setTextureArrangementFromFileData,
@@ -113,60 +110,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const {
     pattern, rotate: textureRotate, hasPathPattern,
   } = texture || {};
-  const numFaceSides = decorationBoundary.vertices.length;
 
-  // when truthy, snap menu is open
-  const [positionSnapMenuAnchorEl, setPositionSnapMenuAnchorEl] = useState(null);
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
-
-  const handleCornerSnapMenuClick = (event) => {
-    setPositionSnapMenuAnchorEl(event.currentTarget);
-  };
-
-  // TODO: extract snap menu to separate component
-  const resetPositionSnapMenuAnchorEl = () => { setPositionSnapMenuAnchorEl(null); };
-
-  const fitTextureToFaceSnapMenuOnclick = () => {
-    refitTextureToFace();
-    resetPositionSnapMenuAnchorEl();
-  };
-
-  const textureOriginToFaceCenterSnapMenuOnclick = () => {
-    repositionTextureWithOriginOverFaceCenter();
-    resetPositionSnapMenuAnchorEl();
-  };
-
-  const textureOriginToCornerSnapMenuOnclick = (index) => {
-    if (index !== undefined) {
-      repositionTextureWithOriginOverCorner(index);
-    }
-    resetPositionSnapMenuAnchorEl();
-  };
-
-  const originToFaceCenterSnapMenuOnclick = () => {
-    repositionOriginOverFaceCenter();
-    resetPositionSnapMenuAnchorEl();
-  };
-
-  const originToCornerSnapMenuOnclick = (index) => {
-    if (index !== undefined) {
-      repositionOriginOverCorner(index);
-    }
-    resetPositionSnapMenuAnchorEl();
-  };
-
-  const selectedNodeToCornerSnapMenuOnclick = (index) => {
-    if (index !== undefined) {
-      repositionSelectedNodeOverCorner(index);
-    }
-    resetPositionSnapMenuAnchorEl();
-  };
-
-  const selectedNodeToFaceCenterSnapMenuOnclick = () => {
-    repositionSelectedNodeOverFaceCenter();
-    resetPositionSnapMenuAnchorEl();
-  };
 
   const ForwardRefdOpenMenuItem = forwardRef((_, ref) => (
     <FilePicker
@@ -350,17 +296,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           />
         )}
 
+        <SnapMenu />
         {texture && (
           <>
-            <Button
-              className={TOUR_ELEMENT_CLASSES.SNAP_MENU}
-              startIcon={<TrackChangesIcon />}
-              aria-controls="simple-menu"
-              aria-haspopup="true"
-              onClick={handleCornerSnapMenuClick}
-            >
-              Snap
-            </Button>
             {/* menu content at bottom section */}
             {hasPathPattern && (
               <>
@@ -442,88 +380,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               }}
               variant="filled"
             />
-            {/* ===================== SNAP MENU ===================== */}
-            <Menu
-              id="simple-menu"
-              anchorEl={positionSnapMenuAnchorEl}
-              keepMounted
-              variant="menu"
-              open={Boolean(positionSnapMenuAnchorEl)}
-              onClose={() => {
-                resetPositionSnapMenuAnchorEl();
-              }}
-            >
-              <MenuItem
-                onClick={() => {
-                  fitTextureToFaceSnapMenuOnclick();
-                }}
-              >
-                Fit texture onto face
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  textureOriginToFaceCenterSnapMenuOnclick();
-                }}
-              >
-                Texture & origin to face center
-              </MenuItem>
-              {range(numFaceSides).map((index) => (
-                <MenuItem
-                  key={index}
-                  onClick={() => {
-                    textureOriginToCornerSnapMenuOnclick(index);
-                  }}
-                >
-                  Texture & origin to corner
-                  {' '}
-                  {index + 1}
-                </MenuItem>
-              ))}
-              <MenuItem
-                onClick={() => {
-                  originToFaceCenterSnapMenuOnclick();
-                }}
-              >
-                Origin to face center
-              </MenuItem>
-              {range(numFaceSides).map((index) => (
-                <MenuItem
-                  key={index}
-                  onClick={() => {
-                    originToCornerSnapMenuOnclick(index);
-                  }}
-                >
-                  Origin to corner
-                  {' '}
-                  {index + 1}
-                </MenuItem>
-              ))}
-
-              {showNodes && selectedTextureNodeIndex !== null && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    selectedNodeToFaceCenterSnapMenuOnclick();
-                  }}
-                >
-                  Selected node to face center
-                </MenuItem>
-                {range(numFaceSides).map((index) => (
-                  <MenuItem
-                    key={index}
-                    onClick={() => {
-                      selectedNodeToCornerSnapMenuOnclick(index);
-                    }}
-                  >
-                    Selected node to corner
-                    {' '}
-                    {index + 1}
-                  </MenuItem>
-                ))}
-              </>
-              )}
-            </Menu>
-
             { IS_ELECTRON_BUILD && (
               <Tooltip title="Send shape decoration to Dieline Editor" arrow>
                 <span>
