@@ -101,6 +101,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement, decorationBoundary,
     selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
+    refitTextureToFace,
     shapePreview: { downloadShapeGLTF },
     assignTextureFromPatternInfo,
     setTextureArrangementFromFileData,
@@ -123,6 +124,11 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   };
 
   const resetPositionSnapMenuAnchorEl = () => { setPositionSnapMenuAnchorEl(null); };
+
+  const handleFitTextureSnapMenuClose = () => {
+    refitTextureToFace();
+    resetPositionSnapMenuAnchorEl();
+  };
 
   const handleTextureOriginSnapMenuClose = (index) => {
     if (index !== undefined) {
@@ -430,6 +436,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 resetPositionSnapMenuAnchorEl();
               }}
             >
+              <MenuItem
+                onClick={() => {
+                  handleFitTextureSnapMenuClose();
+                }}
+              >
+                Fit texture onto face
+              </MenuItem>
               {range(numFaceSides).map((index) => (
                 <MenuItem
                   key={index}

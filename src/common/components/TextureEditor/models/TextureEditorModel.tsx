@@ -1,5 +1,6 @@
 import { inRange } from 'lodash';
 import {
+  castToSnapshot,
   getParentOfType, getSnapshot, Instance, tryResolve, types,
 } from 'mobx-state-tree';
 import fileDownload from 'js-file-download';
@@ -189,6 +190,9 @@ export const TextureEditorModel = types
         : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 };
       self.texture.scale = self.imageCoverScale.scale;
     },
+    refitTextureToFace() {
+      this.setTextureFromPattern(self.texture.pattern);
+    },
     resetNodesEditor() {
       self.showNodes = false;
       self.selectedTextureNodeIndex = null;
@@ -196,11 +200,11 @@ export const TextureEditorModel = types
     clearTexture() {
       self.texture = undefined;
     },
-    setTextureFromPattern(patternSnapshot) {
+    setTextureFromPattern(patternSnapshotOrNode) {
       this.resetNodesEditor();
 
       self.texture = TextureModel.create({
-        pattern: patternSnapshot,
+        pattern: castToSnapshot(patternSnapshotOrNode),
         scale: 1,
         rotate: 0,
         translate: getOriginPoint(),
