@@ -101,6 +101,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement, decorationBoundary,
     selectedTextureNodeIndex, showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
     repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
+    repositionTextureWithOriginOverFaceCenter, repositionOriginOverFaceCenter, repositionSelectedNodeOverFaceCenter,
     refitTextureToFace,
     shapePreview: { downloadShapeGLTF },
     assignTextureFromPatternInfo,
@@ -123,31 +124,47 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     setPositionSnapMenuAnchorEl(event.currentTarget);
   };
 
+  // TODO: extract snap menu to separate component
   const resetPositionSnapMenuAnchorEl = () => { setPositionSnapMenuAnchorEl(null); };
 
-  const handleFitTextureSnapMenuClose = () => {
+  const fitTextureToFaceSnapMenuOnclick = () => {
     refitTextureToFace();
     resetPositionSnapMenuAnchorEl();
   };
 
-  const handleTextureOriginSnapMenuClose = (index) => {
+  const textureOriginToFaceCenterSnapMenuOnclick = () => {
+    repositionTextureWithOriginOverFaceCenter();
+    resetPositionSnapMenuAnchorEl();
+  };
+
+  const textureOriginToCornerSnapMenuOnclick = (index) => {
     if (index !== undefined) {
       repositionTextureWithOriginOverCorner(index);
     }
     resetPositionSnapMenuAnchorEl();
   };
 
-  const handleOriginSnapMenuClose = (index) => {
+  const originToFaceCenterSnapMenuOnclick = () => {
+    repositionOriginOverFaceCenter();
+    resetPositionSnapMenuAnchorEl();
+  };
+
+  const originToCornerSnapMenuOnclick = (index) => {
     if (index !== undefined) {
       repositionOriginOverCorner(index);
     }
     resetPositionSnapMenuAnchorEl();
   };
 
-  const handleSelectedNodeSnapMenuClose = (index) => {
+  const selectedNodeToCornerSnapMenuOnclick = (index) => {
     if (index !== undefined) {
       repositionSelectedNodeOverCorner(index);
     }
+    resetPositionSnapMenuAnchorEl();
+  };
+
+  const selectedNodeToFaceCenterSnapMenuOnclick = () => {
+    repositionSelectedNodeOverFaceCenter();
     resetPositionSnapMenuAnchorEl();
   };
 
@@ -438,16 +455,23 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             >
               <MenuItem
                 onClick={() => {
-                  handleFitTextureSnapMenuClose();
+                  fitTextureToFaceSnapMenuOnclick();
                 }}
               >
                 Fit texture onto face
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  textureOriginToFaceCenterSnapMenuOnclick();
+                }}
+              >
+                Texture & origin to face center
               </MenuItem>
               {range(numFaceSides).map((index) => (
                 <MenuItem
                   key={index}
                   onClick={() => {
-                    handleTextureOriginSnapMenuClose(index);
+                    textureOriginToCornerSnapMenuOnclick(index);
                   }}
                 >
                   Texture & origin to corner
@@ -455,11 +479,18 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                   {index + 1}
                 </MenuItem>
               ))}
+              <MenuItem
+                onClick={() => {
+                  originToFaceCenterSnapMenuOnclick();
+                }}
+              >
+                Origin to face center
+              </MenuItem>
               {range(numFaceSides).map((index) => (
                 <MenuItem
                   key={index}
                   onClick={() => {
-                    handleOriginSnapMenuClose(index);
+                    originToCornerSnapMenuOnclick(index);
                   }}
                 >
                   Origin to corner
@@ -468,18 +499,29 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 </MenuItem>
               ))}
 
-              {showNodes && selectedTextureNodeIndex !== null && range(numFaceSides).map((index) => (
+              {showNodes && selectedTextureNodeIndex !== null && (
+              <>
                 <MenuItem
-                  key={index}
                   onClick={() => {
-                    handleSelectedNodeSnapMenuClose(index);
+                    selectedNodeToFaceCenterSnapMenuOnclick();
                   }}
                 >
-                  Selected node to corner
-                  {' '}
-                  {index + 1}
+                  Selected node to face center
                 </MenuItem>
-              ))}
+                {range(numFaceSides).map((index) => (
+                  <MenuItem
+                    key={index}
+                    onClick={() => {
+                      selectedNodeToCornerSnapMenuOnclick(index);
+                    }}
+                  >
+                    Selected node to corner
+                    {' '}
+                    {index + 1}
+                  </MenuItem>
+                ))}
+              </>
+              )}
             </Menu>
 
             { IS_ELECTRON_BUILD && (

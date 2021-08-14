@@ -211,7 +211,7 @@ export const TextureEditorModel = types
         transformOrigin: getOriginPoint(),
       });
       this.fitTextureToFace();
-      this.repositionOriginOverCorner(0);
+      this.repositionOriginOverFaceCenter();
     },
 
     setTexture(snapshot) {
@@ -253,7 +253,8 @@ export const TextureEditorModel = types
         this.absoluteMovementToSvg(absCoords),
       );
     },
-    repositionTextureWithOriginOverCorner(vertexIndex) {
+
+    repositionTextureWithOriginOverPoint(point) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
@@ -263,26 +264,36 @@ export const TextureEditorModel = types
       self.texture.translate = sumPoints(
         self.texture.translate,
         scalePoint(originAbsolute, -1),
-        self.decorationBoundary.vertices[vertexIndex],
+        point,
       );
     },
-    repositionSelectedNodeOverCorner(vertexIndex) {
+    repositionTextureWithOriginOverCorner(vertexIndex) {
+      this.repositionTextureWithOriginOverPoint(self.decorationBoundary.vertices[vertexIndex]);
+    },
+    repositionTextureWithOriginOverFaceCenter() {
+      this.repositionTextureWithOriginOverPoint(self.decorationBoundary.centerPoint);
+    },
+    repositionSelectedNodeOverPoint(point) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
       const svgTextureNode = transformPoint(
         self.texture.transformMatrixDragged, self.selectedTextureNode,
       );
-      const diff = sumPoints(svgTextureNode, scalePoint(self.decorationBoundary.vertices[vertexIndex], -1));
+      const diff = sumPoints(svgTextureNode, scalePoint(point, -1));
       self.texture.translate = sumPoints(scalePoint(diff, -1), self.texture.translate);
     },
-    repositionOriginOverCorner(vertexIndex) {
+    repositionSelectedNodeOverCorner (vertexIndex) {
+      this.repositionSelectedNodeOverPoint(self.decorationBoundary.vertices[vertexIndex]);
+    },
+    repositionSelectedNodeOverFaceCenter() {
+      this.repositionSelectedNodeOverPoint(self.decorationBoundary.centerPoint);
+    },
+    repositionOriginOverPoint(point) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
-      const relVertex = transformPoint(
-        self.texture.transformMatrix.inverse(), self.decorationBoundary.vertices[vertexIndex],
-      );
+      const relVertex = transformPoint(self.texture.transformMatrix.inverse(), point);
       const delta = scalePoint(sumPoints(scalePoint(relVertex, -1), self.texture.transformOrigin), -1);
       const newTransformOrigin = sumPoints(delta, self.texture.transformOrigin);
       self.texture.translate = sumPoints(
@@ -291,6 +302,14 @@ export const TextureEditorModel = types
           self.texture.scale, self.texture.rotate, self.texture.translate), -1),
       );
       self.texture.transformOrigin = newTransformOrigin;
+    },
+
+    repositionOriginOverCorner(vertexIndex) {
+      this.repositionOriginOverPoint(self.decorationBoundary.vertices[vertexIndex]);
+    },
+
+    repositionOriginOverFaceCenter() {
+      this.repositionOriginOverPoint(self.decorationBoundary.centerPoint);
     },
 
     sendTextureToDielineEditor() {
