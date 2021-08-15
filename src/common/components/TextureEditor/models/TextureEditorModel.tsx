@@ -21,12 +21,11 @@ import { UndoManagerWithGroupState } from '../../UndoManagerWithGroupState';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
 import {
   EVENTS,
-  IS_DEVELOPMENT_BUILD,
   IS_ELECTRON_BUILD,
   IS_WEB_BUILD,
   TEXTURE_ARRANGEMENT_FILE_EXTENSION,
 } from '../../../constants';
-import { ANALYTICS_BUFFERED_EVENTS, BUFFERED_SUM_VARIABLE } from '../../../util/analytics';
+import { reportTransformsTally } from '../../../util/analytics';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -384,46 +383,15 @@ export const TextureEditorModel = types
     },
   }))
   .actions(() => {
-    // ======== ANALYTICS TRACkING ========
-    if (IS_ELECTRON_BUILD || IS_DEVELOPMENT_BUILD) {
-      // stub the function for non-tracking builds
-      // reduces the number of env checks in call sites while preserving type safety
-      return {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        incrementTransformsBuffer(type: ANALYTICS_BUFFERED_EVENTS) {},
-      };
-    }
-
-    const numTransformsByType = Object.keys(ANALYTICS_BUFFERED_EVENTS)
-      .reduce((acc, type) => {
-        acc[type] = 0;
-        return acc;
-      }, {});
-
+    const SEND_ANALYTICS_INTERVAL_MS = 10000;
     let sendAnaylticsBuffersInterval;
-    const sendAnalytics = () => {
-      Object.keys(numTransformsByType).forEach((type) => {
-        if (numTransformsByType[type]) {
-          // TODO: why doesn't typescript respect globals
-          // @ts-ignore
-          dataLayer.push({
-            event: type,
-            [BUFFERED_SUM_VARIABLE]: numTransformsByType[type],
-          });
-          numTransformsByType[type] = 0;
-        }
-      });
-    };
     return {
       afterCreate() {
-        sendAnaylticsBuffersInterval = setInterval(sendAnalytics, 60000);
+        sendAnaylticsBuffersInterval = setInterval(reportTransformsTally, SEND_ANALYTICS_INTERVAL_MS);
       },
       beforeDestroy() {
-        sendAnalytics();
+        reportTransformsTally();
         clearInterval(sendAnaylticsBuffersInterval);
-      },
-      incrementTransformsBuffer(type: ANALYTICS_BUFFERED_EVENTS) {
-        numTransformsByType[type] += 1;
       },
     };
   });
