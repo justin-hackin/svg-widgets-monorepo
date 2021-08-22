@@ -26,6 +26,7 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
     <ToggleButtonGroup
       className={clsx(TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR, classes.dragModeOptionsGroup)}
       value={dragMode}
+      orientation="vertical"
       exclusive
       aria-label="drag mode"
     >

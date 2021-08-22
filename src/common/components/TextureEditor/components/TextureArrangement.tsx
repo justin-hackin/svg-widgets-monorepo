@@ -16,6 +16,7 @@ import {
   TRANSFORM_OPERATIONS,
 } from '../../../util/analytics';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
+import { DragModeOptionsGroup } from './DragModeOptionGroup';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -136,28 +137,31 @@ export const TextureArrangement = observer(() => {
   if (!placementAreaDimensions || !decorationBoundary) { return null; }
 
   return (
-    <Paper
-      className={TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}
+    <>
+      <DragModeOptionsGroup dragMode={dragMode} />
+      <Paper
+        className={TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}
       // @ts-ignore
-      component="svg"
-      square
-      elevation={10}
-      width="100%"
-      height="100%"
-      style={{ overflow: 'hidden' }}
-      {...viewUseWheel()}
-      {...textureTransformationUseDrag()}
-    >
-      <svg
-        x={viewScaleCenterPercentStr}
-        y={viewScaleCenterPercentStr}
-        width={viewScalePercentStr}
-        height={viewScalePercentStr}
-        className="root-svg"
-        viewBox={viewBoxAttrsToString(decorationBoundary.viewBoxAttrs)}
+        component="svg"
+        square
+        elevation={10}
+        width="100%"
+        height="100%"
+        style={{ overflow: 'hidden' }}
+        {...viewUseWheel()}
+        {...textureTransformationUseDrag()}
       >
-        <TextureSvg {...{ transformOriginUseDrag }} />
-      </svg>
-    </Paper>
+        <svg
+          x={viewScaleCenterPercentStr}
+          y={viewScaleCenterPercentStr}
+          width={viewScalePercentStr}
+          height={viewScalePercentStr}
+          className="root-svg"
+          viewBox={viewBoxAttrsToString(decorationBoundary.viewBoxAttrs)}
+        >
+          <TextureSvg {...{ transformOriginUseDrag }} />
+        </svg>
+      </Paper>
+    </>
   );
 });

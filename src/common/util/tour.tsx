@@ -84,6 +84,7 @@ export const TOUR_STEPS: MyStep[] = [
   },
   {
     target: `.${TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR}`,
+    placement: 'right',
     content: (
       <div>
         <p>

@@ -57,7 +57,6 @@ const specFileExtensionName = 'Texture for Pyramid Net Spec';
 export const TextureEditorModel = types
   .model('Texture Editor', {
     texture: types.maybe(TextureModel),
-    // since both controls and matrix function require degrees, use degrees as unit instead of radians
     viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
     shapePreview: types.optional(ShapePreviewModel, {}),
   })

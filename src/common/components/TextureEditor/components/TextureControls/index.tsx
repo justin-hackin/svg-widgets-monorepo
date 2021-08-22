@@ -413,7 +413,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           )}
         </Toolbar>
       </AppBar>
-      <DragModeOptionsGroup dragMode={dragMode} />
     </>
   );
 });
