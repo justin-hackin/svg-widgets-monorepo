@@ -1,6 +1,6 @@
-import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../constants';
+import { IS_PRODUCTION_BUILD, IS_WEB_BUILD } from '../constants';
 
-const SHOULD_REPORT = IS_ELECTRON_BUILD || IS_DEVELOPMENT_BUILD;
+const SHOULD_REPORT = IS_WEB_BUILD && IS_PRODUCTION_BUILD;
 
 export enum TRANSFORM_METHODS {
   DRAG = 'drag',
