@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { getType } from 'mobx-state-tree';
 import React from 'react';
 
-import { IPreferencesModel } from '../../../../models/PreferencesModel';
+import { IPreferencesModel, PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
 import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { closedPolygonPath } from '../../../../util/shapes/generic';
 import {
@@ -11,6 +11,12 @@ import {
 } from '../../../../../../common/models/ImageFaceDecorationPatternModel';
 import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from '../../../../models/TextureFaceDecorationModel';
 import { theme } from '../../../../../../common/style/style';
+import {
+  expandBoundingBoxAttrs,
+  registrationMarksPath,
+  boundingBoxMinPoint,
+} from '../../../../../../common/util/svg';
+import { pointToTranslateString, scalePoint } from '../../../../../../common/util/geom';
 
 const PrintGroup = ({ children }) => (
   <g {...{
@@ -31,7 +37,7 @@ export const PrintLayer = observer(({
     return null;
   }
   const {
-    fitToCanvasTranslationStr,
+    boundingBox,
     pyramidNetSpec: {
       borderInsetFaceHoleTransformMatrix,
       faceDecoration,
@@ -40,6 +46,13 @@ export const PrintLayer = observer(({
       faceBoundaryPoints,
     },
   } = widgetStore;
+
+  const { registrationPadding, printRegistrationType, registrationMarkLength } = preferencesStore;
+  const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
+    ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
+  const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
+    ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
+  const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(dielineRegistrationBB), -1));
 
   if (!faceDecoration || getType(faceDecoration) !== TextureFaceDecorationModel) {
     return null;
@@ -72,6 +85,16 @@ export const PrintLayer = observer(({
         </filter>
       </defs>
       <g transform={fitToCanvasTranslationStr}>
+        {printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
+          && (
+            <path
+              className="print-registration-marks"
+              stroke="black"
+              fill="none"
+              strokeWidth={1}
+              d={registrationMarksPath(printRegistrationBB, registrationMarkLength).getD()}
+            />
+          )}
         { isBordered && (
         <g id="bleed-stroke-group">
           {

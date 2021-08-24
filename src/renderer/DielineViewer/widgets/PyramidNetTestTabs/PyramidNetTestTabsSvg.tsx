@@ -1,7 +1,7 @@
 import React from 'react';
 import { IPreferencesModel } from '../../models/PreferencesModel';
 import { IPyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
-import { boundingViewBoxAttrs } from '../../../../common/util/svg';
+import { getBoundingBoxAttrs } from '../../../../common/util/svg';
 import { RawSvgComponentProps } from '../../models/WorkspaceModel';
 
 export const PyramidNetTestTabs = ({
@@ -32,7 +32,7 @@ export const PyramidNetTestTabs = ({
       {tabs.reduce((acc, { id, paths }) => {
         // TODO: the boundingViewBoxAttrs doesn't calculate path region property (seems to include control points),
         // thus items are improperly spaced
-        const { ymin, ymax } = boundingViewBoxAttrs(paths.cut.getD());
+        const { ymin, ymax } = getBoundingBoxAttrs(paths.cut.getD());
         acc.y += -1 * ymin;
         acc.children.push((
           <g transform={`translate(0, ${acc.y})`} key={id} id={id}>

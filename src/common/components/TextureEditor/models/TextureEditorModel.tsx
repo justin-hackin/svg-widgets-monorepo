@@ -97,13 +97,13 @@ export const TextureEditorModel = types
       if (!this.decorationBoundary || !self.texture) {
         return undefined;
       }
-      return getCoverScale(this.decorationBoundary.viewBoxAttrs, self.texture.dimensions);
+      return getCoverScale(this.decorationBoundary.boundingBoxAttrs, self.texture.dimensions);
     },
     get faceFittingScale() {
       if (!self.placementAreaDimensions || !this.decorationBoundary) {
         return undefined;
       }
-      return getFitScale(self.placementAreaDimensions, this.decorationBoundary.viewBoxAttrs);
+      return getFitScale(self.placementAreaDimensions, this.decorationBoundary.boundingBoxAttrs);
     },
     get shapePreviewDimensions() {
       if (!self.placementAreaDimensions) { return null; }
@@ -175,12 +175,12 @@ export const TextureEditorModel = types
       self.autoRotatePreview = shouldRotate;
     },
     fitTextureToFace() {
-      const { viewBoxAttrs } = self.decorationBoundary;
+      const { boundingBoxAttrs } = self.decorationBoundary;
       const { dimensions: textureDimensions } = self.texture;
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
-      const { height, width, xmin } = viewBoxAttrs;
+      const { height, width, xmin } = boundingBoxAttrs;
       const { scale, widthIsClamp } = self.imageCoverScale;
       self.texture.translate = widthIsClamp
         ? { x: xmin, y: (height - (textureDimensions.height * scale)) / 2 }

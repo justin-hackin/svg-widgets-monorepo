@@ -1,8 +1,18 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { IPreferencesModel } from '../../../../models/PreferencesModel';
+import { IPreferencesModel, PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
 import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { lineLerp, matrixWithTransformOrigin } from '../../../../../../common/util/geom';
+import {
+  lineLerp,
+  matrixWithTransformOrigin,
+  pointToTranslateString,
+  scalePoint,
+} from '../../../../../../common/util/geom';
+import {
+  boundingBoxMinPoint,
+  expandBoundingBoxAttrs, registrationMarksPath,
+  toRectangleCoordinatesAttrs,
+} from '../../../../../../common/util/svg';
 
 const DielineGroup = ({ children }) => (
   <g {...{
@@ -23,7 +33,8 @@ export const DielinesLayer = observer(({
     return null;
   }
   const {
-    fitToCanvasTranslationStr,
+    textureEditor: { texture },
+    boundingBox,
     pyramidNetSpec: {
       masterBaseTabCut,
       masterBaseTabScore,
@@ -39,7 +50,17 @@ export const DielinesLayer = observer(({
 
   const {
     cutProps, scoreProps, useClonesForBaseTabs, useClonesForDecoration,
+    printRegistrationType, registrationPadding, registrationStrokeColor, registrationMarkLength,
   } = preferencesStore;
+
+  const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
+    ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
+  // graphtec type frames with rectangle but laser type has registration L marks facing outward
+  // TODO: consider making DRY with PrintLayer
+  const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
+    ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
+  const fittingBB = (!texture || texture.hasPathPattern) ? boundingBox : dielineRegistrationBB;
+  const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(fittingBB), -1));
 
   const DecorationContent = () => {
     if (!texturePathD) {
@@ -117,6 +138,18 @@ export const DielinesLayer = observer(({
     <>
       <DielineGroup>
         <g transform={fitToCanvasTranslationStr}>
+          {(texture && !texture.hasPathPattern && printRegistrationType !== PRINT_REGISTRATION_TYPES.NONE)
+          && (printRegistrationType === PRINT_REGISTRATION_TYPES.GRAPHTEC_OPTICAL ? (
+            <rect stroke="black" fill="none" {...toRectangleCoordinatesAttrs(printRegistrationBB)} />
+          ) : (
+            <path
+              className="dieline-registration-marks"
+              stroke={registrationStrokeColor}
+              fill="none"
+              strokeWidth={1}
+              d={registrationMarksPath(printRegistrationBB, registrationMarkLength, true).getD()}
+            />
+          ))}
           {useClonesForBaseTabs ? (<ClonePyramidNetContent />) : (
             <>
               <path className="net-score" {...scoreProps} d={score.getD()} />

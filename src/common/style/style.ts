@@ -204,6 +204,9 @@ export const useStyles = makeStyles((theme: Theme) => {
       flexDirection: 'row',
       padding: '2px 1px',
     },
+    printRegistrationTypeToggleButtonGroup: {
+      marginLeft: theme.spacing(1),
+    },
     // ======================== TEXTURE EDITOR ========================
     shapePreviewContainer: {
       background: 'url(../../static/images/space.jpg) no-repeat center center fixed',

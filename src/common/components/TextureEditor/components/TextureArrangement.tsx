@@ -4,7 +4,7 @@ import { clamp } from 'lodash';
 import { Paper } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
-import { viewBoxAttrsToString } from '../../../util/svg';
+import { boundingBoxAttrsToViewBoxStr } from '../../../util/svg';
 import { TextureSvg } from './TextureSvg';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { castCoordToRawPoint } from '../../../util/geom';
@@ -157,7 +157,7 @@ export const TextureArrangement = observer(() => {
           width={viewScalePercentStr}
           height={viewScalePercentStr}
           className="root-svg"
-          viewBox={viewBoxAttrsToString(decorationBoundary.viewBoxAttrs)}
+          viewBox={boundingBoxAttrsToViewBoxStr(decorationBoundary.boundingBoxAttrs)}
         >
           <TextureSvg {...{ transformOriginUseDrag }} />
         </svg>

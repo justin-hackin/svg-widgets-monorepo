@@ -1,7 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { Button } from '@material-ui/core';
+import { Button, Divider } from '@material-ui/core';
 
+import { startCase } from 'lodash';
 import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
 import { PanelColorPicker } from '../../../../../../common/components/PanelColorPicker';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
@@ -9,6 +10,7 @@ import { PanelSwitch } from '../../../../../../common/components/PanelSwitch';
 import { PanelTextInput } from '../../../../../../common/components/PanelTextInput';
 import { PanelRadio } from '../../../../../../common/components/PanelRadio';
 import { UNITS } from '../../../../../../common/util/units';
+import { PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
 
 export const PreferencesControls = observer(() => {
   const { preferences, resetPreferences } = useWorkspaceMst();
@@ -16,6 +18,7 @@ export const PreferencesControls = observer(() => {
   return (
     <>
       <PanelRadio
+        row
         node={preferences}
         property="displayUnit"
         options={options}
@@ -41,13 +44,30 @@ export const PreferencesControls = observer(() => {
       <PanelColorPicker
         node={preferences}
         property="scoreStrokeColor"
-        label="Cut Stroke Color"
       />
+
       <PanelColorPicker
         node={preferences}
         property="cutStrokeColor"
-        label="Score Stroke Color"
       />
+      <Divider />
+      <PanelRadio
+        node={preferences}
+        property="printRegistrationType"
+        options={
+          Object.values(PRINT_REGISTRATION_TYPES)
+            .map((value) => ({ value, label: startCase(value) }))
+        }
+      />
+      <PanelColorPicker
+        node={preferences}
+        property="registrationStrokeColor"
+      />
+
+      <PanelTextInput node={preferences} property="registrationPadding" useUnits />
+
+      <PanelTextInput node={preferences} property="registrationMarkLength" useUnits />
+
       <Button
         variant="contained"
         color="primary"

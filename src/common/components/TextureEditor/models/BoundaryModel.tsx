@@ -2,14 +2,14 @@ import { Instance, types } from 'mobx-state-tree';
 
 import { closedPolygonPath } from '../../../../renderer/DielineViewer/util/shapes/generic';
 import { getLineLineIntersection, lineLerp, RawPoint } from '../../../util/geom';
-import { boundingViewBoxAttrs } from '../../../util/svg';
+import { getBoundingBoxAttrs } from '../../../util/svg';
 
 const frozenPoint = types.frozen<RawPoint>();
 export const BoundaryModel = types.model({
   vertices: types.frozen(types.array(frozenPoint)),
 }).views((self) => ({
-  get viewBoxAttrs() {
-    return boundingViewBoxAttrs(this.pathD);
+  get boundingBoxAttrs() {
+    return getBoundingBoxAttrs(this.pathD);
   },
   get pathD() {
     return closedPolygonPath(self.vertices).getD();

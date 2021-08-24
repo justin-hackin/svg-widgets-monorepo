@@ -10,13 +10,13 @@ import { useStyles } from '../style/style';
 import { mstDataToProps } from '../util/mst';
 
 export const UncontrolledPanelRadio = observer(({
-  value, onChange, options, label, name,
+  value, onChange, options, label, name, row = false,
 }) => {
   const classes = useStyles();
   return (
     <FormControl className={classes.formControl}>
       <FormLabel component="legend">{ label }</FormLabel>
-      <RadioGroup {...{ name, value, onChange }} row>
+      <RadioGroup {...{ name, value, onChange }} row={row}>
         {options.map(({ label: optionLabel, value: optionValue }) => (
           <FormControlLabel key={optionValue} value={optionValue} control={<Radio />} label={optionLabel} />
         ))}
@@ -26,7 +26,7 @@ export const UncontrolledPanelRadio = observer(({
 });
 
 export const PanelRadio = observer(({
-  node, property, options, label = undefined,
+  node, property, options, row=false, label = undefined,
 }) => {
   const {
     value, setValue, valuePath,
@@ -39,7 +39,7 @@ export const PanelRadio = observer(({
   return (
     <UncontrolledPanelRadio
       {...{
-        onChange, options, value, label: resolvedLabel, name: valuePath,
+        onChange, options, row, value, label: resolvedLabel, name: valuePath,
       }}
     />
   );
