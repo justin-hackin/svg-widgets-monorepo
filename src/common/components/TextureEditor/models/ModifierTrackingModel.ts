@@ -1,6 +1,8 @@
 import { types } from 'mobx-state-tree';
 import { includes, flatten } from 'lodash';
-import { EVENTS, INVALID_BUILD_ENV_ERROR, IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../constants';
+import {
+  EVENTS, INVALID_BUILD_ENV_ERROR, IS_ELECTRON_BUILD, IS_WEB_BUILD,
+} from '../../../constants';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',

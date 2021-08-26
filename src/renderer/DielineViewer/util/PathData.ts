@@ -9,7 +9,7 @@ import { roundedEdgePath } from './shapes/generic';
 
 /* eslint-disable no-param-reassign */
 
-enum CommandCodes { M='M', L='L', C='C', S='S', Q='Q', T='T', A='A', Z='Z' }
+enum CommandCodes { M = 'M', L = 'L', C = 'C', S = 'S', Q = 'Q', T = 'T', A = 'A', Z = 'Z' }
 
 export interface DestinationCommand {
   to: RawPoint
@@ -367,7 +367,7 @@ export class PathData {
         }
         return acc;
       }, { subPaths: [], currentPath: (new PathData()) } as (
-        {subPaths: PathData[], currentPath: PathData}
+        { subPaths: PathData[], currentPath: PathData }
       )).subPaths;
   }
 

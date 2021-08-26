@@ -1,5 +1,5 @@
 // from texture editor send
-import {getType, Instance, types} from 'mobx-state-tree';
+import { getType, Instance, types } from 'mobx-state-tree';
 import { PathFaceDecorationPatternModel } from '../../../common/models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../../common/models/ImageFaceDecorationPatternModel';
 import { getTextureTransformMatrix, RawPoint } from '../../../common/util/geom';

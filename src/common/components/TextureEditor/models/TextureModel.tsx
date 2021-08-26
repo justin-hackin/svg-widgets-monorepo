@@ -1,4 +1,4 @@
-import { Instance, getType, getParentOfType } from 'mobx-state-tree';
+import { Instance, getParentOfType } from 'mobx-state-tree';
 
 import { getDimensionsFromPathD } from '../../../util/svg';
 import { PathData } from '../../../../renderer/DielineViewer/util/PathData';
@@ -11,7 +11,6 @@ import {
 import { IImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
 import {
   IPathFaceDecorationPatternModel,
-  PathFaceDecorationPatternModel,
 } from '../../../models/PathFaceDecorationPatternModel';
 import { TextureFaceDecorationModel } from '../../../../renderer/DielineViewer/models/TextureFaceDecorationModel';
 import { TextureEditorModel } from './TextureEditorModel';

@@ -26,7 +26,7 @@ export const UncontrolledPanelRadio = observer(({
 });
 
 export const PanelRadio = observer(({
-  node, property, options, row=false, label = undefined,
+  node, property, options, row = false, label = undefined,
 }) => {
   const {
     value, setValue, valuePath,

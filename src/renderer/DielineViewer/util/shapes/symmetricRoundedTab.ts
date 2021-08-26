@@ -5,9 +5,7 @@ import {
   hingedPlotByProjectionDistance,
   distanceFromOrigin, subtractPoints,
 } from '../../../../common/util/geom';
-import { connectedLineSegments, roundedEdgePath } from './generic';
-import { PathData } from '../PathData';
-import { strokeDashPath } from './strokeDashPath';
+import { roundedEdgePath } from './generic';
 
 const ARBITRARY_LENGTH = 10;
 export const symmetricRoundedTab = (

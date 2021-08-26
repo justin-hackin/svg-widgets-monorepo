@@ -31,7 +31,6 @@ import { isNumber, isNaN } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
-import { DragModeOptionsGroup } from '../DragModeOptionGroup';
 import { HistoryButtons } from
   '../../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { PanelSliderComponent } from '../../../PanelSliderComponent';
@@ -104,7 +103,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     assignTextureFromPatternInfo,
     setTextureArrangementFromFileData,
     shapeName,
-    modifierTracking: { dragMode = undefined } = {},
     history,
   } = pluginModel.textureEditor as ITextureEditorModel;
   const {
