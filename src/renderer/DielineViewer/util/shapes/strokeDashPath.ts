@@ -1,5 +1,5 @@
 import { last, range, sum } from 'lodash';
-import { Instance, types } from 'mobx-state-tree';
+import { Model, model, prop } from 'mobx-keystone';
 
 import {
   distanceFromOrigin, lineLerp, PointLike, subtractPoints,
@@ -17,23 +17,15 @@ export function lineSeries(startEndArray) {
   return path;
 }
 
-export const defaultStrokeDashSpec = {
-  strokeDashPathPattern: '● 1 ○ 2',
-  strokeDashLength: 11,
-  strokeDashOffsetRatio: 0,
-};
-
-export const DashPatternModel = types.model({
-  strokeDashPathPattern: types.reference(StrokeDashPathPatternModel),
-  strokeDashLength: types.number,
-  strokeDashOffsetRatio: types.number,
-});
-
-export interface IDashPatternModel extends Instance<typeof DashPatternModel> {
-}
+@model('DashPatternModel')
+export class DashPatternModel extends Model({
+  strokeDashPathPattern: prop<StrokeDashPathPatternModel>(),
+  strokeDashLength: prop(11),
+  strokeDashOffsetRatio: prop(0),
+}) {}
 
 export function strokeDashPathRatios(
-  start: PointLike, end: PointLike, dashSpec: IDashPatternModel,
+  start: PointLike, end: PointLike, dashSpec: DashPatternModel,
 ) {
   if (!dashSpec) { return [[0, 1]]; }
   const vector = subtractPoints(end, start);
@@ -97,7 +89,7 @@ export function strokeDashPathRatios(
 }
 
 export function strokeDashPath(
-  start: PointLike, end: PointLike, dashSpec: IDashPatternModel,
+  start: PointLike, end: PointLike, dashSpec: DashPatternModel,
 ) {
   const ratios = strokeDashPathRatios(start, end, dashSpec);
   return lineSeries(ratios

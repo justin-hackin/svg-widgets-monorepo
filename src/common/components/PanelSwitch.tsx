@@ -7,7 +7,7 @@ import { Switch } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
 import { useStyles } from '../style/style';
-import { mstDataToProps } from '../util/mst';
+import { mstDataToProps } from '../util/mobx-keystone';
 
 export const PanelSwitchUncontrolled = observer(({
   value, valuePath, onChange, label,

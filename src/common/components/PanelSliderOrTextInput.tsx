@@ -9,9 +9,9 @@ import clsx from 'clsx';
 
 import { useStyles } from '../style/style';
 import { SubmittableTextInput } from './SubmittableTextInput';
-import { mstDataToProps } from '../util/mst';
 import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
+import { mstDataToProps } from '../util/mobx-keystone';
 
 export const PanelSliderOrTextInput = observer(({
   node, property, min, max, step = undefined, useUnits = false, className = undefined, label = undefined,

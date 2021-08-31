@@ -6,7 +6,7 @@ import { PanelSliderOrTextInput } from '../../../../../../common/components/Pane
 import { ratioSliderProps } from './constants';
 import { PanelSwitchUncontrolled } from '../../../../../../common/components/PanelSwitch';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
 
 const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
@@ -18,8 +18,10 @@ export const ScoreControls = observer(() => {
       useDottedStroke, setUseDottedStroke,
       interFaceScoreDashSpec, baseScoreDashSpec, setInterFaceScoreDashSpecPattern, setBaseScoreDashSpecPattern,
     } = {}, dashPatterns,
-  } = workspaceStore.selectedStore as IPyramidNetPluginModel;
-  const dashPatternOptions = dashPatterns.map(({ label, id }) => ({ value: id, label }));
+  } = workspaceStore.selectedStore as PyramidNetPluginModel;
+  const dashPatternOptions = dashPatterns
+    .map(({ strokeDashPathPattern }) => strokeDashPathPattern)
+    .map(({ label, $modelId }) => ({ value: $modelId, label }));
   return (
     <>
       <PanelSwitchUncontrolled
@@ -31,8 +33,8 @@ export const ScoreControls = observer(() => {
       {useDottedStroke && (
         <>
           <UncontrolledPanelSelect
-            value={interFaceScoreDashSpec.strokeDashPathPattern.id}
-            name="interFaceScoreDashSpec.strokeDashPathPattern.id"
+            value={interFaceScoreDashSpec.strokeDashPathPattern.$modelId}
+            name="interFaceScoreDashSpec.strokeDashPathPattern.$modelId"
             label="Inter-face stroke dash pattern"
             onChange={(e) => {
               setInterFaceScoreDashSpecPattern(e.target.value);
@@ -52,8 +54,8 @@ export const ScoreControls = observer(() => {
             {...ratioSliderProps}
           />
           <UncontrolledPanelSelect
-            value={baseScoreDashSpec.strokeDashPathPattern.id}
-            name="baseScoreDashSpec.strokeDashPathPattern.id"
+            value={baseScoreDashSpec.strokeDashPathPattern.$modelId}
+            name="baseScoreDashSpec.strokeDashPathPattern.$modelId"
             label="Base Stroke Dash Pattern"
             onChange={(e) => {
               setBaseScoreDashSpecPattern(e.target.value);

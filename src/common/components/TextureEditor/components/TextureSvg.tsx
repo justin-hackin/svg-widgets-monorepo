@@ -3,10 +3,10 @@ import { observer } from 'mobx-react';
 
 import { RawPoint, scalePoint } from '../../../util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
-import { IImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
-import { IPathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
+import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';
@@ -27,7 +27,7 @@ export const TextureSvgUnobserved = ({
     faceBoundary,
     faceFittingScale,
     placementAreaDimensions,
-  } = store || (useWorkspaceMst().selectedStore as IPyramidNetPluginModel).textureEditor;
+  } = store || (useWorkspaceMst().selectedStore as PyramidNetPluginModel).textureEditor;
   const isOnScreen = !store;
   const materialColor = isOnScreen ? MUTED_WHITE : WHITE;
 
@@ -122,7 +122,7 @@ export const TextureSvgUnobserved = ({
           <g transform={transformMatrixDraggedStr}>
             { (() => {
               if (hasPathPattern) {
-                const { pathD, isPositive } = pattern as IPathFaceDecorationPatternModel;
+                const { pathD, isPositive } = pattern as PathFaceDecorationPatternModel;
                 return (
                   <path
                     {...textureTranslationUseDrag()}
@@ -131,7 +131,7 @@ export const TextureSvgUnobserved = ({
                   />
                 );
               }
-              const { imageData, dimensions } = pattern as IImageFaceDecorationPatternModel;
+              const { imageData, dimensions } = pattern as ImageFaceDecorationPatternModel;
               // pointerEvents: 'none' solves problem of ghost-drag image
               // see: https://stackoverflow.com/a/26792179/2780052
               return (

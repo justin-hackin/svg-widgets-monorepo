@@ -1,6 +1,5 @@
-// @ts-ignore
 import { range } from 'lodash';
-import { Instance, types } from 'mobx-state-tree';
+import { Model, model, prop } from 'mobx-keystone';
 
 import { PathData } from '../PathData';
 import {
@@ -9,30 +8,28 @@ import {
   RawPoint,
   symmetricHingePlotByProjectionDistance,
 } from '../../../../common/util/geom';
-import { IDashPatternModel, strokeDashPathRatios } from './strokeDashPath';
+import { DashPatternModel, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
 
-export const AscendantEdgeTabsModel = types.model('AscendantEdgeTabs', {
-  flapRoundingDistanceRatio: types.optional(types.number, 1),
-  holeFlapTaperAngle: types.optional(types.number, 0.31),
-  holeReachToTabDepth: types.optional(types.number, 0.1),
-  holeWidthRatio: types.optional(types.number, 0.5),
-  midpointDepthToTabDepth: types.optional(types.number, 0.5),
-  tabDepthToTraversalLength: types.optional(types.number, 0.0375),
-  tabStartGapToTabDepth: types.optional(types.number, 1),
-  tabControlPointsProtrusion: types.optional(types.number, 0.93),
-  tabControlPointsAngle: types.optional(types.number, 0.8),
-  tabEdgeEndpointsIndentation: types.optional(types.number, 1),
-  tabsCount: types.optional(types.integer, 3),
-});
-
-export interface IAscendantEdgeTabsModel extends Instance<typeof AscendantEdgeTabsModel> {
-}
+@model('AscendantEdgeTabsModel')
+export class AscendantEdgeTabsModel extends Model({
+  flapRoundingDistanceRatio: prop(1),
+  holeFlapTaperAngle: prop(0.31),
+  holeReachToTabDepth: prop(0.1),
+  holeWidthRatio: prop(0.5),
+  midpointDepthToTabDepth: prop(0.5),
+  tabDepthToTraversalLength: prop(0.0375),
+  tabStartGapToTabDepth: prop(1),
+  tabControlPointsProtrusion: prop(0.93),
+  tabControlPointsAngle: prop(0.8),
+  tabEdgeEndpointsIndentation: prop(1),
+  tabsCount: prop(3),
+}) {}
 
 export const ascendantEdgeConnectionTabs = (
   start: RawPoint, end: RawPoint,
-  tabSpec: IAscendantEdgeTabsModel, scoreDashSpec: IDashPatternModel,
+  tabSpec: AscendantEdgeTabsModel, scoreDashSpec: DashPatternModel,
   tabIntervalRatios, tabGapIntervalRatios, tabDepth: number,
 ): AscendantEdgeConnectionPaths => {
   const {

@@ -5,8 +5,8 @@ import { PanelSliderOrTextInput } from '../../../../../../common/components/Pane
 import { ratioSliderProps } from './constants';
 import { PanelSwitch, PanelSwitchUncontrolled } from '../../../../../../common/components/PanelSwitch';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
+import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -14,7 +14,7 @@ export const BaseEdgeTabControls = observer(() => {
     pyramidNetSpec: {
       baseEdgeTabsSpec,
     } = {},
-  } = workspaceStore.selectedStore as IPyramidNetPluginModel;
+  } = workspaceStore.selectedStore as PyramidNetPluginModel;
   const {
     bendGuideValley,
     unsetBendGuideValley,

@@ -1,7 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { IPreferencesModel, PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
-import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { PRINT_REGISTRATION_TYPES, PreferencesModel } from '../../../../models/PreferencesModel';
 import {
   lineLerp,
   matrixWithTransformOrigin,
@@ -13,6 +12,7 @@ import {
   expandBoundingBoxAttrs, registrationMarksPath,
   toRectangleCoordinatesAttrs,
 } from '../../../../../../common/util/svg';
+import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 
 const DielineGroup = ({ children }) => (
   <g {...{
@@ -27,7 +27,7 @@ const DielineGroup = ({ children }) => (
 export const DielinesLayer = observer(({
   widgetStore, preferencesStore,
 }: {
-  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetPluginModel,
+  preferencesStore: PreferencesModel, widgetStore: PyramidNetPluginModel,
 }) => {
   if (!preferencesStore || !widgetStore) {
     return null;

@@ -1,6 +1,7 @@
-import { types } from 'mobx-state-tree';
+import { Model, model, prop } from 'mobx-keystone';
 
-export const DimensionsModel = types.model('Dimensions', {
-  width: types.number,
-  height: types.number,
-});
+@model('DimensionsModel')
+export class DimensionsModel extends Model({
+  width: prop<number>(),
+  height: prop<number>(),
+}) {}

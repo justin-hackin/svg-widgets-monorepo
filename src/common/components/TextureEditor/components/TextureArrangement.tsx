@@ -9,7 +9,6 @@ import { TextureSvg } from './TextureSvg';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { castCoordToRawPoint } from '../../../util/geom';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import {
   incrementTransformTracking,
   TRANSFORM_METHODS,
@@ -17,10 +16,11 @@ import {
 } from '../../../util/analytics';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
 import { DragModeOptionsGroup } from './DragModeOptionGroup';
+import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const pyramidNetPluginStore:IPyramidNetPluginModel = workspaceStore.selectedStore;
+  const pyramidNetPluginStore:PyramidNetPluginModel = workspaceStore.selectedStore;
   const {
     texture,
     placementAreaDimensions,
@@ -32,8 +32,7 @@ export const TextureArrangement = observer(() => {
     modifierTracking: { dragMode = undefined } = {},
   } = pyramidNetPluginStore.textureEditor || {};
   const {
-    translateDiff, setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
-    reconcileTranslateDiff, reconcileRotateDiff, reconcileScaleDiff, reconcileTransformOriginDiff,
+    transformDiff, reconcileTranslateDiff, reconcileRotateDiff, reconcileScaleDiff, reconcileTransformOriginDiff,
   } = texture || {};
   // Init
   const textureTransformationUseDrag = useDrag(({ movement, down }) => {
@@ -57,30 +56,30 @@ export const TextureArrangement = observer(() => {
       if (down) {
         const svgMovement = absoluteMovementToSvg(movementPt);
         if (dragMode === DRAG_MODES.TRANSLATE) {
-          setTranslateDiff(svgMovement);
+          transformDiff.setTranslate(svgMovement);
         } else if (dragMode === DRAG_MODES.TRANSLATE_VERTICAL) {
-          setTranslateDiff({ x: 0, y: svgMovement.y });
+          transformDiff.setTranslate({ x: 0, y: svgMovement.y });
         } else if (dragMode === DRAG_MODES.TRANSLATE_HORIZONTAL) {
-          setTranslateDiff({ x: svgMovement.x, y: 0 });
+          transformDiff.setTranslate({ x: svgMovement.x, y: 0 });
         }
       } else {
         // could lead to false categorization but it's unlikely that the drag diff would be exactly 0 for either axis
         // if dragMode is TRANSLATE
-        const translateType = (translateDiff.x === 0 || translateDiff.y === 0)
+        const translateType = (transformDiff.translate.x === 0 || transformDiff.translate.y === 0)
           ? TRANSFORM_OPERATIONS.TRANSLATE_TEXTURE_ALONG_AXIS : TRANSFORM_OPERATIONS.TRANSLATE_TEXTURE;
         incrementTransformTracking(TRANSFORM_METHODS.DRAG, translateType);
         reconcileTranslateDiff();
       }
     } else if (dragMode === DRAG_MODES.ROTATE) {
       if (down) {
-        setRotateDiff((movementPt.y / placementAreaDimensions.height) * 360);
+        transformDiff.setRotate((movementPt.y / placementAreaDimensions.height) * 360);
       } else {
         reconcileRotateDiff();
         incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.ROTATE_TEXTURE);
       }
     } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
       if (down) {
-        setScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
+        transformDiff.setScale((movementPt.y / placementAreaDimensions.height) + 1);
       } else {
         reconcileScaleDiff();
         incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.SCALE_TEXTURE);
@@ -94,7 +93,7 @@ export const TextureArrangement = observer(() => {
     // accommodates the scale of svg so that the texture stays under the mouse
     const relDelta = translateAbsoluteCoordsToRelative(castCoordToRawPoint(movement));
     if (down) {
-      setTransformOriginDiff(castCoordToRawPoint(relDelta));
+      transformDiff.setTransformOrigin(castCoordToRawPoint(relDelta));
     } else {
       reconcileTransformOriginDiff();
       incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.DRAG_ORIGIN);
@@ -113,9 +112,9 @@ export const TextureArrangement = observer(() => {
       }
       if (!texture) { return; }
       if (dragMode === DRAG_MODES.ROTATE) {
-        setRotateDiff(texture.rotateDiff + percentHeightDelta * 90);
+        transformDiff.setRotate(transformDiff.rotate + percentHeightDelta * 90);
       } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
-        setScaleDiff(clamp((percentHeightDelta + 1) * texture.scaleDiff, minImageScale, maxImageScale));
+        transformDiff.setScale(clamp((percentHeightDelta + 1) * transformDiff.scale, minImageScale, maxImageScale));
       }
     },
     onWheelEnd: () => {

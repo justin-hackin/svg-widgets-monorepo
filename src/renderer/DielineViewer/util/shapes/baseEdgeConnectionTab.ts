@@ -1,5 +1,7 @@
-import { Instance, types } from 'mobx-state-tree';
-
+// eslint-disable-next-line max-classes-per-file
+import {
+  Model, model, modelAction, prop,
+} from 'mobx-keystone';
 import { PathData } from '../PathData';
 import {
   distanceBetweenPoints,
@@ -9,7 +11,7 @@ import {
   getLineLineIntersection,
   RawPoint, symmetricHingePlotByProjectionDistance,
 } from '../../../../common/util/geom';
-import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
+import { DashPatternModel, strokeDashPath } from './strokeDashPath';
 import { arrowTabPlots } from './symmetricRoundedTab';
 import { VERY_LARGE_NUMBER } from '../../../../common/constants';
 
@@ -29,38 +31,41 @@ TODO: use of qualifier *Ratio is inconsistent remove all instances,
  in order to qualify properties, use property metadata which accurately describes
  property relationships and displays as tooltip on controls
 */
-const BendGuideValleyModel = types.model('BendGuideValley', {
-  depthRatio: types.optional(types.number, 0.9),
-  theta: types.optional(types.number, Math.PI / 4),
-});
 
-export const BaseEdgeTabsModel = types.model('BaseEdgeTabs', {
-  finDepthToTabDepth: types.optional(types.number, 1.3),
-  finOffsetRatio: types.optional(types.number, 0.75), // set by applyShapeBasedDefaults
-  holeBreadthToHalfWidth: types.optional(types.number, 0.25), // set by applyShapeBasedDefaults
-  holeDepthToTabDepth: types.optional(types.number, 0.5),
-  holeTaper: types.optional(types.number, 0.97),
-  scoreTabMidline: types.optional(types.boolean, false),
-  roundingDistanceRatio: types.optional(types.number, 0.9),
-  tabDepthToAscendantTabDepth: types.optional(types.number, 1.5),
-  holeTabClearance: types.optional(types.number, 0.1),
-  bendGuideValley: types.maybe(BendGuideValleyModel),
-  tabConjunctionClearance: types.optional(types.number, 0.1),
-}).actions((self) => ({
+@model('BendGuideValleyModel')
+export class BendGuideValleyModel extends Model({
+  depthRatio: prop(0.9),
+  theta: prop(Math.PI / 4),
+}) {}
+
+@model('BaseEdgeTabsModel')
+export class BaseEdgeTabsModel extends Model({
+  finDepthToTabDepth: prop(1.3),
+  finOffsetRatio: prop(0.75), // set by applyShapeBasedDefaults
+  holeBreadthToHalfWidth: prop(0.25), // set by applyShapeBasedDefaults
+  holeDepthToTabDepth: prop(0.5),
+  holeTaper: prop(0.97),
+  scoreTabMidline: prop(false),
+  roundingDistanceRatio: prop(0.9),
+  tabDepthToAscendantTabDepth: prop(1.5),
+  holeTabClearance: prop(0.1),
+  bendGuideValley: prop<BendGuideValleyModel | null>(() => null),
+  tabConjunctionClearance: prop(0.1),
+}) {
+  @modelAction
   unsetBendGuideValley() {
-    self.bendGuideValley = undefined;
-  },
-  resetBendGuideValleyToDefault() {
-    self.bendGuideValley = BendGuideValleyModel.create();
-  },
-}));
+    this.bendGuideValley = null;
+  }
 
-export interface IBaseEdgeTabsModel extends Instance<typeof BaseEdgeTabsModel> {
+  @modelAction
+  resetBendGuideValleyToDefault() {
+    this.bendGuideValley = new BendGuideValleyModel({});
+  }
 }
 
 export function baseEdgeConnectionTab(
   start: RawPoint, end: RawPoint,
-  tabDepth, tabSpec: IBaseEdgeTabsModel, scoreDashSpec: IDashPatternModel,
+  tabDepth, tabSpec: BaseEdgeTabsModel, scoreDashSpec: DashPatternModel,
 ): BaseEdgeConnectionTab {
   const {
     holeDepthToTabDepth,

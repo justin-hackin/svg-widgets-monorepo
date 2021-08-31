@@ -5,7 +5,6 @@ import clsx from 'clsx';
 import Joyride, { EVENTS } from 'react-joyride';
 
 import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { theme, useStyles } from '../../style/style';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
@@ -14,6 +13,7 @@ import {
   MyStep, SAMPLE_IMAGE_SNAPSHOT, SAMPLE_PATH_SNAPSHOT, STEP_ACTIONS, TOUR_STEPS,
 } from '../../util/tour';
 import { IS_WEB_BUILD } from '../../constants';
+import { PyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
@@ -22,7 +22,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const incrementStepIndex = (index) => { setStepIndex(index + 1); };
   const resetStepIndex = () => { setStepIndex(0); };
   const mainAreaRef = useRef<HTMLDivElement>();
-  const pyramidNetPluginStore: IPyramidNetPluginModel = workspaceStore.selectedStore;
+  const pyramidNetPluginStore: PyramidNetPluginModel = workspaceStore.selectedStore;
   if (!pyramidNetPluginStore || !pyramidNetPluginStore.textureEditor) {
     return null;
   }
@@ -65,7 +65,8 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
       // the user could re-activate the tour, rewind
       resetStepIndex();
       clearTexture();
-      history.clear();
+      history.clearUndo();
+      history.clearRedo();
     } else if (type === EVENTS.STEP_AFTER) {
       if (step.nextAction === STEP_ACTIONS.ADD_PATH_TEXTURE) {
         setTextureFromPattern(SAMPLE_PATH_SNAPSHOT);

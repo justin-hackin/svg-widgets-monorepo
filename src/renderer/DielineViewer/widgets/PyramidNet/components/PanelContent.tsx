@@ -4,7 +4,6 @@ import { Paper, Tab, Tabs } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 import { useStyles } from '../../../../../common/style/style';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
@@ -13,6 +12,7 @@ import { ShapeSelect } from '../../../../../common/components/ShapeSelect';
 import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { PIXELS_PER_CM } from '../../../../../common/util/units';
 import { PanelSelect } from '../../../../../common/components/PanelSelect';
+import { PyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 
 const controlsTabs = [
   {
@@ -34,7 +34,7 @@ const controlsTabs = [
 
 export const PanelContent = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
+  const store = workspaceStore.selectedStore as PyramidNetPluginModel;
   const classes = useStyles();
   const { pyramidNetSpec } = store;
   const { pyramid } = pyramidNetSpec;

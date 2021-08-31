@@ -1,21 +1,29 @@
 /* eslint-disable max-classes-per-file,no-param-reassign */
-import {
-  Instance, types, tryResolve, applySnapshot, getSnapshot,
-} from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
-import { polyhedra } from '../data/polyhedra';
+import {
+  Model, modelAction, prop, applySnapshot, getSnapshot, model,
+} from 'mobx-keystone';
+import { computed } from 'mobx';
 import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { getBoundingBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
-import { dashPatterns, DashPatternsModel } from '../data/dash-patterns';
 import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTestTabsSvg';
 import { SVGWrapper } from '../data/SVGWrapper';
 import { TextureEditorModel } from '../../../common/components/TextureEditor/models/TextureEditorModel';
-import { ITextureFaceDecorationModel } from './TextureFaceDecorationModel';
+import { TextureFaceDecorationModel } from './TextureFaceDecorationModel';
+import { tryResolvePath } from '../../../common/util/mobx-keystone';
+import { dashPatterns } from '../data/dash-patterns';
+import { DashPatternModel } from '../util/shapes/strokeDashPath';
 
-export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetPluginModel }) => {
+export const renderTestTabsToString = (widgetStore, preferencesStore): string => ReactDOMServer.renderToString(
+  <SVGWrapper>
+    <PyramidNetTestTabs preferencesStore={preferencesStore} widgetStore={widgetStore} />
+  </SVGWrapper>,
+);
+
+export const DecorationBoundarySVG = ({ store }: { store: PyramidNetPluginModel }) => {
   const {
     pyramidNetSpec: { normalizedDecorationBoundaryPoints },
   } = store;
@@ -28,57 +36,52 @@ export const DecorationBoundarySVG = ({ store }: { store: IPyramidNetPluginModel
   );
 };
 
-export const PyramidNetPluginModel = types.model('PyramidNetFactory', {
-  pyramidNetSpec: types.optional(PyramidNetModel, {}),
-  textureEditor: types.optional(TextureEditorModel, {}),
-}).volatile(() => ({
-  textureEditorOpen: false,
-  dashPatterns: DashPatternsModel.create(dashPatterns),
-  polyhedraPyramidGeometries: polyhedra,
-}))
-  .views((self) => ({
-    get shapeDefinition() {
-      return self.pyramidNetSpec;
-    },
+@model('PyramidNetPluginModel')
+export class PyramidNetPluginModel extends Model({
+  pyramidNetSpec: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
+  textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),
+}) {
+  textureEditorOpen = false;
 
-    get boundingBox() {
-      return getBoundingBoxAttrs(self.pyramidNetSpec.netPaths.cut.getD());
-    },
-  })).actions((self) => ({
-    setTextureEditorOpen(isOpen) {
-      self.textureEditorOpen = isOpen;
-    },
-    renderDecorationBoundaryToString():string {
+  dashPatterns = dashPatterns.map((pattern) => (new DashPatternModel(pattern)));
+
+  @computed
+  get shapeDefinition() {
+    return this.pyramidNetSpec;
+  }
+
+  @computed
+  get boundingBox() {
+    return getBoundingBoxAttrs(this.pyramidNetSpec.netPaths.cut.getD());
+  }
+
+  @modelAction
+  setTextureEditorOpen(isOpen) {
+    this.textureEditorOpen = isOpen;
+  }
+
+  @modelAction
+  renderDecorationBoundaryToString():string {
     // @ts-ignore
-      return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: self }));
-    },
+    return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: this }));
+  }
 
-    renderTestTabsToString(widgetStore, preferencesStore): string {
-    // @ts-ignore
-      return ReactDOMServer.renderToString(
-        <SVGWrapper>
-          <PyramidNetTestTabs preferencesStore={preferencesStore} widgetStore={widgetStore} />
-        </SVGWrapper>,
-      );
-    },
+  @modelAction
+  getFileBasename() {
+    return `${
+      tryResolvePath(this, ['pyramidNetSpec', 'pyramid', 'shapeName']) || 'shape'
+    }__${
+      tryResolvePath(this, ['pyramidNetSpec', 'faceDecoration', 'pattern', 'sourceFileName']) || 'undecorated'
+    }`;
+  }
 
-    getFileBasename() {
-      return `${
-        tryResolve(self, '/pyramidNetSpec/pyramid/shapeName') || 'shape'
-      }__${
-        tryResolve(self, '/pyramidNetSpec/faceDecoration/pattern/sourceFileName') || 'undecorated'
-      }`;
-    },
-    onFileOpen(filePath, fileData) {
-      applySnapshot(self.pyramidNetSpec, fileData);
-      // @ts-ignore
-      const textureIsFromTextureEditor = (obj: unknown): obj is ITextureFaceDecorationModel => !!obj.transformOrigin;
-      const shouldUpdateTextureEditor = self.pyramidNetSpec.faceDecoration
-      && textureIsFromTextureEditor(self.pyramidNetSpec.faceDecoration);
-      if (shouldUpdateTextureEditor) {
-        self.textureEditor.setTexture(getSnapshot(self.pyramidNetSpec.faceDecoration));
-      }
-    },
-  }));
-
-export interface IPyramidNetPluginModel extends Instance<typeof PyramidNetPluginModel> {}
+  @modelAction
+  onFileOpen(filePath, fileData) {
+    applySnapshot(this.pyramidNetSpec, fileData);
+    const shouldUpdateTextureEditor = this.pyramidNetSpec.faceDecoration
+      && this.pyramidNetSpec.faceDecoration instanceof TextureFaceDecorationModel;
+    if (shouldUpdateTextureEditor) {
+      this.textureEditor.setTexture(getSnapshot(this.pyramidNetSpec.faceDecoration));
+    }
+  }
+}

@@ -1,17 +1,9 @@
-import { Instance, types } from 'mobx-state-tree';
+import { prop, model, Model } from 'mobx-keystone';
 
-export const PathFaceDecorationPatternModel = types.model('PathFaceDecorationPattern', {
-  pathD: types.string,
-  sourceFileName: types.string,
-  isPositive: types.boolean,
-  useAlphaTexturePreview: types.optional(types.boolean, true),
-}).actions((self) => ({
-  setUseAlphaTexturePreview(useAlpha) {
-    self.useAlphaTexturePreview = useAlpha;
-  },
-  setIsPositive(isPositive) {
-    self.isPositive = isPositive;
-  },
-}));
-
-export interface IPathFaceDecorationPatternModel extends Instance<typeof PathFaceDecorationPatternModel> {}
+@model('PathFaceDecorationPatternModel')
+export class PathFaceDecorationPatternModel extends Model({
+  pathD: prop<string>(),
+  sourceFileName: prop<string>(),
+  isPositive: prop<boolean>().withSetter(),
+  useAlphaTexturePreview: prop(true).withSetter(),
+}) {}

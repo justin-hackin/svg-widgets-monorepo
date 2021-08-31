@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { ChromePicker } from 'react-color';
 
 import { useStyles } from '../style/style';
-import { mstDataToProps } from '../util/mst';
+import { mstDataToProps } from '../util/mobx-keystone';
 
 export const PanelColorPicker = ({
   node, property, label = undefined, ...rest

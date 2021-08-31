@@ -1,5 +1,6 @@
-import { Instance, SnapshotIn, types } from 'mobx-state-tree';
 import { chunk, uniq } from 'lodash';
+import { model, Model, prop } from 'mobx-keystone';
+import { computed } from 'mobx';
 
 // import { convertMessageToMorseBooleanString } from './morse';
 // import { PHI } from '../../common/util/geom';
@@ -11,28 +12,26 @@ import { chunk, uniq } from 'lodash';
 //     return acc;
 //   }, []);
 
-const dasharrayLabelMap = (dasharray) => chunk(dasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
-
-export const StrokeDashPathPatternModel = types.model('StrokeDashPathPattern', {
-  id: types.identifier,
-  relativeStrokeDasharray: types.frozen(),
-  labelOverride: types.maybe(types.string),
-}).views((self) => ({
-  get label() {
-    return self.labelOverride || self.id;
-  },
-}));
-
-export interface IStrokeDashPathPatternModel extends Instance<typeof StrokeDashPathPatternModel> {}
-
-export const DashPatternsModel = types.array(StrokeDashPathPatternModel);
-
 const dasharrays = [[1, 2], [2, 1], [1, 3], [3, 1], [2, 1, 1, 1]];
 if (!uniq(dasharrays)) {
   throw new Error('dasharrays contents are not unique');
 }
 
-export const dashPatterns:SnapshotIn<typeof DashPatternsModel> = dasharrays.map((relativeStrokeDasharray) => ({
+const dasharrayLabelMap = (dasharray) => chunk(dasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
+
+export const dashPatterns = dasharrays.map((relativeStrokeDasharray) => ({
   relativeStrokeDasharray,
-  id: dasharrayLabelMap(relativeStrokeDasharray),
+  $modelId: dasharrayLabelMap(relativeStrokeDasharray),
 }));
+
+@model('StrokeDashPathPatternModel')
+export class StrokeDashPathPatternModel extends Model({
+  // TODO: even number length typing?
+  relativeStrokeDasharray: prop<number[]>(() => dasharrays[0]),
+  labelOverride: prop<string | null>(() => null),
+}) {
+  @computed
+  get label() {
+    return this.labelOverride || this.$modelId;
+  }
+}

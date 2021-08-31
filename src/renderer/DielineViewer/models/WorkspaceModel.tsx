@@ -1,36 +1,29 @@
-import {
-  applySnapshot, getSnapshot, getType, Instance, types,
-} from 'mobx-state-tree';
 import ReactDOMServer from 'react-dom/server';
 import React, {
   createContext, FC, MutableRefObject, useContext,
 } from 'react';
-import persist from 'mst-persist';
-import { connectReduxDevtools } from 'mst-middlewares';
-import makeInspectable from 'mobx-devtools-mst';
+// import { persist } from 'mobx-keystone-persist';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
 import parseFilepath from 'parse-filepath';
 import { observer } from 'mobx-react';
-import { reaction } from 'mobx';
-import { IAnyModelType } from 'mobx-state-tree/dist/types/complex-types/model';
+import { computed, observable, reaction } from 'mobx';
+import {
+  Model, modelAction, prop, getSnapshot, _Model, applySnapshot, connectReduxDevTools, model, registerRootStore,
+} from 'mobx-keystone';
 
 import { SVGWrapper } from '../data/SVGWrapper';
-import { PreferencesModel, defaultPreferences, IPreferencesModel } from './PreferencesModel';
+import { PreferencesModel } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../widgets/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../widgets/CylinderLightbox';
 import { PyramidNetTestTabsOptionsInfo } from '../widgets/PyramidNetTestTabs';
-import { IPyramidNetPluginModel } from './PyramidNetMakerStore';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../common/constants';
+import { PyramidNetPluginModel } from './PyramidNetMakerStore';
 
-const getPreferencesStore = () => {
-  const preferencesStore = PreferencesModel.create(defaultPreferences);
-  persist('preferencesStoreLocal', preferencesStore);
-  return preferencesStore;
-};
+const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
 
 export interface RawSvgComponentProps {
-  preferencesStore?: IPreferencesModel, widgetStore: IPyramidNetPluginModel,
+  preferencesStore?: PreferencesModel, widgetStore: PyramidNetPluginModel,
 }
 
 export interface AdditionalFileMenuItemsProps {
@@ -44,132 +37,177 @@ export interface WidgetOptions {
     AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>,
     PanelContent: FC,
   },
-  WidgetModel: IAnyModelType,
+  // TODO: enforce common params
+  WidgetModel: _Model<any, any>,
   AdditionalMainContent?: FC,
   specFileExtension: string,
   specFileExtensionName?: string,
 }
 
-interface WidgetOptionsCollection {
-  [propName: string]: WidgetOptions,
-}
+type WidgetOptionsCollection = Record<string, WidgetOptions>;
 
-const widgetOptions: WidgetOptionsCollection = {
-  'polyhedral-net': PyramidNetOptionsInfo,
-  'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
-  'polyhedral-net-test-tabs': PyramidNetTestTabsOptionsInfo,
-};
+@model('WorkspaceModel')
+export class WorkspaceModel extends Model({
+  selectedWidgetName: prop('polyhedral-net'),
+  preferences: prop<PreferencesModel>(() => (new PreferencesModel({}))),
+}) {
+  widgetOptions = {
+    'polyhedral-net': PyramidNetOptionsInfo,
+    'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
+    'polyhedral-net-test-tabs': PyramidNetTestTabsOptionsInfo,
+  } as WidgetOptionsCollection;
 
-export const WorkspaceModel = types.model('Workspace', {
-  selectedWidgetName: 'polyhedral-net',
-})
-  .volatile(() => ({
-    widgetOptions,
-    preferences: getPreferencesStore(),
-    savedSnapshot: undefined,
-    currentFilePath: undefined,
-    disposers: [],
-  }))
-  .views((self) => ({
-    get selectedWidgetOptions() {
-      return self.widgetOptions[self.selectedWidgetName];
-    },
-    get SelectedRawSvgComponent() {
-      return this.selectedWidgetOptions.RawSvgComponent;
-    },
-    get selectedStore() {
-      return this.selectedWidgetOptions.WidgetModel.create({});
-    },
-    get selectedControlPanelProps() {
-      return this.selectedWidgetOptions.controlPanelProps;
-    },
-    get SelectedAdditionalMainContent() {
-      return this.selectedWidgetOptions.AdditionalMainContent;
-    },
-    get selectedSpecFileExtension() {
-      return this.selectedWidgetOptions.specFileExtension;
-    },
-    get selectedStoreIsSaved() {
-      // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,
-      // instead flagging history records with the associated file name upon save
-      // + creating a middleware variable currentSnapshotIsSaved
-      // this will also allow history to become preserved across files with titlebar accuracy
-      const currentSnapshot = getSnapshot(this.selectedStore.shapeDefinition);
-      // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
-      return JSON.stringify(self.savedSnapshot) === JSON.stringify(currentSnapshot);
-    },
-    get SelectedControlledSvgComponent() {
-      const ObservedSvgComponent = observer(this.SelectedRawSvgComponent);
+  @observable
+  savedSnapshot = undefined;
 
-      return observer(() => (
-        <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={self.preferences} />));
-    },
-    get selectedShapeName() {
-      return getType(this.selectedStore.shapeDefinition).name;
-    },
-    get currentFileName() {
-      return self.currentFilePath ? parseFilepath(self.currentFilePath).name : `New ${this.selectedShapeName}`;
-    },
-    get fileTitleFragment() {
-      return `${this.selectedStoreIsSaved ? '' : '*'}${this.currentFileName}`;
-    },
-    get titleBarText() {
-      return IS_ELECTRON_BUILD
-        ? `${this.selectedShapeName} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
-    },
-  }))
-  .actions((self) => ({
-    afterCreate() {
+  @observable
+  currentFilePath = undefined;
+
+  @observable
+  selectedStore = undefined;
+
+  @computed
+  get selectedWidgetOptions() {
+    return this.widgetOptions[this.selectedWidgetName];
+  }
+
+  @computed
+  get SelectedRawSvgComponent() {
+    return this.selectedWidgetOptions.RawSvgComponent;
+  }
+
+  // TODO: these shortcuts to selectedWidgetOptions properties are unnecessary
+  @computed
+  get selectedControlPanelProps() {
+    return this.selectedWidgetOptions.controlPanelProps;
+  }
+
+  @computed
+  get SelectedAdditionalMainContent() {
+    return this.selectedWidgetOptions.AdditionalMainContent;
+  }
+
+  @computed
+  get selectedSpecFileExtension() {
+    return this.selectedWidgetOptions.specFileExtension;
+  }
+
+  @computed
+  get selectedStoreIsSaved() {
+    // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,
+    // instead flagging history records with the associated file name upon save
+    // + creating a middleware variable currentSnapshotIsSaved
+    // this will also allow history to become preserved across files with titlebar accuracy
+    const currentSnapshot = getSnapshot(this.selectedStore.shapeDefinition);
+    // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
+    return JSON.stringify(this.savedSnapshot) === JSON.stringify(currentSnapshot);
+  }
+
+  @computed
+  get SelectedControlledSvgComponent() {
+    const ObservedSvgComponent = observer(this.SelectedRawSvgComponent);
+
+    return observer(() => (
+      <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={this.preferences} />));
+  }
+
+  @computed
+  get selectedShapeName() {
+    return this.selectedStore.shapeDefinition.$modelType;
+  }
+
+  @computed
+  get currentFileName() {
+    return this.currentFilePath ? parseFilepath(this.currentFilePath).name : `New ${this.selectedShapeName}`;
+  }
+
+  @computed
+  get fileTitleFragment() {
+    return `${this.selectedStoreIsSaved ? '' : '*'}${this.currentFileName}`;
+  }
+
+  @computed
+  get titleBarText() {
+    return IS_ELECTRON_BUILD
+      ? `${this.selectedShapeName} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
+  }
+
+  onAttachedToRootStore() {
+    // this.preferences = new PreferencesModel({});
+    // persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+    const disposers = [
       // title bar changes for file status indication
-      self.disposers.push(reaction(() => [self.titleBarText], () => {
-        document.title = self.titleBarText;
-      }, { fireImmediately: true }));
-    },
-    beforeDestroy() {
-      for (const disposer of self.disposers) {
+      reaction(() => [this.titleBarText], () => {
+      // @ts-ignore
+        document.title = this.titleBarText;
+      }, { fireImmediately: true }),
+
+      // set selected store upon widget change
+      reaction(() => [this.selectedWidgetName], () => {
+        this.selectedStore = new this.selectedWidgetOptions.WidgetModel({});
+      }, { fireImmediately: true }),
+    ];
+
+    return () => {
+      for (const disposer of disposers) {
         disposer();
       }
-    },
-    setSelectedWidgetName(name) {
-      self.selectedWidgetName = name;
-      this.clearCurrentFileData();
-    },
-    renderWidgetToString() {
-      const { SelectedRawSvgComponent } = self;
-      return ReactDOMServer.renderToString(
-        <SVGWrapper {...self.preferences.dielineDocumentDimensions}>
-          <SelectedRawSvgComponent
-            preferencesStore={self.preferences}
-            widgetStore={self.selectedStore}
-          />
-        </SVGWrapper>,
-      );
-    },
-    resetPreferences() {
-      self.preferences.reset();
-    },
-    resetModelToDefault() {
-      applySnapshot(self.selectedStore, {});
-    },
-    setCurrentFileData(filePath, snapshot) {
-      self.currentFilePath = filePath;
-      self.savedSnapshot = snapshot;
-    },
-    clearCurrentFileData() {
-      self.currentFilePath = undefined;
-      self.savedSnapshot = undefined;
-    },
-  }));
+    };
+  }
 
-export interface IWorkspaceModel extends Instance<typeof WorkspaceModel> {}
+  @modelAction
+  setSelectedWidgetName(name) {
+    this.selectedWidgetName = name;
+    this.clearCurrentFileData();
+  }
+
+  @modelAction
+  renderWidgetToString() {
+    const { SelectedRawSvgComponent } = this;
+    return ReactDOMServer.renderToString(
+      <SVGWrapper {...this.preferences.dielineDocumentDimensions}>
+        <SelectedRawSvgComponent
+          preferencesStore={this.preferences}
+          widgetStore={this.selectedStore}
+        />
+      </SVGWrapper>,
+    );
+  }
+
+  @modelAction
+  resetPreferences() {
+    localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
+    this.preferences = new PreferencesModel({});
+    // persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+  }
+
+  @modelAction
+  resetModelToDefault() {
+    applySnapshot(this.selectedStore, {});
+  }
+
+  @modelAction
+  setCurrentFileData(filePath, snapshot) {
+    this.currentFilePath = filePath;
+    this.savedSnapshot = snapshot;
+  }
+
+  @modelAction
+  clearCurrentFileData() {
+    this.currentFilePath = undefined;
+    this.savedSnapshot = undefined;
+  }
+}
+
 // TODO: instantiating this store directly in the module causes unintended side-effects in texture editor:
 // reaction for title bar runs there too but workspace model is only the concern of dieline editor
 // consider this side-effect has the advantage of displaying model name in texture editor -> it doesn't have
 // access to shapeDefinition's model name otherwise
-export const workspaceStore = WorkspaceModel.create({});
+export const workspaceStore = new WorkspaceModel({});
+registerRootStore(workspaceStore);
 // @ts-ignore
 window.workpsaceStore = workspaceStore;
-const WorkspaceStoreContext = createContext<IWorkspaceModel>(workspaceStore);
+const WorkspaceStoreContext = createContext<WorkspaceModel>(workspaceStore);
 
 export const { Provider: WorkspaceProvider } = WorkspaceStoreContext;
 
@@ -183,8 +221,11 @@ export function useWorkspaceMst() {
 
 if (IS_DEVELOPMENT_BUILD) {
   if (IS_ELECTRON_BUILD) {
-    // TODO: why is this causing SocketProtocolError on web build
-    connectReduxDevtools(remotedev, workspaceStore);
+    // create a connection to the monitor (for example with connectViaExtension)
+    const connection = remotedev.connectViaExtension({
+      name: 'Polyhedral Net Studio',
+    });
+
+    connectReduxDevTools(remotedev, connection, workspaceStore);
   }
-  makeInspectable(workspaceStore);
 }

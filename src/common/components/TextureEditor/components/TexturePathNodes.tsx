@@ -4,19 +4,20 @@ import { observer } from 'mobx-react';
 import clsx from 'clsx';
 import { PathData } from '../../../../renderer/DielineViewer/util/PathData';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { ITextureEditorModel } from '../models/TextureEditorModel';
 import { useStyles } from '../../../style/style';
+import { TextureEditorModel } from '../models/TextureEditorModel';
+import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
 
 export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store:ITextureEditorModel = workspaceStore.selectedStore.textureEditor;
+  const store:TextureEditorModel = workspaceStore.selectedStore.textureEditor;
   const {
     texture, selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, imageCoverScale, nodeScaleMux,
   } = store;
   const classes = useStyles();
 
   if (!texture || !texture.hasPathPattern || !showNodes) { return null; }
-  const points = (new PathData(texture.pattern.pathD)).getDestinationPoints();
+  const points = (new PathData((texture.pattern as PathFaceDecorationPatternModel).pathD)).getDestinationPoints();
   return (
     <>
       {

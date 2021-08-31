@@ -1,8 +1,7 @@
 // from file menu template upload
-import { Instance, types } from 'mobx-state-tree';
+import { Model, model, prop } from 'mobx-keystone';
 
-export const RawFaceDecorationModel = types.model('RawFaceDecoration', {
-  dValue: types.string,
-});
-
-export interface IRawFaceDecorationModel extends Instance<typeof RawFaceDecorationModel> {}
+@model('RawFaceDecorationModel')
+export class RawFaceDecorationModel extends Model({
+  dValue: prop<string>(),
+}) {}

@@ -5,16 +5,16 @@ import { observer } from 'mobx-react';
 import { range } from 'lodash';
 
 import { useWorkspaceMst } from '../../../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { ITextureEditorModel } from '../../../models/TextureEditorModel';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../util/tour';
+import { PyramidNetPluginModel } from '../../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { TextureEditorModel } from '../../../models/TextureEditorModel';
 
 export const SnapMenu = observer(() => {
   // when truthy, snap menu is open
   const [positionSnapMenuAnchorEl, setPositionSnapMenuAnchorEl] = useState(null);
 
   const workspaceStore = useWorkspaceMst();
-  const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
+  const pluginModel:PyramidNetPluginModel = workspaceStore.selectedStore;
 
   const {
     texture, decorationBoundary,
@@ -23,7 +23,7 @@ export const SnapMenu = observer(() => {
     repositionTextureWithOriginOverFaceCenter, repositionOriginOverFaceCenter, repositionSelectedNodeOverFaceCenter,
     repositionOriginOverTextureCenter,
     refitTextureToFace,
-  } = pluginModel.textureEditor as ITextureEditorModel;
+  } = pluginModel.textureEditor as TextureEditorModel;
 
   if (!texture || !decorationBoundary) {
     return null;

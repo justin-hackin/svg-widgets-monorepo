@@ -7,9 +7,9 @@ import { observer } from 'mobx-react';
 // used to present underlying pixel values as unit-specific conversions
 // TODO: round up/down max/min/step based on unit (so that all values are divisible by the step)
 import { SubmittableTextInput } from './SubmittableTextInput';
-import { mstDataToProps } from '../util/mst';
 import { useStyles } from '../style/style';
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
+import { mstDataToProps } from '../util/mobx-keystone';
 
 export const PanelTextInput = observer(({
   node, property, useUnits = false, label = undefined,

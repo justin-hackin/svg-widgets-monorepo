@@ -1,5 +1,8 @@
-import { Instance, getParentOfType } from 'mobx-state-tree';
+import {
+  model, findParent, modelAction, ExtendedModel, prop,
+} from 'mobx-keystone';
 
+import { computed, observable } from 'mobx';
 import { getDimensionsFromPathD } from '../../../util/svg';
 import { PathData } from '../../../../renderer/DielineViewer/util/PathData';
 import {
@@ -8,115 +11,150 @@ import {
   scalePoint,
   sumPoints,
 } from '../../../util/geom';
-import { IImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
 import {
-  IPathFaceDecorationPatternModel,
+  PathFaceDecorationPatternModel,
 } from '../../../models/PathFaceDecorationPatternModel';
-import { TextureFaceDecorationModel } from '../../../../renderer/DielineViewer/models/TextureFaceDecorationModel';
+import {
+  TextureFaceDecorationModel,
+} from '../../../../renderer/DielineViewer/models/TextureFaceDecorationModel';
 import { TextureEditorModel } from './TextureEditorModel';
+import { TransformModel } from '../../../models/TransformModel';
+import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
 
 const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);
 
-export const transformDiffDefaults = {
-  translateDiff: getOriginPoint(),
-  rotateDiff: 0,
-  scaleDiff: 1,
-  transformOriginDiff: getOriginPoint(),
-};
+// TODO: rename to PositionedTextureModel
+@model('TextureModel')
+export class TextureModel extends ExtendedModel(TextureFaceDecorationModel, {
+}) {
+  @observable
+  transformDiff = new TransformModel({});
 
-export const TextureModel = TextureFaceDecorationModel
-  .volatile(() => ({ ...transformDiffDefaults }))
-  .views((self) => ({
-    get dimensions() {
-      if (self.hasPathPattern) {
-        const { pathD } = self.pattern as IPathFaceDecorationPatternModel;
-        return getDimensionsFromPathD(pathD);
-      }
-      const { dimensions } = self.pattern as IImageFaceDecorationPatternModel;
-      return dimensions;
-    },
-    get transformOriginDragged() {
-      return sumPoints(self.transformOrigin, self.transformOriginDiff);
-    },
-    get translateDragged() {
-      return sumPoints(self.translate, self.translateDiff);
-    },
-    get rotateDragged() {
-      return wrapDegrees(self.rotate + self.rotateDiff);
-    },
-    get scaleDragged() {
-      return self.scale * self.scaleDiff;
-    },
-    get transformMatrixDragged() {
-      return getTextureTransformMatrix(
-        self.transformOrigin,
-        this.scaleDragged, this.rotateDragged, this.translateDragged,
-      );
-    },
-    get transformMatrixDraggedStr() {
-      return this.transformMatrixDragged && this.transformMatrixDragged.toString();
-    },
-    get destinationPoints() {
-      if (!self.hasPathPattern) {
-        return null;
-      }
-      const { pathD } = self.pattern as IPathFaceDecorationPatternModel;
-      return (new PathData(pathD)).getDestinationPoints();
-    },
-    get parentHistoryManager() {
-      return getParentOfType(self, TextureEditorModel).history;
-    },
-  }))
-  .actions((self) => ({
-    setScaleDiff(mux) {
-      self.parentHistoryManager.withoutUndo(() => {
-        self.scaleDiff = mux;
-      });
-    },
-    reconcileScaleDiff() {
-      self.scale *= self.scaleDiff;
-      self.scaleDiff = 1;
-    },
-    setTranslateDiff(delta) {
-      self.parentHistoryManager.withoutUndo(() => {
-        self.translateDiff = delta;
-      });
-    },
-    reconcileTranslateDiff() {
-      self.translate = sumPoints(self.translate, self.translateDiff);
-      self.translateDiff = getOriginPoint();
-    },
-    setRotate(rotate) {
-      self.rotate = rotate;
-    },
-    setRotateDiff(delta) {
-      self.parentHistoryManager.withoutUndo(() => {
-        self.rotateDiff = delta;
-      });
-    },
-    reconcileRotateDiff() {
-      self.rotate = wrapDegrees(self.rotate + self.rotateDiff);
-      self.rotateDiff = 0;
-    },
-    setTransformOriginDiff(delta) {
-      self.parentHistoryManager.withoutUndo(() => {
-        self.transformOriginDiff = delta;
-      });
-    },
-    reconcileTransformOriginDiff() {
-      const relativeDifference = calculateTransformOriginChangeOffset(
-        self.transformOrigin, self.transformOriginDragged,
-        self.scaleDragged, self.rotateDragged, self.translateDragged,
-      );
-      self.transformOrigin = self.transformOriginDragged;
-      self.translate = sumPoints(self.translate, scalePoint(relativeDifference, -1));
-      self.transformOriginDiff = getOriginPoint();
-    },
-    resetTransformDiff() {
-      Object.assign(self, transformDiffDefaults);
-    },
-  }));
+  @computed
+  get hasPathPattern() {
+    return this.pattern instanceof PathFaceDecorationPatternModel;
+  }
 
-export interface ITextureModel extends Instance<typeof TextureModel> {
+  @computed
+  get dimensions() {
+    if (this.hasPathPattern) {
+      const { pathD } = super.pattern as PathFaceDecorationPatternModel;
+      return getDimensionsFromPathD(pathD);
+    }
+    const { dimensions } = this.pattern as ImageFaceDecorationPatternModel;
+    return dimensions;
+  }
+
+  @computed
+  get transformOriginDragged() {
+    return sumPoints(this.transform.transformOrigin, this.transformDiff.transformOrigin);
+  }
+
+  @computed
+  get translateDragged() {
+    return sumPoints(this.transform.translate, this.transformDiff.translate);
+  }
+
+  @computed
+  get rotateDragged() {
+    return wrapDegrees(this.transform.rotate + this.transformDiff.rotate);
+  }
+
+  @computed
+  get scaleDragged() {
+    return this.transform.scale * this.transformDiff.scale;
+  }
+
+  @computed
+  get transformMatrixDragged() {
+    return getTextureTransformMatrix(
+      this.transform.transformOrigin,
+      this.scaleDragged, this.rotateDragged, this.translateDragged,
+    );
+  }
+
+  @computed
+  get transformMatrixDraggedStr() {
+    return this.transformMatrixDragged && this.transformMatrixDragged.toString();
+  }
+
+  @computed
+  get destinationPoints() {
+    if (!this.hasPathPattern) {
+      return null;
+    }
+    const { pathD } = this.pattern as PathFaceDecorationPatternModel;
+    return (new PathData(pathD)).getDestinationPoints();
+  }
+
+  @computed
+  get parentHistoryManager() {
+    return findParent<TextureEditorModel>(this,
+      (parentNode) => parentNode instanceof TextureEditorModel).history;
+  }
+
+  // TODO: should these actions be purview of the TransformModel?
+  //  OR how to future proof against use of autogenerated setters
+  @modelAction
+  setScaleDiff(mux) {
+    this.parentHistoryManager.withoutUndo(() => {
+      this.transformDiff.scale = mux;
+    });
+  }
+
+  @modelAction
+  reconcileScaleDiff() {
+    this.transform.scale *= this.transformDiff.scale;
+    this.transformDiff.scale = 1;
+  }
+
+  @modelAction
+  setTranslateDiff(delta) {
+    this.parentHistoryManager.withoutUndo(() => {
+      this.transformDiff.translate = delta;
+    });
+  }
+
+  @modelAction
+  reconcileTranslateDiff() {
+    this.transform.translate = sumPoints(this.transform.translate, this.transformDiff.translate);
+    this.transformDiff.translate = getOriginPoint();
+  }
+
+  @modelAction
+  setRotateDiff(delta) {
+    this.parentHistoryManager.withoutUndo(() => {
+      this.transformDiff.rotate = delta;
+    });
+  }
+
+  @modelAction
+  reconcileRotateDiff() {
+    this.transform.rotate = wrapDegrees(this.transform.rotate + this.transformDiff.rotate);
+    this.transformDiff.rotate = 0;
+  }
+
+  @modelAction
+  setTransformOriginDiff(delta) {
+    this.parentHistoryManager.withoutUndo(() => {
+      this.transformDiff.transformOrigin = delta;
+    });
+  }
+
+  @modelAction
+  reconcileTransformOriginDiff() {
+    const relativeDifference = calculateTransformOriginChangeOffset(
+      this.transform.transformOrigin, this.transformOriginDragged,
+      this.scaleDragged, this.rotateDragged, this.translateDragged,
+    );
+    this.transform.transformOrigin = this.transformOriginDragged;
+    this.transform.translate = sumPoints(this.transform.translate, scalePoint(relativeDifference, -1));
+    this.transformDiff.transformOrigin = getOriginPoint();
+  }
+
+  @modelAction
+  resetTransformDiff() {
+    this.transformDiff = new TransformModel({});
+  }
 }

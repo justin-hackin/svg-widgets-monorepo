@@ -36,19 +36,19 @@ import { HistoryButtons } from
 import { PanelSliderComponent } from '../../../PanelSliderComponent';
 import { ShapeSelect } from '../../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../../../style/style';
 import {
   DEFAULT_SLIDER_STEP,
   EVENTS,
-  INVALID_BUILD_ENV_ERROR,
   IS_ELECTRON_BUILD,
   IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION,
 } from '../../../../constants';
-import { ITextureEditorModel } from '../../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../../util/tour';
 import { SnapMenu } from './components/SnapMenu';
+import { PyramidNetPluginModel } from '../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -95,7 +95,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
   const { setNeedsTour } = workspaceStore.preferences;
-  const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
+  const pluginModel:PyramidNetPluginModel = workspaceStore.selectedStore;
   const {
     texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement,
     showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
@@ -104,10 +104,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     setTextureArrangementFromFileData,
     shapeName,
     history,
-  } = pluginModel.textureEditor as ITextureEditorModel;
-  const {
-    pattern, rotate: textureRotate, hasPathPattern,
-  } = texture || {};
+  } = pluginModel.textureEditor;
 
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
@@ -165,16 +162,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               if (IS_WEB_BUILD) {
                 return (<ForwardRefdOpenMenuItem />);
               }
-              if (IS_ELECTRON_BUILD) {
-                return (
-                  <OpenTextureArrangementMenuItem onClick={() => {
-                    openTextureArrangement();
-                    resetFileMenuRef();
-                  }}
-                  />
-                );
-              }
-              throw new Error(INVALID_BUILD_ENV_ERROR);
+              return (
+                <OpenTextureArrangementMenuItem onClick={() => {
+                  openTextureArrangement();
+                  resetFileMenuRef();
+                }}
+                />
+              );
             })()}
             {/* Menu component emits error when child is React.Fragment */}
             { texture
@@ -250,7 +244,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 </FilePicker>
               );
             }
-            throw new Error(INVALID_BUILD_ENV_ERROR);
           })()}
           <ShapeSelect
             className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
@@ -279,15 +272,15 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
           {history && (<HistoryButtons history={history} />)}
 
-          {pattern && !hasPathPattern && (
+          {texture?.pattern && !texture.hasPathPattern && (
           <FormControlLabel
             className={TOUR_ELEMENT_CLASSES.IS_BORDERED}
             labelPlacement="top"
             control={(
               <Switch
-                checked={pattern.isBordered}
+                checked={(texture.pattern as ImageFaceDecorationPatternModel).isBordered}
                 onChange={(e) => {
-                  pattern.setIsBordered(e.target.checked);
+                  (texture.pattern as ImageFaceDecorationPatternModel).setIsBordered(e.target.checked);
                 }}
                 color="primary"
               />
@@ -300,7 +293,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           {texture && (
           <>
             {/* menu content at bottom section */}
-            {hasPathPattern && (
+            {texture?.hasPathPattern && (
             <>
               <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.textureEditorNodeInputs)}>
                 <FormControlLabel
@@ -330,10 +323,11 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 className={TOUR_ELEMENT_CLASSES.FILL_IS_POSITIVE}
                 labelPlacement="top"
                 control={(
+                  // TODO: casting shouldn't be necessary here for TS type safety
                   <Switch
-                    checked={pattern.isPositive}
+                    checked={(texture.pattern as PathFaceDecorationPatternModel).isPositive}
                     onChange={(e) => {
-                      pattern.setIsPositive(e.target.checked);
+                      (texture.pattern as PathFaceDecorationPatternModel).setIsPositive(e.target.checked);
                     }}
                     color="primary"
                   />
@@ -345,9 +339,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 labelPlacement="top"
                 control={(
                   <Switch
-                    checked={pattern.useAlphaTexturePreview}
+                    checked={(texture.pattern as PathFaceDecorationPatternModel).useAlphaTexturePreview}
                     onChange={(e) => {
-                      pattern.setUseAlphaTexturePreview(e.target.checked);
+                      (texture.pattern as PathFaceDecorationPatternModel).setUseAlphaTexturePreview(e.target.checked);
                     }}
                     color="primary"
                   />
@@ -360,13 +354,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             <TextField
               className={clsx(classes.rotationInput, TOUR_ELEMENT_CLASSES.ROTATE_INPUT)}
               label="Rotate"
-              value={textureRotate}
+              value={texture.transform.rotate}
               onChange={({ target: { value } = {} }) => {
                 // TODO: use onKeyPress for enter submission
                 // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
                 // TODO: once above is fixed, use textureRotateDragged as value
                 if (isNumber(value) && !isNaN(value)) {
-                  texture.setRotate(value);
+                  texture.transform.setRotate(value);
                 }
               }}
               InputProps={{

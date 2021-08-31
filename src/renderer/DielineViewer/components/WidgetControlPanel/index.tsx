@@ -18,14 +18,14 @@ import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import {
   AppBar, Button, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@material-ui/core';
-import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 
+import { applySnapshot, getSnapshot } from 'mobx-keystone';
 import { useStyles } from '../../../../common/style/style';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { SimpleDialog } from '../../../../common/components/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
 import { EVENTS } from '../../../../common/constants';
+import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
@@ -35,7 +35,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   useTheme();
   const workspaceStore = useWorkspaceMst();
   const { selectedWidgetOptions: { specFileExtension, specFileExtensionName } } = workspaceStore;
-  const pyramidNetPluginStore = workspaceStore.selectedStore as IPyramidNetPluginModel;
+  const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetPluginModel;
 
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };

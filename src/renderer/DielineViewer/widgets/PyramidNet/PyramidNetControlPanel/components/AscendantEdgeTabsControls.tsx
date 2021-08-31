@@ -4,12 +4,12 @@ import { observer } from 'mobx-react';
 import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
 import { ratioSliderProps } from './constants';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
+import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 
 export const AscendantEdgeTabsControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
+  const store = workspaceStore.selectedStore as PyramidNetPluginModel;
   const { pyramidNetSpec: { ascendantEdgeTabsSpec } = {} } = store;
   return (
     <>

@@ -7,7 +7,7 @@ import HowToVoteIcon from '@material-ui/icons/HowToVote';
 import { startCase } from 'lodash';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
+import { PyramidNetPluginModel, renderTestTabsToString } from '../../../models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../../../common/util/svg';
 import { useStyles } from '../../../../../common/style/style';
 import { EVENTS, IS_ELECTRON_BUILD } from '../../../../../common/constants';
@@ -22,7 +22,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const { selectedWidgetOptions: { specFileExtension, specFileExtensionName = undefined } } = workspaceStore;
   const preferencesStore = workspaceStore.preferences;
   const classes = useStyles();
-  const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
+  const store = workspaceStore.selectedStore as PyramidNetPluginModel;
 
   return (
     <>
@@ -95,7 +95,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       {/* DOWNLOAD TAB TEST */}
       <MenuItem onClick={async () => {
         await globalThis.ipcRenderer
-          .invoke(EVENTS.DIALOG_SAVE_SVG, store.renderTestTabsToString(store, preferencesStore), {
+          .invoke(EVENTS.DIALOG_SAVE_SVG, renderTestTabsToString(store, preferencesStore), {
             message: DOWNLOAD_TAB_TESTER_TXT,
             defaultPath: `${store.getFileBasename()}--test-tabs.svg`,
           });

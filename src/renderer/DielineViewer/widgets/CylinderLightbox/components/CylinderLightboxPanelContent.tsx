@@ -1,17 +1,17 @@
 import React from 'react';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
-import { ICylinderLightBoxModel } from '../models';
 import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { PanelSliderComponent } from '../../../../../common/components/PanelSliderComponent';
 import { useStyles } from '../../../../../common/style/style';
 import { PIXELS_PER_CM } from '../../../../../common/util/units';
 import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
+import { CylinderLightBoxModel } from '../models';
 
 export const CylinderLightboxPanelContent = () => {
   const workspaceStore = useWorkspaceMst();
   const classes = useStyles();
-  const { shapeDefinition } = workspaceStore.selectedStore as ICylinderLightBoxModel;
+  const { shapeDefinition } = workspaceStore.selectedStore as CylinderLightBoxModel;
 
   return (
     <div className={classes.tabContent}>

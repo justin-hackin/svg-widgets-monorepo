@@ -1,13 +1,13 @@
 import { Slider, Tooltip, Typography } from '@material-ui/core';
-import React from 'react';
+import React, { useState } from 'react';
 import uuid from 'uuid/v1';
 import { startCase } from 'lodash';
 
 import { observer } from 'mobx-react';
-import { getHistory, mstDataToProps } from '../util/mst';
 import { useStyles } from '../style/style';
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
 import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../util/units';
+import { getNearestHistoryFromAncestorNode, mstDataToProps } from '../util/mobx-keystone';
 
 const ValueLabelComponent = ({
   children,
@@ -30,23 +30,42 @@ export const UnlabeledPanelSliderComponent = observer(({
   className = undefined,
   disabled = false,
 }) => {
+  const [historyGroup, setHistoryGroup] = useState(null);
+  // TODO: is this too expensive?
+  const history = getNearestHistoryFromAncestorNode(node);
+
+  const endHistoryGroupAndClear = () => {
+    historyGroup.end();
+    setHistoryGroup(null);
+  };
+  const startHistoryGroup = () => {
+    setHistoryGroup(history.createGroup());
+  };
+
   const {
     value, setValue, valuePath,
   } = mstDataToProps(node, property);
-  const history = getHistory(node);
+
   return (
     <Slider
       className={className}
       value={value}
       onChange={(_, val) => {
-        if (history && !history.groupActive) {
-          history.startGroup(() => {
-          });
+        if (!history) {
+          setValue(val);
+          return;
         }
-        setValue(val);
+        if (!historyGroup) {
+          startHistoryGroup();
+        }
+        historyGroup.continue(() => {
+          setValue(val);
+        });
       }}
       onChangeCommitted={history && (() => {
-        history.stopGroup();
+        if (historyGroup) {
+          endHistoryGroupAndClear();
+        }
       })}
       step={step || (unit && UNIT_STEP[unit])}
       valueLabelFormat={unit ? UNIT_LABEL_FORMAT[unit] : undefined}

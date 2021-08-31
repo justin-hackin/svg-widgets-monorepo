@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
 
 import { startCase } from 'lodash';
 import { useStyles } from '../style/style';
-import { mstDataToProps } from '../util/mst';
+import { mstDataToProps } from '../util/mobx-keystone';
 
 export const UncontrolledPanelSelect = observer(({
   value, onChange, options, label, name, displayEmpty = undefined,

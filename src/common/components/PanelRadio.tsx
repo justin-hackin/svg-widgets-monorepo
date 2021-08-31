@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import { startCase } from 'lodash';
 import { useStyles } from '../style/style';
-import { mstDataToProps } from '../util/mst';
+import { mstDataToProps } from '../util/mobx-keystone';
 
 export const UncontrolledPanelRadio = observer(({
   value, onChange, options, label, name, row = false,
