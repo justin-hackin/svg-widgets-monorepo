@@ -1,5 +1,5 @@
 import {
-  model, findParent, modelAction, ExtendedModel, prop,
+  model, findParent, modelAction, ExtendedModel,
 } from 'mobx-keystone';
 
 import { computed, observable } from 'mobx';
@@ -25,25 +25,24 @@ const negativeMod = (n, m) => ((n % m) + m) % m;
 const wrapDegrees = (deg) => negativeMod(deg, 360);
 
 // TODO: rename to PositionedTextureModel
-@model('TextureModel')
+export const TEXTURE_MODEL_TYPE = 'TextureModel';
+@model(TEXTURE_MODEL_TYPE)
 export class TextureModel extends ExtendedModel(TextureFaceDecorationModel, {
 }) {
   @observable
   transformDiff = new TransformModel({});
 
   @computed
-  get hasPathPattern() {
-    return this.pattern instanceof PathFaceDecorationPatternModel;
-  }
-
-  @computed
   get dimensions() {
-    if (this.hasPathPattern) {
-      const { pathD } = super.pattern as PathFaceDecorationPatternModel;
+    if (this.pattern instanceof PathFaceDecorationPatternModel) {
+      const { pathD } = this.pattern as PathFaceDecorationPatternModel;
       return getDimensionsFromPathD(pathD);
     }
-    const { dimensions } = this.pattern as ImageFaceDecorationPatternModel;
-    return dimensions;
+    if (this.pattern instanceof ImageFaceDecorationPatternModel) {
+      const { dimensions } = this.pattern as ImageFaceDecorationPatternModel;
+      return dimensions;
+    }
+    throw new Error('unexpected pattern type');
   }
 
   @computed
@@ -81,11 +80,11 @@ export class TextureModel extends ExtendedModel(TextureFaceDecorationModel, {
 
   @computed
   get destinationPoints() {
-    if (!this.hasPathPattern) {
-      return null;
+    if (this.pattern instanceof PathFaceDecorationPatternModel) {
+      const { pathD } = this.pattern as PathFaceDecorationPatternModel;
+      return (new PathData(pathD)).getDestinationPoints();
     }
-    const { pathD } = this.pattern as PathFaceDecorationPatternModel;
-    return (new PathData(pathD)).getDestinationPoints();
+    return null;
   }
 
   @computed
@@ -151,10 +150,5 @@ export class TextureModel extends ExtendedModel(TextureFaceDecorationModel, {
     this.transform.transformOrigin = this.transformOriginDragged;
     this.transform.translate = sumPoints(this.transform.translate, scalePoint(relativeDifference, -1));
     this.transformDiff.transformOrigin = getOriginPoint();
-  }
-
-  @modelAction
-  resetTransformDiff() {
-    this.transformDiff = new TransformModel({});
   }
 }

@@ -15,11 +15,6 @@ export const BaseEdgeTabControls = observer(() => {
       baseEdgeTabsSpec,
     } = {},
   } = workspaceStore.selectedStore as PyramidNetPluginModel;
-  const {
-    bendGuideValley,
-    unsetBendGuideValley,
-    resetBendGuideValleyToDefault,
-  } = baseEdgeTabsSpec;
 
   return (
     <>
@@ -83,24 +78,24 @@ export const BaseEdgeTabControls = observer(() => {
       <PanelSwitchUncontrolled
         label="Use Bend Guide Valley"
         valuePath="BaseEdgeTabControls__useBendGuideValley"
-        value={!!bendGuideValley}
+        value={!!baseEdgeTabsSpec.bendGuideValley}
         onChange={(e) => {
           if (e.target.checked) {
-            resetBendGuideValleyToDefault();
+            baseEdgeTabsSpec.resetBendGuideValleyToDefault();
           } else {
-            unsetBendGuideValley();
+            baseEdgeTabsSpec.unsetBendGuideValley();
           }
         }}
       />
       {baseEdgeTabsSpec.bendGuideValley && (
         <>
           <PanelSliderOrTextInput
-            node={bendGuideValley}
+            node={baseEdgeTabsSpec.bendGuideValley}
             property="depthRatio"
             {...ratioSliderProps}
           />
           <PanelSliderOrTextInput
-            node={bendGuideValley}
+            node={baseEdgeTabsSpec.bendGuideValley}
             property="theta"
             min={Math.PI / 16}
             max={Math.PI / 3}

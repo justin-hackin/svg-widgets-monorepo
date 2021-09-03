@@ -3,7 +3,7 @@ import fileDownload from 'js-file-download';
 import {
   Model, prop, getSnapshot, model, findParent, undoMiddleware, modelAction,
 } from 'mobx-keystone';
-import { computed, observable } from 'mobx';
+import { computed, observable, reaction } from 'mobx';
 import { BoundaryModel } from './BoundaryModel';
 import { TextureModel } from './TextureModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
@@ -21,7 +21,13 @@ import {
 } from '../../../constants';
 import { reportTransformsTally } from '../../../util/analytics';
 import { tryResolvePath } from '../../../util/mobx-keystone';
-import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
+import {
+  ImageFaceDecorationPatternModel,
+} from '../../../models/ImageFaceDecorationPatternModel';
+import {
+  PathFaceDecorationPatternModel,
+} from '../../../models/PathFaceDecorationPatternModel';
+import { TransformModel } from '../../../models/TransformModel';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -54,13 +60,9 @@ const specFileExtensionName = 'Texture for Pyramid Net Spec';
 export class TextureEditorModel extends Model({
   texture: prop<TextureModel | null>(null),
   viewScale: prop<number>(DEFAULT_VIEW_SCALE),
+  shapePreview: prop<ShapePreviewModel>(() => new ShapePreviewModel({})),
+  modifierTracking: prop<ModifierTrackingModel>(() => new ModifierTrackingModel({})),
 }) {
-  @observable
-  modifierTracking = new ModifierTrackingModel({});
-
-  @observable
-  shapePreview = new ShapePreviewModel({});
-
   @observable
   history = undoMiddleware(this);
 
@@ -91,6 +93,9 @@ export class TextureEditorModel extends Model({
   @observable
   MAX_VIEW_SCALE = 3;
 
+  @observable
+  decorationBoundary = undefined;
+
   @computed
   get parentPyramidNetPluginModel() {
     return findParent(this, (parentNode) => parentNode instanceof PyramidNetPluginModel);
@@ -99,14 +104,6 @@ export class TextureEditorModel extends Model({
   @computed
   get shapeName() {
     return this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName;
-  }
-
-  @computed
-  get decorationBoundary() {
-    return (new BoundaryModel({
-      vertices:
-      this.parentPyramidNetPluginModel.pyramidNetSpec.normalizedDecorationBoundaryPoints,
-    }));
   }
 
   @computed
@@ -218,11 +215,6 @@ export class TextureEditorModel extends Model({
   }
 
   @modelAction
-  setNodeScaleMux(mux) {
-    this.nodeScaleMux = mux;
-  }
-
-  @modelAction
   setAutoRotatePreview(shouldRotate) {
     this.autoRotatePreview = shouldRotate;
   }
@@ -245,7 +237,9 @@ export class TextureEditorModel extends Model({
   @modelAction
   refitTextureToFace() {
     if (this.texture) {
-      this.setTextureFromPattern(getSnapshot(this.texture.pattern));
+      this.texture.transform = new TransformModel({});
+      this.fitTextureToFace();
+      this.repositionOriginOverFaceCenter();
     }
   }
 
@@ -261,10 +255,9 @@ export class TextureEditorModel extends Model({
   }
 
   @modelAction
-  setTextureFromPattern(patternSnapshot) {
+  setTextureFromPattern(pattern) {
     this.resetNodesEditor();
-
-    this.texture = new TextureModel({ pattern: patternSnapshot });
+    this.texture = new TextureModel({ pattern });
     this.fitTextureToFace();
     this.repositionOriginOverFaceCenter();
   }
@@ -276,18 +269,19 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   setTexturePath(pathD, sourceFileName) {
-    this.setTextureFromPattern({
+    this.setTextureFromPattern(new PathFaceDecorationPatternModel({
       pathD, sourceFileName, isPositive: DEFAULT_IS_POSITIVE,
-    });
+    }));
   }
 
   @modelAction
   setTextureImage(imageData, dimensions, sourceFileName) {
-    this.setTextureFromPattern({
+    this.setTextureFromPattern(new ImageFaceDecorationPatternModel({
       imageData, dimensions, sourceFileName,
-    });
+    }));
   }
 
+  @modelAction
   setShapePreviewIsFullScreen(isFullScreen) {
     this.shapePreviewIsFullScreen = isFullScreen;
   }
@@ -476,13 +470,24 @@ export class TextureEditorModel extends Model({
     this.setTextureArrangementFromFileData(fileData);
   }
 
-  onAttachedToRootStore(rootStore) {
-    super.onAttachedToRootStore(rootStore);
+  onAttachedToRootStore() {
     const SEND_ANALYTICS_INTERVAL_MS = 10000;
     const sendAnaylticsBuffersInterval = setInterval(reportTransformsTally, SEND_ANALYTICS_INTERVAL_MS);
+    const vertices = this.parentPyramidNetPluginModel.pyramidNetSpec.normalizedDecorationBoundaryPoints;
+    const disposers = [
+      reaction(() => [vertices], () => {
+        if (vertices) {
+          this.decorationBoundary = new BoundaryModel({ vertices });
+        }
+      }, { fireImmediately: true }),
+    ];
+
     return () => {
       reportTransformsTally();
       clearInterval(sendAnaylticsBuffersInterval);
+      for (const disposer of disposers) {
+        disposer();
+      }
     };
   }
 }

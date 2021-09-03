@@ -6,7 +6,7 @@ import { getTextureTransformMatrix, RawPoint } from '../util/geom';
 export class TransformModel extends Model({
   translate: prop<RawPoint>(() => ({ x: 0, y: 0 })).withSetter(),
   scale: prop<number>(1).withSetter(),
-  rotate: prop<number>(1).withSetter(),
+  rotate: prop<number>(0).withSetter(),
   transformOrigin: prop<RawPoint>(() => ({ x: 0, y: 0 })).withSetter(),
 }) {
   @computed

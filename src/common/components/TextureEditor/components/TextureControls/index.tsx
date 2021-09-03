@@ -94,17 +94,16 @@ const OpenTextureArrangementMenuItem = forwardRef<any, OpenTextureArrangementMen
 export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
-  const { setNeedsTour } = workspaceStore.preferences;
+  const { preferences } = workspaceStore;
   const pluginModel:PyramidNetPluginModel = workspaceStore.selectedStore;
+  const { textureEditor } = pluginModel;
   const {
-    texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement,
-    showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
+    texture,
+    showNodes, autoRotatePreview,
     shapePreview: { downloadShapeGLTF },
-    assignTextureFromPatternInfo,
-    setTextureArrangementFromFileData,
     shapeName,
     history,
-  } = pluginModel.textureEditor;
+  } = textureEditor;
 
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
@@ -115,7 +114,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
       onFilePicked={async (file) => {
         // TODO: why doesn't file.type match downloadFile mime type 'application/json'
         if (file.type === '') {
-          setTextureArrangementFromFileData(JSON.parse(await file.text()));
+          textureEditor.setTextureArrangementFromFileData(JSON.parse(await file.text()));
         }
         resetFileMenuRef();
         //  TODO: snack bar error if wrong type
@@ -164,7 +163,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               }
               return (
                 <OpenTextureArrangementMenuItem onClick={() => {
-                  openTextureArrangement();
+                  textureEditor.openTextureArrangement();
                   resetFileMenuRef();
                 }}
                 />
@@ -177,7 +176,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 <MenuItem
                   key={0}
                   onClick={() => {
-                    saveTextureArrangement();
+                    textureEditor.saveTextureArrangement();
                     resetFileMenuRef();
                   }}
                 >
@@ -205,7 +204,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               return (
                 <UploadButton onClick={async () => {
                   const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
-                  assignTextureFromPatternInfo(patternInfo);
+                  textureEditor.assignTextureFromPatternInfo(patternInfo);
                 }}
                 />
               );
@@ -218,7 +217,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                     if (file) {
                       if (file.type === 'image/svg+xml') {
                         const svgString = await file.text();
-                        assignTextureFromPatternInfo({
+                        textureEditor.assignTextureFromPatternInfo({
                           isPath: true,
                           svgString,
                           sourceFileName: file.name,
@@ -227,7 +226,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                         //  file is either png or jpg
                         const imageData = await toBase64(file);
                         const dimensions = await resolveImageDimensionsFromBase64(imageData);
-                        assignTextureFromPatternInfo({
+                        textureEditor.assignTextureFromPatternInfo({
                           isPath: false,
                           pattern: {
                             imageData,
@@ -262,7 +261,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               <Switch
                 checked={autoRotatePreview}
                 onChange={(e) => {
-                  setAutoRotatePreview(e.target.checked);
+                  textureEditor.setAutoRotatePreview(e.target.checked);
                 }}
                 color="primary"
               />
@@ -272,13 +271,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
           {history && (<HistoryButtons history={history} />)}
 
-          {texture?.pattern && !texture.hasPathPattern && (
+          {texture?.pattern && texture.pattern instanceof ImageFaceDecorationPatternModel && (
           <FormControlLabel
             className={TOUR_ELEMENT_CLASSES.IS_BORDERED}
             labelPlacement="top"
             control={(
               <Switch
-                checked={(texture.pattern as ImageFaceDecorationPatternModel).isBordered}
+                checked={texture.pattern.isBordered}
                 onChange={(e) => {
                   (texture.pattern as ImageFaceDecorationPatternModel).setIsBordered(e.target.checked);
                 }}
@@ -293,7 +292,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           {texture && (
           <>
             {/* menu content at bottom section */}
-            {texture?.hasPathPattern && (
+            {texture.pattern instanceof PathFaceDecorationPatternModel && (
             <>
               <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.textureEditorNodeInputs)}>
                 <FormControlLabel
@@ -302,7 +301,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                     <Switch
                       checked={showNodes}
                       onChange={(e) => {
-                        setShowNodes(e.target.checked);
+                        textureEditor.setShowNodes(e.target.checked);
                       }}
                       color="primary"
                     />
@@ -327,6 +326,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                   <Switch
                     checked={(texture.pattern as PathFaceDecorationPatternModel).isPositive}
                     onChange={(e) => {
+                      // TODO: why is it pattern.isPositive does not need casting but this does
                       (texture.pattern as PathFaceDecorationPatternModel).setIsPositive(e.target.checked);
                     }}
                     color="primary"
@@ -379,7 +379,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               <span>
                 <IconButton
                   onClick={() => {
-                    sendTextureToDielineEditor();
+                    textureEditor.sendTextureToDielineEditor();
                     pluginModel.setTextureEditorOpen(false);
                   }}
                   aria-label="send texture"
@@ -395,7 +395,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           { IS_WEB_BUILD && (
           <IconButton
             onClick={() => {
-              setNeedsTour(true);
+              preferences.setNeedsTour(true);
             }}
             aria-label="send texture"
             component="span"

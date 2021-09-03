@@ -9,7 +9,7 @@ import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/Works
 import { useStyles } from '../../../style/style';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
 import { IS_ELECTRON_BUILD } from '../../../constants';
-import { TextureEditorModel } from '../models/TextureEditorModel';
+import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 
 const { useEffect, useRef } = React;
 
@@ -18,15 +18,14 @@ export const ShapePreview = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const classes = useStyles();
 
-  const store: TextureEditorModel = workspaceStore.selectedStore.textureEditor;
-  const { shapePreview: { setup }, setShapePreviewIsFullScreen } = store;
+  const { textureEditor } = workspaceStore.selectedStore as PyramidNetPluginModel;
 
   const threeContainerRef = useRef<HTMLDivElement>();
 
   // THREE rendering setup
   useEffect(() => {
-    if (!threeContainerRef) { return null; }
-    setup(threeContainerRef.current);
+    if (!threeContainerRef) { return; }
+    textureEditor.shapePreview.setup(threeContainerRef.current);
   }, [threeContainerRef]);
 
   const previewContainer = (
@@ -47,7 +46,7 @@ export const ShapePreview = observer(() => {
       <FullScreen
         handle={handle}
         onChange={(isFullScreen) => {
-          store.setShapePreviewIsFullScreen(isFullScreen);
+          textureEditor.setShapePreviewIsFullScreen(isFullScreen);
         }}
       >
         {previewContainer}

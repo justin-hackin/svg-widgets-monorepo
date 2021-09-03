@@ -5,7 +5,7 @@ import React from 'react';
 import {
   Model, modelAction, prop, applySnapshot, getSnapshot, model,
 } from 'mobx-keystone';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
 import { getBoundingBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
@@ -41,6 +41,7 @@ export class PyramidNetPluginModel extends Model({
   pyramidNetSpec: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
   textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),
 }) {
+  @observable
   textureEditorOpen = false;
 
   dashPatterns = dashPatterns.map((pattern) => (new DashPatternModel(pattern)));

@@ -1,5 +1,7 @@
 // from texture editor send
-import { Model, model, prop } from 'mobx-keystone';
+import {
+  Model, model, prop,
+} from 'mobx-keystone';
 
 import { PathFaceDecorationPatternModel } from '../../../common/models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../../common/models/ImageFaceDecorationPatternModel';

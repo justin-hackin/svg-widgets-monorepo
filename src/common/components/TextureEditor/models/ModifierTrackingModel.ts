@@ -1,9 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
 import { includes, flatten } from 'lodash';
 import {
-  Model, model, modelAction, prop,
+  Model, model, modelAction,
 } from 'mobx-keystone';
-import { computed } from 'mobx';
+import { computed, observable } from 'mobx';
 import {
   EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD,
 } from '../../../constants';
@@ -17,88 +17,71 @@ export const DRAG_MODES = {
   SCALE_VIEW: 'scale view',
 };
 
-
-const keyTrackingModelFactory = (keysToTrack, target = window) => {
-  const trackedKeysStr = keysToTrack.join('-');
-  @model(`ModelWithKeys--${trackedKeysStr}`)
-  class ModelWithKeys extends Model(keysToTrack.reduce((acc, key) => {
-      acc[key] = prop(false);
-      return acc;
-    }, {})) {
-    @modelAction
-    set(key, value) {
-      this[key] = value;
-    }
-  }
-
-  @model(`KeyTracking--${trackedKeysStr}`)
-  class KeyTrackingModel extends Model({
-      keysTracked: prop<string[]>(keysToTrack),
-      keysHeld: prop<ModelWithKeys>(() => (new ModelWithKeys({}))),
-    }) {
-    target = target;
-
-    keyupHandler = (e) => {
-      if (includes(this.keysTracked, e.key)) {
-        this.keysHeld.set(e.key, false);
-      }
-    };
-
-    keydownHandler = (e) => {
-      if (includes(this.keysTracked, e.key)) {
-        this.keysHeld.set(e.key, true);
-      }
-    };
-
-    onAttachedToRootStore(rootStore) {
-      super.onAttachedToRootStore(rootStore);
-      this.target.addEventListener('keyup', this.keyupHandler);
-      this.target.addEventListener('keydown', this.keydownHandler);
-      return () => {
-        this.target.removeEventListener('keyup', this.keyupHandler);
-        this.target.removeEventListener('keydown', this.keydownHandler);
-      };
-    }
-
-    @modelAction
-    releaseHeldKeys() {
-      this.keysTracked.forEach((keyHeld) => {
-        this.keysHeld.set(keyHeld, false);
-      });
-    }
-  }
-  return KeyTrackingModel;
-};
-
 // sorted in order of precedence, first match becomes mode
-const defaultMode = DRAG_MODES.TRANSLATE;
-const modeDefs = [
-  { mode: DRAG_MODES.TRANSLATE_HORIZONTAL, keyOrKeysHeld: ['Alt', 'Control'] },
-  { mode: DRAG_MODES.TRANSLATE_VERTICAL, keyOrKeysHeld: ['Control', 'Shift'] },
-  { mode: DRAG_MODES.SCALE_VIEW, keyOrKeysHeld: 'Alt' },
-  { mode: DRAG_MODES.SCALE_TEXTURE, keyOrKeysHeld: 'Control' },
-  { mode: DRAG_MODES.ROTATE, keyOrKeysHeld: 'Shift' },
-];
-
 const allTrue = (array: boolean[]) => {
   for (const val of array) {
-    if (val === false) { return false; }
+    if (val !== true) { return false; }
   }
   return true;
 };
 
-const areKeysHeld = (trackerKeys, keyOrKeysHeld) => (Array.isArray(keyOrKeysHeld)
-  ? allTrue(keyOrKeysHeld.map((key) => trackerKeys[key])) : trackerKeys[keyOrKeysHeld]);
+const areKeysHeld = (trackerKeys, keysHeld) => allTrue(keysHeld.map((key) => trackerKeys[key]));
 
-const keysUsed = [...flatten(modeDefs.map(({ keyOrKeysHeld }) => keyOrKeysHeld)), defaultMode];
+interface ModeDef {
+  mode: string,
+  keysHeld: string[]
+}
 
-export class ModifierTrackingModel extends keyTrackingModelFactory(keysUsed) {
+// TODO: why can't the model returned from keyTrackingModelFactory be decorated with @model
+@model('ModifierTrackingModel')
+export class ModifierTrackingModel extends Model({
+  // TODO: why does behaviour change when this is moved into a plain observable
+}) {
+  @observable
+  keysHeld = {} as Record<string, boolean>;
+
+  modeDefs = [
+    { mode: DRAG_MODES.TRANSLATE_HORIZONTAL, keysHeld: ['Alt', 'Control'] },
+    { mode: DRAG_MODES.TRANSLATE_VERTICAL, keysHeld: ['Control', 'Shift'] },
+    { mode: DRAG_MODES.SCALE_VIEW, keysHeld: ['Alt'] },
+    { mode: DRAG_MODES.SCALE_TEXTURE, keysHeld: ['Control'] },
+    { mode: DRAG_MODES.ROTATE, keysHeld: ['Shift'] },
+  ] as ModeDef[];
+
+  defaultMode = DRAG_MODES.TRANSLATE;
+
+  @computed
+  get keysTracked() {
+    return flatten(this.modeDefs.map(({ keysHeld }) => keysHeld));
+  }
+
+  @modelAction
+  keyupHandler(e) {
+    if (includes(this.keysTracked, e.key)) {
+      this.keysHeld[e.key] = false;
+    }
+  }
+
+  @modelAction
+  keydownHandler(e) {
+    if (includes(this.keysTracked, e.key)) {
+      this.keysHeld[e.key] = true;
+    }
+  }
+
+  @modelAction
+  releaseHeldKeys() {
+    this.keysTracked.forEach((keyHeld) => {
+      this.keysHeld[keyHeld] = false;
+    });
+  }
+
   @computed
   get dragMode() {
-    for (const modeDef of modeDefs) {
-      if (areKeysHeld(this.keysHeld, modeDef.keyOrKeysHeld)) { return modeDef.mode; }
+    for (const modeDef of this.modeDefs) {
+      if (areKeysHeld(this.keysHeld, modeDef.keysHeld)) { return modeDef.mode; }
     }
-    return defaultMode;
+    return this.defaultMode;
   }
 
   @modelAction
@@ -106,14 +89,19 @@ export class ModifierTrackingModel extends keyTrackingModelFactory(keysUsed) {
     this.releaseHeldKeys();
   };
 
-  onAttachedToRootStore(rootStore) {
-    super.onAttachedToRootStore(rootStore);
+  onAttachedToRootStore():(() => void) {
+    window.addEventListener('keyup', this.keyupHandler.bind(this));
+    window.addEventListener('keydown', this.keydownHandler.bind(this));
+
     if (IS_ELECTRON_BUILD) {
       globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, this.resetHandler);
     } else if (IS_WEB_BUILD) {
       window.addEventListener('blur', this.resetHandler);
     }
     return () => {
+      window.removeEventListener('keyup', this.keyupHandler);
+      window.removeEventListener('keydown', this.keydownHandler);
+
       if (IS_ELECTRON_BUILD) {
         globalThis.ipcRenderer.removeListener(EVENTS.RESET_DRAG_MODE, this.resetHandler);
       } else if (IS_WEB_BUILD) {

@@ -55,11 +55,10 @@ module.exports = (env, argv) => {
                 '@babel/preset-env',
                 '@babel/preset-react',
                 '@babel/preset-typescript',
-                '@babel/preset-flow',
               ],
-              plugins: [...(isProd ? null : [ReactRefreshBabel]),
+              plugins: [
                 ['@babel/plugin-proposal-decorators', { legacy: true }],
-                '@babel/plugin-transform-runtime',
+                !isProd && ReactRefreshBabel,
               ],
             },
           },

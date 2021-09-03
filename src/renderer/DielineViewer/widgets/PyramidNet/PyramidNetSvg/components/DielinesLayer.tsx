@@ -13,6 +13,8 @@ import {
   toRectangleCoordinatesAttrs,
 } from '../../../../../../common/util/svg';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { PathFaceDecorationPatternModel } from '../../../../../../common/models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../../../../../../common/models/ImageFaceDecorationPatternModel';
 
 const DielineGroup = ({ children }) => (
   <g {...{
@@ -59,7 +61,8 @@ export const DielinesLayer = observer(({
   // TODO: consider making DRY with PrintLayer
   const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
     ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
-  const fittingBB = (!texture || texture.hasPathPattern) ? boundingBox : dielineRegistrationBB;
+  const fittingBB = (!texture || texture.pattern instanceof PathFaceDecorationPatternModel)
+    ? boundingBox : dielineRegistrationBB;
   const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(fittingBB), -1));
 
   const DecorationContent = () => {
@@ -138,7 +141,10 @@ export const DielinesLayer = observer(({
     <>
       <DielineGroup>
         <g transform={fitToCanvasTranslationStr}>
-          {(texture && !texture.hasPathPattern && printRegistrationType !== PRINT_REGISTRATION_TYPES.NONE)
+          {/* TODO: consider using something like <Switch>/<ElseIf>, hard to read */}
+          {(
+            texture?.pattern instanceof ImageFaceDecorationPatternModel
+            && printRegistrationType !== PRINT_REGISTRATION_TYPES.NONE)
           && (printRegistrationType === PRINT_REGISTRATION_TYPES.GRAPHTEC_OPTICAL ? (
             <rect stroke="black" fill="none" {...toRectangleCoordinatesAttrs(printRegistrationBB)} />
           ) : (

@@ -13,7 +13,8 @@ import { UNITS } from '../../../../../../common/util/units';
 import { PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
 
 export const PreferencesControls = observer(() => {
-  const { preferences, resetPreferences } = useWorkspaceMst();
+  const workspaceStore = useWorkspaceMst();
+  const { preferences } = workspaceStore;
   const options = Object.keys(UNITS).map((unit) => ({ value: unit, label: unit }));
   return (
     <>
@@ -72,7 +73,7 @@ export const PreferencesControls = observer(() => {
         variant="contained"
         color="primary"
         onClick={() => {
-          resetPreferences();
+          workspaceStore.resetPreferences();
         }}
       >
         Reset

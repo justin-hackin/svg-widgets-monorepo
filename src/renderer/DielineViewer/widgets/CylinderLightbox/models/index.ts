@@ -233,8 +233,7 @@ export class CylinderLightboxModel extends Model({
     return this.innerRadius - this.actualHolderTabFeetLength;
   }
 
-  onAttachedToRootStore(rootStore) {
-    super.onAttachedToRootStore(rootStore);
+  onAttachedToRootStore() {
     this.setSectionPathD();
     this.setWallPathD();
 

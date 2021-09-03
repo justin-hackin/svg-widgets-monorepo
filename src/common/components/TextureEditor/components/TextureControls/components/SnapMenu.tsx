@@ -7,7 +7,6 @@ import { range } from 'lodash';
 import { useWorkspaceMst } from '../../../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../util/tour';
 import { PyramidNetPluginModel } from '../../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { TextureEditorModel } from '../../../models/TextureEditorModel';
 
 export const SnapMenu = observer(() => {
   // when truthy, snap menu is open
@@ -15,15 +14,12 @@ export const SnapMenu = observer(() => {
 
   const workspaceStore = useWorkspaceMst();
   const pluginModel:PyramidNetPluginModel = workspaceStore.selectedStore;
+  const { textureEditor } = pluginModel;
 
   const {
     texture, decorationBoundary,
     selectedTextureNodeIndex, showNodes,
-    repositionTextureWithOriginOverCorner, repositionOriginOverCorner, repositionSelectedNodeOverCorner,
-    repositionTextureWithOriginOverFaceCenter, repositionOriginOverFaceCenter, repositionSelectedNodeOverFaceCenter,
-    repositionOriginOverTextureCenter,
-    refitTextureToFace,
-  } = pluginModel.textureEditor as TextureEditorModel;
+  } = textureEditor;
 
   if (!texture || !decorationBoundary) {
     return null;
@@ -38,48 +34,48 @@ export const SnapMenu = observer(() => {
   const resetPositionSnapMenuAnchorEl = () => { setPositionSnapMenuAnchorEl(null); };
 
   const fitTextureToFaceSnapMenuOnclick = () => {
-    refitTextureToFace();
+    textureEditor.refitTextureToFace();
     resetPositionSnapMenuAnchorEl();
   };
 
   const textureOriginToFaceCenterSnapMenuOnclick = () => {
-    repositionTextureWithOriginOverFaceCenter();
+    textureEditor.repositionTextureWithOriginOverFaceCenter();
     resetPositionSnapMenuAnchorEl();
   };
 
   const textureOriginToCornerSnapMenuOnclick = (index) => {
     if (index !== undefined) {
-      repositionTextureWithOriginOverCorner(index);
+      textureEditor.repositionTextureWithOriginOverCorner(index);
     }
     resetPositionSnapMenuAnchorEl();
   };
 
   const originToFaceCenterSnapMenuOnclick = () => {
-    repositionOriginOverFaceCenter();
+    textureEditor.repositionOriginOverFaceCenter();
     resetPositionSnapMenuAnchorEl();
   };
 
   const originToTextureCenterSnapMenuOnclick = () => {
-    repositionOriginOverTextureCenter();
+    textureEditor.repositionOriginOverTextureCenter();
     resetPositionSnapMenuAnchorEl();
   };
 
   const originToCornerSnapMenuOnclick = (index) => {
     if (index !== undefined) {
-      repositionOriginOverCorner(index);
+      textureEditor.repositionOriginOverCorner(index);
     }
     resetPositionSnapMenuAnchorEl();
   };
 
   const selectedNodeToCornerSnapMenuOnclick = (index) => {
     if (index !== undefined) {
-      repositionSelectedNodeOverCorner(index);
+      textureEditor.repositionSelectedNodeOverCorner(index);
     }
     resetPositionSnapMenuAnchorEl();
   };
 
   const selectedNodeToFaceCenterSnapMenuOnclick = () => {
-    repositionSelectedNodeOverFaceCenter();
+    textureEditor.repositionSelectedNodeOverFaceCenter();
     resetPositionSnapMenuAnchorEl();
   };
 
@@ -159,16 +155,18 @@ export const SnapMenu = observer(() => {
           </MenuItem>
         ))}
 
-        {showNodes && selectedTextureNodeIndex !== null && (
-          <>
-            <MenuItem
-              onClick={() => {
-                selectedNodeToFaceCenterSnapMenuOnclick();
-              }}
-            >
-              Selected node to face center
-            </MenuItem>
-            {range(numFaceSides).map((index) => (
+        {showNodes && selectedTextureNodeIndex !== null
+          && [
+            (
+              <MenuItem
+                onClick={() => {
+                  selectedNodeToFaceCenterSnapMenuOnclick();
+                }}
+              >
+                Selected node to face center
+              </MenuItem>
+            ),
+            ...range(numFaceSides).map((index) => (
               <MenuItem
                 key={index}
                 onClick={() => {
@@ -179,9 +177,8 @@ export const SnapMenu = observer(() => {
                 {' '}
                 {index + 1}
               </MenuItem>
-            ))}
-          </>
-        )}
+            )),
+          ]}
       </Menu>
     </>
   );

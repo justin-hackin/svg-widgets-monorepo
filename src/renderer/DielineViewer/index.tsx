@@ -19,12 +19,13 @@ const patternId = 'grid-pattern';
 
 export const DielineViewer = observer(() => {
   const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
+  const workspaceStore = useWorkspaceMst();
   const {
     preferences: { dielineDocumentDimensions },
     selectedStore,
-    SelectedControlledSvgComponent, selectedWidgetName, setSelectedWidgetName,
+    SelectedControlledSvgComponent, selectedWidgetName,
     selectedControlPanelProps, widgetOptions,
-  } = useWorkspaceMst();
+  } = workspaceStore;
 
   const classes = useStyles();
 
@@ -66,7 +67,7 @@ export const DielineViewer = observer(() => {
                 key={widgetName}
                 selected={selectedWidgetName === widgetName}
                 onClick={() => {
-                  setSelectedWidgetName(widgetName);
+                  workspaceStore.setSelectedWidgetName(widgetName);
                   setWidgetPickerOpen(false);
                 }}
               >

@@ -6,8 +6,10 @@ import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 
 import {
+  // @ts-ignore
+  ToolbarButton,
+  fitToViewer,
   TOOL_PAN, TOOL_ZOOM_IN, TOOL_ZOOM_OUT,
-  ToolbarButton, fitToViewer,
   POSITION_TOP, POSITION_RIGHT, POSITION_BOTTOM, POSITION_LEFT,
   ALIGN_CENTER, ALIGN_LEFT, ALIGN_RIGHT, ALIGN_TOP, ALIGN_BOTTOM,
 } from 'react-svg-pan-zoom';
@@ -22,7 +24,7 @@ export function CustomToolbar({
   };
 
   const handleFit = (event) => {
-    onChangeValue(fitToViewer(value, SVGAlignX, SVGAlignY));
+    onChangeValue(fitToViewer(value));
     event.stopPropagation();
     event.preventDefault();
   };

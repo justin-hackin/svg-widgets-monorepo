@@ -2,14 +2,21 @@ import ReactDOMServer from 'react-dom/server';
 import React, {
   createContext, FC, MutableRefObject, useContext,
 } from 'react';
-// import { persist } from 'mobx-keystone-persist';
+import { persist } from 'mobx-keystone-persist';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
 import parseFilepath from 'parse-filepath';
 import { observer } from 'mobx-react';
 import { computed, observable, reaction } from 'mobx';
 import {
-  Model, modelAction, prop, getSnapshot, _Model, applySnapshot, connectReduxDevTools, model, registerRootStore,
+  Model,
+  modelAction,
+  prop,
+  getSnapshot,
+  _Model,
+  connectReduxDevTools,
+  model,
+  registerRootStore,
 } from 'mobx-keystone';
 
 import { SVGWrapper } from '../data/SVGWrapper';
@@ -50,6 +57,7 @@ type WidgetOptionsCollection = Record<string, WidgetOptions>;
 export class WorkspaceModel extends Model({
   selectedWidgetName: prop('polyhedral-net'),
   preferences: prop<PreferencesModel>(() => (new PreferencesModel({}))),
+  selectedStore: prop<any>(() => (new PyramidNetPluginModel({}))),
 }) {
   widgetOptions = {
     'polyhedral-net': PyramidNetOptionsInfo,
@@ -63,8 +71,28 @@ export class WorkspaceModel extends Model({
   @observable
   currentFilePath = undefined;
 
-  @observable
-  selectedStore = undefined;
+  onAttachedToRootStore():(() => void) {
+    // this.preferences = new PreferencesModel({});
+    persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+    const disposers = [
+      // title bar changes for file status indication
+      reaction(() => [this.titleBarText], () => {
+        // @ts-ignore
+        document.title = this.titleBarText;
+      }, { fireImmediately: true }),
+
+      // set selected store upon widget change
+      reaction(() => [this.selectedWidgetName], () => {
+        this.selectedStore = new this.selectedWidgetOptions.WidgetModel({});
+      }),
+    ];
+
+    return () => {
+      for (const disposer of disposers) {
+        disposer();
+      }
+    };
+  }
 
   @computed
   get selectedWidgetOptions() {
@@ -132,29 +160,6 @@ export class WorkspaceModel extends Model({
       ? `${this.selectedShapeName} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
   }
 
-  onAttachedToRootStore() {
-    // this.preferences = new PreferencesModel({});
-    // persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
-    const disposers = [
-      // title bar changes for file status indication
-      reaction(() => [this.titleBarText], () => {
-      // @ts-ignore
-        document.title = this.titleBarText;
-      }, { fireImmediately: true }),
-
-      // set selected store upon widget change
-      reaction(() => [this.selectedWidgetName], () => {
-        this.selectedStore = new this.selectedWidgetOptions.WidgetModel({});
-      }, { fireImmediately: true }),
-    ];
-
-    return () => {
-      for (const disposer of disposers) {
-        disposer();
-      }
-    };
-  }
-
   @modelAction
   setSelectedWidgetName(name) {
     this.selectedWidgetName = name;
@@ -178,12 +183,12 @@ export class WorkspaceModel extends Model({
   resetPreferences() {
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
     this.preferences = new PreferencesModel({});
-    // persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+    persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
   }
 
   @modelAction
   resetModelToDefault() {
-    applySnapshot(this.selectedStore, {});
+    this.selectedStore = new this.selectedWidgetOptions.WidgetModel({});
   }
 
   @modelAction
@@ -205,6 +210,7 @@ export class WorkspaceModel extends Model({
 // access to shapeDefinition's model name otherwise
 export const workspaceStore = new WorkspaceModel({});
 registerRootStore(workspaceStore);
+
 // @ts-ignore
 window.workpsaceStore = workspaceStore;
 const WorkspaceStoreContext = createContext<WorkspaceModel>(workspaceStore);

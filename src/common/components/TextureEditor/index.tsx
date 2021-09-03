@@ -14,10 +14,13 @@ import {
 } from '../../util/tour';
 import { IS_WEB_BUILD } from '../../constants';
 import { PyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { PathFaceDecorationPatternModel } from '../../models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../../models/ImageFaceDecorationPatternModel';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
-  const { needsTour, setNeedsTour } = workspaceStore.preferences;
+  const { preferences } = workspaceStore;
+  const { needsTour } = preferences;
   const [stepIndex, setStepIndex] = useState<number>(0);
   const incrementStepIndex = (index) => { setStepIndex(index + 1); };
   const resetStepIndex = () => { setStepIndex(0); };
@@ -27,9 +30,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
     return null;
   }
   // ==================================================================================================================
-  const {
-    setPlacementAreaDimensions, setTextureFromPattern, clearTexture, history,
-  } = pyramidNetPluginStore.textureEditor;
+  const { textureEditor } = pyramidNetPluginStore;
   useTheme();
   const classes = useStyles();
   // Init
@@ -42,7 +43,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
         width,
         height,
       } = mainAreaRef.current.getBoundingClientRect();
-      setPlacementAreaDimensions({
+      textureEditor.setPlacementAreaDimensions({
         width: width / 2,
         height,
       });
@@ -61,18 +62,18 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
 
   const joyrideCallback = ({ type, step, index }: { type: string, step: MyStep, index: number }) => {
     if (type === EVENTS.TOUR_END) {
-      setNeedsTour(false);
+      preferences.setNeedsTour(false);
       // the user could re-activate the tour, rewind
       resetStepIndex();
-      clearTexture();
-      history.clearUndo();
-      history.clearRedo();
+      textureEditor.clearTexture();
+      textureEditor.history.clearUndo();
+      textureEditor.history.clearRedo();
     } else if (type === EVENTS.STEP_AFTER) {
       if (step.nextAction === STEP_ACTIONS.ADD_PATH_TEXTURE) {
-        setTextureFromPattern(SAMPLE_PATH_SNAPSHOT);
+        textureEditor.setTextureFromPattern(new PathFaceDecorationPatternModel(SAMPLE_PATH_SNAPSHOT));
         incrementStepIndex(index);
       } else if (step.nextAction === STEP_ACTIONS.ADD_IMAGE_TEXTURE) {
-        setTextureFromPattern(SAMPLE_IMAGE_SNAPSHOT);
+        textureEditor.setTextureFromPattern(new ImageFaceDecorationPatternModel(SAMPLE_IMAGE_SNAPSHOT));
         setTimeout(() => {
           incrementStepIndex(index);
         }, 500);

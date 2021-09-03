@@ -4,7 +4,7 @@ import {
   getParent,
   model, Model, modelAction, prop, resolveId, undoMiddleware,
 } from 'mobx-keystone';
-import {computed, observable} from 'mobx';
+import { computed, observable } from 'mobx';
 
 import {
   hingedPlot,
@@ -68,6 +68,7 @@ export class PyramidNetModel extends Model({
 
   testTabHandleFlapRounding = 0.5;
 
+  @computed
   get tabIntervalRatios() {
     const {
       tabsCount, tabStartGapToTabDepth, tabDepthToTraversalLength, holeWidthRatio,
@@ -400,8 +401,7 @@ export class PyramidNetModel extends Model({
     return matrices;
   }
 
-  onAttachedToRootStore(rootStore) {
-    super.onAttachedToRootStore(rootStore);
+  onAttachedToRootStore() {
     this.applyShapeBasedDefaults();
   }
 

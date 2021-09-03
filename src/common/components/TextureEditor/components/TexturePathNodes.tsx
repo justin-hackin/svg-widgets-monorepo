@@ -5,19 +5,19 @@ import clsx from 'clsx';
 import { PathData } from '../../../../renderer/DielineViewer/util/PathData';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { useStyles } from '../../../style/style';
-import { TextureEditorModel } from '../models/TextureEditorModel';
-import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
+import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
 
 export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store:TextureEditorModel = workspaceStore.selectedStore.textureEditor;
+  const { textureEditor } = workspaceStore.selectedStore as PyramidNetPluginModel;
   const {
-    texture, selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, imageCoverScale, nodeScaleMux,
-  } = store;
+    texture, selectedTextureNodeIndex, showNodes, imageCoverScale, nodeScaleMux,
+  } = textureEditor;
   const classes = useStyles();
 
-  if (!texture || !texture.hasPathPattern || !showNodes) { return null; }
-  const points = (new PathData((texture.pattern as PathFaceDecorationPatternModel).pathD)).getDestinationPoints();
+  if (!texture || texture.pattern instanceof ImageFaceDecorationPatternModel || !showNodes) { return null; }
+  const points = (new PathData(texture.pattern.pathD)).getDestinationPoints();
   return (
     <>
       {
@@ -40,7 +40,7 @@ export const TexturePathNodes = observer(() => {
                 }`}
                 r={(nodeScaleMux * longerTextureSideLength) / 100}
                 onClick={() => {
-                  setSelectedTextureNodeIndex(index);
+                  textureEditor.setSelectedTextureNodeIndex(index);
                 }}
               />
             </g>

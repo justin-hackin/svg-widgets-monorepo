@@ -13,12 +13,9 @@ const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 
 export const ScoreControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const {
-    pyramidNetSpec: {
-      useDottedStroke, setUseDottedStroke,
-      interFaceScoreDashSpec, baseScoreDashSpec, setInterFaceScoreDashSpecPattern, setBaseScoreDashSpecPattern,
-    } = {}, dashPatterns,
-  } = workspaceStore.selectedStore as PyramidNetPluginModel;
+  const selectedStore = workspaceStore.selectedStore as PyramidNetPluginModel;
+  const { pyramidNetSpec, dashPatterns } = selectedStore;
+  const { useDottedStroke, interFaceScoreDashSpec, baseScoreDashSpec } = pyramidNetSpec;
   const dashPatternOptions = dashPatterns
     .map(({ strokeDashPathPattern }) => strokeDashPathPattern)
     .map(({ label, $modelId }) => ({ value: $modelId, label }));
@@ -27,7 +24,7 @@ export const ScoreControls = observer(() => {
       <PanelSwitchUncontrolled
         value={useDottedStroke}
         valuePath="pyramidNetSpec.useDottedStroke"
-        onChange={(e) => { setUseDottedStroke(e.target.checked); }}
+        onChange={(e) => { pyramidNetSpec.setUseDottedStroke(e.target.checked); }}
         label="Use dotted stroke"
       />
       {useDottedStroke && (
@@ -37,7 +34,7 @@ export const ScoreControls = observer(() => {
             name="interFaceScoreDashSpec.strokeDashPathPattern.$modelId"
             label="Inter-face stroke dash pattern"
             onChange={(e) => {
-              setInterFaceScoreDashSpecPattern(e.target.value);
+              pyramidNetSpec.setInterFaceScoreDashSpecPattern(e.target.value);
             }}
             options={dashPatternOptions}
           />
@@ -58,7 +55,7 @@ export const ScoreControls = observer(() => {
             name="baseScoreDashSpec.strokeDashPathPattern.$modelId"
             label="Base Stroke Dash Pattern"
             onChange={(e) => {
-              setBaseScoreDashSpecPattern(e.target.value);
+              pyramidNetSpec.setBaseScoreDashSpecPattern(e.target.value);
             }}
             options={dashPatternOptions}
           />

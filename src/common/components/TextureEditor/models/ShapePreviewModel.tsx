@@ -75,6 +75,10 @@ export class ShapePreviewModel extends Model({
 
   controls = null;
 
+  disposers = null;
+
+  animationFrame = null;
+
   // TODO = make this value adjustable with alpha texture on (changes result in loss of shadows;
   IDEAL_RADIUS = 6;
 
@@ -82,13 +86,23 @@ export class ShapePreviewModel extends Model({
 
   MARGIN = 1;
 
+  protected onAttachedToRootStore(): (() => void) | void {
+    // TODO: Can instantiation be deferred until canvas available?
+    return () => {
+      cancelAnimationFrame(this.animationFrame);
+      for (const disposer of this.disposers) {
+        disposer();
+      }
+    };
+  }
+
   @computed
   get canvasDimensions() {
     // defaults allow camera to be initialized before shapePreviewDimensions have been defined
     const {
       width = 1,
       height = 1,
-    } = this.parentTextureEditor.shapePreviewDimensions || {};
+    } = this.parentTextureEditor?.shapePreviewDimensions || {};
     return { width, height };
   }
 
@@ -210,7 +224,7 @@ export class ShapePreviewModel extends Model({
       this.alphaOnChange();
     }
 
-    const disposers = [
+    this.disposers = [
       // update renderer dimensions
       reaction(() => [this.canvasDimensions, this.renderer], () => {
         if (this.renderer) {
@@ -236,26 +250,19 @@ export class ShapePreviewModel extends Model({
 
       // texture change
       reaction(() => {
-        const {
-          faceBoundary: { pathD: boundaryPathD = undefined } = {},
-          texture: {
-            pattern,
-            transform: {
-              rotate = 0, scale = 0, translate = [0, 0],
-            } = {},
-          },
-        } = this.parentTextureEditor;
-        let patternProps = [];
+        const { texture, faceBoundary } = this.parentTextureEditor;
+        const listenProps:any[] = [this.shapeMesh, faceBoundary];
+        if (!texture) { return listenProps; }
+        const { pattern, transform: { transformMatrix } } = texture;
+        listenProps.push(transformMatrix);
         if (pattern instanceof PathFaceDecorationPatternModel) {
-          patternProps = [pattern.isPositive, pattern.pathD];
+          listenProps.push(pattern.isPositive, pattern.pathD);
         } else if (pattern instanceof ImageFaceDecorationPatternModel) {
-          patternProps = [pattern.imageData, pattern.isBordered];
+          listenProps.push(pattern.imageData, pattern.isBordered);
         }
-        return [
-          this.shapeMesh, boundaryPathD, rotate, scale, translate, ...patternProps,
-        ];
-      }, async () => {
-        await this.applyTextureToMesh();
+        return listenProps;
+      }, () => {
+        this.applyTextureToMesh();
       }),
 
       // use alpha change
@@ -265,7 +272,7 @@ export class ShapePreviewModel extends Model({
     ];
 
     // TODO: is IIFE needed here
-    const animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
+    this.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
       const animate = () => {
         controls.update();
         renderer.render(scene, camera);
@@ -273,19 +280,12 @@ export class ShapePreviewModel extends Model({
       };
       return animate;
     })(this.renderer, this.controls, this.camera, this.scene));
-
-    return () => {
-      cancelAnimationFrame(animationFrame);
-      for (const disposer of disposers) {
-        disposer();
-      }
-    };
   }
 
   @modelFlow
   setShape = _async(function* (this, shapeName) {
     const modelUrl = requireStatic(`models/${shapeName}.gltf`);
-    const importScene = yield _await(resolveSceneFromModelPath(this.gltfLoader, modelUrl));
+    const importScene = yield* _await(resolveSceneFromModelPath(this.gltfLoader, modelUrl));
     // @ts-ignore
     const meshChild:Mesh = importScene.children.find((child) => (child as Mesh).isMesh);
     const normalizingScale = this.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
@@ -332,7 +332,7 @@ export class ShapePreviewModel extends Model({
   applyTextureToMesh = _async(function* (this) {
     const {
       shapeMesh,
-      parentTextureEditor: { faceBoundary: { boundingBoxAttrs } },
+      parentTextureEditor: { faceBoundary: { boundingBoxAttrs = undefined } = {} } = {},
     } = this;
     if (!shapeMesh || !boundingBoxAttrs) {
       return;
@@ -353,13 +353,13 @@ export class ShapePreviewModel extends Model({
     this.textureCanvas.setAttribute('width', vbWidth);
     this.textureCanvas.setAttribute('height', vbHeight);
     const ctx = this.textureCanvas.getContext('2d');
-    const v = yield _await(Canvg.from(ctx, svgStr, {
+    const v = yield* _await(Canvg.from(ctx, svgStr, {
       ignoreAnimation: true,
       ignoreMouse: true,
       enableRedraw: false,
     }));
     v.resize(scaleWidth, scaleHeight, 'none');
-    yield _await(v.render());
+    yield* _await(v.render());
     this.shapeMesh.material.map.needsUpdate = true;
   });
 
