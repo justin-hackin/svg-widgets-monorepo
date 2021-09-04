@@ -14,8 +14,7 @@ import { SVGWrapper } from '../data/SVGWrapper';
 import { TextureEditorModel } from '../../../common/components/TextureEditor/models/TextureEditorModel';
 import { TextureFaceDecorationModel } from './TextureFaceDecorationModel';
 import { tryResolvePath } from '../../../common/util/mobx-keystone';
-import { dashPatterns } from '../data/dash-patterns';
-import { DashPatternModel } from '../util/shapes/strokeDashPath';
+import { dashPatterns, StrokeDashPathPatternModel } from '../util/shapes/strokeDashPath';
 
 export const renderTestTabsToString = (widgetStore, preferencesStore): string => ReactDOMServer.renderToString(
   <SVGWrapper>
@@ -40,11 +39,10 @@ export const DecorationBoundarySVG = ({ store }: { store: PyramidNetPluginModel 
 export class PyramidNetPluginModel extends Model({
   pyramidNetSpec: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
   textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),
+  dashPatterns: prop<StrokeDashPathPatternModel[]>(() => dashPatterns),
 }) {
   @observable
   textureEditorOpen = false;
-
-  dashPatterns = dashPatterns.map((pattern) => (new DashPatternModel(pattern)));
 
   @computed
   get shapeDefinition() {

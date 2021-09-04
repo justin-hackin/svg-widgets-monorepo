@@ -17,8 +17,7 @@ export const ScoreControls = observer(() => {
   const { pyramidNetSpec, dashPatterns } = selectedStore;
   const { useDottedStroke, interFaceScoreDashSpec, baseScoreDashSpec } = pyramidNetSpec;
   const dashPatternOptions = dashPatterns
-    .map(({ strokeDashPathPattern }) => strokeDashPathPattern)
-    .map(({ label, $modelId }) => ({ value: $modelId, label }));
+    .map(({ $modelId }) => ({ value: $modelId, label: $modelId }));
   return (
     <>
       <PanelSwitchUncontrolled

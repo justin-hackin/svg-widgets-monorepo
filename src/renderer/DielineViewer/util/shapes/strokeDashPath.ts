@@ -1,11 +1,17 @@
-import { last, range, sum } from 'lodash';
-import { Model, model, prop } from 'mobx-keystone';
+// eslint-disable-next-line max-classes-per-file
+import {
+  chunk, last, range, sum, uniq,
+} from 'lodash';
+import {
+  detach,
+  Model, model, modelAction, prop, Ref, rootRef,
+} from 'mobx-keystone';
 
+import { computed } from 'mobx';
 import {
   distanceFromOrigin, lineLerp, PointLike, subtractPoints,
 } from '../../../../common/util/geom';
 import { PathData } from '../PathData';
-import { StrokeDashPathPatternModel } from '../../data/dash-patterns';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -16,13 +22,52 @@ export function lineSeries(startEndArray) {
   });
   return path;
 }
+const dasharrays = [[1, 2], [2, 1], [1, 3], [3, 1], [2, 1, 1, 1]];
+if (!uniq(dasharrays)) {
+  throw new Error('dasharrays contents are not unique');
+}
+
+const dasharrayLabelMap = (dasharray) => chunk(dasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
+
+const STROKE_DASH_PATH_PATTERN_MODEL_TYPE = 'StrokeDashPathPatternModel';
+
+@model(STROKE_DASH_PATH_PATTERN_MODEL_TYPE)
+export class StrokeDashPathPatternModel extends Model({
+  // TODO: even number length typing?
+  relativeStrokeDasharray: prop<number[]>(),
+}) { }
+
+const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
+  onResolvedValueChange(ref, newInst, oldInst) {
+    if (oldInst && !newInst) {
+      // if the todo value we were referencing disappeared then remove the reference
+      // from its parent
+      detach(ref);
+    }
+  },
+});
+
+export const dashPatterns = dasharrays.map((relativeStrokeDasharray) => (new StrokeDashPathPatternModel({
+  relativeStrokeDasharray,
+  $modelId: dasharrayLabelMap(relativeStrokeDasharray),
+})));
 
 @model('DashPatternModel')
 export class DashPatternModel extends Model({
-  strokeDashPathPattern: prop<StrokeDashPathPatternModel>(),
+  strokeDashPathPatternRef: prop<Ref<StrokeDashPathPatternModel>>(() => patternRef(dashPatterns[0])),
   strokeDashLength: prop(11),
   strokeDashOffsetRatio: prop(0),
-}) {}
+}) {
+  @computed
+  get strokeDashPathPattern() {
+    return this.strokeDashPathPatternRef.current;
+  }
+
+  @modelAction
+  setStrokeDashPathPattern(pattern: StrokeDashPathPatternModel) {
+    this.strokeDashPathPatternRef = patternRef(pattern);
+  }
+}
 
 export function strokeDashPathRatios(
   start: PointLike, end: PointLike, dashSpec: DashPatternModel,

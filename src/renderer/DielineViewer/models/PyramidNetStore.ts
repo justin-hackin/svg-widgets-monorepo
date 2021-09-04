@@ -456,15 +456,15 @@ export class PyramidNetModel extends Model({
 
   @modelAction
   setInterFaceScoreDashSpecPattern(id) {
-    this.interFaceScoreDashSpec.strokeDashPathPattern = resolveId(
+    this.interFaceScoreDashSpec.setStrokeDashPathPattern(resolveId(
       getParent(this), id,
-    );
+    ));
   }
 
   @modelAction
   setBaseScoreDashSpecPattern(id) {
-    this.baseScoreDashSpec.strokeDashPathPattern = resolveId(
+    this.baseScoreDashSpec.setStrokeDashPathPattern(resolveId(
       getParent(this), id,
-    );
+    ));
   }
 }
