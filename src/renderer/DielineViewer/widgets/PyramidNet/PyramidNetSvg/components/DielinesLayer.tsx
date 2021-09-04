@@ -35,7 +35,7 @@ export const DielinesLayer = observer(({
     return null;
   }
   const {
-    textureEditor: { texture },
+    textureEditor: { faceDecoration },
     boundingBox,
     pyramidNetSpec: {
       masterBaseTabCut,
@@ -61,7 +61,7 @@ export const DielinesLayer = observer(({
   // TODO: consider making DRY with PrintLayer
   const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
     ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
-  const fittingBB = (!texture || texture.pattern instanceof PathFaceDecorationPatternModel)
+  const fittingBB = (!faceDecoration || faceDecoration.pattern instanceof PathFaceDecorationPatternModel)
     ? boundingBox : dielineRegistrationBB;
   const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(fittingBB), -1));
 
@@ -143,7 +143,7 @@ export const DielinesLayer = observer(({
         <g transform={fitToCanvasTranslationStr}>
           {/* TODO: consider using something like <Switch>/<ElseIf>, hard to read */}
           {(
-            texture?.pattern instanceof ImageFaceDecorationPatternModel
+            faceDecoration?.pattern instanceof ImageFaceDecorationPatternModel
             && printRegistrationType !== PRINT_REGISTRATION_TYPES.NONE)
           && (printRegistrationType === PRINT_REGISTRATION_TYPES.GRAPHTEC_OPTICAL ? (
             <rect stroke="black" fill="none" {...toRectangleCoordinatesAttrs(printRegistrationBB)} />

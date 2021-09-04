@@ -10,6 +10,7 @@ import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models
 import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
 import { TextureEditorModel } from '../models/TextureEditorModel';
+import { RawFaceDecorationModel } from '../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';
@@ -31,20 +32,23 @@ export const TextureSvgUnobserved = ({
   // must avoid calling useMst (hooks) when using server-side rendering (results in errors about useLayoutEffect)
   const {
     decorationBoundary: { pathD: decorationBoundaryPathD = '' } = {},
-    texture,
+    faceDecoration,
     faceBoundary,
     faceFittingScale,
     placementAreaDimensions,
   } = store || (useWorkspaceMst().selectedStore as PyramidNetPluginModel).textureEditor;
+  if (
+    !decorationBoundaryPathD || faceDecoration instanceof RawFaceDecorationModel
+    || !faceBoundary || !decorationBoundaryPathD
+  ) { return null; }
+
   const isOnScreen = !store;
   const materialColor = isOnScreen ? MUTED_WHITE : WHITE;
 
-  if (!decorationBoundaryPathD) { return null; }
   const {
     scaleDragged, transformOriginDragged, transformMatrixDraggedStr, pattern,
-  } = texture || {};
+  } = faceDecoration || {};
 
-  if (!faceBoundary || !decorationBoundaryPathD) { return null; }
   const scaleAdjust = (scaleDragged * faceFittingScale.scale);
   const FACE_OUTLINE_STROKE = (faceFittingScale.widthIsClamp
     ? placementAreaDimensions.width

@@ -49,6 +49,7 @@ import { SnapMenu } from './components/SnapMenu';
 import { PyramidNetPluginModel } from '../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
+import {RawFaceDecorationModel} from '../../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -96,15 +97,14 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const workspaceStore = useWorkspaceMst();
   const { preferences } = workspaceStore;
   const pluginModel:PyramidNetPluginModel = workspaceStore.selectedStore;
+  const { history } = pluginModel.pyramidNetSpec;
   const { textureEditor } = pluginModel;
   const {
-    texture,
+    faceDecoration,
     showNodes, autoRotatePreview,
     shapePreview: { downloadShapeGLTF },
     shapeName,
-    history,
   } = textureEditor;
-
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
 
@@ -124,12 +124,14 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     </FilePicker>
   ));
 
+  if (faceDecoration instanceof RawFaceDecorationModel) { return null; }
+
   // TODO: add whitespace, improve button definition and input alignment
   return (
     <>
       <AppBar className={classes.textureEditorControls} color="inherit" position="relative">
         <Toolbar
-          className={clsx(classes.textureToolbar, texture && classes.textureToolbarWithTexture)}
+          className={clsx(classes.textureToolbar, faceDecoration && classes.textureToolbarWithTexture)}
           variant="dense"
         >
           {/* web app uses texture editor as standalone component without drawer */}
@@ -170,7 +172,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               );
             })()}
             {/* Menu component emits error when child is React.Fragment */}
-            { texture
+            { faceDecoration
             && [
               (
                 <MenuItem
@@ -250,7 +252,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             value={shapeName}
             onChange={(e) => {
               pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
-              pluginModel.textureEditor.refitTextureToFace();
             }}
             name="polyhedron-shape"
           />
@@ -271,15 +272,15 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
           {history && (<HistoryButtons history={history} />)}
 
-          {texture?.pattern && texture.pattern instanceof ImageFaceDecorationPatternModel && (
+          {faceDecoration?.pattern && faceDecoration.pattern instanceof ImageFaceDecorationPatternModel && (
           <FormControlLabel
             className={TOUR_ELEMENT_CLASSES.IS_BORDERED}
             labelPlacement="top"
             control={(
               <Switch
-                checked={texture.pattern.isBordered}
+                checked={faceDecoration.pattern.isBordered}
                 onChange={(e) => {
-                  (texture.pattern as ImageFaceDecorationPatternModel).setIsBordered(e.target.checked);
+                  (faceDecoration.pattern as ImageFaceDecorationPatternModel).setIsBordered(e.target.checked);
                 }}
                 color="primary"
               />
@@ -289,10 +290,10 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           )}
 
           <SnapMenu />
-          {texture && (
+          {faceDecoration && (
           <>
             {/* menu content at bottom section */}
-            {texture.pattern instanceof PathFaceDecorationPatternModel && (
+            {faceDecoration.pattern instanceof PathFaceDecorationPatternModel && (
             <>
               <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.textureEditorNodeInputs)}>
                 <FormControlLabel
@@ -324,10 +325,10 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 control={(
                   // TODO: casting shouldn't be necessary here for TS type safety
                   <Switch
-                    checked={(texture.pattern as PathFaceDecorationPatternModel).isPositive}
+                    checked={(faceDecoration.pattern as PathFaceDecorationPatternModel).isPositive}
                     onChange={(e) => {
                       // TODO: why is it pattern.isPositive does not need casting but this does
-                      (texture.pattern as PathFaceDecorationPatternModel).setIsPositive(e.target.checked);
+                      (faceDecoration.pattern as PathFaceDecorationPatternModel).setIsPositive(e.target.checked);
                     }}
                     color="primary"
                   />
@@ -339,9 +340,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 labelPlacement="top"
                 control={(
                   <Switch
-                    checked={(texture.pattern as PathFaceDecorationPatternModel).useAlphaTexturePreview}
+                    checked={(faceDecoration.pattern as PathFaceDecorationPatternModel).useAlphaTexturePreview}
                     onChange={(e) => {
-                      (texture.pattern as PathFaceDecorationPatternModel).setUseAlphaTexturePreview(e.target.checked);
+                      (faceDecoration.pattern as PathFaceDecorationPatternModel).setUseAlphaTexturePreview(e.target.checked);
                     }}
                     color="primary"
                   />
@@ -354,13 +355,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             <TextField
               className={clsx(classes.rotationInput, TOUR_ELEMENT_CLASSES.ROTATE_INPUT)}
               label="Rotate"
-              value={texture.transform.rotate}
+              value={faceDecoration.transform.rotate}
               onChange={({ target: { value } = {} }) => {
                 // TODO: use onKeyPress for enter submission
                 // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
                 // TODO: once above is fixed, use textureRotateDragged as value
                 if (isNumber(value) && !isNaN(value)) {
-                  texture.transform.setRotate(value);
+                  faceDecoration.transform.setRotate(value);
                 }
               }}
               InputProps={{
@@ -374,22 +375,23 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               }}
               variant="filled"
             />
-            { IS_ELECTRON_BUILD && (
-            <Tooltip title="Send shape decoration to Dieline Editor" arrow>
-              <span>
-                <IconButton
-                  onClick={() => {
-                    textureEditor.sendTextureToDielineEditor();
-                    pluginModel.setTextureEditorOpen(false);
-                  }}
-                  aria-label="send texture"
-                  component="span"
-                >
-                  <TelegramIcon fontSize="large" />
-                </IconButton>
-              </span>
-            </Tooltip>
-            )}
+            {/* TODO: use draft? */}
+            {/* { IS_ELECTRON_BUILD && ( */}
+            {/* <Tooltip title="Send shape decoration to Dieline Editor" arrow> */}
+            {/*  <span> */}
+            {/*    <IconButton */}
+            {/*      onClick={() => { */}
+            {/*        textureEditor.sendTextureToDielineEditor(); */}
+            {/*        pluginModel.setTextureEditorOpen(false); */}
+            {/*      }} */}
+            {/*      aria-label="send texture" */}
+            {/*      component="span" */}
+            {/*    > */}
+            {/*      <TelegramIcon fontSize="large" /> */}
+            {/*    </IconButton> */}
+            {/*  </span> */}
+            {/* </Tooltip> */}
+            {/* )} */}
           </>
           )}
           { IS_WEB_BUILD && (

@@ -34,6 +34,7 @@ import { TextureEditorModel } from './TextureEditorModel';
 import { EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../constants';
 import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
+import {RawFaceDecorationModel} from '../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -133,14 +134,14 @@ export class ShapePreviewModel extends Model({
 
   @computed
   get resolvedUseAlphaTexturePreview() {
-    return this.parentTextureEditor && this.parentTextureEditor.texture
-      && this.parentTextureEditor.texture.pattern
-      && (this.parentTextureEditor.texture.pattern as PathFaceDecorationPatternModel).useAlphaTexturePreview;
+    return this.parentTextureEditor && this.parentTextureEditor.faceDecoration
+      && this.parentTextureEditor.faceDecoration.pattern
+      && (this.parentTextureEditor.faceDecoration.pattern as PathFaceDecorationPatternModel).useAlphaTexturePreview;
   }
 
   @computed
   get useAlpha() {
-    return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.texture;
+    return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.faceDecoration;
   }
 
   @modelAction
@@ -250,10 +251,10 @@ export class ShapePreviewModel extends Model({
 
       // texture change
       reaction(() => {
-        const { texture, faceBoundary } = this.parentTextureEditor;
+        const { faceDecoration, faceBoundary } = this.parentTextureEditor;
         const listenProps:any[] = [this.shapeMesh, faceBoundary];
-        if (!texture) { return listenProps; }
-        const { pattern, transform: { transformMatrix } } = texture;
+        if (!faceDecoration || faceDecoration instanceof RawFaceDecorationModel) { return listenProps; }
+        const { pattern, transform: { transformMatrix } } = faceDecoration;
         listenProps.push(transformMatrix);
         if (pattern instanceof PathFaceDecorationPatternModel) {
           listenProps.push(pattern.isPositive, pattern.pathD);
@@ -332,9 +333,9 @@ export class ShapePreviewModel extends Model({
   applyTextureToMesh = _async(function* (this) {
     const {
       shapeMesh,
-      parentTextureEditor: { faceBoundary: { boundingBoxAttrs = undefined } = {} } = {},
+      parentTextureEditor: { faceDecoration = undefined, faceBoundary: { boundingBoxAttrs = undefined } = {} } = {},
     } = this;
-    if (!shapeMesh || !boundingBoxAttrs) {
+    if (!shapeMesh || !boundingBoxAttrs || faceDecoration instanceof RawFaceDecorationModel) {
       return;
     }
 

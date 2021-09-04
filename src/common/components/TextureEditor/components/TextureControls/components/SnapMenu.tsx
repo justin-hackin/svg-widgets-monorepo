@@ -17,11 +17,11 @@ export const SnapMenu = observer(() => {
   const { textureEditor } = pluginModel;
 
   const {
-    texture, decorationBoundary,
+    faceDecoration, decorationBoundary,
     selectedTextureNodeIndex, showNodes,
   } = textureEditor;
 
-  if (!texture || !decorationBoundary) {
+  if (!faceDecoration || !decorationBoundary) {
     return null;
   }
 

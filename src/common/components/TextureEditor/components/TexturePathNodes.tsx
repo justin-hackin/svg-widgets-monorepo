@@ -12,18 +12,18 @@ export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { textureEditor } = workspaceStore.selectedStore as PyramidNetPluginModel;
   const {
-    texture, selectedTextureNodeIndex, showNodes, imageCoverScale, nodeScaleMux,
+    faceDecoration, selectedTextureNodeIndex, showNodes, imageCoverScale, nodeScaleMux,
   } = textureEditor;
   const classes = useStyles();
 
-  if (!texture || texture.pattern instanceof ImageFaceDecorationPatternModel || !showNodes) { return null; }
-  const points = (new PathData(texture.pattern.pathD)).getDestinationPoints();
+  if (!faceDecoration || faceDecoration.pattern instanceof ImageFaceDecorationPatternModel || !showNodes) { return null; }
+  const points = (new PathData(faceDecoration.pattern.pathD)).getDestinationPoints();
   return (
     <>
       {
         points.map(({ x: cx, y: cy }, index) => {
           const longerTextureSideLength = imageCoverScale.widthIsClamp
-            ? texture.dimensions.width : texture.dimensions.height;
+            ? faceDecoration.dimensions.width : faceDecoration.dimensions.height;
           return (
             <g key={`${index}--${cx},${cy}`}>
               <circle

@@ -31,7 +31,7 @@ import { degToRad, PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
 import {
   PathFaceDecorationPatternModel,
 } from '../../../common/models/PathFaceDecorationPatternModel';
-import { TextureFaceDecorationModel } from './TextureFaceDecorationModel';
+import { PositionableFaceDecorationModel } from './PositionableFaceDecorationModel';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import { PyramidModel } from './PyramidModel';
 
@@ -56,10 +56,12 @@ export class PyramidNetModel extends Model({
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),
   baseEdgeTabsSpec: prop<BaseEdgeTabsModel>(() => (new BaseEdgeTabsModel({}))),
   shapeHeight: prop(20 * PIXELS_PER_CM),
-  faceDecoration: prop<TextureFaceDecorationModel | RawFaceDecorationModel | null>(),
+  faceDecoration: prop<PositionableFaceDecorationModel | RawFaceDecorationModel>(
+    () => new PositionableFaceDecorationModel({}),
+  ).withSetter(),
   useDottedStroke: prop(false),
-  baseScoreDashSpec: prop<DashPatternModel | null>(null),
-  interFaceScoreDashSpec: prop<DashPatternModel | null>(null),
+  baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
+  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
 }) {
   @observable
   history = undoMiddleware(this);
@@ -366,8 +368,8 @@ export class PyramidNetModel extends Model({
   get texturePathD() {
     if (!this.faceDecoration) { return null; }
 
-    if (this.faceDecoration instanceof TextureFaceDecorationModel) {
-      const { pattern, transform: { transformMatrix } } = this.faceDecoration as TextureFaceDecorationModel;
+    if (this.faceDecoration instanceof PositionableFaceDecorationModel) {
+      const { pattern, transform: { transformMatrix } } = this.faceDecoration as PositionableFaceDecorationModel;
       if (pattern instanceof PathFaceDecorationPatternModel) {
         const { pathD, isPositive } = pattern as PathFaceDecorationPatternModel;
         return getBoundedTexturePathD(
@@ -409,11 +411,16 @@ export class PyramidNetModel extends Model({
 
   @modelAction
   setPyramidShapeName(name: string) {
-    this.faceDecoration = undefined;
     this.pyramid.shapeName = name;
     // all geometries have 1 as option, but different shapes have different divisors > 1
     this.pyramid.netsPerPyramid = 1;
     this.applyShapeBasedDefaults();
+    getParent(this).textureEditor.refitTextureToFace();
+  }
+
+  @modelAction
+  resetFaceDecoration() {
+    this.faceDecoration = new PositionableFaceDecorationModel({});
   }
 
   @modelAction
@@ -430,16 +437,6 @@ export class PyramidNetModel extends Model({
     const inverseAspectRatio = rangeTraversalRatio(MIN_INVERSE_ASPECT, MAX_INVERSE_ASPECT, clampedInverseAspect);
     this.baseEdgeTabsSpec.holeBreadthToHalfWidth = interpolateBetween(MIN_BREADTH, MAX_BREADTH, inverseAspectRatio);
     this.baseEdgeTabsSpec.finOffsetRatio = interpolateBetween(0, 0.8, 1 - inverseAspectRatio);
-  }
-
-  @modelAction
-  setRawFaceDecoration(d) {
-    this.faceDecoration = new RawFaceDecorationModel({ dValue: d });
-  }
-
-  @modelAction
-  setTextureFaceDecoration(snapshot) {
-    this.faceDecoration = new TextureFaceDecorationModel(snapshot);
   }
 
   @modelAction

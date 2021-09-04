@@ -16,7 +16,7 @@ import {
   _Model,
   connectReduxDevTools,
   model,
-  registerRootStore,
+  registerRootStore, detach,
 } from 'mobx-keystone';
 
 import { SVGWrapper } from '../data/SVGWrapper';
@@ -57,7 +57,7 @@ type WidgetOptionsCollection = Record<string, WidgetOptions>;
 export class WorkspaceModel extends Model({
   selectedWidgetName: prop('polyhedral-net'),
   preferences: prop<PreferencesModel>(() => (new PreferencesModel({}))),
-  selectedStore: prop<any>(() => (new PyramidNetPluginModel({}))),
+  selectedStore: prop<any>(() => (new PyramidNetPluginModel({}))).withSetter(),
 }) {
   widgetOptions = {
     'polyhedral-net': PyramidNetOptionsInfo,
@@ -80,11 +80,6 @@ export class WorkspaceModel extends Model({
         // @ts-ignore
         document.title = this.titleBarText;
       }, { fireImmediately: true }),
-
-      // set selected store upon widget change
-      reaction(() => [this.selectedWidgetName], () => {
-        this.selectedStore = new this.selectedWidgetOptions.WidgetModel({});
-      }),
     ];
 
     return () => {
@@ -141,7 +136,7 @@ export class WorkspaceModel extends Model({
 
   @computed
   get selectedShapeName() {
-    return this.selectedStore.shapeDefinition.$modelType;
+    return this.selectedStore?.shapeDefinition?.$modelType;
   }
 
   @computed
@@ -164,13 +159,15 @@ export class WorkspaceModel extends Model({
   setSelectedWidgetName(name) {
     this.selectedWidgetName = name;
     this.clearCurrentFileData();
+    this.resetModelToDefault();
   }
 
   @modelAction
   renderWidgetToString() {
     const { SelectedRawSvgComponent } = this;
+    const { width, height } = this.preferences.dielineDocumentDimensions;
     return ReactDOMServer.renderToString(
-      <SVGWrapper {...this.preferences.dielineDocumentDimensions}>
+      <SVGWrapper width={width} height={height}>
         <SelectedRawSvgComponent
           preferencesStore={this.preferences}
           widgetStore={this.selectedStore}
@@ -188,7 +185,7 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetModelToDefault() {
-    this.selectedStore = new this.selectedWidgetOptions.WidgetModel({});
+    this.setSelectedStore(new this.selectedWidgetOptions.WidgetModel({}));
   }
 
   @modelAction

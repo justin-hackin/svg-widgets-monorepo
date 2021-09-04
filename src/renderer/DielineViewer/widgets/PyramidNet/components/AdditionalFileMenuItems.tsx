@@ -6,11 +6,14 @@ import BlurOnIcon from '@material-ui/icons/BlurOn';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
 import { startCase } from 'lodash';
 
+import { fromSnapshot } from 'mobx-keystone';
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { PyramidNetPluginModel, renderTestTabsToString } from '../../../models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../../../common/util/svg';
 import { useStyles } from '../../../../../common/style/style';
 import { EVENTS, IS_ELECTRON_BUILD } from '../../../../../common/constants';
+import { PositionableFaceDecorationModel } from '../../../models/PositionableFaceDecorationModel';
+import { RawFaceDecorationModel } from '../../../models/RawFaceDecorationModel';
 
 const DOWNLOAD_TEMPLATE_TXT = 'Download face template SVG (current shape)';
 const IMPORT_SVG_DECORATION_TXT = 'Import face cut pattern from SVG';
@@ -19,7 +22,6 @@ const DOWNLOAD_TAB_TESTER_TXT = 'Download tab tester SVG';
 
 export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const workspaceStore = useWorkspaceMst();
-  const { selectedWidgetOptions: { specFileExtension, specFileExtensionName = undefined } } = workspaceStore;
   const preferencesStore = workspaceStore.preferences;
   const classes = useStyles();
   const store = workspaceStore.selectedStore as PyramidNetPluginModel;
@@ -47,9 +49,9 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       <MenuItem onClick={async () => {
         if (IS_ELECTRON_BUILD) {
           await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
-            .then((svgString) => {
-              const d = extractCutHolesFromSvgString(svgString);
-              store.pyramidNetSpec.setRawFaceDecoration(d);
+            .then(({ fileString }) => {
+              const dValue = extractCutHolesFromSvgString(fileString);
+              store.pyramidNetSpec.setFaceDecoration(new RawFaceDecorationModel({ dValue }));
             });
         }
         resetFileMenuRef();
@@ -65,7 +67,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       <MenuItem onClick={async () => {
         const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
           message: IMPORT_TEXTURE_TXT,
-        }, specFileExtension, specFileExtensionName);
+        }, 'pnst', 'Pyramid Net Spec Texture');
         const currentShapeName = store.pyramidNetSpec.pyramid.shapeName;
         resetFileMenuRef();
         if (!res) {
@@ -83,7 +85,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
             return;
           }
         }
-        store.pyramidNetSpec.setTextureFaceDecoration(fileData.textureSnapshot);
+        store.pyramidNetSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(fileData.textureSnapshot));
       }}
       >
         <ListItemIcon className={classes.listItemIcon}>

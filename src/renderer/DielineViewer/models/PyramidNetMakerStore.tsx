@@ -3,7 +3,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import {
-  Model, modelAction, prop, applySnapshot, getSnapshot, model,
+  Model, modelAction, prop, model, fromSnapshot,
 } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
 import { PyramidNetModel } from './PyramidNetStore';
@@ -12,9 +12,9 @@ import { getBoundingBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg
 import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTestTabsSvg';
 import { SVGWrapper } from '../data/SVGWrapper';
 import { TextureEditorModel } from '../../../common/components/TextureEditor/models/TextureEditorModel';
-import { TextureFaceDecorationModel } from './TextureFaceDecorationModel';
 import { tryResolvePath } from '../../../common/util/mobx-keystone';
 import { dashPatterns, StrokeDashPathPatternModel } from '../util/shapes/strokeDashPath';
+import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 
 export const renderTestTabsToString = (widgetStore, preferencesStore): string => ReactDOMServer.renderToString(
   <SVGWrapper>
@@ -37,7 +37,7 @@ export const DecorationBoundarySVG = ({ store }: { store: PyramidNetPluginModel 
 
 @model('PyramidNetPluginModel')
 export class PyramidNetPluginModel extends Model({
-  pyramidNetSpec: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
+  pyramidNetSpec: prop<PyramidNetModel>(() => (new PyramidNetModel({}))).withSetter(),
   textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),
   dashPatterns: prop<StrokeDashPathPatternModel[]>(() => dashPatterns),
 }) {
@@ -56,6 +56,10 @@ export class PyramidNetPluginModel extends Model({
 
   @modelAction
   setTextureEditorOpen(isOpen) {
+    if (this.pyramidNetSpec.faceDecoration instanceof RawFaceDecorationModel) {
+      // texture editor directly references faceDecoration and will not render TextureSvg if it is Raw
+      this.pyramidNetSpec.resetFaceDecoration();
+    }
     this.textureEditorOpen = isOpen;
   }
 
@@ -76,11 +80,6 @@ export class PyramidNetPluginModel extends Model({
 
   @modelAction
   onFileOpen(filePath, fileData) {
-    applySnapshot(this.pyramidNetSpec, fileData);
-    const shouldUpdateTextureEditor = this.pyramidNetSpec.faceDecoration
-      && this.pyramidNetSpec.faceDecoration instanceof TextureFaceDecorationModel;
-    if (shouldUpdateTextureEditor) {
-      this.textureEditor.setTexture(getSnapshot(this.pyramidNetSpec.faceDecoration));
-    }
+    this.setPyramidNetSpec(fromSnapshot<PyramidNetModel>(fileData));
   }
 }

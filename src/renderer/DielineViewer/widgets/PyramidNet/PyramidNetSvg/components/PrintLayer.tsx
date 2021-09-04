@@ -6,7 +6,7 @@ import { closedPolygonPath } from '../../../../util/shapes/generic';
 import {
   ImageFaceDecorationPatternModel,
 } from '../../../../../../common/models/ImageFaceDecorationPatternModel';
-import { TextureFaceDecorationModel } from '../../../../models/TextureFaceDecorationModel';
+import { PositionableFaceDecorationModel } from '../../../../models/PositionableFaceDecorationModel';
 import { theme } from '../../../../../../common/style/style';
 import {
   expandBoundingBoxAttrs,
@@ -52,10 +52,10 @@ export const PrintLayer = observer(({
     ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
   const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(dielineRegistrationBB), -1));
 
-  if (!faceDecoration || !(faceDecoration instanceof TextureFaceDecorationModel)) {
+  if (!faceDecoration || !(faceDecoration instanceof PositionableFaceDecorationModel)) {
     return null;
   }
-  const { pattern, transform: { transformMatrix } } = faceDecoration as TextureFaceDecorationModel;
+  const { pattern, transform: { transformMatrix } } = faceDecoration as PositionableFaceDecorationModel;
   if (!(pattern instanceof ImageFaceDecorationPatternModel)) {
     return null;
   }

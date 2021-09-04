@@ -16,6 +16,7 @@ import { IS_WEB_BUILD } from '../../constants';
 import { PyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { PathFaceDecorationPatternModel } from '../../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../models/ImageFaceDecorationPatternModel';
+import { RawFaceDecorationModel } from '../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
@@ -26,11 +27,10 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const resetStepIndex = () => { setStepIndex(0); };
   const mainAreaRef = useRef<HTMLDivElement>();
   const pyramidNetPluginStore: PyramidNetPluginModel = workspaceStore.selectedStore;
-  if (!pyramidNetPluginStore || !pyramidNetPluginStore.textureEditor) {
-    return null;
-  }
+  const { history } = pyramidNetPluginStore.pyramidNetSpec;
   // ==================================================================================================================
   const { textureEditor } = pyramidNetPluginStore;
+  const { faceDecoration } = textureEditor;
   useTheme();
   const classes = useStyles();
   // Init
@@ -57,6 +57,9 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
     };
   }, []);
 
+  if (!pyramidNetPluginStore?.textureEditor || faceDecoration instanceof RawFaceDecorationModel) {
+    return null;
+  }
   // TODO: drag and drop functionality, removed in fd71f4aba9dd4a698e5a2667595cff82c8fb5cf5
   // see commit message for rationale
 
@@ -65,9 +68,9 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
       preferences.setNeedsTour(false);
       // the user could re-activate the tour, rewind
       resetStepIndex();
-      textureEditor.clearTexture();
-      textureEditor.history.clearUndo();
-      textureEditor.history.clearRedo();
+      textureEditor.clearTexturePattern();
+      history.clearUndo();
+      history.clearRedo();
     } else if (type === EVENTS.STEP_AFTER) {
       if (step.nextAction === STEP_ACTIONS.ADD_PATH_TEXTURE) {
         textureEditor.setTextureFromPattern(new PathFaceDecorationPatternModel(SAMPLE_PATH_SNAPSHOT));

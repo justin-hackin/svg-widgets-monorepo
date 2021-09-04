@@ -12,7 +12,7 @@ import { PyramidNetPluginModel } from '../DielineViewer/models/PyramidNetMakerSt
 export const TextureEditorDrawer = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const pyramidNetPluginStore:PyramidNetPluginModel = workspaceStore.selectedStore;
-
+  if (!pyramidNetPluginStore) { return null; }
   const classes = useStyles();
   return (
     <Drawer

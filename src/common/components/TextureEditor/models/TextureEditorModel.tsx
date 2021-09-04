@@ -1,11 +1,10 @@
 import { inRange } from 'lodash';
 import fileDownload from 'js-file-download';
 import {
-  Model, prop, getSnapshot, model, findParent, undoMiddleware, modelAction,
+  Model, prop, getSnapshot, model, findParent, modelAction, fromSnapshot,
 } from 'mobx-keystone';
-import { computed, observable, reaction } from 'mobx';
+import { computed, observable } from 'mobx';
 import { BoundaryModel } from './BoundaryModel';
-import { TextureModel } from './TextureModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset, RawPoint, scalePoint, sumPoints, transformPoint,
@@ -28,6 +27,9 @@ import {
   PathFaceDecorationPatternModel,
 } from '../../../models/PathFaceDecorationPatternModel';
 import { TransformModel } from '../../../models/TransformModel';
+import {
+  PositionableFaceDecorationModel,
+} from '../../../../renderer/DielineViewer/models/PositionableFaceDecorationModel';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -58,14 +60,10 @@ const specFileExtensionName = 'Texture for Pyramid Net Spec';
 
 @model('TextureEditorModel')
 export class TextureEditorModel extends Model({
-  texture: prop<TextureModel | null>(null),
   viewScale: prop<number>(DEFAULT_VIEW_SCALE),
   shapePreview: prop<ShapePreviewModel>(() => new ShapePreviewModel({})),
   modifierTracking: prop<ModifierTrackingModel>(() => new ModifierTrackingModel({})),
 }) {
-  @observable
-  history = undoMiddleware(this);
-
   @observable
   shapePreviewIsFullScreen = false;
 
@@ -93,25 +91,37 @@ export class TextureEditorModel extends Model({
   @observable
   MAX_VIEW_SCALE = 3;
 
-  @observable
-  decorationBoundary = undefined;
-
   @computed
   get parentPyramidNetPluginModel() {
     return findParent(this, (parentNode) => parentNode instanceof PyramidNetPluginModel);
   }
 
   @computed
+  get pyramidNetSpec() {
+    return this.parentPyramidNetPluginModel.pyramidNetSpec;
+  }
+
+  @computed
+  get faceDecoration() {
+    return this.pyramidNetSpec.faceDecoration;
+  }
+
+  @computed
+  get decorationBoundary() {
+    return new BoundaryModel(this.pyramidNetSpec.normalizedDecorationBoundaryPoints);
+  }
+
+  @computed
   get shapeName() {
-    return this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName;
+    return this.pyramidNetSpec.pyramid.shapeName;
   }
 
   @computed
   get imageCoverScale() {
-    if (!this.decorationBoundary || !this.texture) {
+    if (!this.faceDecoration?.pattern) {
       return undefined;
     }
-    return getCoverScale(this.decorationBoundary.boundingBoxAttrs, this.texture.dimensions);
+    return getCoverScale(this.decorationBoundary.boundingBoxAttrs, this.faceDecoration.dimensions);
   }
 
   @computed
@@ -157,22 +167,24 @@ export class TextureEditorModel extends Model({
 
   @computed
   get selectedTextureNode() {
-    return (this.selectedTextureNodeIndex !== null && this.texture)
-      && this.texture.destinationPoints[this.selectedTextureNodeIndex];
+    return (this.selectedTextureNodeIndex !== null && this.faceDecoration)
+      && this.faceDecoration.destinationPoints[this.selectedTextureNodeIndex];
   }
 
+  // faceBoundary = decorationBoundary + border (if any)
   @computed
   get faceBoundary() {
     if (!this.decorationBoundary || !this.borderToInsetRatio) { return undefined; }
     // TODO: no more dirty type checking
-    const textureIsBordered = this.texture
-      ? (this.texture.pattern as ImageFaceDecorationPatternModel).isBordered : null;
-    if (textureIsBordered === false) {
+    if (
+      this.faceDecoration?.pattern instanceof ImageFaceDecorationPatternModel
+      && !this.faceDecoration.pattern.isBordered
+    ) {
       return this.decorationBoundary;
     }
     const vertices = this.decorationBoundary.vertices
       .map((pt) => sumPoints(scalePoint(pt, this.borderToInsetRatio), this.insetToBorderOffset));
-    return new BoundaryModel({ vertices });
+    return new BoundaryModel(vertices);
   }
 
   @computed
@@ -222,22 +234,23 @@ export class TextureEditorModel extends Model({
   @modelAction
   fitTextureToFace() {
     const { boundingBoxAttrs } = this.decorationBoundary;
-    const { dimensions: textureDimensions } = this.texture;
-    if (!this.texture || !this.decorationBoundary) {
+    const { dimensions: textureDimensions } = this.faceDecoration;
+    if (!this.faceDecoration?.pattern || !this.decorationBoundary) {
       return;
     }
     const { height, width, xmin } = boundingBoxAttrs;
     const { scale, widthIsClamp } = this.imageCoverScale;
-    this.texture.transform.translate = widthIsClamp
-      ? { x: xmin, y: (height - (textureDimensions.height * scale)) / 2 }
-      : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 };
-    this.texture.transform.scale = this.imageCoverScale.scale;
+    this.faceDecoration.transform = new TransformModel({
+      translate: widthIsClamp
+        ? { x: xmin, y: (height - (textureDimensions.height * scale)) / 2 }
+        : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 },
+      scale,
+    });
   }
 
   @modelAction
   refitTextureToFace() {
-    if (this.texture) {
-      this.texture.transform = new TransformModel({});
+    if (this.faceDecoration?.pattern) {
       this.fitTextureToFace();
       this.repositionOriginOverFaceCenter();
     }
@@ -250,21 +263,17 @@ export class TextureEditorModel extends Model({
   }
 
   @modelAction
-  clearTexture() {
-    this.texture = undefined;
+  clearTexturePattern() {
+    this.faceDecoration.setPattern(undefined);
+    this.faceDecoration.setTransform(new TransformModel({}));
   }
 
   @modelAction
   setTextureFromPattern(pattern) {
     this.resetNodesEditor();
-    this.texture = new TextureModel({ pattern });
+    this.faceDecoration.setPattern(pattern);
     this.fitTextureToFace();
     this.repositionOriginOverFaceCenter();
-  }
-
-  @modelAction
-  setTexture(snapshot) {
-    this.texture = snapshot;
   }
 
   @modelAction
@@ -305,8 +314,8 @@ export class TextureEditorModel extends Model({
   translateAbsoluteCoordsToRelative(absCoords) {
     return transformPoint(
       ((new DOMMatrixReadOnly())
-        .scale(this.texture.scaleDragged, this.texture.scaleDragged)
-        .rotate(this.texture.rotateDragged)
+        .scale(this.faceDecoration.scaleDragged, this.faceDecoration.scaleDragged)
+        .rotate(this.faceDecoration.rotateDragged)
         .inverse()),
       this.absoluteMovementToSvg(absCoords),
     );
@@ -314,14 +323,14 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   repositionTextureWithOriginOverPoint(point) {
-    if (!this.texture || !this.decorationBoundary) {
+    if (!this.faceDecoration || !this.decorationBoundary) {
       return;
     }
     const originAbsolute = transformPoint(
-      this.texture.transformMatrixDragged, this.texture.transform.transformOrigin,
+      this.faceDecoration.transformMatrixDragged, this.faceDecoration.transform.transformOrigin,
     );
-    this.texture.transform.translate = sumPoints(
-      this.texture.transform.translate,
+    this.faceDecoration.transform.translate = sumPoints(
+      this.faceDecoration.transform.translate,
       scalePoint(originAbsolute, -1),
       point,
     );
@@ -339,14 +348,14 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   repositionSelectedNodeOverPoint(point) {
-    if (!this.texture || !this.decorationBoundary) {
+    if (!this.faceDecoration || !this.decorationBoundary) {
       return;
     }
     const svgTextureNode = transformPoint(
-      this.texture.transformMatrixDragged, this.selectedTextureNode,
+      this.faceDecoration.transformMatrixDragged, this.selectedTextureNode,
     );
     const diff = sumPoints(svgTextureNode, scalePoint(point, -1));
-    this.texture.transform.translate = sumPoints(scalePoint(diff, -1), this.texture.transform.translate);
+    this.faceDecoration.transform.translate = sumPoints(scalePoint(diff, -1), this.faceDecoration.transform.translate);
   }
 
   @modelAction
@@ -361,24 +370,29 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   repositionOriginOverPoint(point: RawPoint) {
-    if (!this.texture || !this.decorationBoundary) {
+    if (!this.faceDecoration || !this.decorationBoundary) {
       return;
     }
-    this.repositionOriginOverRelativePoint(transformPoint(this.texture.transform.transformMatrix.inverse(), point));
+    this.repositionOriginOverRelativePoint(
+      transformPoint(this.faceDecoration.transform.transformMatrix.inverse(), point),
+    );
   }
 
   @modelAction
   repositionOriginOverRelativePoint(pointRelativeToTexture: RawPoint) {
     const delta = scalePoint(
-      sumPoints(scalePoint(pointRelativeToTexture, -1), this.texture.transform.transformOrigin), -1,
+      sumPoints(scalePoint(pointRelativeToTexture, -1), this.faceDecoration.transform.transformOrigin), -1,
     );
-    const newTransformOrigin = sumPoints(delta, this.texture.transform.transformOrigin);
-    this.texture.transform.translate = sumPoints(
-      this.texture.transform.translate,
-      scalePoint(calculateTransformOriginChangeOffset(this.texture.transform.transformOrigin, newTransformOrigin,
-        this.texture.transform.scale, this.texture.transform.rotate, this.texture.transform.translate), -1),
+    const {
+      transformOrigin, translate, scale, rotate,
+    } = this.faceDecoration.transform;
+    const newTransformOrigin = sumPoints(delta, transformOrigin);
+    this.faceDecoration.transform.translate = sumPoints(
+      translate,
+      scalePoint(calculateTransformOriginChangeOffset(transformOrigin, newTransformOrigin,
+        scale, rotate, translate), -1),
     );
-    this.texture.transform.transformOrigin = newTransformOrigin;
+    this.faceDecoration.transform.transformOrigin = newTransformOrigin;
   }
 
   @modelAction
@@ -393,27 +407,30 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   repositionOriginOverTextureCenter() {
-    if (this.texture) {
-      const { width, height } = this.texture.dimensions;
+    if (this.faceDecoration) {
+      const { width, height } = this.faceDecoration.dimensions;
       this.repositionOriginOverRelativePoint({ x: width / 2, y: height / 2 });
     }
   }
 
-  @modelAction
-  sendTextureToDielineEditor() {
-    if (!this.texture) { return; }
-    this.parentPyramidNetPluginModel.pyramidNetSpec.setTextureFaceDecoration(getSnapshot(this.texture));
-  }
+  // TODO: although it may be ok to directly edit the dieline texture in the texture editor, consider using drafts
+  // @modelAction
+  // sendTextureToDielineEditor() {
+  //   if (!this.texture) { return; }
+  //   this.parentPyramidNetPluginModel.pyramidNetSpec.setFaceDecoration(
+  //     fromSnapshot<PositionableFaceDecorationModel>(getSnapshot(this.texture)),
+  //   );
+  // }
 
   @modelAction
   saveTextureArrangement() {
-    if (!this.texture) { return; }
+    if (!this.faceDecoration) { return; }
     const fileData = {
       shapeName: this.shapeName,
-      textureSnapshot: getSnapshot(this.texture),
+      textureSnapshot: getSnapshot(this.faceDecoration),
     };
     const defaultPath = `${this.shapeName
-    }__${this.texture.pattern.sourceFileName}.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`;
+    }__${this.faceDecoration.pattern.sourceFileName}.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`;
     if (IS_ELECTRON_BUILD) {
       globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_JSON, fileData, {
         message: 'Save texture arrangement',
@@ -427,7 +444,7 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   setTextureFromSnapshot(textureSnapshot) {
-    this.texture = new TextureModel(textureSnapshot);
+    this.pyramidNetSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
   }
 
   // TODO: ts type the patternInfo
@@ -473,21 +490,10 @@ export class TextureEditorModel extends Model({
   onAttachedToRootStore() {
     const SEND_ANALYTICS_INTERVAL_MS = 10000;
     const sendAnaylticsBuffersInterval = setInterval(reportTransformsTally, SEND_ANALYTICS_INTERVAL_MS);
-    const vertices = this.parentPyramidNetPluginModel.pyramidNetSpec.normalizedDecorationBoundaryPoints;
-    const disposers = [
-      reaction(() => [vertices], () => {
-        if (vertices) {
-          this.decorationBoundary = new BoundaryModel({ vertices });
-        }
-      }, { fireImmediately: true }),
-    ];
 
     return () => {
       reportTransformsTally();
       clearInterval(sendAnaylticsBuffersInterval);
-      for (const disposer of disposers) {
-        disposer();
-      }
     };
   }
 }
