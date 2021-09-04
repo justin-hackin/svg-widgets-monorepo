@@ -31,15 +31,19 @@ export const UnlabeledPanelSliderComponent = observer(({
   disabled = false,
 }) => {
   const [historyGroup, setHistoryGroup] = useState(null);
-  // TODO: is this too expensive?
-  const history = getNearestHistoryFromAncestorNode(node);
+  const [history] = useState(getNearestHistoryFromAncestorNode(node));
 
   const endHistoryGroupAndClear = () => {
     historyGroup.end();
     setHistoryGroup(null);
   };
-  const startHistoryGroup = () => {
-    setHistoryGroup(history.createGroup());
+  const getHistoryGroup = () => {
+    if (!historyGroup) {
+      const group = history.createGroup();
+      setHistoryGroup(group);
+      return group;
+    }
+    return historyGroup;
   };
 
   const {
@@ -55,10 +59,7 @@ export const UnlabeledPanelSliderComponent = observer(({
           setValue(val);
           return;
         }
-        if (!historyGroup) {
-          startHistoryGroup();
-        }
-        historyGroup.continue(() => {
+        getHistoryGroup().continue(() => {
           setValue(val);
         });
       }}

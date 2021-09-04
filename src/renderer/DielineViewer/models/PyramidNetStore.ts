@@ -402,7 +402,9 @@ export class PyramidNetModel extends Model({
   }
 
   onAttachedToRootStore() {
-    this.applyShapeBasedDefaults();
+    this.history.withoutUndo(() => {
+      this.applyShapeBasedDefaults();
+    });
   }
 
   @modelAction

@@ -31,6 +31,8 @@ interface NodeWithHistory extends AnyModel {
 }
 
 export function getNearestHistoryFromAncestorNode(node): UndoManager {
-  if (isRoot(node)) { return null; }
-  return findParent(node, (parentNode) => (parentNode as NodeWithHistory).history instanceof UndoManager);
+  const hasHistory = (testNode) => (testNode as NodeWithHistory).history instanceof UndoManager;
+  if (hasHistory(node)) { return node.history; }
+  const parentWithHistory = findParent(node, hasHistory);
+  return parentWithHistory ? parentWithHistory.history : undefined;
 }
