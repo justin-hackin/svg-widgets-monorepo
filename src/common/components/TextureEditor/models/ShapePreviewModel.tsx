@@ -34,7 +34,7 @@ import { TextureEditorModel } from './TextureEditorModel';
 import { EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../constants';
 import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
-import {RawFaceDecorationModel} from '../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
+import { RawFaceDecorationModel } from '../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -219,6 +219,7 @@ export class ShapePreviewModel extends Model({
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enablePan = false;
     this.controls.maxDistance = this.maxCameraRadius;
+    this.controls.autoRotateSpeed = 1.2;
 
     if (this.shapeMesh) {
       // runs when the shape has already been loaded because the router leaves and returns to texture editor
