@@ -185,6 +185,7 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetModelToDefault() {
+    detach(this.selectedStore);
     this.setSelectedStore(new this.selectedWidgetOptions.WidgetModel({}));
   }
 

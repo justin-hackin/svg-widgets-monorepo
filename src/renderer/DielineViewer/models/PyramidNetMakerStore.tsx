@@ -13,7 +13,7 @@ import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTest
 import { SVGWrapper } from '../data/SVGWrapper';
 import { TextureEditorModel } from '../../../common/components/TextureEditor/models/TextureEditorModel';
 import { tryResolvePath } from '../../../common/util/mobx-keystone';
-import { dashPatterns, StrokeDashPathPatternModel } from '../util/shapes/strokeDashPath';
+import { dashPatternsDefaultFn, StrokeDashPathPatternModel } from '../util/shapes/strokeDashPath';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 
 export const renderTestTabsToString = (widgetStore, preferencesStore): string => ReactDOMServer.renderToString(
@@ -39,7 +39,7 @@ export const DecorationBoundarySVG = ({ store }: { store: PyramidNetPluginModel 
 export class PyramidNetPluginModel extends Model({
   pyramidNetSpec: prop<PyramidNetModel>(() => (new PyramidNetModel({}))).withSetter(),
   textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),
-  dashPatterns: prop<StrokeDashPathPatternModel[]>(() => dashPatterns),
+  dashPatterns: prop<StrokeDashPathPatternModel[]>(dashPatternsDefaultFn),
 }) {
   @observable
   textureEditorOpen = false;

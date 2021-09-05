@@ -3,7 +3,7 @@ import {
   chunk, last, range, sum, uniq,
 } from 'lodash';
 import {
-  detach,
+  detach, findParent,
   Model, model, modelAction, prop, Ref, rootRef,
 } from 'mobx-keystone';
 
@@ -12,6 +12,7 @@ import {
   distanceFromOrigin, lineLerp, PointLike, subtractPoints,
 } from '../../../../common/util/geom';
 import { PathData } from '../PathData';
+import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -47,17 +48,25 @@ const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_
   },
 });
 
-export const dashPatterns = dasharrays.map((relativeStrokeDasharray) => (new StrokeDashPathPatternModel({
+export const dashPatternsDefaultFn = () => dasharrays.map((relativeStrokeDasharray) => (new StrokeDashPathPatternModel({
   relativeStrokeDasharray,
   $modelId: dasharrayLabelMap(relativeStrokeDasharray),
 })));
 
 @model('DashPatternModel')
 export class DashPatternModel extends Model({
-  strokeDashPathPatternRef: prop<Ref<StrokeDashPathPatternModel>>(() => patternRef(dashPatterns[0])),
+  strokeDashPathPatternRef: prop<Ref<StrokeDashPathPatternModel>>(),
   strokeDashLength: prop(11),
   strokeDashOffsetRatio: prop(0),
 }) {
+  protected onAttachedToRootStore(): (() => void) | void {
+    const makerStore = findParent<PyramidNetPluginModel>(this,
+      (parentNode) => parentNode instanceof PyramidNetPluginModel);
+    if (makerStore) {
+      this.setStrokeDashPathPattern(makerStore.dashPatterns[0]);
+    }
+  }
+
   @computed
   get strokeDashPathPattern() {
     return this.strokeDashPathPatternRef.current;
