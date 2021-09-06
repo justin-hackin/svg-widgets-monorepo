@@ -16,7 +16,10 @@ export const TexturePathNodes = observer(() => {
   } = textureEditor;
   const classes = useStyles();
 
-  if (!faceDecoration || faceDecoration.pattern instanceof ImageFaceDecorationPatternModel || !showNodes) { return null; }
+  if (
+    !faceDecoration || !showNodes || faceDecoration.pattern instanceof ImageFaceDecorationPatternModel
+  ) { return null; }
+
   const points = (new PathData(faceDecoration.pattern.pathD)).getDestinationPoints();
   return (
     <>

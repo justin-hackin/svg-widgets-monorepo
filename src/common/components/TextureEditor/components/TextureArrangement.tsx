@@ -113,7 +113,9 @@ export const TextureArrangement = observer(() => {
       if (dragMode === DRAG_MODES.ROTATE) {
         faceDecoration.setRotateDiff(transformDiff.rotate + percentHeightDelta * 90);
       } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
-        faceDecoration.setScaleDiff(clamp((percentHeightDelta + 1) * transformDiff.scale, minImageScale, maxImageScale));
+        faceDecoration.setScaleDiff(
+          clamp((percentHeightDelta + 1) * transformDiff.scale, minImageScale, maxImageScale),
+        );
       }
     },
     onWheelEnd: () => {

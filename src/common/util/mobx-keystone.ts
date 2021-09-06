@@ -1,5 +1,5 @@
 import {
-  AnyModel, applyPatches, findParent, getRootPath, isRoot, Path, resolvePath, UndoManager,
+  AnyModel, applyPatches, findParent, getRootPath, Path, resolvePath, UndoManager,
 } from 'mobx-keystone';
 
 export function tryResolvePath<T>(object: object, path: Path): T | undefined {

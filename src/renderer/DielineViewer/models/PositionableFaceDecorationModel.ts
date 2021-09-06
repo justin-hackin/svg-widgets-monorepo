@@ -1,6 +1,5 @@
 // from texture editor send
 import {
-  findParent,
   Model, model, modelAction, prop,
 } from 'mobx-keystone';
 
@@ -16,8 +15,7 @@ import {
   sumPoints,
 } from '../../../common/util/geom';
 import { PathData } from '../util/PathData';
-import { TextureEditorModel } from '../../../common/components/TextureEditor/models/TextureEditorModel';
-import {getNearestHistoryFromAncestorNode} from '../../../common/util/mobx-keystone';
+import { getNearestHistoryFromAncestorNode } from '../../../common/util/mobx-keystone';
 
 // TODO: move to util
 const negativeMod = (n, m) => ((n % m) + m) % m;

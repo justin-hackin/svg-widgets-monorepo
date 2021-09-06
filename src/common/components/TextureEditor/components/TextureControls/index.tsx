@@ -10,14 +10,12 @@ import {
   MenuItem,
   Toolbar,
   AppBar,
-  Tooltip,
   Divider,
   ListItemIcon,
   Typography,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import CachedIcon from '@material-ui/icons/Cached';
-import TelegramIcon from '@material-ui/icons/Telegram';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderIcon from '@material-ui/icons/Folder';
@@ -375,22 +373,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               variant="filled"
             />
             {/* TODO: use draft? */}
-            {/* { IS_ELECTRON_BUILD && ( */}
-            {/* <Tooltip title="Send shape decoration to Dieline Editor" arrow> */}
-            {/*  <span> */}
-            {/*    <IconButton */}
-            {/*      onClick={() => { */}
-            {/*        textureEditor.sendTextureToDielineEditor(); */}
-            {/*        pluginModel.setTextureEditorOpen(false); */}
-            {/*      }} */}
-            {/*      aria-label="send texture" */}
-            {/*      component="span" */}
-            {/*    > */}
-            {/*      <TelegramIcon fontSize="large" /> */}
-            {/*    </IconButton> */}
-            {/*  </span> */}
-            {/* </Tooltip> */}
-            {/* )} */}
           </>
           )}
           { IS_WEB_BUILD && (

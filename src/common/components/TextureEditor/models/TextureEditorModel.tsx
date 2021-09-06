@@ -9,7 +9,7 @@ import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset, RawPoint, scalePoint, sumPoints, transformPoint,
 } from '../../../util/geom';
-import {rendererContainerContext, ShapePreviewModel} from './ShapePreviewModel';
+import { rendererContainerContext, ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
 import {
@@ -88,6 +88,8 @@ export class TextureEditorModel extends Model({
 
   @observable
   MAX_VIEW_SCALE = 3;
+
+  SEND_ANALYTICS_INTERVAL_MS = 10000;
 
   @computed
   get parentPyramidNetPluginModel() {
@@ -491,12 +493,11 @@ export class TextureEditorModel extends Model({
   }
 
   onAttachedToRootStore() {
-    const SEND_ANALYTICS_INTERVAL_MS = 10000;
-    const sendAnaylticsBuffersInterval = setInterval(reportTransformsTally, SEND_ANALYTICS_INTERVAL_MS);
+    const sendAnalyticsBuffersInterval = setInterval(reportTransformsTally, this.SEND_ANALYTICS_INTERVAL_MS);
 
     return () => {
       reportTransformsTally();
-      clearInterval(sendAnaylticsBuffersInterval);
+      clearInterval(sendAnalyticsBuffersInterval);
     };
   }
 }

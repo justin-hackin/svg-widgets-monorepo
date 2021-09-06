@@ -25,7 +25,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import {
-  Model, model, _async, _await, findParent, modelAction, modelFlow, prop, createContext,
+  Model, model, _async, _await, findParent, modelAction, modelFlow, createContext,
 } from 'mobx-keystone';
 import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { boundingBoxAttrsToViewBoxStr } from '../../../util/svg';
