@@ -63,6 +63,7 @@ export class TextureEditorModel extends Model({
   viewScale: prop<number>(DEFAULT_VIEW_SCALE),
   shapePreview: prop<ShapePreviewModel>(() => new ShapePreviewModel({})),
   modifierTracking: prop<ModifierTrackingModel>(() => new ModifierTrackingModel({})),
+  nodeScaleMux: prop(1),
 }) {
   @observable
   shapePreviewIsFullScreen = false;
@@ -78,9 +79,6 @@ export class TextureEditorModel extends Model({
 
   @observable
   showNodes = false;
-
-  @observable
-  nodeScaleMux = 1;
 
   @observable
   selectedTextureNodeIndex = null;

@@ -49,7 +49,7 @@ import { SnapMenu } from './components/SnapMenu';
 import { PyramidNetPluginModel } from '../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
-import {RawFaceDecorationModel} from '../../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
+import { RawFaceDecorationModel } from '../../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
