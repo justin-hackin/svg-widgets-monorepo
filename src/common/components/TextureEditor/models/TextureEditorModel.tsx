@@ -9,7 +9,7 @@ import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset, RawPoint, scalePoint, sumPoints, transformPoint,
 } from '../../../util/geom';
-import { ShapePreviewModel } from './ShapePreviewModel';
+import {rendererContainerContext, ShapePreviewModel} from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
 import {
@@ -61,7 +61,7 @@ const specFileExtensionName = 'Texture for Pyramid Net Spec';
 @model('TextureEditorModel')
 export class TextureEditorModel extends Model({
   viewScale: prop<number>(DEFAULT_VIEW_SCALE),
-  shapePreview: prop<ShapePreviewModel>(() => new ShapePreviewModel({})),
+  shapePreview: prop<ShapePreviewModel | undefined>(),
   modifierTracking: prop<ModifierTrackingModel>(() => new ModifierTrackingModel({})),
   nodeScaleMux: prop(1),
 }) {
@@ -483,6 +483,11 @@ export class TextureEditorModel extends Model({
     // @ts-ignore
     const { fileData } = res;
     this.setTextureArrangementFromFileData(fileData);
+  }
+
+  @modelAction
+  createShapePreview(rendererContainer: HTMLElement) {
+    this.shapePreview = rendererContainerContext.apply(() => new ShapePreviewModel({}), rendererContainer);
   }
 
   onAttachedToRootStore() {

@@ -25,7 +25,7 @@ export const ShapePreview = observer(() => {
   // THREE rendering setup
   useEffect(() => {
     if (!threeContainerRef) { return; }
-    textureEditor.shapePreview.setup(threeContainerRef.current);
+    textureEditor.createShapePreview(threeContainerRef.current);
   }, [threeContainerRef]);
 
   const previewContainer = (

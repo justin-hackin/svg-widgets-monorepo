@@ -102,9 +102,10 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const {
     faceDecoration,
     showNodes, autoRotatePreview,
-    shapePreview: { downloadShapeGLTF },
+    shapePreview,
     shapeName,
   } = textureEditor;
+
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
 
@@ -124,7 +125,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     </FilePicker>
   ));
 
-  if (faceDecoration instanceof RawFaceDecorationModel) { return null; }
+  if (faceDecoration instanceof RawFaceDecorationModel || !shapePreview) { return null; }
 
   // TODO: add whitespace, improve button definition and input alignment
   return (
@@ -190,7 +191,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 <MenuItem
                   key={1}
                   onClick={async () => {
-                    await downloadShapeGLTF();
+                    await shapePreview.downloadShapeGLTF();
                     resetFileMenuRef();
                   }}
                 >

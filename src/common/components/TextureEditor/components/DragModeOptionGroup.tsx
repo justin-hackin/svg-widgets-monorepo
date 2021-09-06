@@ -13,7 +13,6 @@ import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { useStyles } from '../../../style/style';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
 
-// TODO: remove hover effects
 const extraButtonProps = {
   disableFocusRipple: true,
   disableRipple: true,

@@ -32,10 +32,8 @@ interface ModeDef {
   keysHeld: string[]
 }
 
-// TODO: why can't the model returned from keyTrackingModelFactory be decorated with @model
 @model('ModifierTrackingModel')
 export class ModifierTrackingModel extends Model({
-  // TODO: why does behaviour change when this is moved into a plain observable
 }) {
   @observable
   keysHeld = {} as Record<string, boolean>;

@@ -25,7 +25,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import {
-  Model, model, _async, _await, findParent, modelAction, modelFlow,
+  Model, model, _async, _await, findParent, modelAction, modelFlow, prop, createContext,
 } from 'mobx-keystone';
 import { TextureSvgUnobserved } from '../components/TextureSvg';
 import { boundingBoxAttrsToViewBoxStr } from '../../../util/svg';
@@ -42,9 +42,10 @@ const resolveSceneFromModelPath = (gltfLoader, path) => (new Promise((resolve, r
   gltfLoader.load(path, ({ scene }) => { resolve(scene); }, null, (e) => { reject(e); });
 }));
 
+export const rendererContainerContext = createContext<HTMLElement>();
+
 @model('ShapePreviewModel')
 export class ShapePreviewModel extends Model({
-
 }) {
   @observable
   shapeMesh = null;
@@ -88,10 +89,116 @@ export class ShapePreviewModel extends Model({
   MARGIN = 1;
 
   protected onAttachedToRootStore(): (() => void) | void {
+    const rendererContainer = rendererContainerContext.get(this);
+    this.renderer = new WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      preserveDrawingBuffer: true,
+    });
+    this.scene = new Scene();
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = BasicShadowMap;
+    rendererContainer.appendChild(this.renderer.domElement);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+
+    this.ambientLight = new AmbientLight(this.lightColor);
+    this.ambientLight.intensity = 2;
+    this.scene.add(this.ambientLight);
+
+    // alphaOnChange will add/remove as needed
+    const sphereGeometry = new SphereGeometry(this.sphereRadius, 20, 20);
+    const sphereMaterial = new MeshPhongMaterial({
+      color: 0xff0000,
+      shininess: 10,
+      specular: 0x111111,
+      side: BackSide,
+    });
+    this.castSphere = new Mesh(sphereGeometry, sphereMaterial);
+    this.castSphere.receiveShadow = true;
+
+    // this will only be added to the scene if useAlpha === true
+    this.internalLight = new PointLight(this.lightColor, 3, 20);
+    this.internalLight.castShadow = true;
+    this.internalLight.shadow.camera.near = 0.1;
+    this.internalLight.shadow.camera.far = this.sphereRadius + this.MARGIN;
+    this.internalLight.shadow.bias = -0.005;
+
+    this.camera = new PerspectiveCamera(
+      60, this.canvasDimensions.width / this.canvasDimensions.height, 0.1, this.cameraFar,
+    );
+    this.camera.position.set(0, 0, this.cameraRadius);
+
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enablePan = false;
+    this.controls.maxDistance = this.maxCameraRadius;
+    this.controls.autoRotateSpeed = 1.2;
+
+    if (this.shapeMesh) {
+      // runs when the shape has already been loaded because the router leaves and returns to texture editor
+      this.alphaOnChange();
+    }
+
+    const disposers = [
+      // update renderer dimensions
+      reaction(() => [this.canvasDimensions, this.renderer], () => {
+        if (this.renderer) {
+          const {
+            width,
+            height,
+          } = this.canvasDimensions;
+          this.renderer.setSize(width, height);
+          this.camera.aspect = width / height;
+          this.camera.updateProjectionMatrix();
+        }
+      }, { fireImmediately: true }),
+
+      // auto rotate update controls
+      reaction(() => [this.parentTextureEditor.autoRotatePreview], () => {
+        this.controls.autoRotate = this.parentTextureEditor.autoRotatePreview;
+      }, { fireImmediately: true }),
+
+      // shape change
+      reaction(() => [this.parentTextureEditor.shapeName], async () => {
+        await this.setShape(this.parentTextureEditor.shapeName);
+      }, { fireImmediately: true }),
+
+      // texture change
+      reaction(() => {
+        const { faceDecoration, faceBoundary } = this.parentTextureEditor;
+        const listenProps:any[] = [this.shapeMesh, faceBoundary];
+        if (!faceDecoration || faceDecoration instanceof RawFaceDecorationModel) { return listenProps; }
+        const { pattern, transform: { transformMatrix } } = faceDecoration;
+        listenProps.push(transformMatrix);
+        if (pattern instanceof PathFaceDecorationPatternModel) {
+          listenProps.push(pattern.isPositive, pattern.pathD);
+        } else if (pattern instanceof ImageFaceDecorationPatternModel) {
+          listenProps.push(pattern.imageData, pattern.isBordered);
+        }
+        return listenProps;
+      }, () => {
+        this.applyTextureToMesh();
+      }),
+
+      // use alpha change
+      reaction(() => [this.resolvedUseAlphaTexturePreview, this.useAlpha], () => {
+        this.alphaOnChange();
+      }),
+    ];
+
+    // TODO: is IIFE needed here
+    this.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
+      const animate = () => {
+        controls.update();
+        renderer.render(scene, camera);
+        window.requestAnimationFrame(animate);
+      };
+      return animate;
+    })(this.renderer, this.controls, this.camera, this.scene));
+
     // TODO: Can instantiation be deferred until canvas available?
     return () => {
       cancelAnimationFrame(this.animationFrame);
-      for (const disposer of this.disposers) {
+      for (const disposer of disposers) {
         disposer();
       }
     };
@@ -174,114 +281,6 @@ export class ShapePreviewModel extends Model({
       this.scene.remove(this.internalLight);
     }
     this.shapeMesh.castShadow = this.useAlpha;
-  }
-
-  @modelAction
-  setup(rendererContainer) {
-    this.renderer = new WebGLRenderer({
-      alpha: true,
-      antialias: true,
-      preserveDrawingBuffer: true,
-    });
-    this.scene = new Scene();
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = BasicShadowMap;
-    rendererContainer.appendChild(this.renderer.domElement);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-
-    this.ambientLight = new AmbientLight(this.lightColor);
-    this.ambientLight.intensity = 2;
-    this.scene.add(this.ambientLight);
-
-    // alphaOnChange will add/remove as needed
-    const sphereGeometry = new SphereGeometry(this.sphereRadius, 20, 20);
-    const sphereMaterial = new MeshPhongMaterial({
-      color: 0xff0000,
-      shininess: 10,
-      specular: 0x111111,
-      side: BackSide,
-    });
-    this.castSphere = new Mesh(sphereGeometry, sphereMaterial);
-    this.castSphere.receiveShadow = true;
-
-    // this will only be added to the scene if useAlpha === true
-    this.internalLight = new PointLight(this.lightColor, 3, 20);
-    this.internalLight.castShadow = true;
-    this.internalLight.shadow.camera.near = 0.1;
-    this.internalLight.shadow.camera.far = this.sphereRadius + this.MARGIN;
-    this.internalLight.shadow.bias = -0.005;
-
-    this.camera = new PerspectiveCamera(
-      60, this.canvasDimensions.width / this.canvasDimensions.height, 0.1, this.cameraFar,
-    );
-    this.camera.position.set(0, 0, this.cameraRadius);
-
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.enablePan = false;
-    this.controls.maxDistance = this.maxCameraRadius;
-    this.controls.autoRotateSpeed = 1.2;
-
-    if (this.shapeMesh) {
-      // runs when the shape has already been loaded because the router leaves and returns to texture editor
-      this.alphaOnChange();
-    }
-
-    this.disposers = [
-      // update renderer dimensions
-      reaction(() => [this.canvasDimensions, this.renderer], () => {
-        if (this.renderer) {
-          const {
-            width,
-            height,
-          } = this.canvasDimensions;
-          this.renderer.setSize(width, height);
-          this.camera.aspect = width / height;
-          this.camera.updateProjectionMatrix();
-        }
-      }, { fireImmediately: true }),
-
-      // auto rotate update controls
-      reaction(() => [this.parentTextureEditor.autoRotatePreview], () => {
-        this.controls.autoRotate = this.parentTextureEditor.autoRotatePreview;
-      }, { fireImmediately: true }),
-
-      // shape change
-      reaction(() => [this.parentTextureEditor.shapeName], async () => {
-        await this.setShape(this.parentTextureEditor.shapeName);
-      }, { fireImmediately: true }),
-
-      // texture change
-      reaction(() => {
-        const { faceDecoration, faceBoundary } = this.parentTextureEditor;
-        const listenProps:any[] = [this.shapeMesh, faceBoundary];
-        if (!faceDecoration || faceDecoration instanceof RawFaceDecorationModel) { return listenProps; }
-        const { pattern, transform: { transformMatrix } } = faceDecoration;
-        listenProps.push(transformMatrix);
-        if (pattern instanceof PathFaceDecorationPatternModel) {
-          listenProps.push(pattern.isPositive, pattern.pathD);
-        } else if (pattern instanceof ImageFaceDecorationPatternModel) {
-          listenProps.push(pattern.imageData, pattern.isBordered);
-        }
-        return listenProps;
-      }, () => {
-        this.applyTextureToMesh();
-      }),
-
-      // use alpha change
-      reaction(() => [this.resolvedUseAlphaTexturePreview, this.useAlpha], () => {
-        this.alphaOnChange();
-      }),
-    ];
-
-    // TODO: is IIFE needed here
-    this.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
-      const animate = () => {
-        controls.update();
-        renderer.render(scene, camera);
-        window.requestAnimationFrame(animate);
-      };
-      return animate;
-    })(this.renderer, this.controls, this.camera, this.scene));
   }
 
   @modelFlow
