@@ -323,12 +323,10 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 className={TOUR_ELEMENT_CLASSES.FILL_IS_POSITIVE}
                 labelPlacement="top"
                 control={(
-                  // TODO: casting shouldn't be necessary here for TS type safety
                   <Switch
-                    checked={(faceDecoration.pattern as PathFaceDecorationPatternModel).isPositive}
+                    checked={faceDecoration.pattern.isPositive}
                     onChange={(e) => {
-                      // TODO: why is it pattern.isPositive does not need casting but this does
-                      (faceDecoration.pattern as PathFaceDecorationPatternModel).setIsPositive(e.target.checked);
+                      faceDecoration.pattern.setIsPositive(e.target.checked);
                     }}
                     color="primary"
                   />
@@ -340,9 +338,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 labelPlacement="top"
                 control={(
                   <Switch
-                    checked={(faceDecoration.pattern as PathFaceDecorationPatternModel).useAlphaTexturePreview}
+                    checked={faceDecoration.pattern.useAlphaTexturePreview}
                     onChange={(e) => {
-                      (faceDecoration.pattern as PathFaceDecorationPatternModel).setUseAlphaTexturePreview(e.target.checked);
+                      faceDecoration.pattern.setUseAlphaTexturePreview(e.target.checked);
                     }}
                     color="primary"
                   />
