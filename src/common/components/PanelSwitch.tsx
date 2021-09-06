@@ -32,7 +32,7 @@ export const PanelSwitchUncontrolled = observer(({
   );
 });
 
-export const PanelSwitch = ({ node, property, label = undefined }) => {
+export const PanelSwitch = observer(({ node, property, label = undefined }) => {
   const {
     value, setValue, valuePath,
   } = mstDataToProps(node, property);
@@ -48,4 +48,4 @@ export const PanelSwitch = ({ node, property, label = undefined }) => {
       }}
     />
   );
-};
+});

@@ -78,22 +78,19 @@ export const DielinesLayer = observer(({
       <g id={DECORATION_CUT_ID}>
         {faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
           ? (
-            <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
+            <g key={`${index}-decoration`} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
               {texturePathD && (
               <path d={texturePathD} transform={pathScaleMatrix.toString()} {...cutProps} />
               )}
             </g>
-
           ) : (
-            <>
-              <use
-                key={`${index}-decoration`}
-                xlinkHref={`#${CUT_HOLES_ID}`}
-                transform={
+            <use
+              key={`${index}-decoration`}
+              xlinkHref={`#${CUT_HOLES_ID}`}
+              transform={
                     cloneTransformMatrix.toString()
                   }
-              />
-            </>
+            />
           )))}
       </g>
     );
