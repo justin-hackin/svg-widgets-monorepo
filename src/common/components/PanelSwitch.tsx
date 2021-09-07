@@ -22,7 +22,7 @@ export const PanelSwitchUncontrolled = observer(({
         {label}
       </Typography>
       <Switch
-        value={value}
+        checked={value}
         name={valuePath}
         aria-labelledby={labelId}
         color="primary"
