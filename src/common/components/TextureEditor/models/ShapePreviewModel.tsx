@@ -241,14 +241,12 @@ export class ShapePreviewModel extends Model({
 
   @computed
   get resolvedUseAlphaTexturePreview() {
-    return this.parentTextureEditor && this.parentTextureEditor.faceDecoration
-      && this.parentTextureEditor.faceDecoration.pattern
-      && (this.parentTextureEditor.faceDecoration.pattern as PathFaceDecorationPatternModel).useAlphaTexturePreview;
+    return (this.parentTextureEditor.faceDecoration?.pattern as PathFaceDecorationPatternModel)?.useAlphaTexturePreview;
   }
 
   @computed
   get useAlpha() {
-    return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.faceDecoration;
+    return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.faceDecoration.pattern;
   }
 
   @modelAction
