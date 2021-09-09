@@ -24,7 +24,7 @@ import {
 } from '../util/shapes/ascendantEdgeConnectionTabs';
 import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../util/shapes/baseEdgeConnectionTab';
 import { DashPatternModel, defaultStrokeDashSpec, strokeDashPath } from '../util/shapes/strokeDashPath';
-import { boundingViewBoxAttrs } from '../../../common/util/svg';
+import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { StrokeDashPathPatternModel } from '../data/dash-patterns';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
@@ -179,8 +179,8 @@ export const PyramidNetModel = types.model('Pyramid Net', {
 
     get borderToInsetRatio() {
       const insetPolygonPoints = offsetPolygonPoints(this.faceBoundaryPoints, -this.ascendantEdgeTabDepth);
-      return boundingViewBoxAttrs(closedPolygonPath(this.faceBoundaryPoints).getD()).width
-        / boundingViewBoxAttrs(closedPolygonPath(insetPolygonPoints).getD()).width;
+      return getBoundingBoxAttrs(closedPolygonPath(this.faceBoundaryPoints).getD()).width
+        / getBoundingBoxAttrs(closedPolygonPath(insetPolygonPoints).getD()).width;
     },
 
     get insetToBorderOffset() {

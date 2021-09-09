@@ -1,7 +1,7 @@
 import React from 'react';
 import { svgPathBbox } from 'svg-path-bbox';
 
-// @ts-ignore
+import { PathData } from '../../renderer/DielineViewer/util/PathData';
 
 const parseString = (str) => {
   const parser = new window.DOMParser();
@@ -31,7 +31,7 @@ export const getDimensionsFromPathD = (d) => {
   };
 };
 
-interface ViewBoxAttrs {
+interface BoundingBoxAttrs {
   xmin: number
   ymin: number
   xmax: number
@@ -40,13 +40,49 @@ interface ViewBoxAttrs {
   height: number
 }
 
-export const boundingViewBoxAttrs = (pathD:string):ViewBoxAttrs => {
+export const getBoundingBoxAttrs = (pathD:string):BoundingBoxAttrs => {
   const [xmin, ymin, xmax, ymax] = svgPathBbox(pathD);
   return {
     xmin, ymin, xmax, ymax, width: xmax - xmin, height: ymax - ymin,
   };
 };
+export const toRectangleCoordinatesAttrs = (bb: BoundingBoxAttrs) => ({
+  width: bb.width, height: bb.height, x: bb.xmin, y: bb.ymin,
+});
 
-export const viewBoxAttrsToString = (vb:ViewBoxAttrs) => `${vb.xmin} ${vb.ymin} ${vb.width} ${vb.height}`;
+export const expandBoundingBoxAttrs = (vb: BoundingBoxAttrs, margin: number) => ({
+  xmin: vb.xmin - margin,
+  ymin: vb.ymin - margin,
+  xmax: vb.xmax + margin,
+  ymax: vb.ymax + margin,
+  width: vb.width + 2 * margin,
+  height: vb.height + 2 * margin,
+});
 
-export const pathDToViewBoxStr = (d:string) => viewBoxAttrsToString(boundingViewBoxAttrs(d));
+export const boundingBoxMinPoint = (bb: BoundingBoxAttrs) => ({ x: bb.xmin, y: bb.ymin });
+export const viewBoxMaxPoint = (bb: BoundingBoxAttrs) => ({ x: bb.xmax, y: bb.ymax });
+
+export const boundingBoxAttrsToViewBoxStr = (bb:BoundingBoxAttrs) => `${bb.xmin} ${bb.ymin} ${bb.width} ${bb.height}`;
+
+export const pathDToViewBoxStr = (d:string) => boundingBoxAttrsToViewBoxStr(getBoundingBoxAttrs(d));
+
+export const registrationMarksPath = (bb: BoundingBoxAttrs, markLength: number, facingOutward = false) => {
+  const markOffset = facingOutward ? -1 * markLength : markLength;
+  const topLegsBottom = bb.ymin + markOffset;
+  const bottomLegsTop = bb.ymax - markOffset;
+  const leftLegsRight = bb.xmin + markOffset;
+  const rightLegsLeft = bb.xmax - markOffset;
+  return (new PathData())
+    .move({ x: bb.xmin, y: topLegsBottom })
+    .line(boundingBoxMinPoint(bb))
+    .line({ x: leftLegsRight, y: bb.ymin })
+    .move({ x: rightLegsLeft, y: bb.ymin })
+    .line({ x: bb.xmax, y: bb.ymin })
+    .line({ x: bb.xmax, y: topLegsBottom })
+    .move({ x: bb.xmax, y: bottomLegsTop })
+    .line(viewBoxMaxPoint(bb))
+    .line({ x: rightLegsLeft, y: bb.ymax })
+    .move({ x: leftLegsRight, y: bb.ymax })
+    .line({ x: bb.xmin, y: bb.ymax })
+    .line({ x: bb.xmin, y: bottomLegsTop });
+};

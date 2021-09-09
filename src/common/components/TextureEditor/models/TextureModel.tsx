@@ -29,11 +29,8 @@ export const transformDiffDefaults = {
 export const TextureModel = TextureFaceDecorationModel
   .volatile(() => ({ ...transformDiffDefaults }))
   .views((self) => ({
-    get hasPathPattern() {
-      return getType(self.pattern) === PathFaceDecorationPatternModel;
-    },
     get dimensions() {
-      if (this.hasPathPattern) {
+      if (self.hasPathPattern) {
         const { pathD } = self.pattern as IPathFaceDecorationPatternModel;
         return getDimensionsFromPathD(pathD);
       }
@@ -62,7 +59,7 @@ export const TextureModel = TextureFaceDecorationModel
       return this.transformMatrixDragged && this.transformMatrixDragged.toString();
     },
     get destinationPoints() {
-      if (!this.hasPathPattern) {
+      if (!self.hasPathPattern) {
         return null;
       }
       const { pathD } = self.pattern as IPathFaceDecorationPatternModel;

@@ -8,7 +8,7 @@ import React from 'react';
 import { polyhedra } from '../data/polyhedra';
 import { PyramidNetModel } from './PyramidNetStore';
 import { closedPolygonPath } from '../util/shapes/generic';
-import { boundingViewBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
+import { getBoundingBoxAttrs, pathDToViewBoxStr } from '../../../common/util/svg';
 import { dashPatterns, DashPatternsModel } from '../data/dash-patterns';
 import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTestTabsSvg';
 import { SVGWrapper } from '../data/SVGWrapper';
@@ -41,9 +41,8 @@ export const PyramidNetPluginModel = types.model('PyramidNetFactory', {
       return self.pyramidNetSpec;
     },
 
-    get fitToCanvasTranslationStr() {
-      const { xmin, ymin } = boundingViewBoxAttrs(self.pyramidNetSpec.netPaths.cut.getD());
-      return `translate(${-xmin}, ${-ymin})`;
+    get boundingBox() {
+      return getBoundingBoxAttrs(self.pyramidNetSpec.netPaths.cut.getD());
     },
   })).actions((self) => ({
     setTextureEditorOpen(isOpen) {

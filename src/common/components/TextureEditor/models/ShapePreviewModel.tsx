@@ -28,9 +28,9 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import { TextureSvgUnobserved } from '../components/TextureSvg';
-import { viewBoxAttrsToString } from '../../../util/svg';
+import { boundingBoxAttrsToViewBoxStr } from '../../../util/svg';
 import requireStatic from '../../../../renderer/requireStatic';
-import { TextureEditorModel } from './TextureEditorModel';
+import { ITextureEditorModel, TextureEditorModel } from './TextureEditorModel';
 import { EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../constants';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
@@ -104,22 +104,22 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
     applyTextureToMesh: flow(function* () {
       const {
         shapeMesh,
-        parentTextureEditor: { faceBoundary: { viewBoxAttrs } },
+        parentTextureEditor: { faceBoundary: { boundingBoxAttrs } },
       } = self;
-      if (!shapeMesh || !viewBoxAttrs) {
+      if (!shapeMesh || !boundingBoxAttrs) {
         return;
       }
 
       const svgStr = ReactDOMServer.renderToString(
         React.createElement(TextureSvgUnobserved, {
-          viewBox: viewBoxAttrsToString(viewBoxAttrs),
+          viewBox: boundingBoxAttrsToViewBoxStr(boundingBoxAttrs),
           store: self.parentTextureEditor,
         }),
       );
       const {
         width: vbWidth,
         height: vbHeight,
-      } = viewBoxAttrs;
+      } = boundingBoxAttrs;
       const scaleWidth = npot(vbWidth * self.TEXTURE_BITMAP_SCALE);
       const scaleHeight = npot(vbHeight * self.TEXTURE_BITMAP_SCALE);
       self.textureCanvas.setAttribute('width', vbWidth);
@@ -273,7 +273,7 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
       self.disposers.push(reaction(() => {
         const {
           texture: {
-            transformMatrixDraggedStr = undefined,
+            rotate = 0, scale = 0, translate = [0, 0],
             faceBoundary: { pathD: boundaryPathD = undefined } = {},
             pattern: {
               isPositive = undefined,
@@ -282,9 +282,9 @@ export const ShapePreviewModel = types.model('ShapePreview', {})
               isBordered = undefined,
             } = {},
           } = {},
-        } = self.parentTextureEditor;
+        } = self.parentTextureEditor as ITextureEditorModel;
         return [
-          self.shapeMesh, boundaryPathD, isPositive, patternPathD, imageData, isBordered, transformMatrixDraggedStr,
+          self.shapeMesh, boundaryPathD, isPositive, patternPathD, imageData, isBordered, rotate, scale, translate,
         ];
       }, () => {
         self.applyTextureToMesh();

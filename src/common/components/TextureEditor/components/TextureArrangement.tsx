@@ -4,14 +4,19 @@ import { clamp } from 'lodash';
 import { Paper } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
-import { viewBoxAttrsToString } from '../../../util/svg';
+import { boundingBoxAttrsToViewBoxStr } from '../../../util/svg';
 import { TextureSvg } from './TextureSvg';
 import { DRAG_MODES } from '../models/ModifierTrackingModel';
 import { castCoordToRawPoint } from '../../../util/geom';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { ANALYTICS_BUFFERED_EVENTS } from '../../../util/analytics';
+import {
+  incrementTransformTracking,
+  TRANSFORM_METHODS,
+  TRANSFORM_OPERATIONS,
+} from '../../../util/analytics';
 import { TOUR_ELEMENT_CLASSES } from '../../../util/tour';
+import { DragModeOptionsGroup } from './DragModeOptionGroup';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -25,7 +30,6 @@ export const TextureArrangement = observer(() => {
     minImageScale, maxImageScale,
     viewScaleDiff, setViewScaleDiff, reconcileViewScaleDiff,
     modifierTracking: { dragMode = undefined } = {},
-    incrementTransformsBuffer,
   } = pyramidNetPluginStore.textureEditor || {};
   const {
     translateDiff, setTranslateDiff, setRotateDiff, setScaleDiff, setTransformOriginDiff,
@@ -40,7 +44,7 @@ export const TextureArrangement = observer(() => {
         setViewScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
       } else {
         reconcileViewScaleDiff();
-        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.DRAG_SCALE_VIEW);
+        incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.SCALE_VIEW);
       }
     }
 
@@ -63,8 +67,8 @@ export const TextureArrangement = observer(() => {
         // could lead to false categorization but it's unlikely that the drag diff would be exactly 0 for either axis
         // if dragMode is TRANSLATE
         const translateType = (translateDiff.x === 0 || translateDiff.y === 0)
-          ? ANALYTICS_BUFFERED_EVENTS.DRAG_TRANSLATE_AXIS : ANALYTICS_BUFFERED_EVENTS.DRAG_TRANSLATE;
-        incrementTransformsBuffer(translateType);
+          ? TRANSFORM_OPERATIONS.TRANSLATE_TEXTURE_ALONG_AXIS : TRANSFORM_OPERATIONS.TRANSLATE_TEXTURE;
+        incrementTransformTracking(TRANSFORM_METHODS.DRAG, translateType);
         reconcileTranslateDiff();
       }
     } else if (dragMode === DRAG_MODES.ROTATE) {
@@ -72,14 +76,14 @@ export const TextureArrangement = observer(() => {
         setRotateDiff((movementPt.y / placementAreaDimensions.height) * 360);
       } else {
         reconcileRotateDiff();
-        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.DRAG_ROTATE);
+        incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.ROTATE_TEXTURE);
       }
     } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
       if (down) {
         setScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
       } else {
         reconcileScaleDiff();
-        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.DRAG_SCALE_TEXTURE);
+        incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.SCALE_TEXTURE);
       }
     }
   });
@@ -93,7 +97,7 @@ export const TextureArrangement = observer(() => {
       setTransformOriginDiff(castCoordToRawPoint(relDelta));
     } else {
       reconcileTransformOriginDiff();
-      incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.DRAG_ORIGIN);
+      incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.DRAG_ORIGIN);
     }
   });
 
@@ -118,43 +122,46 @@ export const TextureArrangement = observer(() => {
       if (!placementAreaDimensions || !decorationBoundary) { return; }
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
         reconcileViewScaleDiff();
-        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.SCROLL_SCALE_VIEW);
+        incrementTransformTracking(TRANSFORM_METHODS.SCROLL, TRANSFORM_OPERATIONS.SCALE_VIEW);
       }
       if (!texture) { return; }
       if (dragMode === DRAG_MODES.ROTATE) {
         reconcileRotateDiff();
-        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.SCROLL_ROTATE);
+        incrementTransformTracking(TRANSFORM_METHODS.SCROLL, TRANSFORM_OPERATIONS.ROTATE_TEXTURE);
       } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
         reconcileScaleDiff();
-        incrementTransformsBuffer(ANALYTICS_BUFFERED_EVENTS.SCROLL_SCALE_TEXTURE);
+        incrementTransformTracking(TRANSFORM_METHODS.SCROLL, TRANSFORM_OPERATIONS.SCALE_TEXTURE);
       }
     },
   });
   if (!placementAreaDimensions || !decorationBoundary) { return null; }
 
   return (
-    <Paper
-      className={TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}
+    <>
+      <DragModeOptionsGroup dragMode={dragMode} />
+      <Paper
+        className={TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}
       // @ts-ignore
-      component="svg"
-      square
-      elevation={10}
-      width="100%"
-      height="100%"
-      style={{ overflow: 'hidden' }}
-      {...viewUseWheel()}
-      {...textureTransformationUseDrag()}
-    >
-      <svg
-        x={viewScaleCenterPercentStr}
-        y={viewScaleCenterPercentStr}
-        width={viewScalePercentStr}
-        height={viewScalePercentStr}
-        className="root-svg"
-        viewBox={viewBoxAttrsToString(decorationBoundary.viewBoxAttrs)}
+        component="svg"
+        square
+        elevation={10}
+        width="100%"
+        height="100%"
+        style={{ overflow: 'hidden' }}
+        {...viewUseWheel()}
+        {...textureTransformationUseDrag()}
       >
-        <TextureSvg {...{ transformOriginUseDrag }} />
-      </svg>
-    </Paper>
+        <svg
+          x={viewScaleCenterPercentStr}
+          y={viewScaleCenterPercentStr}
+          width={viewScalePercentStr}
+          height={viewScalePercentStr}
+          className="root-svg"
+          viewBox={boundingBoxAttrsToViewBoxStr(decorationBoundary.boundingBoxAttrs)}
+        >
+          <TextureSvg {...{ transformOriginUseDrag }} />
+        </svg>
+      </Paper>
+    </>
   );
 });

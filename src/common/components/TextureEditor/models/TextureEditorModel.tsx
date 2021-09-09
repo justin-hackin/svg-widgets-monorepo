@@ -9,7 +9,7 @@ import { TextureModel } from './TextureModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset,
-  getOriginPoint,
+  getOriginPoint, RawPoint,
   scalePoint,
   sumPoints,
   transformPoint,
@@ -21,12 +21,11 @@ import { UndoManagerWithGroupState } from '../../UndoManagerWithGroupState';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
 import {
   EVENTS,
-  IS_DEVELOPMENT_BUILD,
   IS_ELECTRON_BUILD,
   IS_WEB_BUILD,
   TEXTURE_ARRANGEMENT_FILE_EXTENSION,
 } from '../../../constants';
-import { ANALYTICS_BUFFERED_EVENTS, BUFFERED_SUM_VARIABLE } from '../../../util/analytics';
+import { reportTransformsTally } from '../../../util/analytics';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -58,7 +57,6 @@ const specFileExtensionName = 'Texture for Pyramid Net Spec';
 export const TextureEditorModel = types
   .model('Texture Editor', {
     texture: types.maybe(TextureModel),
-    // since both controls and matrix function require degrees, use degrees as unit instead of radians
     viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
     shapePreview: types.optional(ShapePreviewModel, {}),
   })
@@ -99,13 +97,13 @@ export const TextureEditorModel = types
       if (!this.decorationBoundary || !self.texture) {
         return undefined;
       }
-      return getCoverScale(this.decorationBoundary.viewBoxAttrs, self.texture.dimensions);
+      return getCoverScale(this.decorationBoundary.boundingBoxAttrs, self.texture.dimensions);
     },
     get faceFittingScale() {
       if (!self.placementAreaDimensions || !this.decorationBoundary) {
         return undefined;
       }
-      return getFitScale(self.placementAreaDimensions, this.decorationBoundary.viewBoxAttrs);
+      return getFitScale(self.placementAreaDimensions, this.decorationBoundary.boundingBoxAttrs);
     },
     get shapePreviewDimensions() {
       if (!self.placementAreaDimensions) { return null; }
@@ -177,17 +175,22 @@ export const TextureEditorModel = types
       self.autoRotatePreview = shouldRotate;
     },
     fitTextureToFace() {
-      const { viewBoxAttrs } = self.decorationBoundary;
+      const { boundingBoxAttrs } = self.decorationBoundary;
       const { dimensions: textureDimensions } = self.texture;
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
-      const { height, width, xmin } = viewBoxAttrs;
+      const { height, width, xmin } = boundingBoxAttrs;
       const { scale, widthIsClamp } = self.imageCoverScale;
       self.texture.translate = widthIsClamp
         ? { x: xmin, y: (height - (textureDimensions.height * scale)) / 2 }
         : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 };
       self.texture.scale = self.imageCoverScale.scale;
+    },
+    refitTextureToFace() {
+      if (self.texture) {
+        this.setTextureFromPattern(getSnapshot(self.texture.pattern));
+      }
     },
     resetNodesEditor() {
       self.showNodes = false;
@@ -207,7 +210,7 @@ export const TextureEditorModel = types
         transformOrigin: getOriginPoint(),
       });
       this.fitTextureToFace();
-      this.repositionOriginOverCorner(0);
+      this.repositionOriginOverFaceCenter();
     },
 
     setTexture(snapshot) {
@@ -249,7 +252,8 @@ export const TextureEditorModel = types
         this.absoluteMovementToSvg(absCoords),
       );
     },
-    repositionTextureWithOriginOverCorner(vertexIndex) {
+
+    repositionTextureWithOriginOverPoint(point) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
@@ -259,27 +263,40 @@ export const TextureEditorModel = types
       self.texture.translate = sumPoints(
         self.texture.translate,
         scalePoint(originAbsolute, -1),
-        self.decorationBoundary.vertices[vertexIndex],
+        point,
       );
     },
-    repositionSelectedNodeOverCorner(vertexIndex) {
+    repositionTextureWithOriginOverCorner(vertexIndex) {
+      this.repositionTextureWithOriginOverPoint(self.decorationBoundary.vertices[vertexIndex]);
+    },
+    repositionTextureWithOriginOverFaceCenter() {
+      this.repositionTextureWithOriginOverPoint(self.decorationBoundary.centerPoint);
+    },
+    repositionSelectedNodeOverPoint(point) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
       const svgTextureNode = transformPoint(
         self.texture.transformMatrixDragged, self.selectedTextureNode,
       );
-      const diff = sumPoints(svgTextureNode, scalePoint(self.decorationBoundary.vertices[vertexIndex], -1));
+      const diff = sumPoints(svgTextureNode, scalePoint(point, -1));
       self.texture.translate = sumPoints(scalePoint(diff, -1), self.texture.translate);
     },
-    repositionOriginOverCorner(vertexIndex) {
+    repositionSelectedNodeOverCorner(vertexIndex) {
+      this.repositionSelectedNodeOverPoint(self.decorationBoundary.vertices[vertexIndex]);
+    },
+    repositionSelectedNodeOverFaceCenter() {
+      this.repositionSelectedNodeOverPoint(self.decorationBoundary.centerPoint);
+    },
+    repositionOriginOverPoint(point: RawPoint) {
       if (!self.texture || !self.decorationBoundary) {
         return;
       }
-      const relVertex = transformPoint(
-        self.texture.transformMatrix.inverse(), self.decorationBoundary.vertices[vertexIndex],
-      );
-      const delta = scalePoint(sumPoints(scalePoint(relVertex, -1), self.texture.transformOrigin), -1);
+      this.repositionOriginOverRelativePoint(transformPoint(self.texture.transformMatrix.inverse(), point));
+    },
+
+    repositionOriginOverRelativePoint(pointRelativeToTexture: RawPoint) {
+      const delta = scalePoint(sumPoints(scalePoint(pointRelativeToTexture, -1), self.texture.transformOrigin), -1);
       const newTransformOrigin = sumPoints(delta, self.texture.transformOrigin);
       self.texture.translate = sumPoints(
         self.texture.translate,
@@ -287,6 +304,21 @@ export const TextureEditorModel = types
           self.texture.scale, self.texture.rotate, self.texture.translate), -1),
       );
       self.texture.transformOrigin = newTransformOrigin;
+    },
+
+    repositionOriginOverCorner(vertexIndex) {
+      this.repositionOriginOverPoint(self.decorationBoundary.vertices[vertexIndex]);
+    },
+
+    repositionOriginOverFaceCenter() {
+      this.repositionOriginOverPoint(self.decorationBoundary.centerPoint);
+    },
+
+    repositionOriginOverTextureCenter() {
+      if (self.texture) {
+        const { width, height } = self.texture.dimensions;
+        this.repositionOriginOverRelativePoint({ x: width / 2, y: height / 2 });
+      }
     },
 
     sendTextureToDielineEditor() {
@@ -350,46 +382,15 @@ export const TextureEditorModel = types
     },
   }))
   .actions(() => {
-    // ======== ANALYTICS TRACkING ========
-    if (IS_ELECTRON_BUILD || IS_DEVELOPMENT_BUILD) {
-      // stub the function for non-tracking builds
-      // reduces the number of env checks in call sites while preserving type safety
-      return {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        incrementTransformsBuffer(type: ANALYTICS_BUFFERED_EVENTS) {},
-      };
-    }
-
-    const numTransformsByType = Object.keys(ANALYTICS_BUFFERED_EVENTS)
-      .reduce((acc, type) => {
-        acc[type] = 0;
-        return acc;
-      }, {});
-
+    const SEND_ANALYTICS_INTERVAL_MS = 10000;
     let sendAnaylticsBuffersInterval;
-    const sendAnalytics = () => {
-      Object.keys(numTransformsByType).forEach((type) => {
-        if (numTransformsByType[type]) {
-          // TODO: why doesn't typescript respect globals
-          // @ts-ignore
-          dataLayer.push({
-            event: type,
-            [BUFFERED_SUM_VARIABLE]: numTransformsByType[type],
-          });
-          numTransformsByType[type] = 0;
-        }
-      });
-    };
     return {
       afterCreate() {
-        sendAnaylticsBuffersInterval = setInterval(sendAnalytics, 60000);
+        sendAnaylticsBuffersInterval = setInterval(reportTransformsTally, SEND_ANALYTICS_INTERVAL_MS);
       },
       beforeDestroy() {
-        sendAnalytics();
+        reportTransformsTally();
         clearInterval(sendAnaylticsBuffersInterval);
-      },
-      incrementTransformsBuffer(type: ANALYTICS_BUFFERED_EVENTS) {
-        numTransformsByType[type] += 1;
       },
     };
   });

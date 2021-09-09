@@ -212,3 +212,5 @@ export const offsetPolygonPoints = (points: RawPoint[], offsetDistance) => {
   const offsetPoly = offset(poly, offsetDistance);
   return offsetPoly.vertices.map(castCoordToRawPoint);
 };
+
+export const pointToTranslateString = (pt: RawPoint) => `translate(${pt.x}, ${pt.y})`;

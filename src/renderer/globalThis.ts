@@ -8,3 +8,9 @@ var __static:string = __static;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 var ipcRenderer:IpcRenderer = ipcImport;
+
+declare global {
+  interface Window {
+    dataLayer:any[];
+  }
+}
