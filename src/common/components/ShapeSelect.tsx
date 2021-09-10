@@ -7,52 +7,50 @@ import React from 'react';
 import {
   Avatar, ListItemAvatar, Typography,
 } from '@material-ui/core';
-import { startCase, sortBy } from 'lodash';
 import { observer } from 'mobx-react';
 import clsx from 'clsx';
 
 import { useStyles } from '../style/style';
-import { polyhedra } from '../../renderer/DielineViewer/data/polyhedra';
 import requireStatic from '../../renderer/requireStatic';
+import { ControllablePrimitiveModel, SelectMetadata } from '../util/controllable-property';
 
 export const ShapeSelect = observer(({
-  onChange, value, name, displayEmpty = undefined, className = undefined, isCompactDisplay = false,
+  node, className = undefined, isCompactDisplay = false,
+}: {
+  node: ControllablePrimitiveModel<string, SelectMetadata<any>>, className?: string, isCompactDisplay?: boolean
 }) => {
-  const label = 'Polyhedron';
   const classes = useStyles();
-  const labelId = `${label}__${uuid()}`;
-  const selectProps = {
-    labelId,
-    value,
-    name,
-    displayEmpty,
-    onChange,
-  };
+  const labelId = `${node.label}__${uuid()}`;
   const classNames = clsx(
     className, classes.shapeSelect, classes.formControl, isCompactDisplay && classes.compactShapeSelect,
   );
   return (
     <FormControl className={classNames}>
-      { !isCompactDisplay && <InputLabel id={labelId}>{ label }</InputLabel>}
+      { !isCompactDisplay && <InputLabel id={labelId}>{ node.label }</InputLabel>}
       <Select
-        {...selectProps}
+        {...{
+          labelId,
+          onChange: (e) => { node.setValue(e.target.value as string); },
+          value: node.value,
+          name: node.valuePath,
+        }}
         SelectDisplayProps={{
           className: clsx(classes.shapeSelectDisplay, isCompactDisplay && classes.compactShapeSelect),
         }}
       >
-        {sortBy(Object.keys(polyhedra)).map((shapeName, i) => (
-          <MenuItem key={i} value={shapeName}>
+        {node.metadata.options.map(({ value, label }, i) => (
+          <MenuItem key={i} value={value}>
             {/* preview images generated with https://codesandbox.io/s/youthful-joliot-uxiy */}
             <ListItemAvatar>
               <Avatar
-                alt={startCase(shapeName)}
+                alt={label}
                 className={classes.shapeAvatar}
                 src={
-                  requireStatic(`images/model-previews/${shapeName}.png`)
+                  requireStatic(`images/model-previews/${value}.png`)
                 }
               />
             </ListItemAvatar>
-            <Typography variant="inherit" className={classes.shapeName}>{startCase(shapeName)}</Typography>
+            <Typography variant="inherit" className={classes.shapeName}>{label}</Typography>
           </MenuItem>
         ))}
       </Select>

@@ -4,7 +4,7 @@ import {
   getParent,
   model, Model, modelAction, prop, undoMiddleware,
 } from 'mobx-keystone';
-import { computed, observable } from 'mobx';
+import { computed, observable, reaction } from 'mobx';
 
 import {
   hingedPlot,
@@ -407,15 +407,21 @@ export class PyramidNetModel extends Model({
     this.history.withoutUndo(() => {
       this.applyShapeBasedDefaults();
     });
-  }
 
-  @modelAction
-  setPyramidShapeName(name: string) {
-    this.pyramid.shapeName = name;
-    // all geometries have 1 as option, but different shapes have different divisors > 1
-    this.pyramid.netsPerPyramid = 1;
-    this.applyShapeBasedDefaults();
-    getParent(this).textureEditor.refitTextureToFace();
+    const disposers = [
+      reaction(() => [this.pyramid.shapeName.value], () => {
+        // all geometries have 1 as option, but different shapes have different divisors > 1
+        this.pyramid.netsPerPyramid = 1;
+        this.applyShapeBasedDefaults();
+        getParent(this).textureEditor.refitTextureToFace();
+      }),
+    ];
+
+    return () => {
+      for (const disposer of disposers) {
+        disposer();
+      }
+    };
   }
 
   @modelAction

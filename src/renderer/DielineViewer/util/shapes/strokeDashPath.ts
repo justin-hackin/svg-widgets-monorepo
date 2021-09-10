@@ -5,7 +5,7 @@ import { detach, getRootPath, Model, model, prop, rootRef, } from 'mobx-keystone
 import { computed } from 'mobx';
 import { distanceFromOrigin, lineLerp, PointLike, subtractPoints, } from '../../../../common/util/geom';
 import { PathData } from '../PathData';
-import { referenceDropdownProp } from '../../../../common/util/controllable-property';
+import { referenceSelectProp } from '../../../../common/util/controllable-property';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -52,7 +52,7 @@ export const dashPatternsDefaultFn = () => dasharrays.map((relativeStrokeDasharr
 
 @model('DashPatternModel')
 export class DashPatternModel extends Model({
-  strokeDashPathPattern: referenceDropdownProp<StrokeDashPathPatternModel>({
+  strokeDashPathPattern: referenceSelectProp<StrokeDashPathPatternModel>({
     labelOverride: (node) => {
       const { path } = getRootPath(node);
       if (path.length) {

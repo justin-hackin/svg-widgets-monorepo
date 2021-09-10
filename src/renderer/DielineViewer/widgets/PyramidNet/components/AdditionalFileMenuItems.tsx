@@ -68,7 +68,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
           message: IMPORT_TEXTURE_TXT,
         }, 'pnst', 'Pyramid Net Spec Texture');
-        const currentShapeName = store.pyramidNetSpec.pyramid.shapeName;
+        const currentShapeName = store.pyramidNetSpec.pyramid.shapeName.value;
         resetFileMenuRef();
         if (!res) {
           return;
@@ -80,7 +80,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
           } but the chosen texture was for ${startCase(fileData.shapeName)
           } shape. Do you want to change the Polyhedron and load its default settings?`);
           if (doIt) {
-            store.pyramidNetSpec.setPyramidShapeName(fileData.shapeName);
+            store.pyramidNetSpec.pyramid.shapeName.setValue(fileData.shapeName);
           } else {
             return;
           }

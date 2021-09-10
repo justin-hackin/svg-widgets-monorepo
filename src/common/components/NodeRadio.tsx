@@ -25,7 +25,7 @@ export const UncontrolledNodeRadio = observer(({
 });
 
 export const NodeRadio = observer((
-  { node }: { node: ControllablePrimitiveModel<string, RadioMetadata> },
+  { node }: { node: ControllablePrimitiveModel<any, RadioMetadata<any>> },
 ) => (
   <UncontrolledNodeRadio
     {...{

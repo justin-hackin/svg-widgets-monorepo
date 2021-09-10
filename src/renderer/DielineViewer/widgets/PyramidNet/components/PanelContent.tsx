@@ -52,11 +52,7 @@ export const PanelContent = observer(() => {
       <div className={classes.shapeSection}>
         <ShapeSelect
           className={classes.shapeSelect}
-          value={pyramidNetSpec.pyramid.shapeName}
-          onChange={(e) => {
-            pyramidNetSpec.setPyramidShapeName(e.target.value);
-          }}
-          name="polyhedron-shape"
+          node={pyramidNetSpec.pyramid.shapeName}
         />
         <PanelSliderOrTextInput
           className={classes.shapeHeightFormControl}

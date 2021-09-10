@@ -48,6 +48,7 @@ import { PyramidNetPluginModel } from '../../../../../renderer/DielineViewer/mod
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { RawFaceDecorationModel } from '../../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
+import { TextureEditorModel } from '../../models/TextureEditorModel';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -102,7 +103,8 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     showNodes, autoRotatePreview,
     shapePreview,
     shapeName,
-  } = textureEditor;
+  //  TODO: why does code loose type info when destructuring this
+  } = textureEditor as TextureEditorModel;
 
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
@@ -248,11 +250,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           <ShapeSelect
             className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
             isCompactDisplay
-            value={shapeName}
-            onChange={(e) => {
-              pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
-            }}
-            name="polyhedron-shape"
+            node={shapeName}
           />
           <FormControlLabel
             className={TOUR_ELEMENT_CLASSES.ROTATE_3D}

@@ -158,8 +158,8 @@ export class ShapePreviewModel extends Model({
       }, { fireImmediately: true }),
 
       // shape change
-      reaction(() => [this.parentTextureEditor.shapeName], async () => {
-        await this.setShape(this.parentTextureEditor.shapeName);
+      reaction(() => [this.parentTextureEditor.shapeName.value], async () => {
+        await this.setShape(this.parentTextureEditor.shapeName.value);
       }, { fireImmediately: true }),
 
       // texture change
@@ -282,7 +282,7 @@ export class ShapePreviewModel extends Model({
   }
 
   @modelFlow
-  setShape = _async(function* (this, shapeName) {
+  setShape = _async(function* (this, shapeName: string) {
     const modelUrl = requireStatic(`models/${shapeName}.gltf`);
     const importScene = yield* _await(resolveSceneFromModelPath(this.gltfLoader, modelUrl));
     // @ts-ignore

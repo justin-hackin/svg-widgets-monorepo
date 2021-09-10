@@ -1,6 +1,7 @@
 import { Model, model, prop } from 'mobx-keystone';
-import { isInteger } from 'lodash';
+import { isInteger, sortBy, startCase } from 'lodash';
 import { polyhedra } from '../data/polyhedra';
+import { selectProp } from '../../../common/util/controllable-property';
 
 const getDivisors = (num) => {
   if (!isInteger(num)) {
@@ -20,11 +21,15 @@ const getDivisors = (num) => {
 
 @model('PyramidModel')
 export class PyramidModel extends Model({
-  shapeName: prop('small-triambic-icosahedron'),
+  shapeName: selectProp('small-triambic-icosahedron', {
+    labelOverride: 'Polyhedron',
+    options: sortBy(Object.keys(polyhedra))
+      .map((shapeId) => ({ value: shapeId, label: startCase(shapeId) })),
+  }),
   netsPerPyramid: prop(1),
 }) {
   get geometry() {
-    return polyhedra[this.shapeName];
+    return polyhedra[this.shapeName.value];
   }
 
   get faceIsSymmetrical() {

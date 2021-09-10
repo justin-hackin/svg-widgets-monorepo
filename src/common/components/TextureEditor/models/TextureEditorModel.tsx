@@ -298,7 +298,7 @@ export class TextureEditorModel extends Model({
   // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
   @modelAction
   getFileBasename() {
-    return `${this.shapeName || 'shape'}__${
+    return `${this.shapeName.value || 'shape'}__${
       tryResolvePath(this, ['texture', 'pattern', 'sourceFileName']) || 'undecorated'}`;
   }
 
@@ -426,10 +426,10 @@ export class TextureEditorModel extends Model({
   saveTextureArrangement() {
     if (!this.faceDecoration) { return; }
     const fileData = {
-      shapeName: this.shapeName,
+      shapeName: this.shapeName.value,
       textureSnapshot: getSnapshot(this.faceDecoration),
     };
-    const defaultPath = `${this.shapeName
+    const defaultPath = `${this.shapeName.value
     }__${this.faceDecoration.pattern.sourceFileName}.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`;
     if (IS_ELECTRON_BUILD) {
       globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_JSON, fileData, {
@@ -468,8 +468,8 @@ export class TextureEditorModel extends Model({
     if (!textureSnapshot) {
       return;
     }
-    if (shapeName !== this.shapeName) {
-      this.parentPyramidNetPluginModel.pyramidNetSpec.setPyramidShapeName(shapeName);
+    if (shapeName !== this.shapeName.value) {
+      this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName.setValue(shapeName);
     }
     this.setTextureFromSnapshot(textureSnapshot);
   }

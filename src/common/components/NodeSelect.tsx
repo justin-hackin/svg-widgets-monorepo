@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
 
 import { startCase } from 'lodash';
 import { useStyles } from '../style/style';
-import { ControllableDropdownReferenceModel } from '../util/controllable-property';
+import { ControllableSelectReferenceModel } from '../util/controllable-property';
 
 export const UncontrolledNodeSelect = observer(({
   value, onChange, options, label, name, displayEmpty = undefined,
@@ -28,7 +28,7 @@ export const UncontrolledNodeSelect = observer(({
         onChange,
       }}
       >
-        {options.map(({ label: optionLabel, value: optionValue }, i) => (
+        {options.map(({ label: optionLabel, value: optionValue }) => (
           <MenuItem key={optionValue} value={optionValue}>{optionLabel}</MenuItem>
         ))}
       </Select>
@@ -38,7 +38,7 @@ export const UncontrolledNodeSelect = observer(({
 
 export const NodeSelect = observer(({
   node,
-}: { node: ControllableDropdownReferenceModel<any, any> }) => {
+}: { node: ControllableSelectReferenceModel<any, any> }) => {
   const {
     valuePath, label, ownPropertyName, options,
   } = node;
@@ -54,7 +54,7 @@ export const NodeSelect = observer(({
         onChange: (e) => {
           node.setValue(idToOptions[e.target.value].value);
         },
-        options: options.map(({ label: optionLabel, value: { $modelId } }, i) => ({
+        options: options.map(({ label: optionLabel, value: { $modelId } }) => ({
           value: $modelId, label: optionLabel,
         })),
         value: node.value.$modelId,

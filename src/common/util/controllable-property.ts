@@ -23,7 +23,8 @@ export enum INPUT_TYPE {
   SWITCH = 'switch',
   COLOR_PICKER = 'color-picker',
   RADIO = 'radio',
-  DROPDOWN = 'dropdown',
+  SELECT = 'select',
+  REFERENCE_SELECT = 'reference-select',
   NUMBER_TEXT = 'number-text',
 }
 
@@ -47,15 +48,20 @@ export interface ColorPickerMetadata extends BasePrimitiveMetadata {
   type: INPUT_TYPE.COLOR_PICKER,
 }
 
-interface OptionsListItem {
-  value: string,
+interface OptionsListItem<T> {
+  value: T,
   label?: string,
 }
 
-export interface RadioMetadata extends BasePrimitiveMetadata {
+export interface RadioMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.RADIO,
-  options: OptionsListItem[],
+  options: OptionsListItem<T>[],
   isRow?: boolean,
+}
+
+export interface SelectMetadata<T> extends BasePrimitiveMetadata {
+  type: INPUT_TYPE.SELECT,
+  options: OptionsListItem<T>[],
 }
 
 export interface NumberTextMetadata extends BasePrimitiveMetadata {
@@ -64,8 +70,8 @@ export interface NumberTextMetadata extends BasePrimitiveMetadata {
 }
 
 export type PrimitiveMetadata =
-  SliderMetadata | SwitchMetadata | ColorPickerMetadata | RadioMetadata | NumberTextMetadata;
-export type ReferenceMetadata = DropdownReferenceMetadata<any>;
+  SliderMetadata | SwitchMetadata | ColorPickerMetadata | RadioMetadata<any> | NumberTextMetadata | SelectMetadata<any>;
+export type ReferenceMetadata = ReferenceSelectMetadata<any>;
 export type AnyMetadata = PrimitiveMetadata | ReferenceMetadata;
 export type ControllableModel =
   ControllablePrimitiveModel<any, PrimitiveMetadata> | ControllableReferenceModel<any, ReferenceMetadata>;
@@ -128,11 +134,21 @@ export const colorPickerProp = (value: string) => controllablePrimitiveProp<stri
   value, { type: INPUT_TYPE.COLOR_PICKER },
 );
 
-export const radioProp = (
-  value: string, metadata: Omit<RadioMetadata, 'type'>,
-) => controllablePrimitiveProp<string, RadioMetadata>(
-  value, { type: INPUT_TYPE.RADIO, ...metadata },
-);
+export function radioProp<T>(
+  value: T, metadata: Omit<RadioMetadata<T>, 'type'>,
+) {
+  return controllablePrimitiveProp<T, RadioMetadata<T>>(
+    value, { type: INPUT_TYPE.RADIO, ...metadata },
+  );
+}
+
+export function selectProp<T>(
+  value: T, metadata: Omit<SelectMetadata<T>, 'type'>,
+) {
+  return controllablePrimitiveProp<T, SelectMetadata<T>>(
+    value, { type: INPUT_TYPE.SELECT, ...metadata },
+  );
+}
 
 // TODO: consider default label override + context for units on label
 export const numberTextProp = (
@@ -146,8 +162,8 @@ export interface ReferenceOptionEntry<T> {
   label: string,
 }
 
-interface DropdownReferenceMetadata<T extends object> {
-  type: INPUT_TYPE.DROPDOWN,
+interface ReferenceSelectMetadata<T extends object> {
+  type: INPUT_TYPE.REFERENCE_SELECT,
   initialValueIndex?: number,
   pathToOptions: Path,
   optionLabeler: (option: T) => string,
@@ -191,9 +207,9 @@ export class ControllableReferenceModel<T extends object, M extends ReferenceMet
   }
 }
 
-@model('ControllableDropdownReferenceModel')
-export class ControllableDropdownReferenceModel<T extends object, M extends DropdownReferenceMetadata<T>> extends
-  ExtendedModel(<T extends object, M extends DropdownReferenceMetadata<T>>() => ({
+@model('ControllableSelectReferenceModel')
+export class ControllableSelectReferenceModel<T extends object, M extends ReferenceSelectMetadata<T>> extends
+  ExtendedModel(<T extends object, M extends ReferenceSelectMetadata<T>>() => ({
     baseModel: modelClass<ControllableReferenceModel<T, M>>(ControllableReferenceModel),
     props: {},
   }))<T, M> {
@@ -203,7 +219,7 @@ export class ControllableDropdownReferenceModel<T extends object, M extends Drop
     this.optionsCtx.setComputed(this, () => {
       // TODO: consider run time type checks for the options found by pathToOptions, type is uncertain
       const resolvedPath = tryResolvePath<T[]>(rootStore, this.metadata.pathToOptions);
-      if (!resolvedPath) { throw new Error('ControllableDropdownReferenceModel failed to resolve pathToOptions'); }
+      if (!resolvedPath) { throw new Error('ControllableSelectReferenceModel failed to resolve pathToOptions'); }
       return resolvedPath.map((option: T) => ({ value: option, label: this.metadata.optionLabeler(option) }));
     });
     if (this.metadata.initialValueIndex !== undefined) {
@@ -220,10 +236,10 @@ export class ControllableDropdownReferenceModel<T extends object, M extends Drop
   }
 }
 
-export function referenceDropdownProp<T extends object>(metadata: Omit<DropdownReferenceMetadata<T>, 'type'>) {
-  return prop<ControllableDropdownReferenceModel<T, DropdownReferenceMetadata<T>>>(() => propertyMetadata.apply(
-    () => new ControllableDropdownReferenceModel<T, DropdownReferenceMetadata<T>>({}), {
-      type: INPUT_TYPE.DROPDOWN, ...metadata,
+export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSelectMetadata<T>, 'type'>) {
+  return prop<ControllableSelectReferenceModel<T, ReferenceSelectMetadata<T>>>(() => propertyMetadata.apply(
+    () => new ControllableSelectReferenceModel<T, ReferenceSelectMetadata<T>>({}), {
+      type: INPUT_TYPE.REFERENCE_SELECT, ...metadata,
     },
   ));
 }
