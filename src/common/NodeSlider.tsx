@@ -7,7 +7,7 @@ import { useWorkspaceMst } from '../renderer/DielineViewer/models/WorkspaceModel
 import { UNIT_LABEL_FORMAT, UNIT_STEP } from './util/units';
 import { getNearestHistoryFromAncestorNode } from './util/mobx-keystone';
 import { useStyles } from './style/style';
-import {ControllablePrimitiveModel, INPUT_TYPE, SliderMetadata} from './util/controllable-property';
+import { ControllablePrimitiveModel, INPUT_TYPE, SliderMetadata } from './util/controllable-property';
 
 const ValueLabelComponent = ({
   children,
@@ -42,7 +42,7 @@ export const ControlledSlider = ({
 export const NodeSlider = observer(({
   node, className = undefined, useUnits = false,
 }: { node: ControllablePrimitiveModel<number, SliderMetadata>, className?: string, useUnits?: boolean }) => {
-  const { preferences: { displayUnit } } = useWorkspaceMst();
+  const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
   const [historyGroup, setHistoryGroup] = useState(null);
   const [history] = useState(getNearestHistoryFromAncestorNode(node));
   const classes = useStyles();

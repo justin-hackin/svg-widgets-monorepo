@@ -31,10 +31,6 @@ interface BasePrimitiveMetadata {
   labelOverride?: labelOverride,
 }
 
-export interface RadioMetadata {
-  type: INPUT_TYPE.RADIO
-}
-
 export interface SliderMetadata extends BasePrimitiveMetadata {
   type: INPUT_TYPE.SLIDER,
   min: number,
@@ -49,7 +45,19 @@ export interface SwitchMetadata extends BasePrimitiveMetadata {
 export interface ColorPickerMetadata extends BasePrimitiveMetadata {
   type: INPUT_TYPE.COLOR_PICKER,
 }
-export type PrimitiveMetadata = SliderMetadata | SwitchMetadata | ColorPickerMetadata;
+
+interface OptionsListItem {
+  value: string,
+  label?: string,
+}
+
+export interface RadioMetadata extends BasePrimitiveMetadata {
+  type: INPUT_TYPE.RADIO,
+  options: OptionsListItem[],
+  isRow?: boolean,
+}
+
+export type PrimitiveMetadata = SliderMetadata | SwitchMetadata | ColorPickerMetadata | RadioMetadata;
 export type ReferenceMetadata = DropdownReferenceMetadata<any>;
 export type AnyMetadata = PrimitiveMetadata | ReferenceMetadata;
 export type ControllableModel =
@@ -92,6 +100,30 @@ export class ControllablePrimitiveModel<T, M extends PrimitiveMetadata> extends 
     return getRootPath(this).path.join('/');
   }
 }
+
+export function controllablePrimitiveProp<T, M extends PrimitiveMetadata>(value:T, metadata: M) {
+  return prop<ControllablePrimitiveModel<T, M>>(() => propertyMetadata.apply(
+    () => new ControllablePrimitiveModel<T, M>({ value, $modelId: uuid() }), metadata,
+  ));
+}
+
+export const sliderProp = (value: number, metadata: Omit<SliderMetadata, 'type'>) => controllablePrimitiveProp<number, SliderMetadata>(
+  value, { type: INPUT_TYPE.SLIDER, ...metadata },
+);
+
+export const switchProp = (value: boolean) => controllablePrimitiveProp<boolean, SwitchMetadata>(
+  value, { type: INPUT_TYPE.SWITCH },
+);
+
+export const colorPickerProp = (value: string) => controllablePrimitiveProp<string, ColorPickerMetadata>(
+  value, { type: INPUT_TYPE.COLOR_PICKER },
+);
+
+export const radioProp = (
+  value: string, metadata: Omit<RadioMetadata, 'type'>,
+) => controllablePrimitiveProp<string, RadioMetadata>(
+  value, { type: INPUT_TYPE.RADIO, ...metadata },
+);
 
 export interface ReferenceOptionEntry<T> {
   value: T,
@@ -142,25 +174,6 @@ export class ControllableReferenceModel<T extends object, M extends ReferenceMet
     return getRootPath(this).path.join('/');
   }
 }
-
-
-export function controllablePrimitiveProp<T, M extends PrimitiveMetadata>(value:T, metadata: M) {
-  return prop<ControllablePrimitiveModel<T, M>>(() => propertyMetadata.apply(
-    () => new ControllablePrimitiveModel<T, M>({ value, $modelId: uuid() }), metadata,
-  ));
-}
-
-export const sliderProp = (value: number, metadata: Omit<SliderMetadata, 'type'>) => controllablePrimitiveProp(
-  value, { type: INPUT_TYPE.SLIDER, ...metadata },
-);
-
-export const switchProp = (value: boolean) => controllablePrimitiveProp<boolean, SwitchMetadata>(
-  value, { type: INPUT_TYPE.SWITCH },
-);
-
-export const colorPickerProp = (value: string) => controllablePrimitiveProp<string, ColorPickerMetadata>(
-  value, { type: INPUT_TYPE.COLOR_PICKER },
-);
 
 @model('ControllableDropdownReferenceModel')
 export class ControllableDropdownReferenceModel<T extends object, M extends DropdownReferenceMetadata<T>> extends

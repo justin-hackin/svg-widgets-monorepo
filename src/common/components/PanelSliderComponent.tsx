@@ -96,7 +96,7 @@ export const PanelSliderComponent = observer(({
   label = undefined,
 }) => {
   const labelId = uuid();
-  const { preferences: { displayUnit } } = useWorkspaceMst();
+  const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
   const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${displayUnit})` : ''}`;
   const classes = useStyles();
   return (

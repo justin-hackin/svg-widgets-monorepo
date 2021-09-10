@@ -45,7 +45,11 @@ export const PrintLayer = observer(({
     },
   } = widgetStore;
 
-  const { registrationPadding, printRegistrationType, registrationMarkLength } = preferencesStore;
+  const {
+    registrationPadding,
+    printRegistrationType: { value: printRegistrationType },
+    registrationMarkLength,
+  } = preferencesStore;
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
   const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER

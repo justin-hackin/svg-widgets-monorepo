@@ -21,7 +21,7 @@ export const PanelSliderOrTextInput = observer(({
   const {
     setValue, valuePath, value,
   } = mstDataToProps(node, property);
-  const { preferences: { displayUnit } } = useWorkspaceMst();
+  const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
   const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${displayUnit})` : ''}`;
   const [isSlider, setIsSlider] = useState(true);
   const toggleIsSlider = () => { setIsSlider(!isSlider); };

@@ -13,7 +13,7 @@ export const SubmittableTextInput = observer(({
   labelId,
   useUnits = false,
 }) => {
-  const { preferences: { displayUnit } } = useWorkspaceMst();
+  const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
   const inputRef = createRef<HTMLInputElement>();
   useEffect(() => {
     if (inputRef.current && useUnits) {

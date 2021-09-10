@@ -54,7 +54,8 @@ export const DielinesLayer = observer(({
     cutProps, scoreProps,
     useClonesForBaseTabs: { value: useClonesForBaseTabs },
     useClonesForDecoration: { value: useClonesForDecoration },
-    printRegistrationType, registrationPadding, registrationStrokeColor, registrationMarkLength,
+    printRegistrationType: { value: printRegistrationType },
+    registrationPadding, registrationStrokeColor, registrationMarkLength,
   } = preferencesStore;
 
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE

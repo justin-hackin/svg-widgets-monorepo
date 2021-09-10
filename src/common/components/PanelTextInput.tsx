@@ -19,7 +19,7 @@ export const PanelTextInput = observer(({
   const {
     value, setValue, valuePath,
   } = mstDataToProps(node, property);
-  const { preferences: { displayUnit } } = useWorkspaceMst();
+  const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
   const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${displayUnit})` : ''}`;
   return (
     <div className={classes.formControl}>
