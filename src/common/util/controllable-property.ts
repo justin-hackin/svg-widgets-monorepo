@@ -1,5 +1,5 @@
 import uuid from 'uuid/v1';
-
+import { isFunction } from 'lodash';
 import { computed } from 'mobx';
 import {
   createContext,
@@ -9,7 +9,6 @@ import {
   Model,
   modelAction,
   modelClass,
-  Path,
   prop,
   Ref,
   RefConstructor,
@@ -52,10 +51,19 @@ interface OptionsListItem<T> {
   value: T,
   label?: string,
 }
+type OptionsListResolverFactory<T> = (rootStore: object) => (() => OptionsListItem<T>[]);
+
+type MetadataOptions<T> = OptionsListItem<T>[] | OptionsListResolverFactory<T>;
+
+function optionsIsListResolver<T>(
+  options: MetadataOptions<T>,
+): options is OptionsListResolverFactory<T> {
+  return isFunction(options);
+}
 
 export interface RadioMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.RADIO,
-  options: OptionsListItem<T>[],
+  options: OptionsListItem<T>[] | OptionsListResolverFactory<T>,
   isRow?: boolean,
 }
 
@@ -157,16 +165,12 @@ export const numberTextProp = (
   value, { type: INPUT_TYPE.NUMBER_TEXT, ...metadata },
 );
 
-export interface ReferenceOptionEntry<T> {
-  value: T,
-  label: string,
-}
+type InitialSelectionResolver<T extends object> = (optionValues: T[], rootStore: object) => (T | undefined);
 
 interface ReferenceSelectMetadata<T extends object> {
   type: INPUT_TYPE.REFERENCE_SELECT,
-  initialValueIndex?: number,
-  pathToOptions: Path,
-  optionLabeler: (option: T) => string,
+  options: MetadataOptions<T>,
+  initialSelectionResolver?: InitialSelectionResolver<T>,
   typeRef: RefConstructor<T>,
   labelOverride?: labelOverride,
 }
@@ -213,25 +217,25 @@ export class ControllableSelectReferenceModel<T extends object, M extends Refere
     baseModel: modelClass<ControllableReferenceModel<T, M>>(ControllableReferenceModel),
     props: {},
   }))<T, M> {
-  private optionsCtx = createContext<ReferenceOptionEntry<T>[] | undefined>();
+  private optionsCtx = createContext<OptionsListItem<T>[] | undefined>();
 
   onAttachedToRootStore(rootStore) {
-    this.optionsCtx.setComputed(this, () => {
-      // TODO: consider run time type checks for the options found by pathToOptions, type is uncertain
-      const resolvedPath = tryResolvePath<T[]>(rootStore, this.metadata.pathToOptions);
-      if (!resolvedPath) { throw new Error('ControllableSelectReferenceModel failed to resolve pathToOptions'); }
-      return resolvedPath.map((option: T) => ({ value: option, label: this.metadata.optionLabeler(option) }));
-    });
-    if (this.metadata.initialValueIndex !== undefined) {
-      const options = this.optionsCtx.get(this);
-      if (options) {
-        this.valueRef = this.metadata.typeRef(options[this.metadata.initialValueIndex].value);
+    if (optionsIsListResolver(this.metadata.options)) {
+      this.optionsCtx.setComputed(this, this.metadata.options(rootStore));
+    } else {
+      this.optionsCtx.set(this, this.metadata.options);
+    }
+
+    if (this.metadata.initialSelectionResolver !== undefined) {
+      const value = this.metadata.initialSelectionResolver(this.options.map(({ value }) => value), rootStore);
+      if (value) {
+        this.valueRef = this.metadata.typeRef(value);
       }
     }
   }
 
   @computed
-  get options():ReferenceOptionEntry<T>[] {
+  get options():OptionsListItem<T>[] {
     return this.optionsCtx.get(this);
   }
 }

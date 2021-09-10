@@ -1,11 +1,19 @@
 // eslint-disable-next-line max-classes-per-file
-import { chunk, last, range, startCase, sum, uniq, } from 'lodash';
-import { detach, getRootPath, Model, model, prop, rootRef, } from 'mobx-keystone';
+import {
+  chunk, last, range, startCase, sum, uniq,
+} from 'lodash';
+import {
+  detach, getRootPath, Model, model, prop, rootRef,
+} from 'mobx-keystone';
 
 import { computed } from 'mobx';
-import { distanceFromOrigin, lineLerp, PointLike, subtractPoints, } from '../../../../common/util/geom';
+import {
+  distanceFromOrigin, lineLerp, PointLike, subtractPoints,
+} from '../../../../common/util/geom';
 import { PathData } from '../PathData';
 import { referenceSelectProp } from '../../../../common/util/controllable-property';
+import { WorkspaceModel } from '../../models/WorkspaceModel';
+import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -48,8 +56,6 @@ export const dashPatternsDefaultFn = () => dasharrays.map((relativeStrokeDasharr
   relativeStrokeDasharray,
 })));
 
-
-
 @model('DashPatternModel')
 export class DashPatternModel extends Model({
   strokeDashPathPattern: referenceSelectProp<StrokeDashPathPatternModel>({
@@ -63,9 +69,13 @@ export class DashPatternModel extends Model({
       return node.ownPropertyName;
     },
     typeRef: patternRef,
-    pathToOptions: ['selectedStore', 'dashPatterns'],
-    optionLabeler: ({ label }) => label,
-    initialValueIndex: 0,
+    // TODO: make root store type generic
+    options: (rootStore) => () => ((rootStore as WorkspaceModel).selectedStore as PyramidNetPluginModel).dashPatterns
+      .map((pattern) => ({
+        value: pattern,
+        label: pattern.label,
+      })),
+    initialSelectionResolver: (options) => options[0],
   }),
   strokeDashLength: prop(11),
   strokeDashOffsetRatio: prop(0),
