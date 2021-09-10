@@ -21,7 +21,7 @@ export const DielineViewer = observer(() => {
   const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
   const workspaceStore = useWorkspaceMst();
   const {
-    preferences: { dielineDocumentDimensions: { width, height } },
+    preferences: { documentWidth: { value: width }, documentHeight: { value: height } },
     selectedStore,
     SelectedControlledSvgComponent, selectedWidgetName,
     selectedControlPanelProps, widgetOptions,

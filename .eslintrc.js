@@ -6,6 +6,8 @@ module.exports = {
   rules: {
     'import/prefer-default-export': 0,
     'max-len': ['error', { code: 120 }],
+    // TODO: remove below, enforce rule
+    'max-classes-per-file': 0,
     'react/jsx-props-no-spreading': 0,
     'react/prop-types': 0,
     'react/no-array-index': 0,
@@ -18,6 +20,7 @@ module.exports = {
     'import/no-cycle': 0,
     'func-names': 0,
     '@typescript-eslint/naming-convention': 0,
+    '@typescript-eslint/no-shadow': 0,
   },
   settings: {
     'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],

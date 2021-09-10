@@ -9,14 +9,15 @@ import parseFilepath from 'parse-filepath';
 import { observer } from 'mobx-react';
 import { computed, observable, reaction } from 'mobx';
 import {
+  _Model,
+  connectReduxDevTools,
+  detach,
+  getSnapshot,
+  model,
   Model,
   modelAction,
   prop,
-  getSnapshot,
-  _Model,
-  connectReduxDevTools,
-  model,
-  registerRootStore, detach,
+  registerRootStore,
 } from 'mobx-keystone';
 
 import { SVGWrapper } from '../data/SVGWrapper';
@@ -73,7 +74,7 @@ export class WorkspaceModel extends Model({
 
   onAttachedToRootStore():(() => void) {
     // this.preferences = new PreferencesModel({});
-    persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+    this.persistPreferences();
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
@@ -156,6 +157,17 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
+  persistPreferences() {
+    try {
+      persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+    } catch (e) {
+      // this invalidates localStorage when schema changes
+      this.resetPreferences();
+      persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+    }
+  }
+
+  @modelAction
   setSelectedWidgetName(name) {
     this.selectedWidgetName = name;
     this.clearCurrentFileData();
@@ -165,7 +177,7 @@ export class WorkspaceModel extends Model({
   @modelAction
   renderWidgetToString() {
     const { SelectedRawSvgComponent } = this;
-    const { width, height } = this.preferences.dielineDocumentDimensions;
+    const { documentWidth: { value: width }, documentHeight: { value: height } } = this.preferences;
     return ReactDOMServer.renderToString(
       <SVGWrapper width={width} height={height}>
         <SelectedRawSvgComponent
@@ -180,7 +192,7 @@ export class WorkspaceModel extends Model({
   resetPreferences() {
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
     this.preferences = new PreferencesModel({});
-    persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+    this.persistPreferences();
   }
 
   @modelAction

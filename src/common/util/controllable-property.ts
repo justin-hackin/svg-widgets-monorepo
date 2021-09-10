@@ -24,6 +24,7 @@ export enum INPUT_TYPE {
   COLOR_PICKER = 'color-picker',
   RADIO = 'radio',
   DROPDOWN = 'dropdown',
+  NUMBER_TEXT = 'number-text',
 }
 
 interface BasePrimitiveMetadata {
@@ -57,7 +58,13 @@ export interface RadioMetadata extends BasePrimitiveMetadata {
   isRow?: boolean,
 }
 
-export type PrimitiveMetadata = SliderMetadata | SwitchMetadata | ColorPickerMetadata | RadioMetadata;
+export interface NumberTextMetadata extends BasePrimitiveMetadata {
+  type: INPUT_TYPE.NUMBER_TEXT,
+  useUnits?: boolean,
+}
+
+export type PrimitiveMetadata =
+  SliderMetadata | SwitchMetadata | ColorPickerMetadata | RadioMetadata | NumberTextMetadata;
 export type ReferenceMetadata = DropdownReferenceMetadata<any>;
 export type AnyMetadata = PrimitiveMetadata | ReferenceMetadata;
 export type ControllableModel =
@@ -107,7 +114,9 @@ export function controllablePrimitiveProp<T, M extends PrimitiveMetadata>(value:
   ));
 }
 
-export const sliderProp = (value: number, metadata: Omit<SliderMetadata, 'type'>) => controllablePrimitiveProp<number, SliderMetadata>(
+export const sliderProp = (
+  value: number, metadata: Omit<SliderMetadata, 'type'>,
+) => controllablePrimitiveProp<number, SliderMetadata>(
   value, { type: INPUT_TYPE.SLIDER, ...metadata },
 );
 
@@ -123,6 +132,13 @@ export const radioProp = (
   value: string, metadata: Omit<RadioMetadata, 'type'>,
 ) => controllablePrimitiveProp<string, RadioMetadata>(
   value, { type: INPUT_TYPE.RADIO, ...metadata },
+);
+
+// TODO: consider default label override + context for units on label
+export const numberTextProp = (
+  value: number, metadata?: Omit<NumberTextMetadata, 'type'>,
+) => controllablePrimitiveProp<number, NumberTextMetadata>(
+  value, { type: INPUT_TYPE.NUMBER_TEXT, ...metadata },
 );
 
 export interface ReferenceOptionEntry<T> {

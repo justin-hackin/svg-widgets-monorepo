@@ -20,6 +20,7 @@ export const SubmittableTextInput = observer(({
       inputRef.current.value = pxToUnitView(value, displayUnit);
     }
   }, [displayUnit]);
+
   return (
     <Input
       inputRef={inputRef}

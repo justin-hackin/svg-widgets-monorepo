@@ -3,23 +3,36 @@ import { observer } from 'mobx-react';
 import { Button, Divider } from '@material-ui/core';
 import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { PanelTextInput } from '../../../../../../common/components/PanelTextInput';
 import { NodeSwitch } from '../../../../../../common/components/NodeSwitch';
 import { NodeColorPicker } from '../../../../../../common/components/NodeColorPicker';
 import { NodeRadio } from '../../../../../../common/components/NodeRadio';
+import { NodeNumberTextInput } from '../../../../../../common/components/NodeNumberTextInput';
 
 export const PreferencesControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { preferences } = workspaceStore;
+  const {
+    displayUnit,
+    documentHeight,
+    documentWidth,
+    useClonesForBaseTabs,
+    useClonesForDecoration,
+    scoreStrokeColor,
+    cutStrokeColor,
+    registrationStrokeColor,
+    printRegistrationType,
+  } = preferences;
   return (
     <>
-      <NodeRadio node={preferences.displayUnit} />
+      <NodeRadio node={displayUnit} />
 
-      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width" useUnits />
-      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" useUnits />
-      <NodeSwitch node={preferences.useClonesForBaseTabs} />
+      <NodeNumberTextInput node={documentWidth} />
 
-      <NodeSwitch node={preferences.useClonesForDecoration} />
+      <NodeNumberTextInput node={documentHeight} />
+
+      <NodeSwitch node={useClonesForBaseTabs} />
+
+      <NodeSwitch node={useClonesForDecoration} />
 
       <PanelSliderOrTextInput
         node={preferences}
@@ -30,19 +43,19 @@ export const PreferencesControls = observer(() => {
         step={0.01}
       />
 
-      <NodeColorPicker node={preferences.scoreStrokeColor} />
+      <NodeColorPicker node={scoreStrokeColor} />
 
-      <NodeColorPicker node={preferences.cutStrokeColor} />
+      <NodeColorPicker node={cutStrokeColor} />
 
-      <NodeColorPicker node={preferences.registrationStrokeColor} />
+      <NodeColorPicker node={registrationStrokeColor} />
 
       <Divider />
 
-      <NodeRadio node={preferences.printRegistrationType} />
+      <NodeRadio node={printRegistrationType} />
 
-      <PanelTextInput node={preferences} property="registrationPadding" useUnits />
+      <NodeNumberTextInput node={preferences.registrationPadding} />
 
-      <PanelTextInput node={preferences} property="registrationMarkLength" useUnits />
+      <NodeNumberTextInput node={preferences.registrationMarkLength} />
 
       <Button
         variant="contained"

@@ -55,7 +55,9 @@ export const DielinesLayer = observer(({
     useClonesForBaseTabs: { value: useClonesForBaseTabs },
     useClonesForDecoration: { value: useClonesForDecoration },
     printRegistrationType: { value: printRegistrationType },
-    registrationPadding, registrationStrokeColor, registrationMarkLength,
+    registrationPadding: { value: registrationPadding },
+    registrationStrokeColor: { value: registrationStrokeColor },
+    registrationMarkLength: { value: registrationMarkLength },
   } = preferencesStore;
 
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
@@ -150,7 +152,7 @@ export const DielinesLayer = observer(({
           ) : (
             <path
               className="dieline-registration-marks"
-              stroke={registrationStrokeColor.value}
+              stroke={registrationStrokeColor}
               fill="none"
               strokeWidth={1}
               d={registrationMarksPath(printRegistrationBB, registrationMarkLength, true).getD()}

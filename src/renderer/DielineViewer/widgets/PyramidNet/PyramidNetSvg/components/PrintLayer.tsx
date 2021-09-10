@@ -46,9 +46,9 @@ export const PrintLayer = observer(({
   } = widgetStore;
 
   const {
-    registrationPadding,
+    registrationPadding: { value: registrationPadding },
     printRegistrationType: { value: printRegistrationType },
-    registrationMarkLength,
+    registrationMarkLength: { value: registrationMarkLength },
   } = preferencesStore;
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
