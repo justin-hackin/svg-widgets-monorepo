@@ -51,7 +51,9 @@ export const DielinesLayer = observer(({
   } = widgetStore;
 
   const {
-    cutProps, scoreProps, useClonesForBaseTabs, useClonesForDecoration,
+    cutProps, scoreProps,
+    useClonesForBaseTabs: { value: useClonesForBaseTabs },
+    useClonesForDecoration: { value: useClonesForDecoration },
     printRegistrationType, registrationPadding, registrationStrokeColor, registrationMarkLength,
   } = preferencesStore;
 

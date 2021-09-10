@@ -1,18 +1,11 @@
 // eslint-disable-next-line max-classes-per-file
-import {
-  chunk, last, range, sum, uniq,
-} from 'lodash';
-import {
-  detach, findParent,
-  Model, model, modelAction, prop, Ref, rootRef,
-} from 'mobx-keystone';
+import { chunk, last, range, startCase, sum, uniq, } from 'lodash';
+import { detach, getRootPath, Model, model, prop, rootRef, } from 'mobx-keystone';
 
 import { computed } from 'mobx';
-import {
-  distanceFromOrigin, lineLerp, PointLike, subtractPoints,
-} from '../../../../common/util/geom';
+import { distanceFromOrigin, lineLerp, PointLike, subtractPoints, } from '../../../../common/util/geom';
 import { PathData } from '../PathData';
-import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
+import { referenceDropdownProp } from '../../../../common/util/controllable-property';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -28,15 +21,18 @@ if (!uniq(dasharrays)) {
   throw new Error('dasharrays contents are not unique');
 }
 
-const dasharrayLabelMap = (dasharray) => chunk(dasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
-
 const STROKE_DASH_PATH_PATTERN_MODEL_TYPE = 'StrokeDashPathPatternModel';
 
 @model(STROKE_DASH_PATH_PATTERN_MODEL_TYPE)
 export class StrokeDashPathPatternModel extends Model({
   // TODO: even number length typing?
   relativeStrokeDasharray: prop<number[]>(),
-}) { }
+}) {
+  @computed
+  get label() {
+    return chunk(this.relativeStrokeDasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
+  }
+}
 
 const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
   onResolvedValueChange(ref, newInst, oldInst) {
@@ -50,42 +46,40 @@ const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_
 
 export const dashPatternsDefaultFn = () => dasharrays.map((relativeStrokeDasharray) => (new StrokeDashPathPatternModel({
   relativeStrokeDasharray,
-  $modelId: dasharrayLabelMap(relativeStrokeDasharray),
 })));
+
+
 
 @model('DashPatternModel')
 export class DashPatternModel extends Model({
-  strokeDashPathPatternRef: prop<Ref<StrokeDashPathPatternModel>>(),
+  strokeDashPathPattern: referenceDropdownProp<StrokeDashPathPatternModel>({
+    labelOverride: (node) => {
+      const { path } = getRootPath(node);
+      if (path.length) {
+        const parentName = `${path[path.length - 2]}`;
+        return `${startCase(parentName)} Pattern`;
+      }
+      // this should never happen
+      return node.ownPropertyName;
+    },
+    typeRef: patternRef,
+    pathToOptions: ['selectedStore', 'dashPatterns'],
+    optionLabeler: ({ label }) => label,
+    initialValueIndex: 0,
+  }),
   strokeDashLength: prop(11),
   strokeDashOffsetRatio: prop(0),
 }) {
-  protected onAttachedToRootStore(): (() => void) | void {
-    const makerStore = findParent<PyramidNetPluginModel>(this,
-      (parentNode) => parentNode instanceof PyramidNetPluginModel);
-    if (makerStore) {
-      this.setStrokeDashPathPattern(makerStore.dashPatterns[0]);
-    }
-  }
-
-  @computed
-  get strokeDashPathPattern() {
-    return this.strokeDashPathPatternRef.current;
-  }
-
-  @modelAction
-  setStrokeDashPathPattern(pattern: StrokeDashPathPatternModel) {
-    this.strokeDashPathPatternRef = patternRef(pattern);
-  }
 }
 
 export function strokeDashPathRatios(
   start: PointLike, end: PointLike, dashSpec: DashPatternModel,
 ) {
-  if (!dashSpec) { return [[0, 1]]; }
+  if (!dashSpec?.strokeDashPathPattern?.value) { return [[0, 1]]; }
   const vector = subtractPoints(end, start);
   const vectorLength = distanceFromOrigin(vector);
   const {
-    strokeDashPathPattern: { relativeStrokeDasharray },
+    strokeDashPathPattern: { value: { relativeStrokeDasharray } = {} } = {},
     strokeDashLength,
     strokeDashOffsetRatio,
   } = dashSpec;

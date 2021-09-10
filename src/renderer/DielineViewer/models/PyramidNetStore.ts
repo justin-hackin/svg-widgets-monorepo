@@ -2,7 +2,7 @@
 import { chunk, flatten, range } from 'lodash';
 import {
   getParent,
-  model, Model, modelAction, prop, resolveId, undoMiddleware,
+  model, Model, modelAction, prop, undoMiddleware,
 } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
 
@@ -449,19 +449,5 @@ export class PyramidNetModel extends Model({
       this.interFaceScoreDashSpec = undefined;
       this.baseScoreDashSpec = undefined;
     }
-  }
-
-  @modelAction
-  setInterFaceScoreDashSpecPattern(id) {
-    this.interFaceScoreDashSpec.setStrokeDashPathPattern(resolveId(
-      getParent(this), id,
-    ));
-  }
-
-  @modelAction
-  setBaseScoreDashSpecPattern(id) {
-    this.baseScoreDashSpec.setStrokeDashPathPattern(resolveId(
-      getParent(this), id,
-    ));
   }
 }

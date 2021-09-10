@@ -6,11 +6,11 @@ import { startCase } from 'lodash';
 import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
 import { PanelColorPicker } from '../../../../../../common/components/PanelColorPicker';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { PanelSwitch } from '../../../../../../common/components/PanelSwitch';
 import { PanelTextInput } from '../../../../../../common/components/PanelTextInput';
 import { PanelRadio } from '../../../../../../common/components/PanelRadio';
 import { UNITS } from '../../../../../../common/util/units';
 import { PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
+import { NodeSwitch } from '../../../../../../common/components/NodeSwitch';
 
 export const PreferencesControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -26,14 +26,10 @@ export const PreferencesControls = observer(() => {
       />
       <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width" useUnits />
       <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" useUnits />
-      <PanelSwitch
-        node={preferences}
-        property="useClonesForBaseTabs"
-      />
-      <PanelSwitch
-        node={preferences}
-        property="useClonesForDecoration"
-      />
+      <NodeSwitch node={preferences.useClonesForBaseTabs} />
+
+      <NodeSwitch node={preferences.useClonesForDecoration} />
+
       <PanelSliderOrTextInput
         node={preferences}
         property="strokeWidth"

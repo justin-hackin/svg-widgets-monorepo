@@ -317,7 +317,7 @@ export class PathData {
     return this.lastCommand.to;
   }
 
-  curvedLineSegments(toPoints, roundingRatio, endWithClose = false) {
+  curvedLineSegments(toPoints, roundingRatio: number, endWithClose = false) {
     // TODO: handle last command is close
     this._assertLastCommandExists();
     const modifiedPoints = this.commands.length ? [this.endPoint, ...toPoints] : [...toPoints];

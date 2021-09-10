@@ -7,6 +7,7 @@ import { PanelSwitch, PanelSwitchUncontrolled } from '../../../../../../common/c
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { NodeSlider } from '../../../../../../common/NodeSlider';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -18,11 +19,8 @@ export const BaseEdgeTabControls = observer(() => {
 
   return (
     <>
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="roundingDistanceRatio"
-        {...ratioSliderProps}
-      />
+      <NodeSlider node={baseEdgeTabsSpec.roundingDistanceRatio} />
+
       <PanelSwitch
         node={baseEdgeTabsSpec}
         property="scoreTabMidline"

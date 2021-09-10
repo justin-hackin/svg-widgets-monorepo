@@ -14,6 +14,7 @@ import {
 import { DashPatternModel, strokeDashPath } from './strokeDashPath';
 import { arrowTabPlots } from './symmetricRoundedTab';
 import { VERY_LARGE_NUMBER } from '../../../../common/constants';
+import {controllablePrimitiveProp, INPUT_TYPE, sliderProp} from '../../../../common/util/controllable-property';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,
@@ -46,7 +47,9 @@ export class BaseEdgeTabsModel extends Model({
   holeDepthToTabDepth: prop(0.5),
   holeTaper: prop(0.97),
   scoreTabMidline: prop(false),
-  roundingDistanceRatio: prop(0.9),
+  roundingDistanceRatio: sliderProp(0.9, {
+    min: 0, max: 1, step: 0.1,
+  }),
   tabDepthToAscendantTabDepth: prop(1.5),
   holeTabClearance: prop(0.1),
   bendGuideValley: prop<BendGuideValleyModel | null>(() => null),
@@ -134,7 +137,7 @@ export function baseEdgeConnectionTab(
     .move(holeBases[0])
     .line(holeBases[1])
     .line(holeBasesClearance[1])
-    .curvedLineSegments([holeEdges[1], holeEdges[0], holeBasesClearance[0]], roundingDistanceRatio)
+    .curvedLineSegments([holeEdges[1], holeEdges[0], holeBasesClearance[0]], roundingDistanceRatio.value)
     .close();
 
   const baseHandleEnd = hingedPlot(start, finBases[0], 0, clearanceLength * 2);
@@ -158,11 +161,11 @@ export function baseEdgeConnectionTab(
     handleCornerPoints.push(handleValleyEdges[0], handleValleyDip, handleValleyEdges[1]);
   }
   handleCornerPoints.push(handleEdges[1], baseHandleEnd);
-  boundaryCut.move(start).curvedLineSegments(handleCornerPoints, roundingDistanceRatio)
+  boundaryCut.move(start).curvedLineSegments(handleCornerPoints, roundingDistanceRatio.value)
     .curvedLineSegments([finBases[0], finBasesClearance[0], tabMidpoints[0]], 0.5);
   boundaryCut.commands.pop();
   boundaryCut.curvedLineSegments(
-    [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]], roundingDistanceRatio,
+    [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]], roundingDistanceRatio.value,
   );
   boundaryCut.commands.pop();
   boundaryCut.curvedLineSegments([finBasesClearance[1], finBases[1], end], 0.5);

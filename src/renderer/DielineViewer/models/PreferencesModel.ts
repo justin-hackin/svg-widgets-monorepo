@@ -1,6 +1,7 @@
 import { Model, model, prop } from 'mobx-keystone';
 import { PIXELS_PER_CM, PIXELS_PER_INCH, UNITS } from '../../../common/util/units';
 import { DimensionsModel } from '../../../common/models/DimensionsModel';
+import { switchProp } from '../../../common/util/controllable-property';
 
 export enum PRINT_REGISTRATION_TYPES {
   LASER_CUTTER = 'laser-cutter',
@@ -16,8 +17,8 @@ export class PreferencesModel extends Model({
     width: PIXELS_PER_CM * 49.5,
     height: PIXELS_PER_CM * 27.9,
   })),
-  useClonesForBaseTabs: prop(false),
-  useClonesForDecoration: prop(false),
+  useClonesForBaseTabs: switchProp(false),
+  useClonesForDecoration: switchProp(false),
   cutStrokeColor: prop('#FF3A5E'),
   scoreStrokeColor: prop('#BDFF48'),
   registrationStrokeColor: prop('#005eff'),
