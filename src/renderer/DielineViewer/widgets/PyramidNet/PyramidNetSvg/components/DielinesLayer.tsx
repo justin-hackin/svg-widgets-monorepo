@@ -149,7 +149,7 @@ export const DielinesLayer = observer(({
           ) : (
             <path
               className="dieline-registration-marks"
-              stroke={registrationStrokeColor}
+              stroke={registrationStrokeColor.value}
               fill="none"
               strokeWidth={1}
               d={registrationMarksPath(printRegistrationBB, registrationMarkLength, true).getD()}

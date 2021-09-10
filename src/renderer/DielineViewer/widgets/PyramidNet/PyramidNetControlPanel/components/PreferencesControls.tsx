@@ -4,13 +4,13 @@ import { Button, Divider } from '@material-ui/core';
 
 import { startCase } from 'lodash';
 import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
-import { PanelColorPicker } from '../../../../../../common/components/PanelColorPicker';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PanelTextInput } from '../../../../../../common/components/PanelTextInput';
 import { PanelRadio } from '../../../../../../common/components/PanelRadio';
 import { UNITS } from '../../../../../../common/util/units';
 import { PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
 import { NodeSwitch } from '../../../../../../common/components/NodeSwitch';
+import { NodeColorPicker } from '../../../../../../common/components/NodeColorPicker';
 
 export const PreferencesControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -38,15 +38,13 @@ export const PreferencesControls = observer(() => {
         max={3}
         step={0.01}
       />
-      <PanelColorPicker
-        node={preferences}
-        property="scoreStrokeColor"
-      />
 
-      <PanelColorPicker
-        node={preferences}
-        property="cutStrokeColor"
-      />
+      <NodeColorPicker node={preferences.scoreStrokeColor} />
+
+      <NodeColorPicker node={preferences.cutStrokeColor} />
+
+      <NodeColorPicker node={preferences.registrationStrokeColor} />
+
       <Divider />
       <PanelRadio
         node={preferences}
@@ -55,10 +53,6 @@ export const PreferencesControls = observer(() => {
           Object.values(PRINT_REGISTRATION_TYPES)
             .map((value) => ({ value, label: startCase(value) }))
         }
-      />
-      <PanelColorPicker
-        node={preferences}
-        property="registrationStrokeColor"
       />
 
       <PanelTextInput node={preferences} property="registrationPadding" useUnits />

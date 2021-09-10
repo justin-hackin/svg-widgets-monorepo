@@ -14,6 +14,7 @@ import {
   Ref,
   RefConstructor,
 } from 'mobx-keystone';
+
 import { ownPropertyName, tryResolvePath } from './mobx-keystone';
 import { labelOverride, resolveLabel } from './label';
 
@@ -160,7 +161,6 @@ export const switchProp = (value: boolean) => controllablePrimitiveProp<boolean,
 export const colorPickerProp = (value: string) => controllablePrimitiveProp<string, ColorPickerMetadata>(
   value, { type: INPUT_TYPE.COLOR_PICKER },
 );
-
 
 @model('ControllableDropdownReferenceModel')
 export class ControllableDropdownReferenceModel<T extends object, M extends DropdownReferenceMetadata<T>> extends
