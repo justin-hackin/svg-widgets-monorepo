@@ -85,6 +85,8 @@ export type AnyMetadata = PrimitiveMetadata | ReferenceMetadata;
 export type ControllableModel =
   ControllablePrimitiveModel<any, PrimitiveMetadata> | ControllableReferenceModel<any, ReferenceMetadata>;
 
+const propertyMetadataRegistry = new Map<string, AnyMetadata>();
+
 const propertyMetadata = createContext<AnyMetadata>();
 
 @model('ControllablePrimitiveModel')// eslint-disable-next-line @typescript-eslint/no-shadow
@@ -93,6 +95,14 @@ export class ControllablePrimitiveModel<T, M extends PrimitiveMetadata> extends 
 }))<T> {
   private defaultValue: T | undefined;
 
+  onAttachedToRootStore(rootStore) {
+    // undefined when applying snapshot
+    const metadataFromContext = propertyMetadata.get(this);
+    if (metadataFromContext) {
+      propertyMetadataRegistry.set(this.valuePath, propertyMetadata.get(this));
+    }
+  }
+
   @modelAction
   reset() {
     this.value = this.defaultValue;
@@ -100,7 +110,7 @@ export class ControllablePrimitiveModel<T, M extends PrimitiveMetadata> extends 
 
   @computed
   get metadata():M {
-    return propertyMetadata.get(this) as M;
+    return propertyMetadataRegistry.get(this.valuePath) as M;
   }
 
   @computed
@@ -140,6 +150,7 @@ export class ControllablePrimitiveWithOptionsModel<T, M extends WithOptionsMetad
 
   // @ts-ignore
   onAttachedToRootStore(rootStore) {
+    super.onAttachedToRootStore(rootStore);
     createOptionsGetter(this, rootStore);
   }
 }
@@ -209,9 +220,19 @@ interface ReferenceSelectMetadata<T extends object> {
 export class ControllableReferenceModel<T extends object, M extends ReferenceMetadata> extends Model(
   <T extends object>() => ({ valueRef: prop<Ref<T> | undefined>() }),
 )<T> {
+  // since applying a snapshot will detach this node and construct a new one, transfer metadata to store
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onAttachedToRootStore(rootStore) {
+    // undefined when applying snapshot
+    const metadataFromContext = propertyMetadata.get(this);
+    if (metadataFromContext) {
+      propertyMetadataRegistry.set(this.valuePath, propertyMetadata.get(this));
+    }
+  }
+
   @computed
   get metadata():M {
-    return propertyMetadata.get(this) as M;
+    return propertyMetadataRegistry.get(this.valuePath) as M;
   }
 
   @computed
@@ -250,6 +271,7 @@ export class ControllableReferenceWithOptionsModel<T extends object, M extends R
   readonly options: OptionsListItem<T>[] | undefined;
 
   onAttachedToRootStore(rootStore) {
+    super.onAttachedToRootStore(rootStore);
     createOptionsGetter(this, rootStore);
 
     if (this.metadata.initialSelectionResolver !== undefined) {

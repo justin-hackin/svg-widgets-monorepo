@@ -73,8 +73,7 @@ export class WorkspaceModel extends Model({
   currentFilePath = undefined;
 
   onAttachedToRootStore():(() => void) {
-    // this.preferences = new PreferencesModel({});
-    // this.persistPreferences();
+    this.persistPreferences();
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
