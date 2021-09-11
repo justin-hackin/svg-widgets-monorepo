@@ -21,6 +21,7 @@ export enum INPUT_TYPE {
   SWITCH = 'switch',
   COLOR_PICKER = 'color-picker',
   RADIO = 'radio',
+  REFERENCE_RADIO = 'radio',
   SELECT = 'select',
   REFERENCE_SELECT = 'reference-select',
   NUMBER_TEXT = 'number-text',
@@ -82,7 +83,7 @@ export interface NumberTextMetadata extends BasePrimitiveMetadata {
 
 export type PrimitiveMetadata =
   SliderMetadata | SwitchMetadata | ColorPickerMetadata | RadioMetadata<any> | NumberTextMetadata | SelectMetadata<any>;
-export type ReferenceMetadata = ReferenceSelectMetadata<any>;
+export type ReferenceMetadata = ReferenceWithOptionsMetadata<any>;
 export type AnyMetadata = PrimitiveMetadata | ReferenceMetadata;
 export type ControllableModel =
   ControllablePrimitiveModel<any, PrimitiveMetadata> | ControllableReferenceModel<any, ReferenceMetadata>;
@@ -213,12 +214,22 @@ export const numberTextProp = (
 
 type InitialSelectionResolver<T> = (optionValues: T[], rootStore: object) => (T | undefined);
 
-interface ReferenceSelectMetadata<T extends object> extends BasePrimitiveMetadata{
-  type: INPUT_TYPE.REFERENCE_SELECT,
-  options: MetadataOptions<T>,
+export interface ReferenceResolvingOptionsMetadata<T extends object> extends BasePrimitiveMetadata {
   initialSelectionResolver?: InitialSelectionResolver<T>,
   typeRef: RefConstructor<T>,
+  options: MetadataOptions<T>,
 }
+
+export interface ReferenceSelectMetadata<T extends object> extends ReferenceResolvingOptionsMetadata<T> {
+  type: INPUT_TYPE.REFERENCE_SELECT,
+}
+
+export interface ReferenceRadioMetadata<T extends object> extends ReferenceResolvingOptionsMetadata<T> {
+  type: INPUT_TYPE.REFERENCE_RADIO,
+  isRow?: boolean
+}
+
+export type ReferenceWithOptionsMetadata<T extends object> = ReferenceRadioMetadata<T> | ReferenceSelectMetadata<T>;
 
 @model('ControllableReferenceModel')
 export class ControllableReferenceModel<T extends object, M extends ReferenceMetadata> extends Model(
@@ -267,8 +278,8 @@ export class ControllableReferenceModel<T extends object, M extends ReferenceMet
 }
 
 @model('ControllableReferenceWithOptionsModel')
-export class ControllableReferenceWithOptionsModel<T extends object, M extends ReferenceSelectMetadata<T>> extends
-  ExtendedModel(<T extends object, M extends ReferenceSelectMetadata<T>>() => ({
+export class ControllableReferenceWithOptionsModel<T extends object, M extends ReferenceWithOptionsMetadata<T>> extends
+  ExtendedModel(<T extends object, M extends ReferenceWithOptionsMetadata<T>>() => ({
     baseModel: modelClass<ControllableReferenceModel<T, M>>(ControllableReferenceModel),
     props: {},
   }))<T, M> {
@@ -288,9 +299,17 @@ export class ControllableReferenceWithOptionsModel<T extends object, M extends R
 }
 
 export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSelectMetadata<T>, 'type'>) {
-  return prop<ControllableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>>(() => propertyMetadata.apply(
-    () => new ControllableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({}), {
-      type: INPUT_TYPE.REFERENCE_SELECT, ...metadata,
+  const defaultFn = () => propertyMetadata.apply(
+    () => new ControllableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({}),
+    { type: INPUT_TYPE.REFERENCE_SELECT, ...metadata },
+  );
+  return prop<ControllableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>>(defaultFn);
+}
+
+export function referenceRadioProp<T extends object>(metadata: Omit<ReferenceRadioMetadata<T>, 'type'>) {
+  return prop<ControllableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>>(() => propertyMetadata.apply(
+    () => new ControllableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({}), {
+      type: INPUT_TYPE.REFERENCE_RADIO, ...metadata,
     },
   ));
 }

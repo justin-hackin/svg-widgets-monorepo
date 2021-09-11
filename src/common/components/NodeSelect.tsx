@@ -40,9 +40,7 @@ export const UncontrolledNodeSelect = observer(({
 export const NodeReferenceSelect = observer(({
   node,
 }: { node: ControllableReferenceWithOptionsModel<any, any> }) => {
-  const {
-    valuePath, label, options,
-  } = node;
+  const { valuePath, label, options } = node;
 
   const idToOptions = useMemo(() => options.reduce((acc, option) => {
     acc[option.value.$modelId] = option;
