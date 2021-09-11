@@ -27,6 +27,8 @@ export class PyramidModel extends Model({
       .map((shapeId) => ({ value: shapeId, label: startCase(shapeId) })),
   }),
   netsPerPyramid: selectProp(1, {
+    // can't use type PyramidModel because of TS2310 (but it's better than using hard-coded paths)
+    // context: https://github.com/microsoft/TypeScript/issues/40315
     options: (_, self) => () => (getParent(self).netsPerPyramidOptions as number[])
       .map((value) => ({ value, label: value.toString() })),
   }),

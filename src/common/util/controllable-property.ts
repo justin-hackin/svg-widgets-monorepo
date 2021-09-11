@@ -50,6 +50,8 @@ interface OptionsListItem<T> {
   value: T,
   label?: string,
 }
+
+// TODO: is this the best parameter order?
 type OptionsListResolverFactory<T> = (rootStore: object, node: object) => (() => OptionsListItem<T>[]);
 
 type MetadataOptions<T> = OptionsListItem<T>[] | OptionsListResolverFactory<T>;
