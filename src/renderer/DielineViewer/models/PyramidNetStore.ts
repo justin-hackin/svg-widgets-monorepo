@@ -411,7 +411,7 @@ export class PyramidNetModel extends Model({
     const disposers = [
       reaction(() => [this.pyramid.shapeName.value], () => {
         // all geometries have 1 as option, but different shapes have different divisors > 1
-        this.pyramid.netsPerPyramid = 1;
+        this.pyramid.netsPerPyramid.setValue(1);
         this.applyShapeBasedDefaults();
         getParent(this).textureEditor.refitTextureToFace();
       }),

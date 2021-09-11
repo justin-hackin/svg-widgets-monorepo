@@ -50,7 +50,7 @@ interface OptionsListItem<T> {
   value: T,
   label?: string,
 }
-type OptionsListResolverFactory<T> = (rootStore: object) => (() => OptionsListItem<T>[]);
+type OptionsListResolverFactory<T> = (rootStore: object, node: object) => (() => OptionsListItem<T>[]);
 
 type MetadataOptions<T> = OptionsListItem<T>[] | OptionsListResolverFactory<T>;
 
@@ -71,7 +71,7 @@ export interface SelectMetadata<T> extends BasePrimitiveMetadata {
   options: MetadataOptions<T>,
 }
 
-type WithOptionsMetadata<T> = SelectMetadata<T> | RadioMetadata<T>;
+export type WithOptionsMetadata<T> = SelectMetadata<T> | RadioMetadata<T>;
 
 export interface NumberTextMetadata extends BasePrimitiveMetadata {
   type: INPUT_TYPE.NUMBER_TEXT,
@@ -95,6 +95,7 @@ export class ControllablePrimitiveModel<T, M extends PrimitiveMetadata> extends 
 }))<T> {
   private defaultValue: T | undefined;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAttachedToRootStore(rootStore) {
     // undefined when applying snapshot
     const metadataFromContext = propertyMetadata.get(this);
@@ -134,7 +135,9 @@ function createOptionsGetter(
   rootStore: object,
 ) {
   Object.defineProperty(node, 'options', {
-    get: optionsIsListResolver(node.metadata.options) ? node.metadata.options(rootStore, node) : () => node.metadata.options,
+    get: optionsIsListResolver(node.metadata.options)
+      ? node.metadata.options(rootStore, node)
+      : () => node.metadata.options,
     configurable: true,
   });
   makeObservable(node, { options: computed });

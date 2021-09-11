@@ -1,10 +1,7 @@
-import {
-  getParent, Model, model, prop, SnapshotOutOf,
-} from 'mobx-keystone';
+import { getParent, Model, model } from 'mobx-keystone';
 import { isInteger, sortBy, startCase } from 'lodash';
 import { polyhedra } from '../data/polyhedra';
 import { selectProp } from '../../../common/util/controllable-property';
-import { PyramidNetPluginModel } from './PyramidNetMakerStore';
 
 const getDivisors = (num) => {
   if (!isInteger(num)) {
@@ -29,7 +26,10 @@ export class PyramidModel extends Model({
     options: sortBy(Object.keys(polyhedra))
       .map((shapeId) => ({ value: shapeId, label: startCase(shapeId) })),
   }),
-  netsPerPyramid: prop(1),
+  netsPerPyramid: selectProp(1, {
+    options: (_, self) => () => (getParent(self).netsPerPyramidOptions as number[])
+      .map((value) => ({ value, label: value.toString() })),
+  }),
 }) {
   get geometry() {
     return polyhedra[this.shapeName.value];
@@ -48,6 +48,6 @@ export class PyramidModel extends Model({
   }
 
   get facesPerNet() {
-    return this.geometry.faceCount / this.netsPerPyramid;
+    return this.geometry.faceCount / this.netsPerPyramid.value;
   }
 }

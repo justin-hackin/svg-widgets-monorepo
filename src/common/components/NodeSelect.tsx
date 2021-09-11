@@ -5,8 +5,6 @@ import uuid from 'uuid/v1';
 import FormControl from '@material-ui/core/FormControl';
 import React, { useMemo } from 'react';
 import { observer } from 'mobx-react';
-
-import { startCase } from 'lodash';
 import { useStyles } from '../style/style';
 import {
   ControllablePrimitiveWithOptionsModel,
@@ -39,11 +37,11 @@ export const UncontrolledNodeSelect = observer(({
   );
 });
 
-export const NodeSelect = observer(({
+export const NodeReferenceSelect = observer(({
   node,
-}: { node: ControllableReferenceWithOptionsModel<any, any> | ControllablePrimitiveWithOptionsModel<any, any> }) => {
+}: { node: ControllableReferenceWithOptionsModel<any, any> }) => {
   const {
-    valuePath, label, ownPropertyName, options,
+    valuePath, label, options,
   } = node;
 
   const idToOptions = useMemo(() => options.reduce((acc, option) => {
@@ -61,7 +59,29 @@ export const NodeSelect = observer(({
           value: $modelId, label: optionLabel,
         })),
         value: node.value.$modelId,
-        label: label || startCase(ownPropertyName),
+        label,
+        name: valuePath,
+      }}
+    />
+  );
+});
+
+export const NodeSelect = observer(({
+  node,
+}: { node: ControllablePrimitiveWithOptionsModel<any, any> }) => {
+  const {
+    valuePath, label, options,
+  } = node;
+
+  return (
+    <UncontrolledNodeSelect
+      {...{
+        onChange: (e) => {
+          node.setValue(e.target.value);
+        },
+        options,
+        value: node.value,
+        label,
         name: valuePath,
       }}
     />

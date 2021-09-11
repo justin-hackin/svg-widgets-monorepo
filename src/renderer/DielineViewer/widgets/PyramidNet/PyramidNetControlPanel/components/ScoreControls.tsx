@@ -6,7 +6,7 @@ import { PanelSwitchUncontrolled } from '../../../../../../common/components/Pan
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
-import { NodeSelect } from '../../../../../../common/components/NodeSelect';
+import { NodeReferenceSelect } from '../../../../../../common/components/NodeSelect';
 
 const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 
@@ -26,7 +26,7 @@ export const ScoreControls = observer(() => {
       />
       {useDottedStroke && (
         <>
-          <NodeSelect node={interFaceScoreDashSpec.strokeDashPathPattern} />
+          <NodeReferenceSelect node={interFaceScoreDashSpec.strokeDashPathPattern} />
 
           <PanelSliderOrTextInput
             node={interFaceScoreDashSpec}
@@ -41,7 +41,7 @@ export const ScoreControls = observer(() => {
             {...ratioSliderProps}
           />
 
-          <NodeSelect node={baseScoreDashSpec.strokeDashPathPattern} />
+          <NodeReferenceSelect node={baseScoreDashSpec.strokeDashPathPattern} />
 
           <PanelSliderOrTextInput
             node={baseScoreDashSpec}

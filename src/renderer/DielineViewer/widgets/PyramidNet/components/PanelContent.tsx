@@ -11,8 +11,8 @@ import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControl
 import { ShapeSelect } from '../../../../../common/components/ShapeSelect';
 import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
 import { PIXELS_PER_CM } from '../../../../../common/util/units';
-import { PanelSelect } from '../../../../../common/components/PanelSelect';
 import { PyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
+import { NodeSelect } from '../../../../../common/components/NodeSelect';
 
 const controlsTabs = [
   {
@@ -62,11 +62,7 @@ export const PanelContent = observer(() => {
           max={60 * PIXELS_PER_CM}
           useUnits
         />
-        <PanelSelect
-          node={pyramid}
-          property="netsPerPyramid"
-          options={pyramid.netsPerPyramidOptions.map((value) => ({ label: value.toString(), value }))}
-        />
+        <NodeSelect node={pyramid.netsPerPyramid} />
       </div>
       <Divider />
       <Paper square>
