@@ -1,7 +1,10 @@
-import { Model, model, prop } from 'mobx-keystone';
+import {
+  getParent, Model, model, prop, SnapshotOutOf,
+} from 'mobx-keystone';
 import { isInteger, sortBy, startCase } from 'lodash';
 import { polyhedra } from '../data/polyhedra';
 import { selectProp } from '../../../common/util/controllable-property';
+import { PyramidNetPluginModel } from './PyramidNetMakerStore';
 
 const getDivisors = (num) => {
   if (!isInteger(num)) {
@@ -37,7 +40,7 @@ export class PyramidModel extends Model({
   }
 
   // allows multiple nets to build a single pyramid e.g. one face per net
-  get netsPerPyramidOptions() {
+  get netsPerPyramidOptions(): number[] {
     // TODO: re-enable this as integer divisors of face count, integer-divisor npm emits regeneratorRuntime errors
     return getDivisors(this.geometry.faceCount)
       // can't apply ascendant edge tabs to an odd number of faces because male & female edge lengths not equal

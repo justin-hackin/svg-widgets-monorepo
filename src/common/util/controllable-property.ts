@@ -62,13 +62,13 @@ function optionsIsListResolver<T>(
 
 export interface RadioMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.RADIO,
-  options: OptionsListItem<T>[] | OptionsListResolverFactory<T>,
+  options: MetadataOptions<T>,
   isRow?: boolean,
 }
 
 export interface SelectMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.SELECT,
-  options: OptionsListItem<T>[],
+  options: MetadataOptions<T>,
 }
 
 type WithOptionsMetadata<T> = SelectMetadata<T> | RadioMetadata<T>;
@@ -134,7 +134,7 @@ function createOptionsGetter(
   rootStore: object,
 ) {
   Object.defineProperty(node, 'options', {
-    get: optionsIsListResolver(node.metadata.options) ? node.metadata.options(rootStore) : () => node.metadata.options,
+    get: optionsIsListResolver(node.metadata.options) ? node.metadata.options(rootStore, node) : () => node.metadata.options,
     configurable: true,
   });
   makeObservable(node, { options: computed });
@@ -208,12 +208,11 @@ export const numberTextProp = (
 
 type InitialSelectionResolver<T> = (optionValues: T[], rootStore: object) => (T | undefined);
 
-interface ReferenceSelectMetadata<T extends object> {
+interface ReferenceSelectMetadata<T extends object> extends BasePrimitiveMetadata{
   type: INPUT_TYPE.REFERENCE_SELECT,
   options: MetadataOptions<T>,
   initialSelectionResolver?: InitialSelectionResolver<T>,
   typeRef: RefConstructor<T>,
-  labelOverride?: labelOverride,
 }
 
 @model('ControllableReferenceModel')
