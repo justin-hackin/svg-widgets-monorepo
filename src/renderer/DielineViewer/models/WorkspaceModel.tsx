@@ -74,7 +74,7 @@ export class WorkspaceModel extends Model({
 
   onAttachedToRootStore():(() => void) {
     // this.preferences = new PreferencesModel({});
-    this.persistPreferences();
+    // this.persistPreferences();
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
@@ -190,9 +190,9 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetPreferences() {
-    localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
+    // localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
     this.preferences = new PreferencesModel({});
-    this.persistPreferences();
+    // this.persistPreferences();
   }
 
   @modelAction
@@ -220,7 +220,7 @@ export class WorkspaceModel extends Model({
 // access to shapeDefinition's model name otherwise
 export const workspaceStore = new WorkspaceModel({});
 registerRootStore(workspaceStore);
-
+// workspaceStore.persistPreferences();
 // @ts-ignore
 window.workpsaceStore = workspaceStore;
 const WorkspaceStoreContext = createContext<WorkspaceModel>(workspaceStore);

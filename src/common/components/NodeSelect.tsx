@@ -8,7 +8,10 @@ import { observer } from 'mobx-react';
 
 import { startCase } from 'lodash';
 import { useStyles } from '../style/style';
-import { ControllableSelectReferenceModel } from '../util/controllable-property';
+import {
+  ControllablePrimitiveWithOptionsModel,
+  ControllableReferenceWithOptionsModel,
+} from '../util/controllable-property';
 
 export const UncontrolledNodeSelect = observer(({
   value, onChange, options, label, name, displayEmpty = undefined,
@@ -38,7 +41,7 @@ export const UncontrolledNodeSelect = observer(({
 
 export const NodeSelect = observer(({
   node,
-}: { node: ControllableSelectReferenceModel<any, any> }) => {
+}: { node: ControllableReferenceWithOptionsModel<any, any> | ControllablePrimitiveWithOptionsModel<any, any> }) => {
   const {
     valuePath, label, ownPropertyName, options,
   } = node;

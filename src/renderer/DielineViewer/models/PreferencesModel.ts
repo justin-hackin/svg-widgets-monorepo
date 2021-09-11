@@ -11,16 +11,14 @@ export enum PRINT_REGISTRATION_TYPES {
   NONE = 'none',
 }
 
-// NOTE: after modifying schema, running `workpsaceStore.resetPreferences()` is required
-// in order to invalidate the persist cache
-// Post-launch, migration schemes will be upon data shape changes
+// Post-launch, migration schemes will be needed upon data shape changes
+// in order to not invalidate localstorage after upgrade
 @model('PreferencesModel')
 export class PreferencesModel extends Model({
   displayUnit: radioProp(UNITS.cm, {
-    options: Object.values(UNITS).map((unit) => ({ value: unit })),
+    options: Object.values(UNITS).map((unit) => ({ value: unit, label: unit })),
     isRow: true,
   }),
-  // TODO: make enum
   documentWidth: numberTextProp(PIXELS_PER_CM * 49.5, { useUnits: true }),
   documentHeight: numberTextProp(PIXELS_PER_CM * 27.9, { useUnits: true }),
   useClonesForBaseTabs: switchProp(false),
@@ -31,7 +29,7 @@ export class PreferencesModel extends Model({
   strokeWidth: prop(1),
   needsTour: prop(true).withSetter(),
   // TODO: how to do enum property in keystone
-  printRegistrationType: radioProp(PRINT_REGISTRATION_TYPES.LASER_CUTTER, {
+  printRegistrationType: radioProp<PRINT_REGISTRATION_TYPES>(PRINT_REGISTRATION_TYPES.LASER_CUTTER, {
     options: Object.values(PRINT_REGISTRATION_TYPES).map((type) => ({ value: type, label: startCase(type) })),
   }),
   registrationPadding: numberTextProp(PIXELS_PER_INCH * 0.5, { useUnits: true }),

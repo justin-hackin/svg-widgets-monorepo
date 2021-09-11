@@ -1,6 +1,6 @@
 import uuid from 'uuid/v1';
 import { isFunction } from 'lodash';
-import { computed } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 import {
   createContext,
   ExtendedModel,
@@ -13,8 +13,7 @@ import {
   Ref,
   RefConstructor,
 } from 'mobx-keystone';
-
-import { ownPropertyName, tryResolvePath } from './mobx-keystone';
+import { ownPropertyName } from './mobx-keystone';
 import { labelOverride, resolveLabel } from './label';
 
 export enum INPUT_TYPE {
@@ -72,6 +71,8 @@ export interface SelectMetadata<T> extends BasePrimitiveMetadata {
   options: OptionsListItem<T>[],
 }
 
+type WithOptionsMetadata<T> = SelectMetadata<T> | RadioMetadata<T>;
+
 export interface NumberTextMetadata extends BasePrimitiveMetadata {
   type: INPUT_TYPE.NUMBER_TEXT,
   useUnits?: boolean,
@@ -90,11 +91,7 @@ const propertyMetadata = createContext<AnyMetadata>();
 export class ControllablePrimitiveModel<T, M extends PrimitiveMetadata> extends Model(<T>() => ({
   value: prop<T>().withSetter(),
 }))<T> {
-  private defaultValue;
-
-  onInit() {
-    this.defaultValue = this.value;
-  }
+  private defaultValue: T | undefined;
 
   @modelAction
   reset() {
@@ -122,6 +119,31 @@ export class ControllablePrimitiveModel<T, M extends PrimitiveMetadata> extends 
   }
 }
 
+function createOptionsGetter(
+  node: ControllablePrimitiveWithOptionsModel<any, any> | ControllableReferenceWithOptionsModel<any, any>,
+  rootStore: object,
+) {
+  Object.defineProperty(node, 'options', {
+    get: optionsIsListResolver(node.metadata.options) ? node.metadata.options(rootStore) : () => node.metadata.options,
+    configurable: true,
+  });
+  makeObservable(node, { options: computed });
+}
+
+@model('ControllablePrimitiveWithOptionsModel')
+export class ControllablePrimitiveWithOptionsModel<T, M extends WithOptionsMetadata<T>> extends
+  ExtendedModel(<T, M extends WithOptionsMetadata<T>>() => ({
+    baseModel: modelClass<ControllablePrimitiveModel<T, M>>(ControllablePrimitiveModel),
+    props: {},
+  }))<T, M> {
+  readonly options: OptionsListItem<T>[] | undefined;
+
+  // @ts-ignore
+  onAttachedToRootStore(rootStore) {
+    createOptionsGetter(this, rootStore);
+  }
+}
+
 export function controllablePrimitiveProp<T, M extends PrimitiveMetadata>(value:T, metadata: M) {
   return prop<ControllablePrimitiveModel<T, M>>(() => propertyMetadata.apply(
     () => new ControllablePrimitiveModel<T, M>({ value, $modelId: uuid() }), metadata,
@@ -142,10 +164,18 @@ export const colorPickerProp = (value: string) => controllablePrimitiveProp<stri
   value, { type: INPUT_TYPE.COLOR_PICKER },
 );
 
+function controllablePrimitiveWithOptionsProp<T, M extends WithOptionsMetadata<T>>(
+  value: T, metadata: M,
+) {
+  return prop<ControllablePrimitiveWithOptionsModel<T, M>>(() => propertyMetadata.apply(
+    () => new ControllablePrimitiveWithOptionsModel<T, M>({ value, $modelId: uuid() }), metadata,
+  ));
+}
+
 export function radioProp<T>(
   value: T, metadata: Omit<RadioMetadata<T>, 'type'>,
 ) {
-  return controllablePrimitiveProp<T, RadioMetadata<T>>(
+  return controllablePrimitiveWithOptionsProp<T, RadioMetadata<T>>(
     value, { type: INPUT_TYPE.RADIO, ...metadata },
   );
 }
@@ -153,7 +183,7 @@ export function radioProp<T>(
 export function selectProp<T>(
   value: T, metadata: Omit<SelectMetadata<T>, 'type'>,
 ) {
-  return controllablePrimitiveProp<T, SelectMetadata<T>>(
+  return controllablePrimitiveWithOptionsProp<T, SelectMetadata<T>>(
     value, { type: INPUT_TYPE.SELECT, ...metadata },
   );
 }
@@ -165,7 +195,7 @@ export const numberTextProp = (
   value, { type: INPUT_TYPE.NUMBER_TEXT, ...metadata },
 );
 
-type InitialSelectionResolver<T extends object> = (optionValues: T[], rootStore: object) => (T | undefined);
+type InitialSelectionResolver<T> = (optionValues: T[], rootStore: object) => (T | undefined);
 
 interface ReferenceSelectMetadata<T extends object> {
   type: INPUT_TYPE.REFERENCE_SELECT,
@@ -211,20 +241,16 @@ export class ControllableReferenceModel<T extends object, M extends ReferenceMet
   }
 }
 
-@model('ControllableSelectReferenceModel')
-export class ControllableSelectReferenceModel<T extends object, M extends ReferenceSelectMetadata<T>> extends
+@model('ControllableReferenceWithOptionsModel')
+export class ControllableReferenceWithOptionsModel<T extends object, M extends ReferenceSelectMetadata<T>> extends
   ExtendedModel(<T extends object, M extends ReferenceSelectMetadata<T>>() => ({
     baseModel: modelClass<ControllableReferenceModel<T, M>>(ControllableReferenceModel),
     props: {},
   }))<T, M> {
-  private optionsCtx = createContext<OptionsListItem<T>[] | undefined>();
+  readonly options: OptionsListItem<T>[] | undefined;
 
   onAttachedToRootStore(rootStore) {
-    if (optionsIsListResolver(this.metadata.options)) {
-      this.optionsCtx.setComputed(this, this.metadata.options(rootStore));
-    } else {
-      this.optionsCtx.set(this, this.metadata.options);
-    }
+    createOptionsGetter(this, rootStore);
 
     if (this.metadata.initialSelectionResolver !== undefined) {
       const value = this.metadata.initialSelectionResolver(this.options.map(({ value }) => value), rootStore);
@@ -233,16 +259,11 @@ export class ControllableSelectReferenceModel<T extends object, M extends Refere
       }
     }
   }
-
-  @computed
-  get options():OptionsListItem<T>[] {
-    return this.optionsCtx.get(this);
-  }
 }
 
 export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSelectMetadata<T>, 'type'>) {
-  return prop<ControllableSelectReferenceModel<T, ReferenceSelectMetadata<T>>>(() => propertyMetadata.apply(
-    () => new ControllableSelectReferenceModel<T, ReferenceSelectMetadata<T>>({}), {
+  return prop<ControllableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>>(() => propertyMetadata.apply(
+    () => new ControllableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({}), {
       type: INPUT_TYPE.REFERENCE_SELECT, ...metadata,
     },
   ));

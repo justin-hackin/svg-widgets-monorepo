@@ -13,7 +13,7 @@ import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTest
 import { SVGWrapper } from '../data/SVGWrapper';
 import { TextureEditorModel } from '../../../common/components/TextureEditor/models/TextureEditorModel';
 import { tryResolvePath } from '../../../common/util/mobx-keystone';
-import { dashPatternsDefaultFn, StrokeDashPathPatternModel } from '../util/shapes/strokeDashPath';
+import { dashPatternsDefaultFn, StrokeDashPathPatternModel, strokeDashPathRatios } from '../util/shapes/strokeDashPath';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 
 export const renderTestTabsToString = (widgetStore, preferencesStore): string => ReactDOMServer.renderToString(
@@ -52,6 +52,13 @@ export class PyramidNetPluginModel extends Model({
   @computed
   get boundingBox() {
     return getBoundingBoxAttrs(this.pyramidNetSpec.netPaths.cut.getD());
+  }
+
+  @modelAction
+  insertNewDashPattern() {
+    this.dashPatterns.push(
+      new StrokeDashPathPatternModel({ relativeStrokeDasharray: [20, 10, 5, 7] }),
+    );
   }
 
   @modelAction
