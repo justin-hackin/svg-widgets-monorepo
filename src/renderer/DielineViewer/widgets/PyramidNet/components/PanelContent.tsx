@@ -9,10 +9,9 @@ import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEd
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { ShapeSelect } from '../../../../../common/components/ShapeSelect';
-import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
-import { PIXELS_PER_CM } from '../../../../../common/util/units';
 import { PyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 import { NodeSelect } from '../../../../../common/components/NodeSelect';
+import { NodeSliderOrTextInput } from '../../../../../common/components/NodeSliderOrTextInput';
 
 const controlsTabs = [
   {
@@ -54,13 +53,9 @@ export const PanelContent = observer(() => {
           className={classes.shapeSelect}
           node={pyramidNetSpec.pyramid.shapeName}
         />
-        <PanelSliderOrTextInput
+        <NodeSliderOrTextInput
           className={classes.shapeHeightFormControl}
-          node={pyramidNetSpec}
-          property="shapeHeight"
-          min={20 * PIXELS_PER_CM}
-          max={60 * PIXELS_PER_CM}
-          useUnits
+          node={pyramidNetSpec.shapeHeight}
         />
         <NodeSelect node={pyramid.netsPerPyramid} />
       </div>

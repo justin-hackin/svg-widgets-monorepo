@@ -11,9 +11,11 @@ import {
   distanceFromOrigin, lineLerp, PointLike, subtractPoints,
 } from '../../../../common/util/geom';
 import { PathData } from '../PathData';
-import { referenceSelectProp } from '../../../../common/util/controllable-property';
+import { referenceSelectProp, sliderWithTextProp } from '../../../../common/util/controllable-property';
 import { WorkspaceModel } from '../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
+import { ratioSliderProps } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/constants';
+import { DEFAULT_SLIDER_STEP } from '../../../../common/constants';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -56,6 +58,7 @@ export const dashPatternsDefaultFn = () => dasharrays.map((relativeStrokeDasharr
   relativeStrokeDasharray,
 })));
 
+const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 @model('DashPatternModel')
 export class DashPatternModel extends Model({
   strokeDashPathPattern: referenceSelectProp<StrokeDashPathPatternModel>({
@@ -77,8 +80,12 @@ export class DashPatternModel extends Model({
       })),
     initialSelectionResolver: (options) => options[0],
   }),
-  strokeDashLength: prop(11),
-  strokeDashOffsetRatio: prop(0),
+  strokeDashLength: sliderWithTextProp(11, {
+    ...strokeLengthProps,
+  }),
+  strokeDashOffsetRatio: sliderWithTextProp(0, {
+    ...ratioSliderProps,
+  }),
 }) {
 }
 
@@ -90,8 +97,8 @@ export function strokeDashPathRatios(
   const vectorLength = distanceFromOrigin(vector);
   const {
     strokeDashPathPattern: { value: { relativeStrokeDasharray } = {} } = {},
-    strokeDashLength,
-    strokeDashOffsetRatio,
+    strokeDashLength: { value: strokeDashLength },
+    strokeDashOffsetRatio: { value: strokeDashOffsetRatio },
   } = dashSpec;
   const strokeDashLengthToVectorLength = strokeDashLength / vectorLength;
 

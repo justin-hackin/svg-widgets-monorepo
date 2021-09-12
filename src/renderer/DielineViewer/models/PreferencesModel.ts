@@ -2,7 +2,11 @@ import { Model, model, prop } from 'mobx-keystone';
 import { startCase } from 'lodash';
 import { PIXELS_PER_CM, PIXELS_PER_INCH, UNITS } from '../../../common/util/units';
 import {
-  colorPickerProp, numberTextProp, radioProp, switchProp,
+  colorPickerProp,
+  numberTextProp,
+  radioProp,
+  sliderWithTextProp,
+  switchProp,
 } from '../../../common/util/controllable-property';
 
 export enum PRINT_REGISTRATION_TYPES {
@@ -26,7 +30,9 @@ export class PreferencesModel extends Model({
   cutStrokeColor: colorPickerProp('#FF3A5E'),
   scoreStrokeColor: colorPickerProp('#BDFF48'),
   registrationStrokeColor: colorPickerProp('#005eff'),
-  strokeWidth: prop(1),
+  strokeWidth: sliderWithTextProp(1, {
+    labelOverride: 'Dieline Stroke Width', min: 0, max: 3, step: 0.01,
+  }),
   needsTour: prop(true).withSetter(),
   // TODO: how to do enum property in keystone
   printRegistrationType: radioProp<PRINT_REGISTRATION_TYPES>(PRINT_REGISTRATION_TYPES.LASER_CUTTER, {
@@ -36,10 +42,10 @@ export class PreferencesModel extends Model({
   registrationMarkLength: numberTextProp(PIXELS_PER_INCH * 0.5, { useUnits: true }),
 }) {
   get scoreProps() {
-    return { stroke: this.scoreStrokeColor.value, strokeWidth: this.strokeWidth, fill: 'none' };
+    return { stroke: this.scoreStrokeColor.value, strokeWidth: this.strokeWidth.value, fill: 'none' };
   }
 
   get cutProps() {
-    return { stroke: this.cutStrokeColor.value, strokeWidth: this.strokeWidth, fill: 'none' };
+    return { stroke: this.cutStrokeColor.value, strokeWidth: this.strokeWidth.value, fill: 'none' };
   }
 }

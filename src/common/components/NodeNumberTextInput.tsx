@@ -5,12 +5,12 @@ import { observer } from 'mobx-react';
 
 // used to present underlying pixel values as unit-specific conversions
 // TODO: round up/down max/min/step based on unit (so that all values are divisible by the step)
-import { SubmittableTextInput } from './SubmittableTextInput';
+import { NodeUnlabelledNumberTextInput } from './NodeUnlabelledNumberTextInput';
 import { useStyles } from '../style/style';
-import { ControllablePrimitiveModel, NumberTextMetadata } from '../util/controllable-property';
+import { ControllablePrimitiveModel, NumberTextMetadata, SliderWithTextMetadata } from '../util/controllable-property';
 
 export const NodeNumberTextInput = observer((
-  { node }: { node: ControllablePrimitiveModel<number, NumberTextMetadata> },
+  { node }: { node: ControllablePrimitiveModel<number, NumberTextMetadata | SliderWithTextMetadata> },
 ) => {
   const classes = useStyles();
   const labelId = uuid();
@@ -19,13 +19,8 @@ export const NodeNumberTextInput = observer((
       <Typography id={labelId} gutterBottom>
         {node.label}
       </Typography>
-      <SubmittableTextInput
-        useUnits={node.metadata.useUnits}
-        value={node.value}
-        setValue={(val) => {
-          node.setValue(val);
-        }}
-        valuePath={node.valuePath}
+      <NodeUnlabelledNumberTextInput
+        node={node}
         labelId={labelId}
       />
     </div>

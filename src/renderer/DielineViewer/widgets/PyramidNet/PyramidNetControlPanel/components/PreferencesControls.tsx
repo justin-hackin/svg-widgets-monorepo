@@ -1,12 +1,13 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { Button, Divider } from '@material-ui/core';
-import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { NodeSwitch } from '../../../../../../common/components/NodeSwitch';
 import { NodeColorPicker } from '../../../../../../common/components/NodeColorPicker';
 import { NodeRadio } from '../../../../../../common/components/NodeRadio';
 import { NodeNumberTextInput } from '../../../../../../common/components/NodeNumberTextInput';
+import { NodeSliderOrTextInput } from '../../../../../../common/components/NodeSliderOrTextInput';
+import { PreferencesModel } from '../../../../models/PreferencesModel';
 
 export const PreferencesControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -21,7 +22,9 @@ export const PreferencesControls = observer(() => {
     cutStrokeColor,
     registrationStrokeColor,
     printRegistrationType,
-  } = preferences;
+    strokeWidth,
+  } = preferences as PreferencesModel;
+
   return (
     <>
       <NodeRadio node={displayUnit} />
@@ -34,14 +37,7 @@ export const PreferencesControls = observer(() => {
 
       <NodeSwitch node={useClonesForDecoration} />
 
-      <PanelSliderOrTextInput
-        node={preferences}
-        property="strokeWidth"
-        label="Dieline Stroke Width"
-        min={0}
-        max={3}
-        step={0.01}
-      />
+      <NodeSliderOrTextInput node={strokeWidth} />
 
       <NodeColorPicker node={scoreStrokeColor} />
 

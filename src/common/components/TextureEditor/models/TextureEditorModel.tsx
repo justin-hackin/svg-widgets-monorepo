@@ -1,18 +1,22 @@
 import { inRange } from 'lodash';
 import fileDownload from 'js-file-download';
-import {
-  Model, prop, getSnapshot, model, findParent, modelAction, fromSnapshot,
-} from 'mobx-keystone';
+import { findParent, fromSnapshot, getSnapshot, Model, model, modelAction, prop, } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
+import React from 'react';
 import { BoundaryModel } from './BoundaryModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
-  calculateTransformOriginChangeOffset, RawPoint, scalePoint, sumPoints, transformPoint,
+  calculateTransformOriginChangeOffset,
+  RawPoint,
+  scalePoint,
+  sumPoints,
+  transformPoint,
 } from '../../../util/geom';
 import { rendererContainerContext, ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
 import {
+  DEFAULT_SLIDER_STEP,
   EVENTS,
   IS_ELECTRON_BUILD,
   IS_WEB_BUILD,
@@ -20,16 +24,11 @@ import {
 } from '../../../constants';
 import { reportTransformsTally } from '../../../util/analytics';
 import { tryResolvePath } from '../../../util/mobx-keystone';
-import {
-  ImageFaceDecorationPatternModel,
-} from '../../../models/ImageFaceDecorationPatternModel';
-import {
-  PathFaceDecorationPatternModel,
-} from '../../../models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel, } from '../../../models/ImageFaceDecorationPatternModel';
+import { PathFaceDecorationPatternModel, } from '../../../models/PathFaceDecorationPatternModel';
 import { TransformModel } from '../../../models/TransformModel';
-import {
-  PositionableFaceDecorationModel,
-} from '../../../../renderer/DielineViewer/models/PositionableFaceDecorationModel';
+import { PositionableFaceDecorationModel, } from '../../../../renderer/DielineViewer/models/PositionableFaceDecorationModel';
+import { sliderProp } from '../../../util/controllable-property';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -63,7 +62,9 @@ export class TextureEditorModel extends Model({
   viewScale: prop<number>(DEFAULT_VIEW_SCALE),
   shapePreview: prop<ShapePreviewModel | undefined>(),
   modifierTracking: prop<ModifierTrackingModel>(() => new ModifierTrackingModel({})),
-  nodeScaleMux: prop(1),
+  nodeScaleMux: sliderProp(1, {
+    labelOverride: 'Node size', min: 0.1, max: 10, step: DEFAULT_SLIDER_STEP,
+  }),
 }) {
   @observable
   shapePreviewIsFullScreen = false;

@@ -1,11 +1,9 @@
 /* eslint-disable no-param-reassign */
 import { chunk, flatten, range } from 'lodash';
 import {
-  getParent,
-  model, Model, modelAction, prop, undoMiddleware,
+  getParent, model, Model, modelAction, prop, undoMiddleware,
 } from 'mobx-keystone';
 import { computed, observable, reaction } from 'mobx';
-
 import {
   hingedPlot,
   hingedPlotByProjectionDistance,
@@ -28,12 +26,12 @@ import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
 import { PathData } from '../util/PathData';
 import { degToRad, PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
-import {
-  PathFaceDecorationPatternModel,
-} from '../../../common/models/PathFaceDecorationPatternModel';
+import { PathFaceDecorationPatternModel } from '../../../common/models/PathFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from './PositionableFaceDecorationModel';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import { PyramidModel } from './PyramidModel';
+import { sliderWithTextProp } from '../../../common/util/controllable-property';
+import { DEFAULT_SLIDER_STEP } from '../../../common/constants';
 
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 
@@ -55,7 +53,9 @@ export class PyramidNetModel extends Model({
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),
   baseEdgeTabsSpec: prop<BaseEdgeTabsModel>(() => (new BaseEdgeTabsModel({}))),
-  shapeHeight: prop(20 * PIXELS_PER_CM),
+  shapeHeight: sliderWithTextProp(20 * PIXELS_PER_CM, {
+    min: 20 * PIXELS_PER_CM, max: 60 * PIXELS_PER_CM, step: DEFAULT_SLIDER_STEP, useUnits: true,
+  }),
   faceDecoration: prop<PositionableFaceDecorationModel | RawFaceDecorationModel>(
     () => new PositionableFaceDecorationModel({}),
   ).withSetter(),
@@ -73,7 +73,10 @@ export class PyramidNetModel extends Model({
   @computed
   get tabIntervalRatios() {
     const {
-      tabsCount, tabStartGapToTabDepth, tabDepthToTraversalLength, holeWidthRatio,
+      tabsCount: { value: tabsCount },
+      tabStartGapToTabDepth: { value: tabStartGapToTabDepth },
+      tabDepthToTraversalLength: { value: tabDepthToTraversalLength },
+      holeWidthRatio: { value: holeWidthRatio },
     } = this.ascendantEdgeTabsSpec;
     const offsetRatio = tabDepthToTraversalLength * tabStartGapToTabDepth;
     const intervalRatio = (1 - offsetRatio) / tabsCount;
@@ -136,9 +139,8 @@ export class PyramidNetModel extends Model({
   // factor to scale face lengths such that the first edge will be equal to 1
   @computed
   get faceLengthAdjustRatio() {
-    const { shapeHeight } = this;
     const { diameter } = this.pyramid.geometry;
-    const firstSideLengthInPx = ((shapeHeight * this.relativeFaceEdgeLengths[0]) / diameter);
+    const firstSideLengthInPx = ((this.shapeHeight.value * this.relativeFaceEdgeLengths[0]) / diameter);
     return firstSideLengthInPx / FACE_FIRST_EDGE_NORMALIZED_SIZE;
   }
 
@@ -149,7 +151,11 @@ export class PyramidNetModel extends Model({
 
   @computed
   get ascendantEdgeTabDepth() {
-    const { ascendantEdgeTabsSpec: { tabDepthToTraversalLength } } = this;
+    const {
+      ascendantEdgeTabsSpec: {
+        tabDepthToTraversalLength: { value: tabDepthToTraversalLength },
+      },
+    } = this;
     return this.traversalLength * tabDepthToTraversalLength * 0.6;
   }
 
@@ -183,7 +189,7 @@ export class PyramidNetModel extends Model({
 
   @computed
   get baseTabDepth() {
-    return this.baseEdgeTabsSpec.tabDepthToAscendantTabDepth * this.ascendantEdgeTabDepth;
+    return this.baseEdgeTabsSpec.tabDepthToAscendantTabDepth.value * this.ascendantEdgeTabDepth;
   }
 
   @computed
@@ -263,7 +269,7 @@ export class PyramidNetModel extends Model({
 
     return roundedEdgePath(
       [start, outerPt1, outerPt2, end],
-      this.ascendantEdgeTabsSpec.flapRoundingDistanceRatio,
+      this.ascendantEdgeTabsSpec.flapRoundingDistanceRatio.value,
     );
   }
 
@@ -355,8 +361,8 @@ export class PyramidNetModel extends Model({
 
   @computed
   get textureBorderWidth() {
-    const { ascendantEdgeTabsSpec: { tabDepthToTraversalLength } } = this;
-    return tabDepthToTraversalLength * FACE_FIRST_EDGE_NORMALIZED_SIZE * this.borderToInsetRatio;
+    return this.ascendantEdgeTabsSpec.tabDepthToTraversalLength.value
+      * FACE_FIRST_EDGE_NORMALIZED_SIZE * this.borderToInsetRatio;
   }
 
   @computed
@@ -441,8 +447,10 @@ export class PyramidNetModel extends Model({
     const actualInverseAspect = this.faceBoundaryPoints[1].y / this.actualFaceEdgeLengths[1];
     const clampedInverseAspect = Math.min(Math.max(actualInverseAspect, MIN_INVERSE_ASPECT), MAX_INVERSE_ASPECT);
     const inverseAspectRatio = rangeTraversalRatio(MIN_INVERSE_ASPECT, MAX_INVERSE_ASPECT, clampedInverseAspect);
-    this.baseEdgeTabsSpec.holeBreadthToHalfWidth = interpolateBetween(MIN_BREADTH, MAX_BREADTH, inverseAspectRatio);
-    this.baseEdgeTabsSpec.finOffsetRatio = interpolateBetween(0, 0.8, 1 - inverseAspectRatio);
+    this.baseEdgeTabsSpec.holeBreadthToHalfWidth.setValue(
+      interpolateBetween(MIN_BREADTH, MAX_BREADTH, inverseAspectRatio),
+    );
+    this.baseEdgeTabsSpec.finOffsetRatio.setValue(interpolateBetween(0, 0.8, 1 - inverseAspectRatio));
   }
 
   @modelAction

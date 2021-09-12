@@ -1,4 +1,3 @@
-import { startCase } from 'lodash';
 import uuid from 'uuid/v1';
 import React, { useState } from 'react';
 import { FormControl, IconButton, Typography } from '@material-ui/core';
@@ -8,21 +7,19 @@ import { observer } from 'mobx-react';
 import clsx from 'clsx';
 
 import { useStyles } from '../style/style';
-import { SubmittableTextInput } from './SubmittableTextInput';
-import { UnlabeledPanelSliderComponent } from './PanelSliderComponent';
+import { NodeUnlabelledNumberTextInput } from './NodeUnlabelledNumberTextInput';
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
-import { mstDataToProps } from '../util/mobx-keystone';
+import { ControllablePrimitiveModel, SliderWithTextMetadata } from '../util/controllable-property';
+import { UnlabelledNodeSlider } from '../NodeSlider';
 
-export const PanelSliderOrTextInput = observer(({
-  node, property, min, max, step = undefined, useUnits = false, className = undefined, label = undefined,
-}) => {
+export const NodeSliderOrTextInput = observer(({
+  node, className = undefined,
+}: { node: ControllablePrimitiveModel<number, SliderWithTextMetadata>, className?: string }) => {
   const classes = useStyles();
   const labelId = uuid();
-  const {
-    setValue, valuePath, value,
-  } = mstDataToProps(node, property);
+  const { label, metadata: { useUnits } } = node;
   const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
-  const resolvedLabel = `${label || startCase(property)}${useUnits ? ` (${displayUnit})` : ''}`;
+  const resolvedLabel = `${label}${useUnits ? ` (${displayUnit})` : ''}`;
   const [isSlider, setIsSlider] = useState(true);
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
 
@@ -34,18 +31,9 @@ export const PanelSliderOrTextInput = observer(({
       <div className={classes.sliderTextInputContainer}>
         <div className={classes.sliderTextInput}>
           {(isSlider) ? (
-            <UnlabeledPanelSliderComponent {...{
-              node, property, min, max, step, unit: useUnits ? displayUnit : undefined, labelId,
-            }}
-            />
+            <UnlabelledNodeSlider node={node} labelId={labelId} />
           ) : (
-            <SubmittableTextInput
-              useUnits={useUnits}
-              value={value}
-              setValue={setValue}
-              valuePath={valuePath}
-              labelId={labelId}
-            />
+            <NodeUnlabelledNumberTextInput node={node} labelId={labelId} />
           ) }
         </div>
         <IconButton className={classes.sliderTextInputToggle} onClick={toggleIsSlider}>

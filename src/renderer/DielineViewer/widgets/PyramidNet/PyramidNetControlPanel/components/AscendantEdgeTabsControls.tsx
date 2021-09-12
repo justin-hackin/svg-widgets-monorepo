@@ -1,11 +1,9 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-
-import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
-import { ratioSliderProps } from './constants';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { NodeSliderOrTextInput } from '../../../../../../common/components/NodeSliderOrTextInput';
+import { NodeSlider } from '../../../../../../common/NodeSlider';
 
 export const AscendantEdgeTabsControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -13,63 +11,23 @@ export const AscendantEdgeTabsControls = observer(() => {
   const { pyramidNetSpec: { ascendantEdgeTabsSpec } = {} } = store;
   return (
     <>
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="tabsCount"
-        min={2}
-        max={5}
-        step={1}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="tabDepthToTraversalLength"
-        min={0.03}
-        max={0.05}
-        step={0.0001}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="holeReachToTabDepth"
-        min={0.05}
-        max={0.2}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="tabEdgeEndpointsIndentation"
-        min={0}
-        max={2}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="tabControlPointsAngle"
-        {...ratioSliderProps}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="tabControlPointsProtrusion"
-        {...ratioSliderProps}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="tabStartGapToTabDepth"
-        min={0.3}
-        max={1}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="holeWidthRatio"
-        min={0.1}
-        max={0.9}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={ascendantEdgeTabsSpec}
-        property="flapRoundingDistanceRatio"
-        {...ratioSliderProps}
-      />
+      <NodeSlider node={ascendantEdgeTabsSpec.tabsCount} />
+
+      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabDepthToTraversalLength} />
+
+      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.holeReachToTabDepth} />
+
+      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabEdgeEndpointsIndentation} />
+
+      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabControlPointsAngle} className="fuck" />
+
+      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabControlPointsProtrusion} />
+
+      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabStartGapToTabDepth} />
+
+      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.holeWidthRatio} />
+
+      <NodeSlider node={ascendantEdgeTabsSpec.flapRoundingDistanceRatio} />
     </>
   );
 });

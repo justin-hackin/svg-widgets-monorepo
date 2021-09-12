@@ -18,6 +18,7 @@ import { labelOverride, resolveLabel } from './label';
 
 export enum INPUT_TYPE {
   SLIDER = 'slider',
+  SLIDER_WITH_TEXT = 'slider',
   SWITCH = 'switch',
   COLOR_PICKER = 'color-picker',
   RADIO = 'radio',
@@ -32,11 +33,14 @@ interface BasePrimitiveMetadata {
   labelOverride?: labelOverride,
 }
 
-export interface SliderMetadata extends BasePrimitiveMetadata {
-  type: INPUT_TYPE.SLIDER,
+interface SliderRest {
   min: number,
   max: number,
   step: number,
+}
+
+export interface SliderMetadata extends SliderRest, BasePrimitiveMetadata {
+  type: INPUT_TYPE.SLIDER,
 }
 
 export interface SwitchMetadata extends BasePrimitiveMetadata {
@@ -76,9 +80,16 @@ export interface SelectMetadata<T> extends BasePrimitiveMetadata {
 
 export type WithOptionsMetadata<T> = SelectMetadata<T> | RadioMetadata<T>;
 
-export interface NumberTextMetadata extends BasePrimitiveMetadata {
-  type: INPUT_TYPE.NUMBER_TEXT,
+export interface NumberTextRest {
   useUnits?: boolean,
+}
+
+export interface NumberTextMetadata extends BasePrimitiveMetadata, NumberTextRest {
+  type: INPUT_TYPE.NUMBER_TEXT,
+}
+
+export interface SliderWithTextMetadata extends BasePrimitiveMetadata, NumberTextRest, SliderRest {
+  type: INPUT_TYPE.SLIDER_WITH_TEXT
 }
 
 export type PrimitiveMetadata =
@@ -171,6 +182,12 @@ export const sliderProp = (
   value: number, metadata: Omit<SliderMetadata, 'type'>,
 ) => controllablePrimitiveProp<number, SliderMetadata>(
   value, { type: INPUT_TYPE.SLIDER, ...metadata },
+);
+
+export const sliderWithTextProp = (
+  value: number, metadata: Omit<SliderWithTextMetadata, 'type'>,
+) => controllablePrimitiveProp<number, SliderWithTextMetadata>(
+  value, { type: INPUT_TYPE.SLIDER_WITH_TEXT, ...metadata },
 );
 
 export const switchProp = (value: boolean) => controllablePrimitiveProp<boolean, SwitchMetadata>(

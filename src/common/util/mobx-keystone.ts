@@ -10,7 +10,7 @@ export function tryResolvePath<T>(object: object, path: Path): T | undefined {
 export const ownPropertyName = (node) => {
   const toPath = getParentToChildPath(getParent(node), node);
   return toPath ? (toPath[0] as string) : undefined;
-}
+};
 
 export const mstDataToProps = (node, property) => {
   const value = node[property];

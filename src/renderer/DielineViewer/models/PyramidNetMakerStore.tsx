@@ -3,7 +3,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import {
-  Model, modelAction, prop, model, fromSnapshot,
+  fromSnapshot, model, Model, modelAction, prop,
 } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
 import { PyramidNetModel } from './PyramidNetStore';
@@ -13,7 +13,7 @@ import { PyramidNetTestTabs } from '../widgets/PyramidNetTestTabs/PyramidNetTest
 import { SVGWrapper } from '../data/SVGWrapper';
 import { TextureEditorModel } from '../../../common/components/TextureEditor/models/TextureEditorModel';
 import { tryResolvePath } from '../../../common/util/mobx-keystone';
-import { dashPatternsDefaultFn, StrokeDashPathPatternModel, strokeDashPathRatios } from '../util/shapes/strokeDashPath';
+import { dashPatternsDefaultFn, StrokeDashPathPatternModel } from '../util/shapes/strokeDashPath';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 
 export const renderTestTabsToString = (widgetStore, preferencesStore): string => ReactDOMServer.renderToString(

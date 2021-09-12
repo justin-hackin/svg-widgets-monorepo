@@ -39,7 +39,7 @@ export interface AdditionalFileMenuItemsProps {
 }
 
 export interface WidgetOptions {
-  RawSvgComponent: FC<RawSvgComponentProps>,
+  RawSvgComponent: FC<any>,
   controlPanelProps: {
     AdditionalToolbarContent?: FC,
     AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>,
@@ -189,9 +189,9 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetPreferences() {
-    // localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
+    localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
     this.preferences = new PreferencesModel({});
-    // this.persistPreferences();
+    this.persistPreferences();
   }
 
   @modelAction

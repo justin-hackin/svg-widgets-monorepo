@@ -12,7 +12,8 @@ export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { textureEditor } = workspaceStore.selectedStore as PyramidNetPluginModel;
   const {
-    faceDecoration, selectedTextureNodeIndex, showNodes, imageCoverScale, nodeScaleMux,
+    faceDecoration, selectedTextureNodeIndex, showNodes, imageCoverScale,
+    nodeScaleMux: { value: nodeScaleMux },
   } = textureEditor;
   const classes = useStyles();
 

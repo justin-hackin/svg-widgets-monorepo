@@ -5,16 +5,14 @@ import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
 import { pxToUnitView, PIXELS_PER_UNIT } from '../util/units';
+import { ControllablePrimitiveModel, NumberTextMetadata, SliderWithTextMetadata } from '../util/controllable-property';
 
-export const SubmittableTextInput = observer(({
-  value,
-  setValue,
-  valuePath,
-  labelId,
-  useUnits = false,
-}) => {
+export const NodeUnlabelledNumberTextInput = observer(({
+  node, labelId,
+}: { node: ControllablePrimitiveModel<number, (NumberTextMetadata | SliderWithTextMetadata)>, labelId: string }) => {
   const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
   const inputRef = createRef<HTMLInputElement>();
+  const { value, valuePath, metadata: { useUnits } } = node;
   useEffect(() => {
     if (inputRef.current && useUnits) {
       inputRef.current.value = pxToUnitView(value, displayUnit);
@@ -32,14 +30,14 @@ export const SubmittableTextInput = observer(({
           if (useUnits) {
             try {
               const [num, denom] = parseFraction(stringValue);
-              setValue((num / denom) * PIXELS_PER_UNIT[displayUnit]);
+              node.setValue((num / denom) * PIXELS_PER_UNIT[displayUnit]);
               // eslint-disable-next-line no-empty
             } catch (_) {
             }
           } else {
             const parsedFloat = parseFloat(stringValue);
             if (!Number.isNaN(parsedFloat)) {
-              setValue(parsedFloat);
+              node.setValue(parsedFloat);
             }
           }
         }

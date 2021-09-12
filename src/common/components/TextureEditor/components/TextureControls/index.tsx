@@ -1,17 +1,17 @@
 import React, { forwardRef, useState } from 'react';
 import {
-  TextField,
-  InputAdornment,
+  AppBar,
   Button,
-  Switch,
+  Divider,
   FormControlLabel,
   IconButton,
+  InputAdornment,
+  ListItemIcon,
   Menu,
   MenuItem,
+  Switch,
+  TextField,
   Toolbar,
-  AppBar,
-  Divider,
-  ListItemIcon,
   Typography,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
@@ -25,22 +25,16 @@ import PublishIcon from '@material-ui/icons/Publish';
 import FilePicker from '@mavedev/react-file-picker';
 import HelpIcon from '@material-ui/icons/Help';
 
-import { isNumber, isNaN } from 'lodash';
+import { isNaN, isNumber } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
 import { HistoryButtons } from
-  '../../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
-import { PanelSliderComponent } from '../../../PanelSliderComponent';
+    '../../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { ShapeSelect } from '../../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { useStyles } from '../../../../style/style';
-import {
-  DEFAULT_SLIDER_STEP,
-  EVENTS,
-  IS_ELECTRON_BUILD,
-  IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION,
-} from '../../../../constants';
+import { EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION, } from '../../../../constants';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../../util/tour';
 import { SnapMenu } from './components/SnapMenu';
@@ -49,6 +43,7 @@ import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecor
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { RawFaceDecorationModel } from '../../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 import { TextureEditorModel } from '../../models/TextureEditorModel';
+import { NodeSlider } from '../../../../NodeSlider';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -306,14 +301,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                     )}
                   label="Node selection"
                 />
-                <PanelSliderComponent
-                  node={pluginModel.textureEditor}
-                  property="nodeScaleMux"
+                <NodeSlider
+                  node={pluginModel.textureEditor.nodeScaleMux}
                   className={classes.nodeScaleMuxSlider}
-                  label="Node size"
-                  min={0.1}
-                  max={10}
-                  step={DEFAULT_SLIDER_STEP}
                 />
               </span>
               <FormControlLabel

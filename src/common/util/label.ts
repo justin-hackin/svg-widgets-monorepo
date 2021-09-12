@@ -1,4 +1,4 @@
-import {isFunction, startCase} from 'lodash';
+import { isFunction, startCase } from 'lodash';
 import { ControllableModel } from './controllable-property';
 
 export type labelGenerator = (node: ControllableModel) => string;

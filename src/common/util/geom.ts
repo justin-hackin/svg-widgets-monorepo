@@ -47,7 +47,7 @@ export const rawPointToString = ({ x, y }: RawPoint) => `${x},${y}`;
 
 export const PHI:number = (1 + Math.sqrt(5)) / 2;
 
-export const pointFromPolar = (theta, length):RawPoint => ({
+export const pointFromPolar = (theta: number, length: number):RawPoint => ({
   x: Math.cos(theta) * length, y: Math.sin(theta) * length,
 });
 export const pointsAreEqual = (pt1, pt2, marginOfError = 0.01) => (

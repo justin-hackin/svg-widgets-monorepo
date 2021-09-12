@@ -1,13 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-
-import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
-import { ratioSliderProps } from './constants';
-import { PanelSwitch, PanelSwitchUncontrolled } from '../../../../../../common/components/PanelSwitch';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { NodeSlider } from '../../../../../../common/NodeSlider';
+import { NodeSwitch, NodeSwitchUncontrolled } from '../../../../../../common/components/NodeSwitch';
+import { NodeSliderOrTextInput } from '../../../../../../common/components/NodeSliderOrTextInput';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -21,59 +18,25 @@ export const BaseEdgeTabControls = observer(() => {
     <>
       <NodeSlider node={baseEdgeTabsSpec.roundingDistanceRatio} />
 
-      <PanelSwitch
-        node={baseEdgeTabsSpec}
-        property="scoreTabMidline"
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="finDepthToTabDepth"
-        {...{ ...ratioSliderProps, min: 0.05 }}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="tabDepthToAscendantTabDepth"
-        min={0.6}
-        max={2}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="holeDepthToTabDepth"
-        {...{ ...ratioSliderProps, min: 0.05 }}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="finOffsetRatio"
-        {...ratioSliderProps}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="holeBreadthToHalfWidth"
-        {...{ ...ratioSliderProps, min: 0.05, max: 0.95 }}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="holeTabClearance"
-        min={0}
-        max={0.1}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="holeTaper"
-        min={Math.PI / 8}
-        max={Math.PI / 3}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="tabConjunctionClearance"
-        min={0.05}
-        max={0.4}
-        step={0.01}
-      />
-      <PanelSwitchUncontrolled
+      <NodeSwitch node={baseEdgeTabsSpec.scoreTabMidline} />
+
+      <NodeSliderOrTextInput node={baseEdgeTabsSpec.finDepthToTabDepth} />
+
+      <NodeSliderOrTextInput node={baseEdgeTabsSpec.tabDepthToAscendantTabDepth} />
+
+      <NodeSliderOrTextInput node={baseEdgeTabsSpec.holeDepthToTabDepth} />
+
+      <NodeSliderOrTextInput node={baseEdgeTabsSpec.finOffsetRatio} />
+
+      <NodeSliderOrTextInput node={baseEdgeTabsSpec.holeBreadthToHalfWidth} />
+
+      <NodeSliderOrTextInput node={baseEdgeTabsSpec.holeTabClearance} />
+
+      <NodeSliderOrTextInput node={baseEdgeTabsSpec.holeTaper} />
+
+      <NodeSliderOrTextInput node={baseEdgeTabsSpec.tabConjunctionClearance} />
+
+      <NodeSwitchUncontrolled
         label="Use Bend Guide Valley"
         valuePath="BaseEdgeTabControls__useBendGuideValley"
         value={!!baseEdgeTabsSpec.bendGuideValley}
@@ -87,18 +50,9 @@ export const BaseEdgeTabControls = observer(() => {
       />
       {baseEdgeTabsSpec.bendGuideValley && (
         <>
-          <PanelSliderOrTextInput
-            node={baseEdgeTabsSpec.bendGuideValley}
-            property="depthRatio"
-            {...ratioSliderProps}
-          />
-          <PanelSliderOrTextInput
-            node={baseEdgeTabsSpec.bendGuideValley}
-            property="theta"
-            min={Math.PI / 16}
-            max={Math.PI / 3}
-            step={DEFAULT_SLIDER_STEP}
-          />
+          <NodeSlider node={baseEdgeTabsSpec.bendGuideValley.depthRatio} />
+
+          <NodeSliderOrTextInput node={baseEdgeTabsSpec.bendGuideValley.theta} />
         </>
       )}
     </>
