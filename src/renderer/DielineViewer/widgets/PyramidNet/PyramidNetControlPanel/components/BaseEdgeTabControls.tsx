@@ -5,6 +5,7 @@ import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { NodeSlider } from '../../../../../../common/NodeSlider';
 import { NodeSwitch, NodeSwitchUncontrolled } from '../../../../../../common/components/NodeSwitch';
 import { NodeSliderOrTextInput } from '../../../../../../common/components/NodeSliderOrTextInput';
+import { BendGuideValleyModel } from '../../../../util/shapes/baseEdgeConnectionTab';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -48,8 +49,9 @@ export const BaseEdgeTabControls = observer(() => {
           }
         }}
       />
-      {baseEdgeTabsSpec.bendGuideValley && (
+      {baseEdgeTabsSpec.bendGuideValley instanceof BendGuideValleyModel && (
         <>
+          {/* TODO: there should be a ts error here as prop is sliderWithTextProp */}
           <NodeSlider node={baseEdgeTabsSpec.bendGuideValley.depthRatio} />
 
           <NodeSliderOrTextInput node={baseEdgeTabsSpec.bendGuideValley.theta} />

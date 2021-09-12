@@ -37,7 +37,7 @@ TODO: use of qualifier *Ratio is inconsistent remove all instances,
 
 @model('BendGuideValleyModel')
 export class BendGuideValleyModel extends Model({
-  depthRatio: sliderProp(0.9, ratioSliderProps),
+  depthRatio: sliderWithTextProp(0.9, ratioSliderProps),
   theta: sliderWithTextProp(Math.PI / 4, {
     min: Math.PI / 16, max: Math.PI / 3, step: DEFAULT_SLIDER_STEP,
   }),
@@ -66,7 +66,7 @@ export class BaseEdgeTabsModel extends Model({
   holeTabClearance: sliderWithTextProp(0.1, {
     min: 0, max: 0.1, step: DEFAULT_SLIDER_STEP,
   }),
-  bendGuideValley: prop<BendGuideValleyModel | null>(() => null),
+  bendGuideValley: prop<BendGuideValleyModel | undefined>(() => undefined),
   tabConjunctionClearance: sliderWithTextProp(0.1, {
     min: 0.05, max: 0.4, step: 0.01,
   }),
