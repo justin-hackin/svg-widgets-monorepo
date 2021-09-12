@@ -5,9 +5,8 @@ import {
   colorPickerProp,
   numberTextProp,
   radioProp,
-  sliderWithTextProp,
-  switchProp,
-} from '../../../common/util/controllable-property';
+  sliderWithTextProp, switchProp
+} from '../../../common/keystone-tweakables/props';
 
 export enum PRINT_REGISTRATION_TYPES {
   LASER_CUTTER = 'laser-cutter',

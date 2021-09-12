@@ -6,10 +6,8 @@ import FormControl from '@material-ui/core/FormControl';
 import React, { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import { useStyles } from '../style/style';
-import {
-  ControllablePrimitiveWithOptionsModel,
-  ControllableReferenceWithOptionsModel,
-} from '../util/controllable-property';
+import { ControllablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/ControllablePrimitiveWithOptionsModel';
+import { ControllableReferenceWithOptionsModel } from '../keystone-tweakables/models/ControllableReferenceWithOptionsModel';
 
 export const UncontrolledNodeSelect = observer(({
   value, onChange, options, label, name, displayEmpty = undefined,

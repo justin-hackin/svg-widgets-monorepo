@@ -1,8 +1,9 @@
 import { inRange } from 'lodash';
 import fileDownload from 'js-file-download';
-import { findParent, fromSnapshot, getSnapshot, Model, model, modelAction, prop, } from 'mobx-keystone';
+import {
+  findParent, fromSnapshot, getSnapshot, Model, model, modelAction, prop,
+} from 'mobx-keystone';
 import { computed, observable } from 'mobx';
-import React from 'react';
 import { BoundaryModel } from './BoundaryModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
@@ -24,11 +25,12 @@ import {
 } from '../../../constants';
 import { reportTransformsTally } from '../../../util/analytics';
 import { tryResolvePath } from '../../../util/mobx-keystone';
-import { ImageFaceDecorationPatternModel, } from '../../../models/ImageFaceDecorationPatternModel';
-import { PathFaceDecorationPatternModel, } from '../../../models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
+import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
 import { TransformModel } from '../../../models/TransformModel';
-import { PositionableFaceDecorationModel, } from '../../../../renderer/DielineViewer/models/PositionableFaceDecorationModel';
-import { sliderProp } from '../../../util/controllable-property';
+import { PositionableFaceDecorationModel }
+  from '../../../../renderer/DielineViewer/models/PositionableFaceDecorationModel';
+import { sliderProp } from '../../../keystone-tweakables/props';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;

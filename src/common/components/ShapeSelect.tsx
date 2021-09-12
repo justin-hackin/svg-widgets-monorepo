@@ -10,7 +10,8 @@ import clsx from 'clsx';
 
 import { useStyles } from '../style/style';
 import requireStatic from '../../renderer/requireStatic';
-import { ControllablePrimitiveWithOptionsModel, WithOptionsMetadata } from '../util/controllable-property';
+import { ControllablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/ControllablePrimitiveWithOptionsModel';
+import { WithOptionsMetadata } from '../keystone-tweakables/types';
 
 export const ShapeSelect = observer(({
   node, className = undefined, isCompactDisplay = false,

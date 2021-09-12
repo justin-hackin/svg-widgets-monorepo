@@ -1,7 +1,7 @@
 import { getParent, Model, model } from 'mobx-keystone';
 import { isInteger, sortBy, startCase } from 'lodash';
 import { polyhedra } from '../data/polyhedra';
-import { selectProp } from '../../../common/util/controllable-property';
+import { selectProp } from '../../../common/keystone-tweakables/props';
 
 const getDivisors = (num) => {
   if (!isInteger(num)) {

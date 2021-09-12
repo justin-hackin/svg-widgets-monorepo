@@ -6,11 +6,9 @@ import {
 } from '@material-ui/core';
 
 import { useStyles } from '../style/style';
-import {
-  ControllablePrimitiveWithOptionsModel, ControllableReferenceWithOptionsModel,
-  RadioMetadata,
-  ReferenceRadioMetadata,
-} from '../util/controllable-property';
+import { ControllablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/ControllablePrimitiveWithOptionsModel';
+import { ControllableReferenceWithOptionsModel } from '../keystone-tweakables/models/ControllableReferenceWithOptionsModel';
+import { RadioMetadata, ReferenceRadioMetadata } from '../keystone-tweakables/types';
 
 export const UncontrolledNodeRadio = observer(({
   value, onChange, options, label, name, row = false,

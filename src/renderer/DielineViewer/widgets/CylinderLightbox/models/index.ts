@@ -12,8 +12,8 @@ import { DestinationCommand, PathData } from '../../../util/PathData';
 import { closedPolygonPath } from '../../../util/shapes/generic';
 import { subtractDValues, unifyDValues } from '../../../../../common/util/path-boolean';
 import { PIXELS_PER_CM, radToDeg } from '../../../../../common/util/units';
-import { sliderProp, sliderWithTextProp } from '../../../../../common/util/controllable-property';
 import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
+import { sliderProp, sliderWithTextProp } from '../../../../../common/keystone-tweakables/props';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },

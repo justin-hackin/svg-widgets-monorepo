@@ -15,8 +15,8 @@ import {
 import { DashPatternModel, strokeDashPath } from './strokeDashPath';
 import { arrowTabPlots } from './symmetricRoundedTab';
 import { DEFAULT_SLIDER_STEP, VERY_LARGE_NUMBER } from '../../../../common/constants';
-import { sliderProp, sliderWithTextProp, switchProp } from '../../../../common/util/controllable-property';
 import { ratioSliderProps } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/constants';
+import { sliderProp, sliderWithTextProp, switchProp } from '../../../../common/keystone-tweakables/props';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,

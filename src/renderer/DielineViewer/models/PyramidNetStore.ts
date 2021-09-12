@@ -30,8 +30,8 @@ import { PathFaceDecorationPatternModel } from '../../../common/models/PathFaceD
 import { PositionableFaceDecorationModel } from './PositionableFaceDecorationModel';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import { PyramidModel } from './PyramidModel';
-import { sliderWithTextProp } from '../../../common/util/controllable-property';
 import { DEFAULT_SLIDER_STEP } from '../../../common/constants';
+import { sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 

@@ -5,7 +5,8 @@ import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
 import { pxToUnitView, PIXELS_PER_UNIT } from '../util/units';
-import { ControllablePrimitiveModel, NumberTextMetadata, SliderWithTextMetadata } from '../util/controllable-property';
+import { ControllablePrimitiveModel } from '../keystone-tweakables/models/ControllablePrimitiveModel';
+import { NumberTextMetadata, SliderWithTextMetadata } from '../keystone-tweakables/types';
 
 export const NodeUnlabelledNumberTextInput = observer(({
   node, labelId,

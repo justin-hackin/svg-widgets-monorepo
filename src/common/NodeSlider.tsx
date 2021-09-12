@@ -7,12 +7,8 @@ import { useWorkspaceMst } from '../renderer/DielineViewer/models/WorkspaceModel
 import { UNIT_LABEL_FORMAT, UNIT_STEP } from './util/units';
 import { getNearestHistoryFromAncestorNode } from './util/mobx-keystone';
 import { useStyles } from './style/style';
-import {
-  ControllablePrimitiveModel,
-  INPUT_TYPE,
-  SliderMetadata,
-  SliderWithTextMetadata,
-} from './util/controllable-property';
+import { ControllablePrimitiveModel } from './keystone-tweakables/models/ControllablePrimitiveModel';
+import { INPUT_TYPE, SliderMetadata, SliderWithTextMetadata } from './keystone-tweakables/types';
 
 const ValueLabelComponent = ({
   children,

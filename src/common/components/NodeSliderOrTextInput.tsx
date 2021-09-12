@@ -9,8 +9,9 @@ import clsx from 'clsx';
 import { useStyles } from '../style/style';
 import { NodeUnlabelledNumberTextInput } from './NodeUnlabelledNumberTextInput';
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
-import { ControllablePrimitiveModel, SliderWithTextMetadata } from '../util/controllable-property';
 import { UnlabelledNodeSlider } from '../NodeSlider';
+import { ControllablePrimitiveModel } from '../keystone-tweakables/models/ControllablePrimitiveModel';
+import { SliderWithTextMetadata } from '../keystone-tweakables/types';
 
 export const NodeSliderOrTextInput = observer(({
   node, className = undefined,

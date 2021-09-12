@@ -6,7 +6,8 @@ import { Switch } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
 import { useStyles } from '../style/style';
-import { ControllablePrimitiveModel, SwitchMetadata } from '../util/controllable-property';
+import { ControllablePrimitiveModel } from '../keystone-tweakables/models/ControllablePrimitiveModel';
+import { SwitchMetadata } from '../keystone-tweakables/types';
 
 export const NodeSwitchUncontrolled = observer(({
   value, valuePath, onChange, label,

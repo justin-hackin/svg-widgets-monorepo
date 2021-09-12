@@ -11,11 +11,11 @@ import {
   distanceFromOrigin, lineLerp, PointLike, subtractPoints,
 } from '../../../../common/util/geom';
 import { PathData } from '../PathData';
-import { referenceSelectProp, sliderWithTextProp } from '../../../../common/util/controllable-property';
 import { WorkspaceModel } from '../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
 import { ratioSliderProps } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/constants';
 import { DEFAULT_SLIDER_STEP } from '../../../../common/constants';
+import { referenceSelectProp, sliderWithTextProp } from '../../../../common/keystone-tweakables/props';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 

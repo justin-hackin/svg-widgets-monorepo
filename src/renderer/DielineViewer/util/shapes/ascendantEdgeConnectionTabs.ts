@@ -7,9 +7,9 @@ import {
 import { DashPatternModel, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
-import { sliderProp, sliderWithTextProp } from '../../../../common/util/controllable-property';
 import { DEFAULT_SLIDER_STEP } from '../../../../common/constants';
 import { ratioSliderProps } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/constants';
+import { sliderProp, sliderWithTextProp } from '../../../../common/keystone-tweakables/props';
 
 @model('AscendantEdgeTabsModel')
 export class AscendantEdgeTabsModel extends Model({
