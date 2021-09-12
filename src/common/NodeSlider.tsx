@@ -7,7 +7,7 @@ import { useWorkspaceMst } from '../renderer/DielineViewer/models/WorkspaceModel
 import { UNIT_LABEL_FORMAT, UNIT_STEP } from './util/units';
 import { getNearestHistoryFromAncestorNode } from './util/mobx-keystone';
 import { useStyles } from './style/style';
-import { ControllablePrimitiveModel } from './keystone-tweakables/models/ControllablePrimitiveModel';
+import { TweakablePrimitiveModel } from './keystone-tweakables/models/TweakablePrimitiveModel';
 import { INPUT_TYPE, SliderMetadata, SliderWithTextMetadata } from './keystone-tweakables/types';
 
 const ValueLabelComponent = ({
@@ -23,7 +23,7 @@ const ValueLabelComponent = ({
 export const UnlabelledNodeSlider = observer(({
   node, className, labelId,
 }: {
-  node: ControllablePrimitiveModel<number, SliderMetadata | SliderWithTextMetadata>, labelId: string, className?: string
+  node: TweakablePrimitiveModel<number, SliderMetadata | SliderWithTextMetadata>, labelId: string, className?: string
 }) => {
   const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
   const [historyGroup, setHistoryGroup] = useState(null);
@@ -85,7 +85,7 @@ export const UnlabelledNodeSlider = observer(({
 
 export const NodeSlider = observer(({
   node, className = undefined,
-}: { node: ControllablePrimitiveModel<number, SliderMetadata>, className?: string, useUnits?: boolean }) => {
+}: { node: TweakablePrimitiveModel<number, SliderMetadata>, className?: string, useUnits?: boolean }) => {
   const classes = useStyles();
   const labelId = uuid();
 

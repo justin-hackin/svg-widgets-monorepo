@@ -6,8 +6,8 @@ import { propertyMetadataCtx, propertyMetadataRegistry } from '../data';
 import { ownPropertyName, resolveLabel } from '../util';
 import { ReferenceMetadata } from '../types';
 
-@model('ControllableReferenceModel')
-export class ControllableReferenceModel<T extends object, M extends ReferenceMetadata> extends Model(
+@model('TweakableReferenceModel')
+export class TweakableReferenceModel<T extends object, M extends ReferenceMetadata> extends Model(
   <T extends object>() => ({ valueRef: prop<Ref<T> | undefined>() }),
 )<T> {
   // since applying a snapshot will detach this node and construct a new one, transfer metadata to store

@@ -6,8 +6,8 @@ import FormControl from '@material-ui/core/FormControl';
 import React, { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import { useStyles } from '../style/style';
-import { ControllablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/ControllablePrimitiveWithOptionsModel';
-import { ControllableReferenceWithOptionsModel } from '../keystone-tweakables/models/ControllableReferenceWithOptionsModel';
+import { TweakablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/TweakablePrimitiveWithOptionsModel';
+import { TweakableReferenceWithOptionsModel } from '../keystone-tweakables/models/TweakableReferenceWithOptionsModel';
 
 export const UncontrolledNodeSelect = observer(({
   value, onChange, options, label, name, displayEmpty = undefined,
@@ -37,7 +37,7 @@ export const UncontrolledNodeSelect = observer(({
 
 export const NodeReferenceSelect = observer(({
   node,
-}: { node: ControllableReferenceWithOptionsModel<any, any> }) => {
+}: { node: TweakableReferenceWithOptionsModel<any, any> }) => {
   const { valuePath, label, options } = node;
 
   const idToOptions = useMemo(() => options.reduce((acc, option) => {
@@ -64,7 +64,7 @@ export const NodeReferenceSelect = observer(({
 
 export const NodeSelect = observer(({
   node,
-}: { node: ControllablePrimitiveWithOptionsModel<any, any> }) => {
+}: { node: TweakablePrimitiveWithOptionsModel<any, any> }) => {
   const {
     valuePath, label, options,
   } = node;

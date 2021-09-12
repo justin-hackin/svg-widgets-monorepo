@@ -19,7 +19,7 @@ export const AscendantEdgeTabsControls = observer(() => {
 
       <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabEdgeEndpointsIndentation} />
 
-      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabControlPointsAngle} className="fuck" />
+      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabControlPointsAngle} />
 
       <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabControlPointsProtrusion} />
 

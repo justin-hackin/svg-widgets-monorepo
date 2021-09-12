@@ -10,12 +10,12 @@ import { useStyles } from '../style/style';
 import { NodeUnlabelledNumberTextInput } from './NodeUnlabelledNumberTextInput';
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
 import { UnlabelledNodeSlider } from '../NodeSlider';
-import { ControllablePrimitiveModel } from '../keystone-tweakables/models/ControllablePrimitiveModel';
+import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
 import { SliderWithTextMetadata } from '../keystone-tweakables/types';
 
 export const NodeSliderOrTextInput = observer(({
   node, className = undefined,
-}: { node: ControllablePrimitiveModel<number, SliderWithTextMetadata>, className?: string }) => {
+}: { node: TweakablePrimitiveModel<number, SliderWithTextMetadata>, className?: string }) => {
   const classes = useStyles();
   const labelId = uuid();
   const { label, metadata: { useUnits } } = node;

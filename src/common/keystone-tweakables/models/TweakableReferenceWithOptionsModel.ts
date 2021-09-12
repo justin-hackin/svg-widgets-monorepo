@@ -1,12 +1,12 @@
 import { ExtendedModel, model, modelClass } from 'mobx-keystone';
-import { ControllableReferenceModel } from './ControllableReferenceModel';
+import { TweakableReferenceModel } from './TweakableReferenceModel';
 import { createOptionsGetter } from '../util';
 import { OptionsListItem, ReferenceWithOptionsMetadata } from '../types';
 
-@model('ControllableReferenceWithOptionsModel')
-export class ControllableReferenceWithOptionsModel<T extends object, M extends ReferenceWithOptionsMetadata<T> >
+@model('TweakableReferenceWithOptionsModel')
+export class TweakableReferenceWithOptionsModel<T extends object, M extends ReferenceWithOptionsMetadata<T> >
   extends ExtendedModel(<T extends object, M extends ReferenceWithOptionsMetadata<T>>() => ({
-    baseModel: modelClass<ControllableReferenceModel<T, M>>(ControllableReferenceModel),
+    baseModel: modelClass<TweakableReferenceModel<T, M>>(TweakableReferenceModel),
     props: {},
   }))<T, M> {
   readonly options: OptionsListItem<T>[] | undefined;

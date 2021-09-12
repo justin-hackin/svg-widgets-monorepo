@@ -6,8 +6,8 @@ import { ownPropertyName, resolveLabel } from '../util';
 import { propertyMetadataCtx, propertyMetadataRegistry } from '../data';
 import { PrimitiveMetadata } from '../types';
 
-@model('ControllablePrimitiveModel')// eslint-disable-next-line @typescript-eslint/no-shadow
-export class ControllablePrimitiveModel<T, M extends PrimitiveMetadata> extends Model(<T>() => ({
+@model('TweakablePrimitiveModel')// eslint-disable-next-line @typescript-eslint/no-shadow
+export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Model(<T>() => ({
   value: prop<T>()
     .withSetter(),
 }))<T> {

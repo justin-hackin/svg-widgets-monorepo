@@ -6,7 +6,7 @@ import { Switch } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
 import { useStyles } from '../style/style';
-import { ControllablePrimitiveModel } from '../keystone-tweakables/models/ControllablePrimitiveModel';
+import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
 import { SwitchMetadata } from '../keystone-tweakables/types';
 
 export const NodeSwitchUncontrolled = observer(({
@@ -33,7 +33,7 @@ export const NodeSwitchUncontrolled = observer(({
 });
 
 export const NodeSwitch = observer((
-  { node } : { node: ControllablePrimitiveModel<boolean, SwitchMetadata> },
+  { node } : { node: TweakablePrimitiveModel<boolean, SwitchMetadata> },
 ) => {
   if (node.value === undefined) { return null; }
   return (

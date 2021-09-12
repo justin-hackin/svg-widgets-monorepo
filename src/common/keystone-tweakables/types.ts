@@ -1,6 +1,6 @@
 import { RefConstructor } from 'mobx-keystone';
-import { ControllablePrimitiveModel } from './models/ControllablePrimitiveModel';
-import { ControllableReferenceModel } from './models/ControllableReferenceModel';
+import { TweakablePrimitiveModel } from './models/TweakablePrimitiveModel';
+import { TweakableReferenceModel } from './models/TweakableReferenceModel';
 
 export enum INPUT_TYPE {
   SLIDER = 'slider',
@@ -14,7 +14,7 @@ export enum INPUT_TYPE {
   NUMBER_TEXT = 'number-text',
 }
 
-export type labelGenerator = (node: ControllableModel) => string;
+export type labelGenerator = (node: TweakableModel) => string;
 export type labelOverride = string | labelGenerator;
 
 interface BasePrimitiveMetadata {
@@ -78,8 +78,8 @@ export type PrimitiveMetadata =
   SliderMetadata | SwitchMetadata | ColorPickerMetadata | RadioMetadata<any> | NumberTextMetadata | SelectMetadata<any>;
 export type ReferenceMetadata = ReferenceWithOptionsMetadata<any>;
 export type AnyMetadata = PrimitiveMetadata | ReferenceMetadata;
-export type ControllableModel =
-  ControllablePrimitiveModel<any, PrimitiveMetadata> | ControllableReferenceModel<any, ReferenceMetadata>;
+export type TweakableModel =
+  TweakablePrimitiveModel<any, PrimitiveMetadata> | TweakableReferenceModel<any, ReferenceMetadata>;
 type InitialSelectionResolver<T> = (optionValues: T[], rootStore: object) => (T | undefined);
 
 export interface ReferenceResolvingOptionsMetadata<T extends object> extends BasePrimitiveMetadata {

@@ -1,10 +1,10 @@
 import { getParent, getParentToChildPath } from 'mobx-keystone';
 import { computed, makeObservable } from 'mobx';
 import { isFunction, startCase } from 'lodash';
-import { ControllablePrimitiveWithOptionsModel } from './models/ControllablePrimitiveWithOptionsModel';
-import { ControllableReferenceWithOptionsModel } from './models/ControllableReferenceWithOptionsModel';
+import { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
+import { TweakableReferenceWithOptionsModel } from './models/TweakableReferenceWithOptionsModel';
 import {
-  ControllableModel,
+  TweakableModel,
   labelGenerator,
   labelOverride,
   MetadataOptions,
@@ -23,7 +23,7 @@ export function optionsIsListResolver<T>(
 }
 
 export function createOptionsGetter(
-  node: ControllablePrimitiveWithOptionsModel<any, any> | ControllableReferenceWithOptionsModel<any, any>,
+  node: TweakablePrimitiveWithOptionsModel<any, any> | TweakableReferenceWithOptionsModel<any, any>,
   rootStore: object,
 ) {
   Object.defineProperty(node, 'options', {
@@ -36,7 +36,7 @@ export function createOptionsGetter(
 }
 
 export const isFunctionOverride = (override: labelOverride): override is labelGenerator => isFunction(override);
-export const resolveLabel = (node: ControllableModel) => {
+export const resolveLabel = (node: TweakableModel) => {
   // IDE thinks labelOverride is never used
   const {
     ownPropertyName,

@@ -1,10 +1,10 @@
 import { prop } from 'mobx-keystone';
 import uuid from 'uuid/v4';
 
-import { ControllablePrimitiveModel } from './models/ControllablePrimitiveModel';
-import { ControllablePrimitiveWithOptionsModel } from './models/ControllablePrimitiveWithOptionsModel';
+import { TweakablePrimitiveModel } from './models/TweakablePrimitiveModel';
+import { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
 import { propertyMetadataCtx } from './data';
-import { ControllableReferenceWithOptionsModel } from './models/ControllableReferenceWithOptionsModel';
+import { TweakableReferenceWithOptionsModel } from './models/TweakableReferenceWithOptionsModel';
 import {
   ColorPickerMetadata, INPUT_TYPE,
   NumberTextMetadata,
@@ -15,8 +15,8 @@ import {
 } from './types';
 
 export function controllablePrimitiveProp<T, M extends PrimitiveMetadata>(value: T, metadata: M) {
-  return prop<ControllablePrimitiveModel<T, M>>(() => propertyMetadataCtx.apply(
-    () => new ControllablePrimitiveModel<T, M>({
+  return prop<TweakablePrimitiveModel<T, M>>(() => propertyMetadataCtx.apply(
+    () => new TweakablePrimitiveModel<T, M>({
       value,
       $modelId: uuid(),
     }), metadata,
@@ -40,8 +40,8 @@ export const colorPickerProp = (value: string) => controllablePrimitiveProp<stri
 function controllablePrimitiveWithOptionsProp<T, M extends WithOptionsMetadata<T>>(
   value: T, metadata: M,
 ) {
-  return prop<ControllablePrimitiveWithOptionsModel<T, M>>(() => propertyMetadataCtx.apply(
-    () => new ControllablePrimitiveWithOptionsModel<T, M>({
+  return prop<TweakablePrimitiveWithOptionsModel<T, M>>(() => propertyMetadataCtx.apply(
+    () => new TweakablePrimitiveWithOptionsModel<T, M>({
       value,
       $modelId: uuid(),
     }), metadata,
@@ -73,15 +73,15 @@ export const numberTextProp = (
 
 export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSelectMetadata<T>, 'type'>) {
   const defaultFn = () => propertyMetadataCtx.apply(
-    () => new ControllableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({}),
+    () => new TweakableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({}),
     { type: INPUT_TYPE.REFERENCE_SELECT, ...metadata },
   );
-  return prop<ControllableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>>(defaultFn);
+  return prop<TweakableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>>(defaultFn);
 }
 
 export function referenceRadioProp<T extends object>(metadata: Omit<ReferenceRadioMetadata<T>, 'type'>) {
-  return prop<ControllableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>>(() => propertyMetadataCtx.apply(
-    () => new ControllableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({}), {
+  return prop<TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>>(() => propertyMetadataCtx.apply(
+    () => new TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({}), {
       type: INPUT_TYPE.REFERENCE_RADIO, ...metadata,
     },
   ));

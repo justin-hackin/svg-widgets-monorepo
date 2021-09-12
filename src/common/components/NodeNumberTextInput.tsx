@@ -7,11 +7,11 @@ import { observer } from 'mobx-react';
 // TODO: round up/down max/min/step based on unit (so that all values are divisible by the step)
 import { NodeUnlabelledNumberTextInput } from './NodeUnlabelledNumberTextInput';
 import { useStyles } from '../style/style';
-import { ControllablePrimitiveModel } from '../keystone-tweakables/models/ControllablePrimitiveModel';
+import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
 import { NumberTextMetadata, SliderWithTextMetadata } from '../keystone-tweakables/types';
 
 export const NodeNumberTextInput = observer((
-  { node }: { node: ControllablePrimitiveModel<number, NumberTextMetadata | SliderWithTextMetadata> },
+  { node }: { node: TweakablePrimitiveModel<number, NumberTextMetadata | SliderWithTextMetadata> },
 ) => {
   const classes = useStyles();
   const labelId = uuid();

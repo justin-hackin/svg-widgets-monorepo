@@ -6,8 +6,8 @@ import {
 } from '@material-ui/core';
 
 import { useStyles } from '../style/style';
-import { ControllablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/ControllablePrimitiveWithOptionsModel';
-import { ControllableReferenceWithOptionsModel } from '../keystone-tweakables/models/ControllableReferenceWithOptionsModel';
+import { TweakablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/TweakablePrimitiveWithOptionsModel';
+import { TweakableReferenceWithOptionsModel } from '../keystone-tweakables/models/TweakableReferenceWithOptionsModel';
 import { RadioMetadata, ReferenceRadioMetadata } from '../keystone-tweakables/types';
 
 export const UncontrolledNodeRadio = observer(({
@@ -27,7 +27,7 @@ export const UncontrolledNodeRadio = observer(({
 });
 
 export const NodeRadio = observer((
-  { node }: { node: ControllablePrimitiveWithOptionsModel<any, RadioMetadata<any>> },
+  { node }: { node: TweakablePrimitiveWithOptionsModel<any, RadioMetadata<any>> },
 ) => (
   <UncontrolledNodeRadio
     {...{
@@ -45,7 +45,7 @@ export const NodeRadio = observer((
 
 // NOTE: not used but useful for future "framework" library
 export const NodeReferenceRadio = observer((
-  { node }: { node: ControllableReferenceWithOptionsModel<any, ReferenceRadioMetadata<any>> },
+  { node }: { node: TweakableReferenceWithOptionsModel<any, ReferenceRadioMetadata<any>> },
 ) => {
   const { valuePath, label, options } = node;
   const idToOptions = useMemo(() => options.reduce((acc, option) => {

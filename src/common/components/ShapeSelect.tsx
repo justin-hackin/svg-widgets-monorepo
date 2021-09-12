@@ -10,13 +10,13 @@ import clsx from 'clsx';
 
 import { useStyles } from '../style/style';
 import requireStatic from '../../renderer/requireStatic';
-import { ControllablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/ControllablePrimitiveWithOptionsModel';
+import { TweakablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/TweakablePrimitiveWithOptionsModel';
 import { WithOptionsMetadata } from '../keystone-tweakables/types';
 
 export const ShapeSelect = observer(({
   node, className = undefined, isCompactDisplay = false,
 }: {
-  node: ControllablePrimitiveWithOptionsModel<string, WithOptionsMetadata<any>>,
+  node: TweakablePrimitiveWithOptionsModel<string, WithOptionsMetadata<any>>,
   className?: string, isCompactDisplay?: boolean
 }) => {
   const classes = useStyles();
