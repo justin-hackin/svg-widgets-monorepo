@@ -26,6 +26,7 @@ const DielineGroup = ({ children }) => (
     {children}
   </g>
 );
+
 export const DielinesLayer = observer(({
   widgetStore, preferencesStore,
 }: {
@@ -38,6 +39,7 @@ export const DielinesLayer = observer(({
     textureEditor: { faceDecoration },
     boundingBox,
     pyramidNetSpec: {
+      faceLengthAdjustRatio,
       masterBaseTabCut,
       masterBaseTabScore,
       netPaths: { cut, score },
@@ -58,7 +60,7 @@ export const DielinesLayer = observer(({
     registrationPadding: { value: registrationPadding },
     registrationStrokeColor: { value: registrationStrokeColor },
     registrationMarkLength: { value: registrationMarkLength },
-  } = preferencesStore;
+  } = preferencesStore as PreferencesModel;
 
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
@@ -85,7 +87,9 @@ export const DielinesLayer = observer(({
           ? (
             <g key={`${index}-decoration`} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
               {texturePathD && (
-              <path d={texturePathD} transform={pathScaleMatrix.toString()} {...cutProps} />
+              <path d={texturePathD} transform={pathScaleMatrix.toString()} {
+                ...{...cutProps, strokeWidth: cutProps.strokeWidth / faceLengthAdjustRatio}
+              } />
               )}
             </g>
           ) : (
@@ -158,11 +162,11 @@ export const DielinesLayer = observer(({
               d={registrationMarksPath(printRegistrationBB, registrationMarkLength, true).getD()}
             />
           ))}
+          <DecorationContent />
           {useClonesForBaseTabs ? (<ClonePyramidNetContent />) : (
             <>
               <path className="net-score" {...scoreProps} d={score.getD()} />
               <path className="net-cut" {...cutProps} d={cut.getD()} />
-              <DecorationContent />
             </>
           )}
         </g>
