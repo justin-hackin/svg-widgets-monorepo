@@ -45,7 +45,7 @@ import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecor
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { RawFaceDecorationModel } from '../../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 import { TextureEditorModel } from '../../models/TextureEditorModel';
-import { TweakableInput } from '../../../TweakableInput';
+import { TweakableInput } from '../../../../keystone-tweakables/material-ui-controls/TweakableInput';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat

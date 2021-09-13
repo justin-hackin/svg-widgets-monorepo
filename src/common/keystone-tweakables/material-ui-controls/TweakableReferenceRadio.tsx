@@ -1,8 +1,8 @@
 // NOTE: not used but useful for future "framework" library
 import { observer } from 'mobx-react';
 import React, { useMemo } from 'react';
-import { TweakableReferenceWithOptionsModel } from '../keystone-tweakables/models/TweakableReferenceWithOptionsModel';
-import { ReferenceRadioMetadata } from '../keystone-tweakables/types';
+import { TweakableReferenceWithOptionsModel } from '../models/TweakableReferenceWithOptionsModel';
+import { ReferenceRadioMetadata } from '../types';
 import { SimpleRadio } from './SimpleRadio';
 
 export const TweakableReferenceRadio = observer((

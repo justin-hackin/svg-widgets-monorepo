@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { TweakableInput } from '../../../../../../common/components/TweakableInput';
+import { TweakableInput } from '../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 
 export const AscendantEdgeTabsControls = observer(() => {
   const workspaceStore = useWorkspaceMst();

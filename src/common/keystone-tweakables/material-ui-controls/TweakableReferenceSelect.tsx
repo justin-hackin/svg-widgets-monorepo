@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useMemo } from 'react';
-import { TweakableReferenceWithOptionsModel } from '../keystone-tweakables/models/TweakableReferenceWithOptionsModel';
+import { TweakableReferenceWithOptionsModel } from '../models/TweakableReferenceWithOptionsModel';
 import { SimpleSelect } from './SimpleSelect';
 
 export const TweakableReferenceSelect = observer(({

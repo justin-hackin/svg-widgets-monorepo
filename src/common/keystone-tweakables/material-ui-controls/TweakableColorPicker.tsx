@@ -4,9 +4,9 @@ import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import { ChromePicker } from 'react-color';
 
-import { useStyles } from '../style/style';
-import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
-import { ColorPickerMetadata } from '../keystone-tweakables/types';
+import { useStyles } from '../../style/style';
+import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
+import { ColorPickerMetadata } from '../types';
 
 export const TweakableColorPicker = ({
   node,

@@ -5,7 +5,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import { Switch } from '@material-ui/core';
 import React from 'react';
-import { useStyles } from '../style/style';
+import { useStyles } from '../../style/style';
 
 export const SimpleSwitch = observer(({
   value,

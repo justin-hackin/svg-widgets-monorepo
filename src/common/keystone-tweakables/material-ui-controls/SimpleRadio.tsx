@@ -4,7 +4,7 @@ import {
   FormControlLabel, FormLabel, Radio, RadioGroup,
 } from '@material-ui/core';
 import React from 'react';
-import { useStyles } from '../style/style';
+import { useStyles } from '../../style/style';
 
 export const SimpleRadio = observer(({
   value, onChange, options, label, name, row = false,

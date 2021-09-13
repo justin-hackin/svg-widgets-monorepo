@@ -6,12 +6,12 @@ import KeyboardIcon from '@material-ui/icons/Keyboard';
 import { observer } from 'mobx-react';
 import clsx from 'clsx';
 
-import { useStyles } from '../style/style';
+import { useStyles } from '../../style/style';
 import { TweakableUnlabelledNumberTextInput } from './TweakableUnlabelledNumberTextInput';
-import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
-import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
-import { SliderWithTextMetadata } from '../keystone-tweakables/types';
-import { TweakableUnlabelledSlider } from '../TweakableUnlabelledSlider';
+import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
+import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
+import { SliderWithTextMetadata } from '../types';
+import { TweakableUnlabelledSlider } from '../../TweakableUnlabelledSlider';
 
 export const TweakableSliderOrTextInput = observer(({
   node, className = undefined,

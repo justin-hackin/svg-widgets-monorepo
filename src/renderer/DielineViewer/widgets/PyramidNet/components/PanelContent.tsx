@@ -10,7 +10,7 @@ import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { ShapeSelect } from '../../../../../common/components/ShapeSelect';
 import { PyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
-import { TweakableInput } from '../../../../../common/components/TweakableInput';
+import { TweakableInput } from '../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 
 const controlsTabs = [
   {

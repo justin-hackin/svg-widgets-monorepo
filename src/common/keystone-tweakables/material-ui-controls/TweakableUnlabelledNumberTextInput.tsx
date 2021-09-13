@@ -3,10 +3,10 @@ import React, { createRef, useEffect } from 'react';
 import parseFraction from 'parse-fraction';
 import { observer } from 'mobx-react';
 
-import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
-import { pxToUnitView, PIXELS_PER_UNIT } from '../util/units';
-import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
-import { NumberTextMetadata, SliderWithTextMetadata } from '../keystone-tweakables/types';
+import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
+import { pxToUnitView, PIXELS_PER_UNIT } from '../../util/units';
+import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
+import { NumberTextMetadata, SliderWithTextMetadata } from '../types';
 
 export const TweakableUnlabelledNumberTextInput = observer(({
   node, labelId,

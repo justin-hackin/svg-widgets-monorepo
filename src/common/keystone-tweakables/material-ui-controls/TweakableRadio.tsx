@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { TweakablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/TweakablePrimitiveWithOptionsModel';
-import { RadioMetadata } from '../keystone-tweakables/types';
+import { TweakablePrimitiveWithOptionsModel } from '../models/TweakablePrimitiveWithOptionsModel';
+import { RadioMetadata } from '../types';
 import { SimpleRadio } from './SimpleRadio';
 
 export const TweakableRadio = observer((

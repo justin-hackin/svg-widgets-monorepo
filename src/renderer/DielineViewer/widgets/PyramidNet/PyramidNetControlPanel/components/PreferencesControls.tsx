@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { Button, Divider } from '@material-ui/core';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PreferencesModel } from '../../../../models/PreferencesModel';
-import { TweakableInput } from '../../../../../../common/components/TweakableInput';
+import { TweakableInput } from '../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 
 export const PreferencesControls = observer(() => {
   const workspaceStore = useWorkspaceMst();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
-import { SwitchMetadata } from '../keystone-tweakables/types';
+import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
+import { SwitchMetadata } from '../types';
 import { SimpleSwitch } from './SimpleSwitch';
 
 export const TweakableSwitch = observer((

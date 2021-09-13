@@ -3,9 +3,9 @@ import React from 'react';
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { useStyles } from '../../../../../common/style/style';
 import { CylinderLightBoxModel } from '../models';
-import { TweakableSliderOrTextInput } from '../../../../../common/components/TweakableSliderOrTextInput';
+import { TweakableSliderOrTextInput } from '../../../../../common/keystone-tweakables/material-ui-controls/TweakableSliderOrTextInput';
 import { TweakableSlider } from '../../../../../common/TweakableSlider';
-import { TweakableInput } from '../../../../../common/components/TweakableInput';
+import { TweakableInput } from '../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 
 export const CylinderLightboxPanelContent = () => {
   const workspaceStore = useWorkspaceMst();

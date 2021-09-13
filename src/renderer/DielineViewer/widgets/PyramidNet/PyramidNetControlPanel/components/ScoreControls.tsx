@@ -2,8 +2,8 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { TweakableInput } from '../../../../../../common/components/TweakableInput';
-import { SimpleSwitch } from '../../../../../../common/components/SimpleSwitch';
+import { TweakableInput } from '../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
+import { SimpleSwitch } from '../../../../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
 
 export const ScoreControls = observer(() => {
   const workspaceStore = useWorkspaceMst();

@@ -3,8 +3,8 @@ import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 import { BendGuideValleyModel } from '../../../../util/shapes/baseEdgeConnectionTab';
-import { TweakableInput } from '../../../../../../common/components/TweakableInput';
-import { SimpleSwitch } from '../../../../../../common/components/SimpleSwitch';
+import { TweakableInput } from '../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
+import { SimpleSwitch } from '../../../../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();

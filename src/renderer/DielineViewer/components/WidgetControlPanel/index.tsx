@@ -22,7 +22,7 @@ import {
 import { applySnapshot, getSnapshot } from 'mobx-keystone';
 import { useStyles } from '../../../../common/style/style';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
-import { SimpleDialog } from '../../../../common/components/SimpleDialog';
+import { SimpleDialog } from '../../../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/PreferencesControls';
 import { EVENTS } from '../../../../common/constants';
 import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';

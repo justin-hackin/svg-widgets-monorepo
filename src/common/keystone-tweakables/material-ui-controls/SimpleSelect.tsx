@@ -5,7 +5,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
 import uuid from 'uuid/v1';
-import { useStyles } from '../style/style';
+import { useStyles } from '../../style/style';
 
 export const SimpleSelect = observer(({
   value,

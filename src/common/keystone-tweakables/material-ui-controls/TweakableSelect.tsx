@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { TweakablePrimitiveWithOptionsModel } from '../keystone-tweakables/models/TweakablePrimitiveWithOptionsModel';
+import { TweakablePrimitiveWithOptionsModel } from '../models/TweakablePrimitiveWithOptionsModel';
 import { SimpleSelect } from './SimpleSelect';
 
 export const TweakableSelect = observer(({
