@@ -47,7 +47,7 @@ export class BendGuideValleyModel extends Model({
 export class BaseEdgeTabsModel extends Model({
   finDepthToTabDepth: sliderWithTextProp(1.3, { ...ratioSliderProps, min: 0.05 }),
   // set by applyShapeBasedDefaults
-  finOffsetRatio: sliderWithTextProp(0.75, ratioSliderProps),
+  finOffsetRatio: sliderProp(0.75, {...ratioSliderProps, max: 0.99}),
   // set by applyShapeBasedDefaults,
   holeBreadthToHalfWidth: sliderWithTextProp(0.25, {
     min: 0.05, max: 0.95, step: DEFAULT_SLIDER_STEP,
