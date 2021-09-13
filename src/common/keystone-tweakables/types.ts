@@ -3,22 +3,21 @@ import { TweakablePrimitiveModel } from './models/TweakablePrimitiveModel';
 import { TweakableReferenceModel } from './models/TweakableReferenceModel';
 
 export enum INPUT_TYPE {
-  SLIDER = 'slider',
-  SLIDER_WITH_TEXT = 'slider',
   SWITCH = 'switch',
-  COLOR_PICKER = 'color-picker',
-  RADIO = 'radio',
-  REFERENCE_RADIO = 'radio',
-  SELECT = 'select',
-  REFERENCE_SELECT = 'reference-select',
+  SLIDER = 'slider',
+  SLIDER_WITH_TEXT = 'slider-with-text',
   NUMBER_TEXT = 'number-text',
+  SELECT = 'select',
+  RADIO = 'radio',
+  COLOR_PICKER = 'color-picker',
+  REFERENCE_SELECT = 'reference-select',
+  REFERENCE_RADIO = 'radio',
 }
 
 export type labelGenerator = (node: TweakableModel) => string;
 export type labelOverride = string | labelGenerator;
 
 interface BasePrimitiveMetadata {
-  type: INPUT_TYPE,
   labelOverride?: labelOverride,
 }
 
@@ -75,7 +74,14 @@ export interface SliderWithTextMetadata extends BasePrimitiveMetadata, NumberTex
 }
 
 export type PrimitiveMetadata =
-  SliderMetadata | SwitchMetadata | ColorPickerMetadata | RadioMetadata<any> | NumberTextMetadata | SelectMetadata<any>;
+  | SwitchMetadata
+  | SliderMetadata
+  | SliderWithTextMetadata
+  | NumberTextMetadata
+  | ColorPickerMetadata
+  | RadioMetadata<any>
+  | SelectMetadata<any>;
+
 export type ReferenceMetadata = ReferenceWithOptionsMetadata<any>;
 export type AnyMetadata = PrimitiveMetadata | ReferenceMetadata;
 export type TweakableModel =

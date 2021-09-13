@@ -5,10 +5,12 @@ import Typography from '@material-ui/core/Typography';
 import { ChromePicker } from 'react-color';
 
 import { useStyles } from '../style/style';
+import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
+import { ColorPickerMetadata } from '../keystone-tweakables/types';
 
 export const NodeColorPicker = ({
-  node, ...rest
-}) => {
+  node,
+}: { node: TweakablePrimitiveModel<string, ColorPickerMetadata> }) => {
   const classes = useStyles();
   const labelId = uuid();
   if (node.value === undefined) { return null; }
@@ -25,7 +27,6 @@ export const NodeColorPicker = ({
         onChangeComplete={(color) => {
           node.setValue(color.hex);
         }}
-        {...rest}
       />
     </FormControl>
   );
