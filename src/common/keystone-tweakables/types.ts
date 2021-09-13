@@ -11,7 +11,7 @@ export enum INPUT_TYPE {
   RADIO = 'radio',
   COLOR_PICKER = 'color-picker',
   REFERENCE_SELECT = 'reference-select',
-  REFERENCE_RADIO = 'radio',
+  REFERENCE_RADIO = 'reference-radio',
 }
 
 export type labelGenerator = (node: TweakableModel) => string;
