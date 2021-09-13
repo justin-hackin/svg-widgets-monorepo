@@ -8,7 +8,7 @@ import { pxToUnitView, PIXELS_PER_UNIT } from '../util/units';
 import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
 import { NumberTextMetadata, SliderWithTextMetadata } from '../keystone-tweakables/types';
 
-export const NodeUnlabelledNumberTextInput = observer(({
+export const TweakableUnlabelledNumberTextInput = observer(({
   node, labelId,
 }: { node: TweakablePrimitiveModel<number, (NumberTextMetadata | SliderWithTextMetadata)>, labelId: string }) => {
   const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();

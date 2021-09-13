@@ -2,9 +2,9 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { NodeSwitchUncontrolled } from '../../../../../../common/components/NodeSwitch';
 import { BendGuideValleyModel } from '../../../../util/shapes/baseEdgeConnectionTab';
 import { TweakableInput } from '../../../../../../common/components/TweakableInput';
+import { SimpleSwitch } from '../../../../../../common/components/SimpleSwitch';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -36,9 +36,9 @@ export const BaseEdgeTabControls = observer(() => {
 
       <TweakableInput node={baseEdgeTabsSpec.tabConjunctionClearance} />
 
-      <NodeSwitchUncontrolled
+      <SimpleSwitch
         label="Use Bend Guide Valley"
-        valuePath="BaseEdgeTabControls__useBendGuideValley"
+        name="BaseEdgeTabControls__useBendGuideValley"
         value={!!baseEdgeTabsSpec.bendGuideValley}
         onChange={(e) => {
           if (e.target.checked) {

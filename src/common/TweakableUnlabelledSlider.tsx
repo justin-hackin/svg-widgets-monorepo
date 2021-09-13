@@ -1,14 +1,11 @@
-import { Slider, Tooltip, Typography } from '@material-ui/core';
+import { Slider, Tooltip } from '@material-ui/core';
 import React, { useState } from 'react';
-import uuid from 'uuid/v1';
-
 import { observer } from 'mobx-react';
-import { useWorkspaceMst } from '../renderer/DielineViewer/models/WorkspaceModel';
-import { UNIT_LABEL_FORMAT, UNIT_STEP } from './util/units';
-import { getNearestHistoryFromAncestorNode } from './util/mobx-keystone';
-import { useStyles } from './style/style';
 import { TweakablePrimitiveModel } from './keystone-tweakables/models/TweakablePrimitiveModel';
 import { INPUT_TYPE, SliderMetadata, SliderWithTextMetadata } from './keystone-tweakables/types';
+import { useWorkspaceMst } from '../renderer/DielineViewer/models/WorkspaceModel';
+import { getNearestHistoryFromAncestorNode } from './util/mobx-keystone';
+import { UNIT_LABEL_FORMAT, UNIT_STEP } from './util/units';
 
 const ValueLabelComponent = ({
   children,
@@ -19,9 +16,10 @@ const ValueLabelComponent = ({
     {children}
   </Tooltip>
 );
-
-export const UnlabelledNodeSlider = observer(({
-  node, className, labelId,
+export const TweakableUnlabelledSlider = observer(({
+  node,
+  className,
+  labelId,
 }: {
   node: TweakablePrimitiveModel<number, SliderMetadata | SliderWithTextMetadata>, labelId: string, className?: string
 }) => {
@@ -31,10 +29,11 @@ export const UnlabelledNodeSlider = observer(({
 
   const {
     metadata: {
-    // @ts-ignore
-      min, max, step, useUnits = undefined,
-    }, valuePath,
+      min, max, step,
+    },
+    valuePath,
   } = node;
+  const useUnits = node.metadata.type === INPUT_TYPE.SLIDER_WITH_TEXT && node.metadata.useUnits;
 
   const endHistoryGroupAndClear = () => {
     historyGroup.end();
@@ -54,7 +53,9 @@ export const UnlabelledNodeSlider = observer(({
       className={className}
       value={node.value}
       onChange={(_, val) => {
-        if (Array.isArray(val)) { return; }
+        if (Array.isArray(val)) {
+          return;
+        }
         if (!history) {
           node.setValue(val);
           return;
@@ -80,29 +81,5 @@ export const UnlabelledNodeSlider = observer(({
       ValueLabelComponent={ValueLabelComponent}
 
     />
-  );
-});
-
-export const NodeSlider = observer(({
-  node, className = undefined,
-}: { node: TweakablePrimitiveModel<number, SliderMetadata>, className?: string, useUnits?: boolean }) => {
-  const classes = useStyles();
-  const labelId = uuid();
-
-  // @ts-ignore
-  if (node.metadata.type !== INPUT_TYPE.SLIDER) {
-    throw new Error(`Slider node must have metadata.type as "slider", saw: ${node.metadata.type}`);
-  }
-  return (
-    <div className={classes.formControl}>
-      <Typography id={labelId} gutterBottom>
-        {node.label}
-      </Typography>
-      <UnlabelledNodeSlider
-        className={className}
-        node={node}
-        labelId={labelId}
-      />
-    </div>
   );
 });

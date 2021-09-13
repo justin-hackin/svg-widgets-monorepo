@@ -7,13 +7,13 @@ import { observer } from 'mobx-react';
 import clsx from 'clsx';
 
 import { useStyles } from '../style/style';
-import { NodeUnlabelledNumberTextInput } from './NodeUnlabelledNumberTextInput';
+import { TweakableUnlabelledNumberTextInput } from './TweakableUnlabelledNumberTextInput';
 import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
-import { UnlabelledNodeSlider } from '../NodeSlider';
 import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
 import { SliderWithTextMetadata } from '../keystone-tweakables/types';
+import { TweakableUnlabelledSlider } from '../TweakableUnlabelledSlider';
 
-export const NodeSliderOrTextInput = observer(({
+export const TweakableSliderOrTextInput = observer(({
   node, className = undefined,
 }: { node: TweakablePrimitiveModel<number, SliderWithTextMetadata>, className?: string }) => {
   const classes = useStyles();
@@ -32,9 +32,9 @@ export const NodeSliderOrTextInput = observer(({
       <div className={classes.sliderTextInputContainer}>
         <div className={classes.sliderTextInput}>
           {(isSlider) ? (
-            <UnlabelledNodeSlider node={node} labelId={labelId} />
+            <TweakableUnlabelledSlider node={node} labelId={labelId} />
           ) : (
-            <NodeUnlabelledNumberTextInput node={node} labelId={labelId} />
+            <TweakableUnlabelledNumberTextInput node={node} labelId={labelId} />
           ) }
         </div>
         <IconButton className={classes.sliderTextInputToggle} onClick={toggleIsSlider}>

@@ -5,12 +5,12 @@ import { observer } from 'mobx-react';
 
 // used to present underlying pixel values as unit-specific conversions
 // TODO: round up/down max/min/step based on unit (so that all values are divisible by the step)
-import { NodeUnlabelledNumberTextInput } from './NodeUnlabelledNumberTextInput';
+import { TweakableUnlabelledNumberTextInput } from './TweakableUnlabelledNumberTextInput';
 import { useStyles } from '../style/style';
 import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
 import { NumberTextMetadata, SliderWithTextMetadata } from '../keystone-tweakables/types';
 
-export const NodeNumberTextInput = observer((
+export const TweakableNumberTextInput = observer((
   { node }: { node: TweakablePrimitiveModel<number, NumberTextMetadata | SliderWithTextMetadata> },
 ) => {
   const classes = useStyles();
@@ -20,7 +20,7 @@ export const NodeNumberTextInput = observer((
       <Typography id={labelId} gutterBottom>
         {node.label}
       </Typography>
-      <NodeUnlabelledNumberTextInput
+      <TweakableUnlabelledNumberTextInput
         node={node}
         labelId={labelId}
       />

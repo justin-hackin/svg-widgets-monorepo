@@ -3,8 +3,8 @@ import React from 'react';
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { useStyles } from '../../../../../common/style/style';
 import { CylinderLightBoxModel } from '../models';
-import { NodeSliderOrTextInput } from '../../../../../common/components/NodeSliderOrTextInput';
-import { NodeSlider } from '../../../../../common/NodeSlider';
+import { TweakableSliderOrTextInput } from '../../../../../common/components/TweakableSliderOrTextInput';
+import { TweakableSlider } from '../../../../../common/TweakableSlider';
 import { TweakableInput } from '../../../../../common/components/TweakableInput';
 
 export const CylinderLightboxPanelContent = () => {

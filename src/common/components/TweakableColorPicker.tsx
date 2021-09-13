@@ -8,7 +8,7 @@ import { useStyles } from '../style/style';
 import { TweakablePrimitiveModel } from '../keystone-tweakables/models/TweakablePrimitiveModel';
 import { ColorPickerMetadata } from '../keystone-tweakables/types';
 
-export const NodeColorPicker = ({
+export const TweakableColorPicker = ({
   node,
 }: { node: TweakablePrimitiveModel<string, ColorPickerMetadata> }) => {
   const classes = useStyles();
