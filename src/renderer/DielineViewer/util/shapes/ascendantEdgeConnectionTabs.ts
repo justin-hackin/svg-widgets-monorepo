@@ -26,7 +26,7 @@ export class AscendantEdgeTabsModel extends Model({
   tabDepthToTraversalLength: sliderWithTextProp(0.0375, {
     min: 0.03, max: 0.05, step: 0.0001,
   }),
-  tabStartGapToTabDepth: sliderProp(1, {
+  tabStartGapToTabDepth: sliderWithTextProp(1, {
     min: 0.3, max: 1, step: DEFAULT_SLIDER_STEP,
   }),
   tabControlPointsProtrusion: sliderWithTextProp(0.93, ratioSliderProps),

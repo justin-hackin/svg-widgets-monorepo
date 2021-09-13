@@ -25,7 +25,7 @@ export const AscendantEdgeTabsControls = observer(() => {
 
       <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabStartGapToTabDepth} />
 
-      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.holeWidthRatio} />
+      <NodeSlider node={ascendantEdgeTabsSpec.holeWidthRatio} />
 
       <NodeSlider node={ascendantEdgeTabsSpec.flapRoundingDistanceRatio} />
     </>

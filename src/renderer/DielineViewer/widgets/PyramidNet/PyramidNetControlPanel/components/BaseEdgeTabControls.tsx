@@ -51,7 +51,6 @@ export const BaseEdgeTabControls = observer(() => {
       />
       {baseEdgeTabsSpec.bendGuideValley instanceof BendGuideValleyModel && (
         <>
-          {/* TODO: there should be a ts error here as prop is sliderWithTextProp */}
           <NodeSlider node={baseEdgeTabsSpec.bendGuideValley.depthRatio} />
 
           <NodeSliderOrTextInput node={baseEdgeTabsSpec.bendGuideValley.theta} />
