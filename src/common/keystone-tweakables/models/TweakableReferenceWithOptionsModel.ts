@@ -15,7 +15,7 @@ export class TweakableReferenceWithOptionsModel<T extends object, M extends Refe
     super.onAttachedToRootStore(rootStore);
     createOptionsGetter(this, rootStore);
 
-    if (this.metadata.initialSelectionResolver !== undefined) {
+    if (this.value === undefined && this.metadata.initialSelectionResolver !== undefined) {
       const value = this.metadata.initialSelectionResolver(this.options.map(({ value }) => value), rootStore);
       if (value) {
         this.valueRef = this.metadata.typeRef(value);
