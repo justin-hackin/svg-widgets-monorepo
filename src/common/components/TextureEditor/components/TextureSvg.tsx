@@ -1,12 +1,16 @@
+/* eslint-disable react/require-default-props */
 import React from 'react';
 import { observer } from 'mobx-react';
 
+import { HookReturnType, UseDragConfig } from 'react-use-gesture/dist/types';
 import { RawPoint, scalePoint } from '../../../util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
-import { IImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
-import { IPathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
+import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
+import { TextureEditorModel } from '../models/TextureEditorModel';
+import { RawFaceDecorationModel } from '../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';
@@ -16,28 +20,36 @@ const IMAGE_TEXTURE_DESIGN_BOUNDARY_FILL = '#00ff00';
 
 export const TextureSvgUnobserved = ({
   viewBox = undefined,
-  textureTranslationUseDrag = () => {},
-  transformOriginUseDrag = () => {},
+  textureTransformationUseDrag = undefined,
+  transformOriginUseDrag = undefined,
   store = undefined,
+}: {
+  textureTransformationUseDrag?: (...args: any[]) => HookReturnType<UseDragConfig>,
+  transformOriginUseDrag?: (...args: any[]) => HookReturnType<UseDragConfig>,
+  viewBox?: string,
+  store?: TextureEditorModel,
 }) => {
   // must avoid calling useMst (hooks) when using server-side rendering (results in errors about useLayoutEffect)
   const {
     decorationBoundary: { pathD: decorationBoundaryPathD = '' } = {},
-    texture,
+    faceDecoration,
     faceBoundary,
     faceFittingScale,
     placementAreaDimensions,
-  } = store || (useWorkspaceMst().selectedStore as IPyramidNetPluginModel).textureEditor;
+  } = store || (useWorkspaceMst().selectedStore as PyramidNetPluginModel).textureEditor;
+  if (
+    !decorationBoundaryPathD || faceDecoration instanceof RawFaceDecorationModel
+    || !faceBoundary || !decorationBoundaryPathD
+  ) { return null; }
+
   const isOnScreen = !store;
   const materialColor = isOnScreen ? MUTED_WHITE : WHITE;
 
-  if (!decorationBoundaryPathD) { return null; }
   const {
-    scale: textureScale, transformOriginDragged, transformMatrixDraggedStr, hasPathPattern, pattern,
-  } = texture || {};
+    scaleDragged, transformOriginDragged, transformMatrixDraggedStr, pattern,
+  } = faceDecoration || {};
 
-  if (!faceBoundary || !decorationBoundaryPathD) { return null; }
-  const scaleAdjust = (textureScale * faceFittingScale.scale);
+  const scaleAdjust = (scaleDragged * faceFittingScale.scale);
   const FACE_OUTLINE_STROKE = (faceFittingScale.widthIsClamp
     ? placementAreaDimensions.width
     : placementAreaDimensions.height) / 200;
@@ -48,13 +60,14 @@ export const TextureSvgUnobserved = ({
   const DOT_RADIUS_TO_WHOLE = 0.05;
   const TEXTURE_CLIP_ID = 'texture-clip';
 
-  const faceBoundaryFill = (!pattern || hasPathPattern) ? materialColor : HOLES_COLOR;
+  const faceBoundaryFill = (!pattern || pattern instanceof PathFaceDecorationPatternModel)
+    ? materialColor : HOLES_COLOR;
 
   const designBoundaryFill = (() => {
     if (!pattern) {
       return HOLES_COLOR;
     }
-    if (hasPathPattern) {
+    if (pattern instanceof PathFaceDecorationPatternModel) {
       return pattern.isPositive ? HOLES_COLOR : materialColor;
     }
     // some of the color shines through at the edge of design boundary
@@ -104,7 +117,8 @@ export const TextureSvgUnobserved = ({
             if (!isOnScreen) {
               return faceBoundaryFill;
             }
-            return hasPathPattern === false ? '#ddd' : HOLES_COLOR;
+            // TODO: no magic colors, themify
+            return pattern instanceof ImageFaceDecorationPatternModel ? '#ddd' : HOLES_COLOR;
           })()}
           strokeWidth={FACE_OUTLINE_STROKE}
           fill={faceBoundaryFill}
@@ -121,34 +135,37 @@ export const TextureSvgUnobserved = ({
         <g clipPath={isOnScreen ? undefined : `url(#${TEXTURE_CLIP_ID})`}>
           <g transform={transformMatrixDraggedStr}>
             { (() => {
-              if (hasPathPattern) {
-                const { pathD, isPositive } = pattern as IPathFaceDecorationPatternModel;
+              if (pattern instanceof PathFaceDecorationPatternModel) {
+                const { pathD, isPositive } = pattern;
                 return (
                   <path
-                    {...textureTranslationUseDrag()}
+                    {...(textureTransformationUseDrag ? textureTransformationUseDrag() : undefined)}
                     fill={isPositive ? materialColor : HOLES_COLOR}
                     d={pathD}
                   />
                 );
               }
-              const { imageData, dimensions } = pattern as IImageFaceDecorationPatternModel;
-              // pointerEvents: 'none' solves problem of ghost-drag image
-              // see: https://stackoverflow.com/a/26792179/2780052
-              return (
-                <image
-                  style={{ pointerEvents: 'none' }}
-                  xlinkHref={imageData}
-                  {...dimensions}
-                  {...textureTranslationUseDrag()}
-                />
-              );
+              if (pattern instanceof ImageFaceDecorationPatternModel) {
+                const { imageData, dimensions } = pattern;
+                // pointerEvents: 'none' solves problem of ghost-drag image
+                // see: https://stackoverflow.com/a/26792179/2780052
+                return (
+                  <image
+                    style={{ pointerEvents: 'none' }}
+                    xlinkHref={imageData}
+                    {...dimensions}
+                    {...(textureTransformationUseDrag ? textureTransformationUseDrag() : undefined)}
+                  />
+                );
+              }
+              throw new Error('unexpected pattern type');
             })() }
 
-            {isOnScreen && hasPathPattern && (<TexturePathNodes />)}
+            {isOnScreen && pattern instanceof PathFaceDecorationPatternModel && (<TexturePathNodes />)}
 
             {isOnScreen && (
               <g
-                {...transformOriginUseDrag()}
+                {...(transformOriginUseDrag ? transformOriginUseDrag() : undefined)}
                 transform={`translate(${transformOriginDragged.x}, ${transformOriginDragged.y})`}
               >
                 <circle

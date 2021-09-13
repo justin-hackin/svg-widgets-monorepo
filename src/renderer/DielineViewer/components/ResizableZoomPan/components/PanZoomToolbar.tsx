@@ -6,14 +6,15 @@ import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 
 import {
+  // @ts-ignore
+  ToolbarButton,
+  fitToViewer,
   TOOL_PAN, TOOL_ZOOM_IN, TOOL_ZOOM_OUT,
-  ToolbarButton, fitToViewer,
   POSITION_TOP, POSITION_RIGHT, POSITION_BOTTOM, POSITION_LEFT,
-  ALIGN_CENTER, ALIGN_LEFT, ALIGN_RIGHT, ALIGN_TOP, ALIGN_BOTTOM,
 } from 'react-svg-pan-zoom';
 
 export function CustomToolbar({
-  tool, value, onChangeValue, onChangeTool, activeToolColor, position, SVGAlignX, SVGAlignY,
+  tool, value, onChangeValue, onChangeTool, activeToolColor, position,
 }) {
   const handleChangeTool = (event, toolVal) => {
     onChangeTool(toolVal);
@@ -22,7 +23,7 @@ export function CustomToolbar({
   };
 
   const handleFit = (event) => {
-    onChangeValue(fitToViewer(value, SVGAlignX, SVGAlignY));
+    onChangeValue(fitToViewer(value));
     event.stopPropagation();
     event.preventDefault();
   };
@@ -107,14 +108,10 @@ CustomToolbar.propTypes = {
 
   // customizations
   position: PropTypes.oneOf([POSITION_TOP, POSITION_RIGHT, POSITION_BOTTOM, POSITION_LEFT]),
-  SVGAlignX: PropTypes.oneOf([ALIGN_CENTER, ALIGN_LEFT, ALIGN_RIGHT]),
-  SVGAlignY: PropTypes.oneOf([ALIGN_CENTER, ALIGN_TOP, ALIGN_BOTTOM]),
   activeToolColor: PropTypes.string,
 };
 
 CustomToolbar.defaultProps = {
   position: POSITION_RIGHT,
-  SVGAlignX: ALIGN_LEFT,
-  SVGAlignY: ALIGN_TOP,
   activeToolColor: '#1CA6FC',
 };

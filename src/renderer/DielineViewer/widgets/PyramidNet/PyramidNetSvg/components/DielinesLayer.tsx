@@ -1,7 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { IPreferencesModel, PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
-import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { PRINT_REGISTRATION_TYPES, PreferencesModel } from '../../../../models/PreferencesModel';
 import {
   lineLerp,
   matrixWithTransformOrigin,
@@ -13,6 +12,9 @@ import {
   expandBoundingBoxAttrs, registrationMarksPath,
   toRectangleCoordinatesAttrs,
 } from '../../../../../../common/util/svg';
+import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { PathFaceDecorationPatternModel } from '../../../../../../common/models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../../../../../../common/models/ImageFaceDecorationPatternModel';
 
 const DielineGroup = ({ children }) => (
   <g {...{
@@ -24,18 +26,20 @@ const DielineGroup = ({ children }) => (
     {children}
   </g>
 );
+
 export const DielinesLayer = observer(({
   widgetStore, preferencesStore,
 }: {
-  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetPluginModel,
+  preferencesStore: PreferencesModel, widgetStore: PyramidNetPluginModel,
 }) => {
   if (!preferencesStore || !widgetStore) {
     return null;
   }
   const {
-    textureEditor: { texture },
+    textureEditor: { faceDecoration },
     boundingBox,
     pyramidNetSpec: {
+      faceLengthAdjustRatio,
       masterBaseTabCut,
       masterBaseTabScore,
       netPaths: { cut, score },
@@ -49,9 +53,14 @@ export const DielinesLayer = observer(({
   } = widgetStore;
 
   const {
-    cutProps, scoreProps, useClonesForBaseTabs, useClonesForDecoration,
-    printRegistrationType, registrationPadding, registrationStrokeColor, registrationMarkLength,
-  } = preferencesStore;
+    cutProps, scoreProps,
+    useClonesForBaseTabs: { value: useClonesForBaseTabs },
+    useClonesForDecoration: { value: useClonesForDecoration },
+    printRegistrationType: { value: printRegistrationType },
+    registrationPadding: { value: registrationPadding },
+    registrationStrokeColor: { value: registrationStrokeColor },
+    registrationMarkLength: { value: registrationMarkLength },
+  } = preferencesStore as PreferencesModel;
 
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
@@ -59,7 +68,8 @@ export const DielinesLayer = observer(({
   // TODO: consider making DRY with PrintLayer
   const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
     ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
-  const fittingBB = (!texture || texture.hasPathPattern) ? boundingBox : dielineRegistrationBB;
+  const fittingBB = (!faceDecoration || faceDecoration.pattern instanceof PathFaceDecorationPatternModel)
+    ? boundingBox : dielineRegistrationBB;
   const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(fittingBB), -1));
 
   const DecorationContent = () => {
@@ -75,22 +85,21 @@ export const DielinesLayer = observer(({
       <g id={DECORATION_CUT_ID}>
         {faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
           ? (
-            <g key={index} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
+            <g key={`${index}-decoration`} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
               {texturePathD && (
-              <path d={texturePathD} transform={pathScaleMatrix.toString()} {...cutProps} />
+              <path d={texturePathD} transform={pathScaleMatrix.toString()} {
+                ...{...cutProps, strokeWidth: cutProps.strokeWidth / faceLengthAdjustRatio}
+              } />
               )}
             </g>
-
           ) : (
-            <>
-              <use
-                key={`${index}-decoration`}
-                xlinkHref={`#${CUT_HOLES_ID}`}
-                transform={
+            <use
+              key={`${index}-decoration`}
+              xlinkHref={`#${CUT_HOLES_ID}`}
+              transform={
                     cloneTransformMatrix.toString()
                   }
-              />
-            </>
+            />
           )))}
       </g>
     );
@@ -138,7 +147,10 @@ export const DielinesLayer = observer(({
     <>
       <DielineGroup>
         <g transform={fitToCanvasTranslationStr}>
-          {(texture && !texture.hasPathPattern && printRegistrationType !== PRINT_REGISTRATION_TYPES.NONE)
+          {/* TODO: consider using something like <Switch>/<ElseIf>, hard to read */}
+          {(
+            faceDecoration?.pattern instanceof ImageFaceDecorationPatternModel
+            && printRegistrationType !== PRINT_REGISTRATION_TYPES.NONE)
           && (printRegistrationType === PRINT_REGISTRATION_TYPES.GRAPHTEC_OPTICAL ? (
             <rect stroke="black" fill="none" {...toRectangleCoordinatesAttrs(printRegistrationBB)} />
           ) : (
@@ -150,11 +162,11 @@ export const DielinesLayer = observer(({
               d={registrationMarksPath(printRegistrationBB, registrationMarkLength, true).getD()}
             />
           ))}
+          <DecorationContent />
           {useClonesForBaseTabs ? (<ClonePyramidNetContent />) : (
             <>
               <path className="net-score" {...scoreProps} d={score.getD()} />
               <path className="net-cut" {...cutProps} d={cut.getD()} />
-              <DecorationContent />
             </>
           )}
         </g>

@@ -1,31 +1,36 @@
 import { inRange } from 'lodash';
-import {
-  getParentOfType, getSnapshot, Instance, tryResolve, types,
-} from 'mobx-state-tree';
 import fileDownload from 'js-file-download';
-
+import {
+  findParent, fromSnapshot, getSnapshot, Model, model, modelAction, prop,
+} from 'mobx-keystone';
+import { computed, observable } from 'mobx';
 import { BoundaryModel } from './BoundaryModel';
-import { TextureModel } from './TextureModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset,
-  getOriginPoint, RawPoint,
+  RawPoint,
   scalePoint,
   sumPoints,
   transformPoint,
 } from '../../../util/geom';
-import { IImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
-import { ShapePreviewModel } from './ShapePreviewModel';
+import { rendererContainerContext, ShapePreviewModel } from './ShapePreviewModel';
 import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
-import { UndoManagerWithGroupState } from '../../UndoManagerWithGroupState';
 import { extractCutHolesFromSvgString } from '../../../util/svg';
 import {
+  DEFAULT_SLIDER_STEP,
   EVENTS,
   IS_ELECTRON_BUILD,
   IS_WEB_BUILD,
   TEXTURE_ARRANGEMENT_FILE_EXTENSION,
 } from '../../../constants';
 import { reportTransformsTally } from '../../../util/analytics';
+import { tryResolvePath } from '../../../util/mobx-keystone';
+import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
+import { PathFaceDecorationPatternModel } from '../../../models/PathFaceDecorationPatternModel';
+import { TransformModel } from '../../../models/TransformModel';
+import { PositionableFaceDecorationModel }
+  from '../../../../renderer/DielineViewer/models/PositionableFaceDecorationModel';
+import { sliderProp } from '../../../keystone-tweakables/props';
 
 // TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
@@ -54,345 +59,448 @@ const getFitScale = (bounds, image) => {
 
 const specFileExtensionName = 'Texture for Pyramid Net Spec';
 
-export const TextureEditorModel = types
-  .model('Texture Editor', {
-    texture: types.maybe(TextureModel),
-    viewScale: types.optional(types.number, DEFAULT_VIEW_SCALE),
-    shapePreview: types.optional(ShapePreviewModel, {}),
-  })
-  .volatile((self) => ({
-    modifierTracking: ModifierTrackingModel.create({}),
-    history: UndoManagerWithGroupState.create({}, { targetStore: self }),
-    shapePreviewIsFullScreen: false,
-    placementAreaDimensions: null,
-    // amount of scaling required to make the decoration area match the size of the face boundary
-    borderToInsetRatio: null,
-    // translation required to bring the decoration area first corner to the face boundary first corner
-    insetToBorderOffset: null,
-    viewScaleDiff: 1,
-    autoRotatePreview: false,
-    showNodes: false,
-    nodeScaleMux: 1,
-    selectedTextureNodeIndex: null,
-    MIN_VIEW_SCALE: 0.3,
-    MAX_VIEW_SCALE: 3,
-    disposers: [],
-  }))
-  .views((self) => ({
-    get parentPyramidNetPluginModel() {
-      return getParentOfType(self, PyramidNetPluginModel);
-    },
-    get shapeName() {
-      return this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName;
-    },
+@model('TextureEditorModel')
+export class TextureEditorModel extends Model({
+  viewScale: prop<number>(DEFAULT_VIEW_SCALE),
+  shapePreview: prop<ShapePreviewModel | undefined>(),
+  modifierTracking: prop<ModifierTrackingModel>(() => new ModifierTrackingModel({})),
+  nodeScaleMux: sliderProp(1, {
+    labelOverride: 'Node size', min: 0.1, max: 10, step: DEFAULT_SLIDER_STEP,
+  }),
+}) {
+  @observable
+  shapePreviewIsFullScreen = false;
 
-    get decorationBoundary() {
-      return BoundaryModel.create({
-        vertices:
-        this.parentPyramidNetPluginModel.pyramidNetSpec.normalizedDecorationBoundaryPoints,
-      });
-    },
+  @observable
+  placementAreaDimensions = null;
 
-    get imageCoverScale() {
-      if (!this.decorationBoundary || !self.texture) {
-        return undefined;
-      }
-      return getCoverScale(this.decorationBoundary.boundingBoxAttrs, self.texture.dimensions);
-    },
-    get faceFittingScale() {
-      if (!self.placementAreaDimensions || !this.decorationBoundary) {
-        return undefined;
-      }
-      return getFitScale(self.placementAreaDimensions, this.decorationBoundary.boundingBoxAttrs);
-    },
-    get shapePreviewDimensions() {
-      if (!self.placementAreaDimensions) { return null; }
-      return self.shapePreviewIsFullScreen
-        ? { width: window.innerWidth, height: window.innerHeight }
-        : self.placementAreaDimensions;
-    },
-    get minImageScale() {
-      return this.imageCoverScale && (0.1 * this.imageCoverScale.scale);
-    },
-    get maxImageScale() {
-      return this.imageCoverScale && (5 * this.imageCoverScale.scale);
-    },
-    get viewScaleDragged() {
-      return self.viewScale && (self.viewScale * self.viewScaleDiff);
-    },
-    get viewScaleCenterPercentStr() {
-      return this.viewScaleDragged && `${((1 - this.viewScaleDragged) * 100) / 2}%`;
-    },
-    get viewScalePercentStr() {
-      return this.viewScaleDragged && `${this.viewScaleDragged * 100}%`;
-    },
-    get selectedTextureNode() {
-      return (self.selectedTextureNodeIndex !== null && self.texture)
-        && self.texture.destinationPoints[self.selectedTextureNodeIndex];
-    },
-    get faceBoundary() {
-      if (!this.decorationBoundary || !self.borderToInsetRatio) { return undefined; }
-      // TODO: no more dirty type checking
-      const textureIsBordered = self.texture
-        ? (self.texture.pattern as IImageFaceDecorationPatternModel).isBordered : null;
-      if (textureIsBordered === false) {
-        return this.decorationBoundary;
-      }
-      const vertices = this.decorationBoundary.vertices
-        .map((pt) => sumPoints(scalePoint(pt, self.borderToInsetRatio), self.insetToBorderOffset));
-      return BoundaryModel.create({ vertices });
-    },
-    get borderToInsetRatio() {
-      return this.parentPyramidNetPluginModel.pyramidNetSpec.borderToInsetRatio;
-    },
-    get insetToBorderOffset() {
-      return this.parentPyramidNetPluginModel.pyramidNetSpec.insetToBorderOffset;
-    },
-  })).actions((self) => ({
-    setPlacementAreaDimensions(placementAreaDimensions) {
-      self.placementAreaDimensions = placementAreaDimensions;
-    },
-    setViewScaleDiff(mux) {
-      if (inRange(mux * self.viewScale, self.MIN_VIEW_SCALE, self.MAX_VIEW_SCALE)) {
-        self.viewScaleDiff = mux;
-      }
-    },
-    reconcileViewScaleDiff() {
-      self.viewScale = self.viewScaleDragged;
-      self.viewScaleDiff = 1;
-    },
-    setSelectedTextureNodeIndex(index) {
-      self.selectedTextureNodeIndex = index;
-    },
-    setShowNodes(showNodes) {
-      self.showNodes = showNodes;
-      if (!self.showNodes) { self.selectedTextureNodeIndex = undefined; }
-    },
-    setNodeScaleMux(mux) {
-      self.nodeScaleMux = mux;
-    },
-    setAutoRotatePreview(shouldRotate) {
-      self.autoRotatePreview = shouldRotate;
-    },
-    fitTextureToFace() {
-      const { boundingBoxAttrs } = self.decorationBoundary;
-      const { dimensions: textureDimensions } = self.texture;
-      if (!self.texture || !self.decorationBoundary) {
-        return;
-      }
-      const { height, width, xmin } = boundingBoxAttrs;
-      const { scale, widthIsClamp } = self.imageCoverScale;
-      self.texture.translate = widthIsClamp
+  @observable
+  viewScaleDiff = 1;
+
+  @observable
+  autoRotatePreview = false;
+
+  @observable
+  showNodes = false;
+
+  @observable
+  selectedTextureNodeIndex = null;
+
+  @observable
+  MIN_VIEW_SCALE = 0.3;
+
+  @observable
+  MAX_VIEW_SCALE = 3;
+
+  SEND_ANALYTICS_INTERVAL_MS = 10000;
+
+  @computed
+  get parentPyramidNetPluginModel() {
+    return findParent(this, (parentNode) => parentNode instanceof PyramidNetPluginModel);
+  }
+
+  @computed
+  get pyramidNetSpec() {
+    return this.parentPyramidNetPluginModel.pyramidNetSpec;
+  }
+
+  @computed
+  get faceDecoration() {
+    return this.pyramidNetSpec.faceDecoration;
+  }
+
+  @computed
+  get decorationBoundary() {
+    return new BoundaryModel(this.pyramidNetSpec.normalizedDecorationBoundaryPoints);
+  }
+
+  @computed
+  get shapeName() {
+    return this.pyramidNetSpec.pyramid.shapeName;
+  }
+
+  @computed
+  get imageCoverScale() {
+    if (!this.faceDecoration?.pattern) {
+      return undefined;
+    }
+    return getCoverScale(this.decorationBoundary.boundingBoxAttrs, this.faceDecoration.dimensions);
+  }
+
+  @computed
+  get faceFittingScale() {
+    if (!this.placementAreaDimensions || !this.decorationBoundary) {
+      return undefined;
+    }
+    return getFitScale(this.placementAreaDimensions, this.decorationBoundary.boundingBoxAttrs);
+  }
+
+  @computed
+  get shapePreviewDimensions() {
+    if (!this.placementAreaDimensions) { return null; }
+    return this.shapePreviewIsFullScreen
+      ? { width: window.innerWidth, height: window.innerHeight }
+      : this.placementAreaDimensions;
+  }
+
+  @computed
+  get minImageScale() {
+    return this.imageCoverScale && (0.1 * this.imageCoverScale.scale);
+  }
+
+  @computed
+  get maxImageScale() {
+    return this.imageCoverScale && (5 * this.imageCoverScale.scale);
+  }
+
+  @computed
+  get viewScaleDragged() {
+    return this.viewScale && (this.viewScale * this.viewScaleDiff);
+  }
+
+  @computed
+  get viewScaleCenterPercentStr() {
+    return this.viewScaleDragged && `${((1 - this.viewScaleDragged) * 100) / 2}%`;
+  }
+
+  @computed
+  get viewScalePercentStr() {
+    return this.viewScaleDragged && `${this.viewScaleDragged * 100}%`;
+  }
+
+  @computed
+  get selectedTextureNode() {
+    return (this.selectedTextureNodeIndex !== null && this.faceDecoration)
+      && this.faceDecoration.destinationPoints[this.selectedTextureNodeIndex];
+  }
+
+  // faceBoundary = decorationBoundary + border (if any)
+  @computed
+  get faceBoundary() {
+    if (!this.decorationBoundary || !this.borderToInsetRatio) { return undefined; }
+    // TODO: no more dirty type checking
+    if (
+      this.faceDecoration?.pattern instanceof ImageFaceDecorationPatternModel
+      && !this.faceDecoration.pattern.isBordered
+    ) {
+      return this.decorationBoundary;
+    }
+    const vertices = this.decorationBoundary.vertices
+      .map((pt) => sumPoints(scalePoint(pt, this.borderToInsetRatio), this.insetToBorderOffset));
+    return new BoundaryModel(vertices);
+  }
+
+  @computed
+  get borderToInsetRatio() {
+    return this.parentPyramidNetPluginModel.pyramidNetSpec.borderToInsetRatio;
+  }
+
+  @computed
+  get insetToBorderOffset() {
+    return this.parentPyramidNetPluginModel.pyramidNetSpec.insetToBorderOffset;
+  }
+
+  @modelAction
+  setPlacementAreaDimensions(placementAreaDimensions) {
+    this.placementAreaDimensions = placementAreaDimensions;
+  }
+
+  @modelAction
+  setViewScaleDiff(mux) {
+    if (inRange(mux * this.viewScale, this.MIN_VIEW_SCALE, this.MAX_VIEW_SCALE)) {
+      this.viewScaleDiff = mux;
+    }
+  }
+
+  @modelAction
+  reconcileViewScaleDiff() {
+    this.viewScale = this.viewScaleDragged;
+    this.viewScaleDiff = 1;
+  }
+
+  @modelAction
+  setSelectedTextureNodeIndex(index) {
+    this.selectedTextureNodeIndex = index;
+  }
+
+  @modelAction
+  setShowNodes(showNodes) {
+    this.showNodes = showNodes;
+    if (!this.showNodes) { this.selectedTextureNodeIndex = undefined; }
+  }
+
+  @modelAction
+  setAutoRotatePreview(shouldRotate) {
+    this.autoRotatePreview = shouldRotate;
+  }
+
+  @modelAction
+  fitTextureToFace() {
+    const { boundingBoxAttrs } = this.decorationBoundary;
+    const { dimensions: textureDimensions } = this.faceDecoration;
+    if (!this.faceDecoration?.pattern || !this.decorationBoundary) {
+      return;
+    }
+    const { height, width, xmin } = boundingBoxAttrs;
+    const { scale, widthIsClamp } = this.imageCoverScale;
+    this.faceDecoration.transform = new TransformModel({
+      translate: widthIsClamp
         ? { x: xmin, y: (height - (textureDimensions.height * scale)) / 2 }
-        : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 };
-      self.texture.scale = self.imageCoverScale.scale;
-    },
-    refitTextureToFace() {
-      if (self.texture) {
-        this.setTextureFromPattern(getSnapshot(self.texture.pattern));
-      }
-    },
-    resetNodesEditor() {
-      self.showNodes = false;
-      self.selectedTextureNodeIndex = null;
-    },
-    clearTexture() {
-      self.texture = undefined;
-    },
-    setTextureFromPattern(patternSnapshot) {
-      this.resetNodesEditor();
+        : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 },
+      scale,
+    });
+  }
 
-      self.texture = TextureModel.create({
-        pattern: patternSnapshot,
-        scale: 1,
-        rotate: 0,
-        translate: getOriginPoint(),
-        transformOrigin: getOriginPoint(),
-      });
+  @modelAction
+  refitTextureToFace() {
+    if (this.faceDecoration?.pattern) {
       this.fitTextureToFace();
       this.repositionOriginOverFaceCenter();
-    },
+    }
+  }
 
-    setTexture(snapshot) {
-      self.texture = snapshot;
-    },
+  @modelAction
+  resetNodesEditor() {
+    this.showNodes = false;
+    this.selectedTextureNodeIndex = null;
+  }
 
-    setTexturePath(pathD, sourceFileName) {
-      this.setTextureFromPattern({
-        pathD, sourceFileName, isPositive: DEFAULT_IS_POSITIVE,
-      });
-    },
-    setTextureImage(imageData, dimensions, sourceFileName) {
-      this.setTextureFromPattern({
-        imageData, dimensions, sourceFileName,
-      });
-    },
+  @modelAction
+  clearTexturePattern() {
+    this.faceDecoration.setPattern(undefined);
+    this.faceDecoration.setTransform(new TransformModel({}));
+  }
 
-    setShapePreviewIsFullScreen(isFullScreen) {
-      self.shapePreviewIsFullScreen = isFullScreen;
-    },
+  @modelAction
+  setTextureFromPattern(pattern) {
+    this.resetNodesEditor();
+    this.faceDecoration.setPattern(pattern);
+    this.fitTextureToFace();
+    this.repositionOriginOverFaceCenter();
+  }
 
-    // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
-    getFileBasename() {
-      return `${self.shapeName || 'shape'}__${tryResolve(self, '/texture/pattern/sourceFileName') || 'undecorated'}`;
-    },
+  @modelAction
+  setTexturePath(pathD, sourceFileName) {
+    this.setTextureFromPattern(new PathFaceDecorationPatternModel({
+      pathD, sourceFileName, isPositive: DEFAULT_IS_POSITIVE,
+    }));
+  }
 
-    // TODO: add limits for view scale and
-    // these seem like the domain of the texture model but setters for
-    // textureScaleDiff (and more to follow) need boundary
-    absoluteMovementToSvg(absCoords) {
-      return scalePoint(absCoords, 1 / (self.viewScaleDragged * self.faceFittingScale.scale));
-    },
-    translateAbsoluteCoordsToRelative(absCoords) {
-      return transformPoint(
-        ((new DOMMatrixReadOnly())
-          .scale(self.texture.scaleDragged, self.texture.scaleDragged)
-          .rotate(self.texture.rotateDragged)
-          .inverse()),
-        this.absoluteMovementToSvg(absCoords),
-      );
-    },
+  @modelAction
+  setTextureImage(imageData, dimensions, sourceFileName) {
+    this.setTextureFromPattern(new ImageFaceDecorationPatternModel({
+      imageData, dimensions, sourceFileName,
+    }));
+  }
 
-    repositionTextureWithOriginOverPoint(point) {
-      if (!self.texture || !self.decorationBoundary) {
-        return;
-      }
-      const originAbsolute = transformPoint(
-        self.texture.transformMatrixDragged, self.texture.transformOrigin,
-      );
-      self.texture.translate = sumPoints(
-        self.texture.translate,
-        scalePoint(originAbsolute, -1),
-        point,
-      );
-    },
-    repositionTextureWithOriginOverCorner(vertexIndex) {
-      this.repositionTextureWithOriginOverPoint(self.decorationBoundary.vertices[vertexIndex]);
-    },
-    repositionTextureWithOriginOverFaceCenter() {
-      this.repositionTextureWithOriginOverPoint(self.decorationBoundary.centerPoint);
-    },
-    repositionSelectedNodeOverPoint(point) {
-      if (!self.texture || !self.decorationBoundary) {
-        return;
-      }
-      const svgTextureNode = transformPoint(
-        self.texture.transformMatrixDragged, self.selectedTextureNode,
-      );
-      const diff = sumPoints(svgTextureNode, scalePoint(point, -1));
-      self.texture.translate = sumPoints(scalePoint(diff, -1), self.texture.translate);
-    },
-    repositionSelectedNodeOverCorner(vertexIndex) {
-      this.repositionSelectedNodeOverPoint(self.decorationBoundary.vertices[vertexIndex]);
-    },
-    repositionSelectedNodeOverFaceCenter() {
-      this.repositionSelectedNodeOverPoint(self.decorationBoundary.centerPoint);
-    },
-    repositionOriginOverPoint(point: RawPoint) {
-      if (!self.texture || !self.decorationBoundary) {
-        return;
-      }
-      this.repositionOriginOverRelativePoint(transformPoint(self.texture.transformMatrix.inverse(), point));
-    },
+  @modelAction
+  setShapePreviewIsFullScreen(isFullScreen) {
+    this.shapePreviewIsFullScreen = isFullScreen;
+  }
 
-    repositionOriginOverRelativePoint(pointRelativeToTexture: RawPoint) {
-      const delta = scalePoint(sumPoints(scalePoint(pointRelativeToTexture, -1), self.texture.transformOrigin), -1);
-      const newTransformOrigin = sumPoints(delta, self.texture.transformOrigin);
-      self.texture.translate = sumPoints(
-        self.texture.translate,
-        scalePoint(calculateTransformOriginChangeOffset(self.texture.transformOrigin, newTransformOrigin,
-          self.texture.scale, self.texture.rotate, self.texture.translate), -1),
-      );
-      self.texture.transformOrigin = newTransformOrigin;
-    },
+  // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
+  @modelAction
+  getFileBasename() {
+    return `${this.shapeName.value || 'shape'}__${
+      tryResolvePath(this, ['texture', 'pattern', 'sourceFileName']) || 'undecorated'}`;
+  }
 
-    repositionOriginOverCorner(vertexIndex) {
-      this.repositionOriginOverPoint(self.decorationBoundary.vertices[vertexIndex]);
-    },
+  // TODO: add limits for view scale and
+  // these seem like the domain of the texture model but setters for
+  // textureScaleDiff (and more to follow) need boundary
+  @modelAction
+  absoluteMovementToSvg(absCoords) {
+    return scalePoint(absCoords, 1 / (this.viewScaleDragged * this.faceFittingScale.scale));
+  }
 
-    repositionOriginOverFaceCenter() {
-      this.repositionOriginOverPoint(self.decorationBoundary.centerPoint);
-    },
+  @modelAction
+  translateAbsoluteCoordsToRelative(absCoords) {
+    return transformPoint(
+      ((new DOMMatrixReadOnly())
+        .scale(this.faceDecoration.scaleDragged, this.faceDecoration.scaleDragged)
+        .rotate(this.faceDecoration.rotateDragged)
+        .inverse()),
+      this.absoluteMovementToSvg(absCoords),
+    );
+  }
 
-    repositionOriginOverTextureCenter() {
-      if (self.texture) {
-        const { width, height } = self.texture.dimensions;
-        this.repositionOriginOverRelativePoint({ x: width / 2, y: height / 2 });
-      }
-    },
+  @modelAction
+  repositionTextureWithOriginOverPoint(point) {
+    if (!this.faceDecoration || !this.decorationBoundary) {
+      return;
+    }
+    const originAbsolute = transformPoint(
+      this.faceDecoration.transformMatrixDragged, this.faceDecoration.transform.transformOrigin,
+    );
+    this.faceDecoration.transform.translate = sumPoints(
+      this.faceDecoration.transform.translate,
+      scalePoint(originAbsolute, -1),
+      point,
+    );
+  }
 
-    sendTextureToDielineEditor() {
-      if (!self.texture) { return; }
-      self.parentPyramidNetPluginModel.pyramidNetSpec.setTextureFaceDecoration(getSnapshot(self.texture));
-    },
-    saveTextureArrangement() {
-      if (!self.texture) { return; }
-      const fileData = {
-        shapeName: self.shapeName,
-        textureSnapshot: getSnapshot(self.texture),
-      };
-      const defaultPath = `${self.shapeName
-      }__${self.texture.pattern.sourceFileName}.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`;
-      if (IS_ELECTRON_BUILD) {
-        globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_JSON, fileData, {
-          message: 'Save texture arrangement',
-          defaultPath,
-        }, TEXTURE_ARRANGEMENT_FILE_EXTENSION, specFileExtensionName);
-      }
-      if (IS_WEB_BUILD) {
-        fileDownload(JSON.stringify(fileData), defaultPath, 'application/json');
-      }
-    },
-    setTextureFromSnapshot(textureSnapshot) {
-      self.texture = TextureModel.create(textureSnapshot);
-    },
-    // TODO: ts type the patternInfo
-    assignTextureFromPatternInfo(patternInfo) {
-      if (patternInfo) {
-        if (patternInfo.isPath) {
-          const { svgString, sourceFileName } = patternInfo;
-          const pathD = extractCutHolesFromSvgString(svgString);
-          this.setTexturePath(pathD, sourceFileName);
-        } else {
-          const { imageData, dimensions, sourceFileName } = patternInfo.pattern;
-          this.setTextureImage(imageData, dimensions, sourceFileName);
-        }
-      }
-    },
-    setTextureArrangementFromFileData(fileData) {
-      const { shapeName, textureSnapshot } = fileData;
-      if (!textureSnapshot) {
-        return;
-      }
-      if (shapeName !== self.shapeName) {
-        self.parentPyramidNetPluginModel.pyramidNetSpec.setPyramidShapeName(shapeName);
-      }
-      this.setTextureFromSnapshot(textureSnapshot);
-    },
-    async openTextureArrangement() {
-      const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
-        message: 'Import texture arrangement',
-      }, TEXTURE_ARRANGEMENT_FILE_EXTENSION, specFileExtensionName);
-      // TODO: snackbar error alerts
-      if (!res) { return; }
+  @modelAction
+  repositionTextureWithOriginOverCorner(vertexIndex) {
+    this.repositionTextureWithOriginOverPoint(this.decorationBoundary.vertices[vertexIndex]);
+  }
 
-      // @ts-ignore
-      const { fileData } = res;
-      this.setTextureArrangementFromFileData(fileData);
-    },
-  }))
-  .actions(() => {
-    const SEND_ANALYTICS_INTERVAL_MS = 10000;
-    let sendAnaylticsBuffersInterval;
-    return {
-      afterCreate() {
-        sendAnaylticsBuffersInterval = setInterval(reportTransformsTally, SEND_ANALYTICS_INTERVAL_MS);
-      },
-      beforeDestroy() {
-        reportTransformsTally();
-        clearInterval(sendAnaylticsBuffersInterval);
-      },
+  @modelAction
+  repositionTextureWithOriginOverFaceCenter() {
+    this.repositionTextureWithOriginOverPoint(this.decorationBoundary.centerPoint);
+  }
+
+  @modelAction
+  repositionSelectedNodeOverPoint(point) {
+    if (!this.faceDecoration || !this.decorationBoundary) {
+      return;
+    }
+    const svgTextureNode = transformPoint(
+      this.faceDecoration.transformMatrixDragged, this.selectedTextureNode,
+    );
+    const diff = sumPoints(svgTextureNode, scalePoint(point, -1));
+    this.faceDecoration.transform.translate = sumPoints(scalePoint(diff, -1), this.faceDecoration.transform.translate);
+  }
+
+  @modelAction
+  repositionSelectedNodeOverCorner(vertexIndex) {
+    this.repositionSelectedNodeOverPoint(this.decorationBoundary.vertices[vertexIndex]);
+  }
+
+  @modelAction
+  repositionSelectedNodeOverFaceCenter() {
+    this.repositionSelectedNodeOverPoint(this.decorationBoundary.centerPoint);
+  }
+
+  @modelAction
+  repositionOriginOverPoint(point: RawPoint) {
+    if (!this.faceDecoration || !this.decorationBoundary) {
+      return;
+    }
+    this.repositionOriginOverRelativePoint(
+      transformPoint(this.faceDecoration.transform.transformMatrix.inverse(), point),
+    );
+  }
+
+  @modelAction
+  repositionOriginOverRelativePoint(pointRelativeToTexture: RawPoint) {
+    const delta = scalePoint(
+      sumPoints(scalePoint(pointRelativeToTexture, -1), this.faceDecoration.transform.transformOrigin), -1,
+    );
+    const {
+      transformOrigin, translate, scale, rotate,
+    } = this.faceDecoration.transform;
+    const newTransformOrigin = sumPoints(delta, transformOrigin);
+    this.faceDecoration.transform.translate = sumPoints(
+      translate,
+      scalePoint(calculateTransformOriginChangeOffset(transformOrigin, newTransformOrigin,
+        scale, rotate, translate), -1),
+    );
+    this.faceDecoration.transform.transformOrigin = newTransformOrigin;
+  }
+
+  @modelAction
+  repositionOriginOverCorner(vertexIndex) {
+    this.repositionOriginOverPoint(this.decorationBoundary.vertices[vertexIndex]);
+  }
+
+  @modelAction
+  repositionOriginOverFaceCenter() {
+    this.repositionOriginOverPoint(this.decorationBoundary.centerPoint);
+  }
+
+  @modelAction
+  repositionOriginOverTextureCenter() {
+    if (this.faceDecoration) {
+      const { width, height } = this.faceDecoration.dimensions;
+      this.repositionOriginOverRelativePoint({ x: width / 2, y: height / 2 });
+    }
+  }
+
+  // TODO: although it may be ok to directly edit the dieline texture in the texture editor, consider using drafts
+  // @modelAction
+  // sendTextureToDielineEditor() {
+  //   if (!this.texture) { return; }
+  //   this.parentPyramidNetPluginModel.pyramidNetSpec.setFaceDecoration(
+  //     fromSnapshot<PositionableFaceDecorationModel>(getSnapshot(this.texture)),
+  //   );
+  // }
+
+  @modelAction
+  saveTextureArrangement() {
+    if (!this.faceDecoration) { return; }
+    const fileData = {
+      shapeName: this.shapeName.value,
+      textureSnapshot: getSnapshot(this.faceDecoration),
     };
-  });
+    const defaultPath = `${this.shapeName.value
+    }__${this.faceDecoration.pattern.sourceFileName}.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`;
+    if (IS_ELECTRON_BUILD) {
+      globalThis.ipcRenderer.invoke(EVENTS.DIALOG_SAVE_JSON, fileData, {
+        message: 'Save texture arrangement',
+        defaultPath,
+      }, TEXTURE_ARRANGEMENT_FILE_EXTENSION, specFileExtensionName);
+    }
+    if (IS_WEB_BUILD) {
+      fileDownload(JSON.stringify(fileData), defaultPath, 'application/json');
+    }
+  }
 
-export interface ITextureEditorModel extends Instance<typeof TextureEditorModel> {}
+  @modelAction
+  setTextureFromSnapshot(textureSnapshot) {
+    this.pyramidNetSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
+  }
+
+  // TODO: ts type the patternInfo
+  @modelAction
+  assignTextureFromPatternInfo(patternInfo) {
+    if (patternInfo) {
+      if (patternInfo.isPath) {
+        const { svgString, sourceFileName } = patternInfo;
+        const pathD = extractCutHolesFromSvgString(svgString);
+        this.setTexturePath(pathD, sourceFileName);
+      } else {
+        const { imageData, dimensions, sourceFileName } = patternInfo.pattern;
+        this.setTextureImage(imageData, dimensions, sourceFileName);
+      }
+    }
+  }
+
+  @modelAction
+  setTextureArrangementFromFileData(fileData) {
+    const { shapeName, textureSnapshot } = fileData;
+    if (!textureSnapshot) {
+      return;
+    }
+    if (shapeName !== this.shapeName.value) {
+      this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName.setValue(shapeName);
+    }
+    this.setTextureFromSnapshot(textureSnapshot);
+  }
+
+  @modelAction
+  async openTextureArrangement() {
+    const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
+      message: 'Import texture arrangement',
+    }, TEXTURE_ARRANGEMENT_FILE_EXTENSION, specFileExtensionName);
+    // TODO: snackbar error alerts
+    if (!res) { return; }
+
+    // @ts-ignore
+    const { fileData } = res;
+    this.setTextureArrangementFromFileData(fileData);
+  }
+
+  @modelAction
+  createShapePreview(rendererContainer: HTMLElement) {
+    this.shapePreview = rendererContainerContext.apply(() => new ShapePreviewModel({}), rendererContainer);
+  }
+
+  onAttachedToRootStore() {
+    const sendAnalyticsBuffersInterval = setInterval(reportTransformsTally, this.SEND_ANALYTICS_INTERVAL_MS);
+
+    return () => {
+      reportTransformsTally();
+      clearInterval(sendAnalyticsBuffersInterval);
+    };
+  }
+}

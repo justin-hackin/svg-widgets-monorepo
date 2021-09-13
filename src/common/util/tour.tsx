@@ -2,6 +2,7 @@ import React from 'react';
 import { Step } from 'react-joyride';
 import { theme } from '../style/style';
 import { SAMPLE_TEXTURES } from './sample-textures';
+import { DimensionsModel } from '../models/DimensionsModel';
 
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable max-len */
@@ -254,6 +255,6 @@ export const SAMPLE_PATH_SNAPSHOT = {
 
 export const SAMPLE_IMAGE_SNAPSHOT = {
   sourceFileName: 'sample_jpg',
-  dimensions: { width: 1028, height: 685 },
+  dimensions: new DimensionsModel({ width: 1028, height: 685 }),
   imageData: SAMPLE_TEXTURES.imageData,
 };

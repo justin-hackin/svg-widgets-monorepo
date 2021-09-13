@@ -4,25 +4,30 @@ import { observer } from 'mobx-react';
 import clsx from 'clsx';
 import { PathData } from '../../../../renderer/DielineViewer/util/PathData';
 import { useWorkspaceMst } from '../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { ITextureEditorModel } from '../models/TextureEditorModel';
 import { useStyles } from '../../../style/style';
+import { PyramidNetPluginModel } from '../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { ImageFaceDecorationPatternModel } from '../../../models/ImageFaceDecorationPatternModel';
 
 export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store:ITextureEditorModel = workspaceStore.selectedStore.textureEditor;
+  const { textureEditor } = workspaceStore.selectedStore as PyramidNetPluginModel;
   const {
-    texture, selectedTextureNodeIndex, setSelectedTextureNodeIndex, showNodes, imageCoverScale, nodeScaleMux,
-  } = store;
+    faceDecoration, selectedTextureNodeIndex, showNodes, imageCoverScale,
+    nodeScaleMux: { value: nodeScaleMux },
+  } = textureEditor;
   const classes = useStyles();
 
-  if (!texture || !texture.hasPathPattern || !showNodes) { return null; }
-  const points = (new PathData(texture.pattern.pathD)).getDestinationPoints();
+  if (
+    !faceDecoration || !showNodes || faceDecoration.pattern instanceof ImageFaceDecorationPatternModel
+  ) { return null; }
+
+  const points = (new PathData(faceDecoration.pattern.pathD)).getDestinationPoints();
   return (
     <>
       {
         points.map(({ x: cx, y: cy }, index) => {
           const longerTextureSideLength = imageCoverScale.widthIsClamp
-            ? texture.dimensions.width : texture.dimensions.height;
+            ? faceDecoration.dimensions.width : faceDecoration.dimensions.height;
           return (
             <g key={`${index}--${cx},${cy}`}>
               <circle
@@ -39,7 +44,7 @@ export const TexturePathNodes = observer(() => {
                 }`}
                 r={(nodeScaleMux * longerTextureSideLength) / 100}
                 onClick={() => {
-                  setSelectedTextureNodeIndex(index);
+                  textureEditor.setSelectedTextureNodeIndex(index);
                 }}
               />
             </g>

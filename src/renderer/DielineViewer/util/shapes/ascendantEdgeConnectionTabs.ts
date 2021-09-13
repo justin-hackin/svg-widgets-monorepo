@@ -1,47 +1,54 @@
-// @ts-ignore
 import { range } from 'lodash';
-import { Instance, types } from 'mobx-state-tree';
-
+import { Model, model, prop } from 'mobx-keystone';
 import { PathData } from '../PathData';
 import {
-  hingedPlot,
-  lineLerp,
-  RawPoint,
-  symmetricHingePlotByProjectionDistance,
+  hingedPlot, lineLerp, RawPoint, symmetricHingePlotByProjectionDistance,
 } from '../../../../common/util/geom';
-import { IDashPatternModel, strokeDashPathRatios } from './strokeDashPath';
+import { DashPatternModel, strokeDashPathRatios } from './strokeDashPath';
 import { subtractRangeSet } from '../../data/range';
 import { connectedLineSegments } from './generic';
+import { DEFAULT_SLIDER_STEP } from '../../../../common/constants';
+import { ratioSliderProps } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/constants';
+import { sliderProp, sliderWithTextProp } from '../../../../common/keystone-tweakables/props';
 
-export const AscendantEdgeTabsModel = types.model('AscendantEdgeTabs', {
-  flapRoundingDistanceRatio: types.optional(types.number, 1),
-  holeFlapTaperAngle: types.optional(types.number, 0.31),
-  holeReachToTabDepth: types.optional(types.number, 0.1),
-  holeWidthRatio: types.optional(types.number, 0.5),
-  midpointDepthToTabDepth: types.optional(types.number, 0.5),
-  tabDepthToTraversalLength: types.optional(types.number, 0.0375),
-  tabStartGapToTabDepth: types.optional(types.number, 1),
-  tabControlPointsProtrusion: types.optional(types.number, 0.93),
-  tabControlPointsAngle: types.optional(types.number, 0.8),
-  tabEdgeEndpointsIndentation: types.optional(types.number, 1),
-  tabsCount: types.optional(types.integer, 3),
-});
-
-export interface IAscendantEdgeTabsModel extends Instance<typeof AscendantEdgeTabsModel> {
-}
+@model('AscendantEdgeTabsModel')
+export class AscendantEdgeTabsModel extends Model({
+  // TODO: consider making these constants or give controls
+  holeFlapTaperAngle: prop(0.31),
+  midpointDepthToTabDepth: prop(0.5),
+  tabsCount: sliderProp(3, { min: 1, max: 5, step: 1 }),
+  tabDepthToTraversalLength: sliderWithTextProp(0.0375, {
+    min: 0.03, max: 0.05, step: 0.0001,
+  }),
+  holeReachToTabDepth: sliderWithTextProp(0.1, {
+    min: 0.05, max: 0.2, step: DEFAULT_SLIDER_STEP,
+  }),
+  tabEdgeEndpointsIndentation: sliderWithTextProp(1, {
+    min: 0, max: 2, step: DEFAULT_SLIDER_STEP,
+  }),
+  tabControlPointsProtrusion: sliderWithTextProp(0.93, ratioSliderProps),
+  tabControlPointsAngle: sliderWithTextProp(0.8, ratioSliderProps),
+  tabStartGapToTabDepth: sliderWithTextProp(1, {
+    min: 0.3, max: 1, step: DEFAULT_SLIDER_STEP,
+  }),
+  holeWidthRatio: sliderProp(0.5, {
+    min: 0.1, max: 0.9, step: DEFAULT_SLIDER_STEP,
+  }),
+  flapRoundingDistanceRatio: sliderProp(1, ratioSliderProps),
+}) {}
 
 export const ascendantEdgeConnectionTabs = (
   start: RawPoint, end: RawPoint,
-  tabSpec: IAscendantEdgeTabsModel, scoreDashSpec: IDashPatternModel,
+  tabSpec: AscendantEdgeTabsModel, scoreDashSpec: DashPatternModel,
   tabIntervalRatios, tabGapIntervalRatios, tabDepth: number,
 ): AscendantEdgeConnectionPaths => {
   const {
     holeFlapTaperAngle,
-    holeReachToTabDepth,
-    tabsCount,
-    tabControlPointsProtrusion,
-    tabControlPointsAngle,
-    tabEdgeEndpointsIndentation,
+    holeReachToTabDepth: { value: holeReachToTabDepth },
+    tabsCount: { value: tabsCount },
+    tabControlPointsProtrusion: { value: tabControlPointsProtrusion },
+    tabControlPointsAngle: { value: tabControlPointsAngle },
+    tabEdgeEndpointsIndentation: { value: tabEdgeEndpointsIndentation },
   } = tabSpec;
 
   const getTabBaseInterval = (tabNum) => [

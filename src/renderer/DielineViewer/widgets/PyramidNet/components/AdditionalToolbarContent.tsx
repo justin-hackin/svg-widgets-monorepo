@@ -5,20 +5,22 @@ import React from 'react';
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
 import { HistoryButtons } from '../PyramidNetControlPanel/components/HistoryButtons';
 import { useStyles } from '../../../../../common/style/style';
+import { PyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 
 export const AdditionalToolbarContent = () => {
   const workspaceStore = useWorkspaceMst();
   const classes = useStyles();
-  const { pyramidNetSpec: { history }, setTextureEditorOpen } = workspaceStore.selectedStore;
+  const pyramidNetStore = workspaceStore.selectedStore as PyramidNetPluginModel;
+  const { pyramidNetSpec: { history } } = pyramidNetStore;
   return (
     <>
-      <HistoryButtons history={history} />
+      { history && (<HistoryButtons history={history} />)}
 
       <Tooltip title="Open texture editor" arrow>
         <Button
           className={classes.dielinePanelButton}
           startIcon={<BrushIcon />}
-          onClick={() => { setTextureEditorOpen(true); }}
+          onClick={() => { pyramidNetStore.setTextureEditorOpen(true); }}
         >
           Texture
         </Button>

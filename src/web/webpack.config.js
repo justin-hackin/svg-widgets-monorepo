@@ -51,12 +51,16 @@ module.exports = (env, argv) => {
           use: {
             loader: require.resolve('babel-loader'),
             options: {
+              babelrc: false,
               presets: [
                 '@babel/preset-env',
                 '@babel/preset-react',
                 '@babel/preset-typescript',
               ],
-              plugins: isProd ? undefined : [ReactRefreshBabel],
+              plugins: [
+                ['@babel/plugin-proposal-decorators', { legacy: true }],
+                !isProd && ReactRefreshBabel,
+              ],
             },
           },
           exclude: /node_modules/,

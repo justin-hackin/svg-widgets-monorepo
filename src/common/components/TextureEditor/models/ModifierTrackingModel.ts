@@ -1,6 +1,12 @@
-import { types } from 'mobx-state-tree';
+// eslint-disable-next-line max-classes-per-file
 import { includes, flatten } from 'lodash';
-import { EVENTS, INVALID_BUILD_ENV_ERROR, IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../constants';
+import {
+  Model, model, modelAction,
+} from 'mobx-keystone';
+import { computed, observable } from 'mobx';
+import {
+  EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD,
+} from '../../../constants';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',
@@ -11,106 +17,94 @@ export const DRAG_MODES = {
   SCALE_VIEW: 'scale view',
 };
 
-const keyTrackingModelFactory = (keysToTrack, target = window) => {
-  const ModelWithKeys = types.model(keysToTrack.reduce((acc, key) => {
-    acc[key] = types.optional(types.boolean, false);
-    return acc;
-  }, {})).actions((self) => ({
-    set(key, value) {
-      self[key] = value;
-    },
-  }));
-
-  return types.model(`KeyTracking--${keysToTrack.join('-')}`, {
-    keysTracked: types.optional(types.array(types.string), keysToTrack),
-    keysHeld: types.optional(ModelWithKeys, {}),
-  }).volatile(() => ({ target }))
-    .actions((self) => {
-      const keyupHandler = (e) => {
-        if (includes(self.keysTracked, e.key)) {
-          self.keysHeld.set(e.key, false);
-        }
-      };
-      const keydownHandler = (e) => {
-        if (includes(self.keysTracked, e.key)) {
-          self.keysHeld.set(e.key, true);
-        }
-      };
-
-      return {
-        afterCreate() {
-          self.target.addEventListener('keyup', keyupHandler);
-          self.target.addEventListener('keydown', keydownHandler);
-        },
-        beforeDestroy() {
-          self.target.removeEventListener('keyup', keyupHandler);
-          self.target.removeEventListener('keydown', keydownHandler);
-        },
-        releaseHeldKeys() {
-          self.keysTracked.forEach((keyHeld) => {
-            self.keysHeld.set(keyHeld, false);
-          });
-        },
-      };
-    });
-};
-
 // sorted in order of precedence, first match becomes mode
-const defaultMode = DRAG_MODES.TRANSLATE;
-const modeDefs = [
-  { mode: DRAG_MODES.TRANSLATE_HORIZONTAL, keyOrKeysHeld: ['Alt', 'Control'] },
-  { mode: DRAG_MODES.TRANSLATE_VERTICAL, keyOrKeysHeld: ['Control', 'Shift'] },
-  { mode: DRAG_MODES.SCALE_VIEW, keyOrKeysHeld: 'Alt' },
-  { mode: DRAG_MODES.SCALE_TEXTURE, keyOrKeysHeld: 'Control' },
-  { mode: DRAG_MODES.ROTATE, keyOrKeysHeld: 'Shift' },
-];
-
 const allTrue = (array: boolean[]) => {
   for (const val of array) {
-    if (val === false) { return false; }
+    if (val !== true) { return false; }
   }
   return true;
 };
 
-const areKeysHeld = (trackerKeys, keyOrKeysHeld) => (Array.isArray(keyOrKeysHeld)
-  ? allTrue(keyOrKeysHeld.map((key) => trackerKeys[key])) : trackerKeys[keyOrKeysHeld]);
+const areKeysHeld = (trackerKeys, keysHeld) => allTrue(keysHeld.map((key) => trackerKeys[key]));
 
-const keysUsed = [...flatten(modeDefs.map(({ keyOrKeysHeld }) => keyOrKeysHeld)), defaultMode];
-export const ModifierTrackingModel = keyTrackingModelFactory(keysUsed)
-  .views((self) => ({
-    get dragMode() {
-      for (const modeDef of modeDefs) {
-        if (areKeysHeld(self.keysHeld, modeDef.keyOrKeysHeld)) { return modeDef.mode; }
-      }
-      return defaultMode;
-    },
-  })).actions((self) => {
+interface ModeDef {
+  mode: string,
+  keysHeld: string[]
+}
+
+@model('ModifierTrackingModel')
+export class ModifierTrackingModel extends Model({
+}) {
+  @observable
+  keysHeld = {} as Record<string, boolean>;
+
+  modeDefs = [
+    { mode: DRAG_MODES.TRANSLATE_HORIZONTAL, keysHeld: ['Alt', 'Control'] },
+    { mode: DRAG_MODES.TRANSLATE_VERTICAL, keysHeld: ['Control', 'Shift'] },
+    { mode: DRAG_MODES.SCALE_VIEW, keysHeld: ['Alt'] },
+    { mode: DRAG_MODES.SCALE_TEXTURE, keysHeld: ['Control'] },
+    { mode: DRAG_MODES.ROTATE, keysHeld: ['Shift'] },
+  ] as ModeDef[];
+
+  defaultMode = DRAG_MODES.TRANSLATE;
+
+  @computed
+  get keysTracked() {
+    return flatten(this.modeDefs.map(({ keysHeld }) => keysHeld));
+  }
+
+  @modelAction
+  keyupHandler(e) {
+    if (includes(this.keysTracked, e.key)) {
+      this.keysHeld[e.key] = false;
+    }
+  }
+
+  @modelAction
+  keydownHandler(e) {
+    if (includes(this.keysTracked, e.key)) {
+      this.keysHeld[e.key] = true;
+    }
+  }
+
+  @modelAction
+  releaseHeldKeys() {
+    this.keysTracked.forEach((keyHeld) => {
+      this.keysHeld[keyHeld] = false;
+    });
+  }
+
+  @computed
+  get dragMode() {
+    for (const modeDef of this.modeDefs) {
+      if (areKeysHeld(this.keysHeld, modeDef.keysHeld)) { return modeDef.mode; }
+    }
+    return this.defaultMode;
+  }
+
+  @modelAction
+  resetHandler = () => {
+    this.releaseHeldKeys();
+  };
+
+  onAttachedToRootStore():(() => void) {
+    window.addEventListener('keyup', this.keyupHandler.bind(this));
+    window.addEventListener('keydown', this.keydownHandler.bind(this));
+
     if (IS_ELECTRON_BUILD) {
-      const ipcResetHandler = () => {
-        self.releaseHeldKeys();
-      };
-      return {
-        afterCreate() {
-          globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, ipcResetHandler);
-        },
-        beforeDestroy() {
-          globalThis.ipcRenderer.removeListener(EVENTS.RESET_DRAG_MODE, ipcResetHandler);
-        },
-      };
+      globalThis.ipcRenderer.on(EVENTS.RESET_DRAG_MODE, this.resetHandler);
+    } else if (IS_WEB_BUILD) {
+      window.addEventListener('blur', this.resetHandler);
     }
-    if (IS_WEB_BUILD) {
-      const documentBlurHandler = () => {
-        self.releaseHeldKeys();
-      };
+    return () => {
+      window.removeEventListener('keyup', this.keyupHandler);
+      window.removeEventListener('keydown', this.keydownHandler);
 
-      return {
-        afterCreate() {
-          window.addEventListener('blur', documentBlurHandler);
-        },
-        beforeDestroy() {
-          window.removeEventListener('blur', documentBlurHandler);
-        },
-      };
-    }
-    throw new Error(INVALID_BUILD_ENV_ERROR);
-  });
+      if (IS_ELECTRON_BUILD) {
+        globalThis.ipcRenderer.removeListener(EVENTS.RESET_DRAG_MODE, this.resetHandler);
+      } else if (IS_WEB_BUILD) {
+        window.removeEventListener('blur', this.resetHandler);
+      }
+    };
+  }
+}

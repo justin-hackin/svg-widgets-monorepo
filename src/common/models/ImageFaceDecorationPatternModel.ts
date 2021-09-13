@@ -1,17 +1,12 @@
-import { Instance, types } from 'mobx-state-tree';
-
+import {
+  prop, model, Model,
+} from 'mobx-keystone';
 import { DimensionsModel } from './DimensionsModel';
 
-export const ImageFaceDecorationPatternModel = types.model('ImageFaceDecorationPattern', {
-  imageData: types.string,
-  dimensions: DimensionsModel,
-  sourceFileName: types.string,
-  isBordered: types.optional(types.boolean, true),
-})
-  .actions((self) => ({
-    setIsBordered(isBordered) {
-      self.isBordered = isBordered;
-    },
-  }));
-
-export interface IImageFaceDecorationPatternModel extends Instance<typeof ImageFaceDecorationPatternModel> {}
+@model('ImageFaceDecorationPatternModel')
+export class ImageFaceDecorationPatternModel extends Model({
+  imageData: prop<string>(),
+  dimensions: prop<DimensionsModel>(),
+  sourceFileName: prop<string>(),
+  isBordered: prop(true).withSetter(),
+}) {}
