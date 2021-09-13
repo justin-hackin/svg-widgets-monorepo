@@ -49,9 +49,12 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       <MenuItem onClick={async () => {
         if (IS_ELECTRON_BUILD) {
           await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
-            .then(({ fileString }) => {
+            .then(({ fileString, filePath }) => {
               const dValue = extractCutHolesFromSvgString(fileString);
-              store.pyramidNetSpec.setFaceDecoration(new RawFaceDecorationModel({ dValue }));
+              // This file should have a .svg extension, without an extension this will be ''
+              const baseFileName = filePath.split('.').slice(0, -1).join('.');
+              store.pyramidNetSpec
+                .setFaceDecoration(new RawFaceDecorationModel({ dValue, sourceFileName: baseFileName }));
             });
         }
         resetFileMenuRef();

@@ -409,6 +409,13 @@ export class PyramidNetModel extends Model({
     return matrices;
   }
 
+  @computed
+  get faceDecorationSourceFileName(): string | undefined {
+    return this.faceDecoration instanceof RawFaceDecorationModel ?
+      this.faceDecoration.sourceFileName :
+      this.faceDecoration?.pattern?.sourceFileName;
+  }
+
   onAttachedToRootStore() {
     this.history.withoutUndo(() => {
       this.applyShapeBasedDefaults();

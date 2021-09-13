@@ -79,9 +79,9 @@ export class PyramidNetPluginModel extends Model({
   @modelAction
   getFileBasename() {
     return `${
-      tryResolvePath(this, ['pyramidNetSpec', 'pyramid', 'shapeName']) || 'shape'
+      this.pyramidNetSpec.pyramid.shapeName.value || 'shape'
     }__${
-      tryResolvePath(this, ['pyramidNetSpec', 'faceDecoration', 'pattern', 'sourceFileName']) || 'undecorated'
+      this.pyramidNetSpec.faceDecorationSourceFileName || 'undecorated'
     }`;
   }
 
