@@ -10,8 +10,7 @@ import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { ShapeSelect } from '../../../../../common/components/ShapeSelect';
 import { PyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
-import { NodeSelect } from '../../../../../common/components/NodeSelect';
-import { NodeSliderOrTextInput } from '../../../../../common/components/NodeSliderOrTextInput';
+import { TweakableInput } from '../../../../../common/components/TweakableInput';
 
 const controlsTabs = [
   {
@@ -53,11 +52,11 @@ export const PanelContent = observer(() => {
           className={classes.shapeSelect}
           node={pyramidNetSpec.pyramid.shapeName}
         />
-        <NodeSliderOrTextInput
+        <TweakableInput
           className={classes.shapeHeightFormControl}
           node={pyramidNetSpec.shapeHeight}
         />
-        <NodeSelect node={pyramid.netsPerPyramid} />
+        <TweakableInput node={pyramid.netsPerPyramid} />
       </div>
       <Divider />
       <Paper square>

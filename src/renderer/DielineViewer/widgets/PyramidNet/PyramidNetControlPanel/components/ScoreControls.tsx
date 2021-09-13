@@ -2,9 +2,8 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { NodeReferenceSelect } from '../../../../../../common/components/NodeSelect';
-import { NodeSliderOrTextInput } from '../../../../../../common/components/NodeSliderOrTextInput';
 import { NodeSwitchUncontrolled } from '../../../../../../common/components/NodeSwitch';
+import { TweakableInput } from '../../../../../../common/components/TweakableInput';
 
 export const ScoreControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -23,17 +22,17 @@ export const ScoreControls = observer(() => {
       {useDottedStroke && (
         <>
           {/* TODO: add headers, consider computed labelOverride */}
-          <NodeReferenceSelect node={interFaceScoreDashSpec.strokeDashPathPattern} />
+          <TweakableInput node={interFaceScoreDashSpec.strokeDashPathPattern} />
 
-          <NodeSliderOrTextInput node={interFaceScoreDashSpec.strokeDashLength} />
+          <TweakableInput node={interFaceScoreDashSpec.strokeDashLength} />
 
-          <NodeSliderOrTextInput node={interFaceScoreDashSpec.strokeDashOffsetRatio} />
+          <TweakableInput node={interFaceScoreDashSpec.strokeDashOffsetRatio} />
 
-          <NodeReferenceSelect node={baseScoreDashSpec.strokeDashPathPattern} />
+          <TweakableInput node={baseScoreDashSpec.strokeDashPathPattern} />
 
-          <NodeSliderOrTextInput node={baseScoreDashSpec.strokeDashLength} />
+          <TweakableInput node={baseScoreDashSpec.strokeDashLength} />
 
-          <NodeSliderOrTextInput node={baseScoreDashSpec.strokeDashOffsetRatio} />
+          <TweakableInput node={baseScoreDashSpec.strokeDashOffsetRatio} />
         </>
       )}
     </>

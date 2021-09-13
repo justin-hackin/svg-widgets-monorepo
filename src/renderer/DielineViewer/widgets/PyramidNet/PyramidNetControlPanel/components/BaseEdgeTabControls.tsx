@@ -2,10 +2,9 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { NodeSlider } from '../../../../../../common/NodeSlider';
-import { NodeSwitch, NodeSwitchUncontrolled } from '../../../../../../common/components/NodeSwitch';
-import { NodeSliderOrTextInput } from '../../../../../../common/components/NodeSliderOrTextInput';
+import { NodeSwitchUncontrolled } from '../../../../../../common/components/NodeSwitch';
 import { BendGuideValleyModel } from '../../../../util/shapes/baseEdgeConnectionTab';
+import { TweakableInput } from '../../../../../../common/components/TweakableInput';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -17,25 +16,25 @@ export const BaseEdgeTabControls = observer(() => {
 
   return (
     <>
-      <NodeSlider node={baseEdgeTabsSpec.roundingDistanceRatio} />
+      <TweakableInput node={baseEdgeTabsSpec.roundingDistanceRatio} />
 
-      <NodeSwitch node={baseEdgeTabsSpec.scoreTabMidline} />
+      <TweakableInput node={baseEdgeTabsSpec.scoreTabMidline} />
 
-      <NodeSliderOrTextInput node={baseEdgeTabsSpec.finDepthToTabDepth} />
+      <TweakableInput node={baseEdgeTabsSpec.finDepthToTabDepth} />
 
-      <NodeSliderOrTextInput node={baseEdgeTabsSpec.tabDepthToAscendantTabDepth} />
+      <TweakableInput node={baseEdgeTabsSpec.tabDepthToAscendantTabDepth} />
 
-      <NodeSliderOrTextInput node={baseEdgeTabsSpec.holeDepthToTabDepth} />
+      <TweakableInput node={baseEdgeTabsSpec.holeDepthToTabDepth} />
 
-      <NodeSliderOrTextInput node={baseEdgeTabsSpec.finOffsetRatio} />
+      <TweakableInput node={baseEdgeTabsSpec.finOffsetRatio} />
 
-      <NodeSliderOrTextInput node={baseEdgeTabsSpec.holeBreadthToHalfWidth} />
+      <TweakableInput node={baseEdgeTabsSpec.holeBreadthToHalfWidth} />
 
-      <NodeSliderOrTextInput node={baseEdgeTabsSpec.holeTabClearance} />
+      <TweakableInput node={baseEdgeTabsSpec.holeTabClearance} />
 
-      <NodeSliderOrTextInput node={baseEdgeTabsSpec.holeTaper} />
+      <TweakableInput node={baseEdgeTabsSpec.holeTaper} />
 
-      <NodeSliderOrTextInput node={baseEdgeTabsSpec.tabConjunctionClearance} />
+      <TweakableInput node={baseEdgeTabsSpec.tabConjunctionClearance} />
 
       <NodeSwitchUncontrolled
         label="Use Bend Guide Valley"
@@ -51,9 +50,9 @@ export const BaseEdgeTabControls = observer(() => {
       />
       {baseEdgeTabsSpec.bendGuideValley instanceof BendGuideValleyModel && (
         <>
-          <NodeSlider node={baseEdgeTabsSpec.bendGuideValley.depthRatio} />
+          <TweakableInput node={baseEdgeTabsSpec.bendGuideValley.depthRatio} />
 
-          <NodeSliderOrTextInput node={baseEdgeTabsSpec.bendGuideValley.theta} />
+          <TweakableInput node={baseEdgeTabsSpec.bendGuideValley.theta} />
         </>
       )}
     </>

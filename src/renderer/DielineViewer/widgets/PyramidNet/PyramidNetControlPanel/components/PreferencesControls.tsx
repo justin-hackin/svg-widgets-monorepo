@@ -2,12 +2,8 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { Button, Divider } from '@material-ui/core';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { NodeSwitch } from '../../../../../../common/components/NodeSwitch';
-import { NodeColorPicker } from '../../../../../../common/components/NodeColorPicker';
-import { NodeRadio } from '../../../../../../common/components/NodeRadio';
-import { NodeNumberTextInput } from '../../../../../../common/components/NodeNumberTextInput';
-import { NodeSliderOrTextInput } from '../../../../../../common/components/NodeSliderOrTextInput';
 import { PreferencesModel } from '../../../../models/PreferencesModel';
+import { TweakableInput } from '../../../../../../common/components/TweakableInput';
 
 export const PreferencesControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -27,31 +23,31 @@ export const PreferencesControls = observer(() => {
 
   return (
     <>
-      <NodeRadio node={displayUnit} />
+      <TweakableInput node={displayUnit} />
 
-      <NodeNumberTextInput node={documentWidth} />
+      <TweakableInput node={documentWidth} />
 
-      <NodeNumberTextInput node={documentHeight} />
+      <TweakableInput node={documentHeight} />
 
-      <NodeSwitch node={useClonesForBaseTabs} />
+      <TweakableInput node={useClonesForBaseTabs} />
 
-      <NodeSwitch node={useClonesForDecoration} />
+      <TweakableInput node={useClonesForDecoration} />
 
-      <NodeSliderOrTextInput node={strokeWidth} />
+      <TweakableInput node={strokeWidth} />
 
-      <NodeColorPicker node={scoreStrokeColor} />
+      <TweakableInput node={scoreStrokeColor} />
 
-      <NodeColorPicker node={cutStrokeColor} />
+      <TweakableInput node={cutStrokeColor} />
 
-      <NodeColorPicker node={registrationStrokeColor} />
+      <TweakableInput node={registrationStrokeColor} />
 
       <Divider />
 
-      <NodeRadio node={printRegistrationType} />
+      <TweakableInput node={printRegistrationType} />
 
-      <NodeNumberTextInput node={preferences.registrationPadding} />
+      <TweakableInput node={preferences.registrationPadding} />
 
-      <NodeNumberTextInput node={preferences.registrationMarkLength} />
+      <TweakableInput node={preferences.registrationMarkLength} />
 
       <Button
         variant="contained"

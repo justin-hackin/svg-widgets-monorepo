@@ -29,12 +29,14 @@ import { isNaN, isNumber } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
-import { HistoryButtons } from
-    '../../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
+import { HistoryButtons }
+  from '../../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { ShapeSelect } from '../../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../../renderer/DielineViewer/models/WorkspaceModel';
 import { useStyles } from '../../../../style/style';
-import { EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION, } from '../../../../constants';
+import {
+  EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION,
+} from '../../../../constants';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../../util/tour';
 import { SnapMenu } from './components/SnapMenu';
@@ -43,7 +45,7 @@ import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecor
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { RawFaceDecorationModel } from '../../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 import { TextureEditorModel } from '../../models/TextureEditorModel';
-import { NodeSlider } from '../../../../NodeSlider';
+import { TweakableInput } from '../../../TweakableInput';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -301,7 +303,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                     )}
                   label="Node selection"
                 />
-                <NodeSlider
+                <TweakableInput
                   node={pluginModel.textureEditor.nodeScaleMux}
                   className={classes.nodeScaleMuxSlider}
                 />

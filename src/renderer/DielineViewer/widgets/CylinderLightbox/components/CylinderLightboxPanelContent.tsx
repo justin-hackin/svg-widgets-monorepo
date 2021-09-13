@@ -5,6 +5,7 @@ import { useStyles } from '../../../../../common/style/style';
 import { CylinderLightBoxModel } from '../models';
 import { NodeSliderOrTextInput } from '../../../../../common/components/NodeSliderOrTextInput';
 import { NodeSlider } from '../../../../../common/NodeSlider';
+import { TweakableInput } from '../../../../../common/components/TweakableInput';
 
 export const CylinderLightboxPanelContent = () => {
   const workspaceStore = useWorkspaceMst();
@@ -13,17 +14,17 @@ export const CylinderLightboxPanelContent = () => {
 
   return (
     <div className={classes.tabContent}>
-      <NodeSlider node={shapeDefinition.arcsPerRing} />
-      <NodeSlider node={shapeDefinition.wallsPerArc} />
-      <NodeSlider node={shapeDefinition.holderTabsPerArc} />
-      <NodeSliderOrTextInput node={shapeDefinition.materialThickness} />
-      <NodeSliderOrTextInput node={shapeDefinition.cylinderHeight} />
+      <TweakableInput node={shapeDefinition.arcsPerRing} />
+      <TweakableInput node={shapeDefinition.wallsPerArc} />
+      <TweakableInput node={shapeDefinition.holderTabsPerArc} />
+      <TweakableInput node={shapeDefinition.materialThickness} />
+      <TweakableInput node={shapeDefinition.cylinderHeight} />
 
-      <NodeSliderOrTextInput node={shapeDefinition.ringRadius} />
-      <NodeSliderOrTextInput node={shapeDefinition.ringThicknessRatio} />
-      <NodeSliderOrTextInput node={shapeDefinition.dovetailIngressRatio} />
-      <NodeSliderOrTextInput node={shapeDefinition.dovetailSizeRatio} />
-      <NodeSliderOrTextInput node={shapeDefinition.holderTabsFeetLengthRatio} />
+      <TweakableInput node={shapeDefinition.ringRadius} />
+      <TweakableInput node={shapeDefinition.ringThicknessRatio} />
+      <TweakableInput node={shapeDefinition.dovetailIngressRatio} />
+      <TweakableInput node={shapeDefinition.dovetailSizeRatio} />
+      <TweakableInput node={shapeDefinition.holderTabsFeetLengthRatio} />
     </div>
   );
 };

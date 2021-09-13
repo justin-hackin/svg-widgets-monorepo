@@ -2,8 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
 import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { NodeSliderOrTextInput } from '../../../../../../common/components/NodeSliderOrTextInput';
-import { NodeSlider } from '../../../../../../common/NodeSlider';
+import { TweakableInput } from '../../../../../../common/components/TweakableInput';
 
 export const AscendantEdgeTabsControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -11,23 +10,23 @@ export const AscendantEdgeTabsControls = observer(() => {
   const { pyramidNetSpec: { ascendantEdgeTabsSpec } = {} } = store;
   return (
     <>
-      <NodeSlider node={ascendantEdgeTabsSpec.tabsCount} />
+      <TweakableInput node={ascendantEdgeTabsSpec.tabsCount} />
 
-      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabDepthToTraversalLength} />
+      <TweakableInput node={ascendantEdgeTabsSpec.tabDepthToTraversalLength} />
 
-      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.holeReachToTabDepth} />
+      <TweakableInput node={ascendantEdgeTabsSpec.holeReachToTabDepth} />
 
-      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabEdgeEndpointsIndentation} />
+      <TweakableInput node={ascendantEdgeTabsSpec.tabEdgeEndpointsIndentation} />
 
-      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabControlPointsAngle} />
+      <TweakableInput node={ascendantEdgeTabsSpec.tabControlPointsAngle} />
 
-      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabControlPointsProtrusion} />
+      <TweakableInput node={ascendantEdgeTabsSpec.tabControlPointsProtrusion} />
 
-      <NodeSliderOrTextInput node={ascendantEdgeTabsSpec.tabStartGapToTabDepth} />
+      <TweakableInput node={ascendantEdgeTabsSpec.tabStartGapToTabDepth} />
 
-      <NodeSlider node={ascendantEdgeTabsSpec.holeWidthRatio} />
+      <TweakableInput node={ascendantEdgeTabsSpec.holeWidthRatio} />
 
-      <NodeSlider node={ascendantEdgeTabsSpec.flapRoundingDistanceRatio} />
+      <TweakableInput node={ascendantEdgeTabsSpec.flapRoundingDistanceRatio} />
     </>
   );
 });
