@@ -225,7 +225,7 @@ export class CylinderLightboxModel extends Model({
     const holesPath = new PathData();
     // TODO: extract shared operations with wall holes for DRYness
     const sectionDegrees = 360 / (this.holderTabsPerArc.value * this.arcsPerRing.value);
-    for (let i = 0; i < this.wallsPerArc.value; i += 1) {
+    for (let i = 0; i < this.holderTabsPerArc.value; i += 1) {
       const rotation = (i - (this.holderTabsPerArc.value / 2) + 0.5) * sectionDegrees;
       const thisHole = rectanglePathCenteredOnOrigin(this.actualHolderTabFeetLength, this.materialThickness.value)
         .transform(`rotate(${rotation}) translate(${this.holderTabRadius}, 0)`);
