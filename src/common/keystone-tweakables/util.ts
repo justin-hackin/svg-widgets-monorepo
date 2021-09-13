@@ -37,7 +37,6 @@ export function createOptionsGetter(
 
 export const isFunctionOverride = (override: labelOverride): override is labelGenerator => isFunction(override);
 export const resolveLabel = (node: TweakableModel) => {
-  // IDE thinks labelOverride is never used
   const {
     ownPropertyName,
     metadata: { labelOverride },
