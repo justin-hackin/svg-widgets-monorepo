@@ -16,25 +16,25 @@ export class AscendantEdgeTabsModel extends Model({
   // TODO: consider making these constants or give controls
   holeFlapTaperAngle: prop(0.31),
   midpointDepthToTabDepth: prop(0.5),
-  flapRoundingDistanceRatio: sliderProp(1, ratioSliderProps),
+  tabsCount: sliderProp(3, { min: 1, max: 5, step: 1 }),
+  tabDepthToTraversalLength: sliderWithTextProp(0.0375, {
+    min: 0.03, max: 0.05, step: 0.0001,
+  }),
   holeReachToTabDepth: sliderWithTextProp(0.1, {
     min: 0.05, max: 0.2, step: DEFAULT_SLIDER_STEP,
+  }),
+  tabEdgeEndpointsIndentation: sliderWithTextProp(1, {
+    min: 0, max: 2, step: DEFAULT_SLIDER_STEP,
+  }),
+  tabControlPointsProtrusion: sliderWithTextProp(0.93, ratioSliderProps),
+  tabControlPointsAngle: sliderWithTextProp(0.8, ratioSliderProps),
+  tabStartGapToTabDepth: sliderWithTextProp(1, {
+    min: 0.3, max: 1, step: DEFAULT_SLIDER_STEP,
   }),
   holeWidthRatio: sliderProp(0.5, {
     min: 0.1, max: 0.9, step: DEFAULT_SLIDER_STEP,
   }),
-  tabDepthToTraversalLength: sliderWithTextProp(0.0375, {
-    min: 0.03, max: 0.05, step: 0.0001,
-  }),
-  tabStartGapToTabDepth: sliderWithTextProp(1, {
-    min: 0.3, max: 1, step: DEFAULT_SLIDER_STEP,
-  }),
-  tabControlPointsProtrusion: sliderWithTextProp(0.93, ratioSliderProps),
-  tabControlPointsAngle: sliderWithTextProp(0.8, ratioSliderProps),
-  tabEdgeEndpointsIndentation: sliderWithTextProp(1, {
-    min: 0, max: 2, step: DEFAULT_SLIDER_STEP,
-  }),
-  tabsCount: sliderProp(3, { min: 1, max: 5, step: 1 }),
+  flapRoundingDistanceRatio: sliderProp(1, ratioSliderProps),
 }) {}
 
 export const ascendantEdgeConnectionTabs = (

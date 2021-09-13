@@ -45,31 +45,31 @@ export class BendGuideValleyModel extends Model({
 
 @model('BaseEdgeTabsModel')
 export class BaseEdgeTabsModel extends Model({
-  finDepthToTabDepth: sliderWithTextProp(1.3, { ...ratioSliderProps, min: 0.05 }),
-  // set by applyShapeBasedDefaults
-  finOffsetRatio: sliderProp(0.75, {...ratioSliderProps, max: 0.99}),
-  // set by applyShapeBasedDefaults,
-  holeBreadthToHalfWidth: sliderWithTextProp(0.25, {
-    min: 0.05, max: 0.95, step: DEFAULT_SLIDER_STEP,
-  }),
-  holeDepthToTabDepth: sliderWithTextProp(0.5, { ...ratioSliderProps, min: 0.05 }),
-  holeTaper: sliderWithTextProp(0.97, {
-    min: Math.PI / 8, max: Math.PI / 3, step: DEFAULT_SLIDER_STEP,
-  }),
-  scoreTabMidline: switchProp(false),
   roundingDistanceRatio: sliderProp(0.9, {
     min: 0, max: 1, step: 0.1,
   }),
+  scoreTabMidline: switchProp(false),
+  finDepthToTabDepth: sliderWithTextProp(1.3, { ...ratioSliderProps, min: 0.05 }),
   tabDepthToAscendantTabDepth: sliderWithTextProp(1.5, {
     min: 0.6, max: 2, step: DEFAULT_SLIDER_STEP,
+  }),
+  holeDepthToTabDepth: sliderWithTextProp(0.5, { ...ratioSliderProps, min: 0.05 }),
+  // set by applyShapeBasedDefaults
+  finOffsetRatio: sliderProp(0.75, {...ratioSliderProps, max: 0.99}),
+  holeBreadthToHalfWidth: sliderWithTextProp(0.25, {
+    min: 0.05, max: 0.95, step: DEFAULT_SLIDER_STEP,
   }),
   holeTabClearance: sliderWithTextProp(0.1, {
     min: 0, max: 0.1, step: DEFAULT_SLIDER_STEP,
   }),
-  bendGuideValley: prop<BendGuideValleyModel | undefined>(() => undefined),
+  // set by applyShapeBasedDefaults,
+  holeTaper: sliderWithTextProp(0.97, {
+    min: Math.PI / 8, max: Math.PI / 3, step: DEFAULT_SLIDER_STEP,
+  }),
   tabConjunctionClearance: sliderWithTextProp(0.1, {
     min: 0.05, max: 0.4, step: 0.01,
   }),
+  bendGuideValley: prop<BendGuideValleyModel | undefined>(() => undefined),
 }) {
   @modelAction
   unsetBendGuideValley() {

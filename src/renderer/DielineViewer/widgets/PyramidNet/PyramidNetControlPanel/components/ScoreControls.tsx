@@ -1,9 +1,9 @@
 import React from 'react';
-import { observer } from 'mobx-react';
-import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { TweakableInput } from '../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
-import { SimpleSwitch } from '../../../../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
+import {observer} from 'mobx-react';
+import {useWorkspaceMst} from '../../../../models/WorkspaceModel';
+import {PyramidNetPluginModel} from '../../../../models/PyramidNetMakerStore';
+import {SimpleSwitch} from '../../../../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
+import {TweakableChildrenInputs} from '../../../../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 
 export const ScoreControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -22,17 +22,9 @@ export const ScoreControls = observer(() => {
       {useDottedStroke && (
         <>
           {/* TODO: add headers, consider computed labelOverride */}
-          <TweakableInput node={interFaceScoreDashSpec.strokeDashPathPattern} />
+          <TweakableChildrenInputs parentNode={interFaceScoreDashSpec}/>
+          <TweakableChildrenInputs parentNode={baseScoreDashSpec}/>
 
-          <TweakableInput node={interFaceScoreDashSpec.strokeDashLength} />
-
-          <TweakableInput node={interFaceScoreDashSpec.strokeDashOffsetRatio} />
-
-          <TweakableInput node={baseScoreDashSpec.strokeDashPathPattern} />
-
-          <TweakableInput node={baseScoreDashSpec.strokeDashLength} />
-
-          <TweakableInput node={baseScoreDashSpec.strokeDashOffsetRatio} />
         </>
       )}
     </>
