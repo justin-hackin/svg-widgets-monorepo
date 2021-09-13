@@ -7,8 +7,9 @@ import { ChromePicker } from 'react-color';
 import { useStyles } from '../../style/style';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { ColorPickerMetadata } from '../types';
+import {observer} from 'mobx-react';
 
-export const TweakableColorPicker = ({
+export const TweakableColorPicker = observer(({
   node,
 }: { node: TweakablePrimitiveModel<string, ColorPickerMetadata> }) => {
   const classes = useStyles();
@@ -30,4 +31,4 @@ export const TweakableColorPicker = ({
       />
     </FormControl>
   );
-};
+});
