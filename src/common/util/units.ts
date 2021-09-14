@@ -1,8 +1,9 @@
 import gcd from 'gcd';
 
-export const UNITS = {
-  cm: 'cm', in: 'in',
-};
+export enum UNITS {
+  cm = 'cm', in = 'in',
+}
+
 const INCHES_TO_CM_RATIO = 1.0 / 2.54;
 export const PIXELS_PER_INCH = 96;
 export const PIXELS_PER_CM = INCHES_TO_CM_RATIO * PIXELS_PER_INCH;

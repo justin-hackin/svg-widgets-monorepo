@@ -1,15 +1,12 @@
 import { observer } from 'mobx-react';
-import { getType } from 'mobx-state-tree';
 import React from 'react';
 
-import { IPreferencesModel, PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
-import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
+import { PreferencesModel, PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
 import { closedPolygonPath } from '../../../../util/shapes/generic';
 import {
-  IImageFaceDecorationPatternModel,
   ImageFaceDecorationPatternModel,
 } from '../../../../../../common/models/ImageFaceDecorationPatternModel';
-import { ITextureFaceDecorationModel, TextureFaceDecorationModel } from '../../../../models/TextureFaceDecorationModel';
+import { PositionableFaceDecorationModel } from '../../../../models/PositionableFaceDecorationModel';
 import { theme } from '../../../../../../common/style/style';
 import {
   expandBoundingBoxAttrs,
@@ -17,6 +14,7 @@ import {
   boundingBoxMinPoint,
 } from '../../../../../../common/util/svg';
 import { pointToTranslateString, scalePoint } from '../../../../../../common/util/geom';
+import { PyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
 
 const PrintGroup = ({ children }) => (
   <g {...{
@@ -31,7 +29,7 @@ const PrintGroup = ({ children }) => (
 export const PrintLayer = observer(({
   widgetStore, preferencesStore,
 }: {
-  preferencesStore: IPreferencesModel, widgetStore: IPyramidNetPluginModel,
+  preferencesStore: PreferencesModel, widgetStore: PyramidNetPluginModel,
 }) => {
   if (!preferencesStore || !widgetStore) {
     return null;
@@ -47,22 +45,26 @@ export const PrintLayer = observer(({
     },
   } = widgetStore;
 
-  const { registrationPadding, printRegistrationType, registrationMarkLength } = preferencesStore;
+  const {
+    registrationPadding: { value: registrationPadding },
+    printRegistrationType: { value: printRegistrationType },
+    registrationMarkLength: { value: registrationMarkLength },
+  } = preferencesStore;
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
   const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
     ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
   const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(dielineRegistrationBB), -1));
 
-  if (!faceDecoration || getType(faceDecoration) !== TextureFaceDecorationModel) {
+  if (!faceDecoration || !(faceDecoration instanceof PositionableFaceDecorationModel)) {
     return null;
   }
-  const { pattern, transformMatrix } = faceDecoration as ITextureFaceDecorationModel;
-  if (getType(pattern) !== ImageFaceDecorationPatternModel) {
+  const { pattern, transform: { transformMatrix } } = faceDecoration as PositionableFaceDecorationModel;
+  if (!(pattern instanceof ImageFaceDecorationPatternModel)) {
     return null;
   }
 
-  const { imageData, dimensions, isBordered } = pattern as IImageFaceDecorationPatternModel;
+  const { imageData, dimensions, isBordered } = pattern as ImageFaceDecorationPatternModel;
   const PRINT_IMAGE_ID = 'print-face-decoration';
   const PRINT_BLEED_PATH_ID = 'print-bleed-path-id';
   const CLIP_PATH_ID = 'clip-path';

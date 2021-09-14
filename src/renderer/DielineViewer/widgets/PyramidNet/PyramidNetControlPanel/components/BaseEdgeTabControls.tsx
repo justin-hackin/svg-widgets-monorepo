@@ -1,12 +1,11 @@
 import React from 'react';
-import { observer } from 'mobx-react';
+import {observer} from 'mobx-react';
+import {useWorkspaceMst} from '../../../../models/WorkspaceModel';
+import {PyramidNetPluginModel} from '../../../../models/PyramidNetMakerStore';
+import {BendGuideValleyModel} from '../../../../util/shapes/baseEdgeConnectionTab';
+import {SimpleSwitch} from '../../../../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
+import {TweakableChildrenInputs} from '../../../../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 
-import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
-import { ratioSliderProps } from './constants';
-import { PanelSwitch, PanelSwitchUncontrolled } from '../../../../../../common/components/PanelSwitch';
-import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../models/PyramidNetMakerStore';
-import { DEFAULT_SLIDER_STEP } from '../../../../../../common/constants';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -14,98 +13,27 @@ export const BaseEdgeTabControls = observer(() => {
     pyramidNetSpec: {
       baseEdgeTabsSpec,
     } = {},
-  } = workspaceStore.selectedStore as IPyramidNetPluginModel;
-  const {
-    bendGuideValley,
-    unsetBendGuideValley,
-    resetBendGuideValleyToDefault,
-  } = baseEdgeTabsSpec;
+  } = workspaceStore.selectedStore as PyramidNetPluginModel;
 
   return (
     <>
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="roundingDistanceRatio"
-        {...ratioSliderProps}
-      />
-      <PanelSwitch
-        node={baseEdgeTabsSpec}
-        property="scoreTabMidline"
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="finDepthToTabDepth"
-        {...{ ...ratioSliderProps, min: 0.05 }}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="tabDepthToAscendantTabDepth"
-        min={0.6}
-        max={2}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="holeDepthToTabDepth"
-        {...{ ...ratioSliderProps, min: 0.05 }}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="finOffsetRatio"
-        {...ratioSliderProps}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="holeBreadthToHalfWidth"
-        {...{ ...ratioSliderProps, min: 0.05, max: 0.95 }}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="holeTabClearance"
-        min={0}
-        max={0.1}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="holeTaper"
-        min={Math.PI / 8}
-        max={Math.PI / 3}
-        step={DEFAULT_SLIDER_STEP}
-      />
-      <PanelSliderOrTextInput
-        node={baseEdgeTabsSpec}
-        property="tabConjunctionClearance"
-        min={0.05}
-        max={0.4}
-        step={0.01}
-      />
-      <PanelSwitchUncontrolled
+      <TweakableChildrenInputs parentNode={baseEdgeTabsSpec}/>
+
+      <SimpleSwitch
         label="Use Bend Guide Valley"
-        valuePath="BaseEdgeTabControls__useBendGuideValley"
-        value={!!bendGuideValley}
+        name="BaseEdgeTabControls__useBendGuideValley"
+        value={!!baseEdgeTabsSpec.bendGuideValley}
         onChange={(e) => {
           if (e.target.checked) {
-            resetBendGuideValleyToDefault();
+            baseEdgeTabsSpec.resetBendGuideValleyToDefault();
           } else {
-            unsetBendGuideValley();
+            baseEdgeTabsSpec.unsetBendGuideValley();
           }
         }}
       />
-      {baseEdgeTabsSpec.bendGuideValley && (
+      {baseEdgeTabsSpec.bendGuideValley instanceof BendGuideValleyModel && (
         <>
-          <PanelSliderOrTextInput
-            node={bendGuideValley}
-            property="depthRatio"
-            {...ratioSliderProps}
-          />
-          <PanelSliderOrTextInput
-            node={bendGuideValley}
-            property="theta"
-            min={Math.PI / 16}
-            max={Math.PI / 3}
-            step={DEFAULT_SLIDER_STEP}
-          />
+          <TweakableChildrenInputs parentNode={baseEdgeTabsSpec.bendGuideValley}/>
         </>
       )}
     </>

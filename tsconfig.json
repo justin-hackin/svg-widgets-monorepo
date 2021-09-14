@@ -1,8 +1,10 @@
 {
   "extends": "./node_modules/electron-webpack/tsconfig-base.json",
   "compilerOptions": {
+    "lib": ["dom"],
     "jsx": "react",
-    "esModuleInterop": false,
+    "target": "ES5",
+    "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
@@ -14,7 +16,15 @@
     "noImplicitAny": false,
     "noImplicitReturns": true,
     "noImplicitThis": true,
+    "experimentalDecorators": true,
+    "noEmit": false,
+    "downlevelIteration": true
   },
-  "include": ["src/**/*"],
+  //  TODO: prevent TS5055: Cannot write file '[projectDir]/webpack.config.js' because it would overwrite input file.
+  //  TODO: why aren't .js files being picked up with first glob given allowJs === true
+  //  TODO: if js files not included, editing eslint files results in
+    //  Parsing error: "parserOptions.project" has been set for @typescript-eslint/parser.
+  "outDir": "./dist",
+  "include": ["./src/**/*"],
   "exclude": ["node_modules"]
 }

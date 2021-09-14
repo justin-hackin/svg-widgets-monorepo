@@ -1,78 +1,23 @@
 import React from 'react';
-import { observer } from 'mobx-react';
-import { Button, Divider } from '@material-ui/core';
-
-import { startCase } from 'lodash';
-import { PanelSliderOrTextInput } from '../../../../../../common/components/PanelSliderOrTextInput';
-import { PanelColorPicker } from '../../../../../../common/components/PanelColorPicker';
-import { useWorkspaceMst } from '../../../../models/WorkspaceModel';
-import { PanelSwitch } from '../../../../../../common/components/PanelSwitch';
-import { PanelTextInput } from '../../../../../../common/components/PanelTextInput';
-import { PanelRadio } from '../../../../../../common/components/PanelRadio';
-import { UNITS } from '../../../../../../common/util/units';
-import { PRINT_REGISTRATION_TYPES } from '../../../../models/PreferencesModel';
+import {observer} from 'mobx-react';
+import {Button} from '@material-ui/core';
+import {useWorkspaceMst, WorkspaceModel} from '../../../../models/WorkspaceModel';
+import {PreferencesModel} from '../../../../models/PreferencesModel';
+import {TweakableChildrenInputs} from '../../../../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 
 export const PreferencesControls = observer(() => {
-  const { preferences, resetPreferences } = useWorkspaceMst();
-  const options = Object.keys(UNITS).map((unit) => ({ value: unit, label: unit }));
+  const workspaceStore: WorkspaceModel = useWorkspaceMst();
+  const { preferences }: { preferences: PreferencesModel} = workspaceStore;
+
   return (
     <>
-      <PanelRadio
-        row
-        node={preferences}
-        property="displayUnit"
-        options={options}
-      />
-      <PanelTextInput label="Document Width" node={preferences.dielineDocumentDimensions} property="width" useUnits />
-      <PanelTextInput label="Document Height" node={preferences.dielineDocumentDimensions} property="height" useUnits />
-      <PanelSwitch
-        node={preferences}
-        property="useClonesForBaseTabs"
-      />
-      <PanelSwitch
-        node={preferences}
-        property="useClonesForDecoration"
-      />
-      <PanelSliderOrTextInput
-        node={preferences}
-        property="strokeWidth"
-        label="Dieline Stroke Width"
-        min={0}
-        max={3}
-        step={0.01}
-      />
-      <PanelColorPicker
-        node={preferences}
-        property="scoreStrokeColor"
-      />
-
-      <PanelColorPicker
-        node={preferences}
-        property="cutStrokeColor"
-      />
-      <Divider />
-      <PanelRadio
-        node={preferences}
-        property="printRegistrationType"
-        options={
-          Object.values(PRINT_REGISTRATION_TYPES)
-            .map((value) => ({ value, label: startCase(value) }))
-        }
-      />
-      <PanelColorPicker
-        node={preferences}
-        property="registrationStrokeColor"
-      />
-
-      <PanelTextInput node={preferences} property="registrationPadding" useUnits />
-
-      <PanelTextInput node={preferences} property="registrationMarkLength" useUnits />
+      <TweakableChildrenInputs parentNode={preferences}/>
 
       <Button
         variant="contained"
         color="primary"
         onClick={() => {
-          resetPreferences();
+          workspaceStore.resetPreferences();
         }}
       >
         Reset

@@ -1,3 +1,5 @@
+import { PHI } from '../../../common/util/geom';
+
 interface CharCodeBool {
   [key: string]: boolean[]
 }
@@ -50,3 +52,9 @@ export const convertMessageToMorseBooleanString = (message):boolean[] => {
   }
   return booleanMessage;
 };
+
+export const scoreMessage:number[] = convertMessageToMorseBooleanString('playful geometer is symmetrically excellent')
+  .reduce((acc:number[], isLong) => {
+    acc.push(isLong ? PHI ** 2 : 1 / PHI, 1);
+    return acc;
+  }, []);

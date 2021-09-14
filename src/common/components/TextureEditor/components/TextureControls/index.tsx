@@ -1,23 +1,21 @@
 import React, { forwardRef, useState } from 'react';
 import {
-  TextField,
-  InputAdornment,
+  AppBar,
   Button,
-  Switch,
+  Divider,
   FormControlLabel,
   IconButton,
+  InputAdornment,
+  ListItemIcon,
   Menu,
   MenuItem,
+  Switch,
+  TextField,
   Toolbar,
-  AppBar,
-  Tooltip,
-  Divider,
-  ListItemIcon,
   Typography,
 } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import CachedIcon from '@material-ui/icons/Cached';
-import TelegramIcon from '@material-ui/icons/Telegram';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import FolderIcon from '@material-ui/icons/Folder';
@@ -27,29 +25,27 @@ import PublishIcon from '@material-ui/icons/Publish';
 import FilePicker from '@mavedev/react-file-picker';
 import HelpIcon from '@material-ui/icons/Help';
 
-import { isNumber, isNaN } from 'lodash';
+import { isNaN, isNumber } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
-import { DragModeOptionsGroup } from '../DragModeOptionGroup';
-import { HistoryButtons } from
-  '../../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
-import { PanelSliderComponent } from '../../../PanelSliderComponent';
+import { HistoryButtons }
+  from '../../../../../renderer/DielineViewer/widgets/PyramidNet/PyramidNetControlPanel/components/HistoryButtons';
 import { ShapeSelect } from '../../../ShapeSelect';
 import { useWorkspaceMst } from '../../../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { useStyles } from '../../../../style/style';
 import {
-  DEFAULT_SLIDER_STEP,
-  EVENTS,
-  INVALID_BUILD_ENV_ERROR,
-  IS_ELECTRON_BUILD,
-  IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION,
+  EVENTS, IS_ELECTRON_BUILD, IS_WEB_BUILD, TEXTURE_ARRANGEMENT_FILE_EXTENSION,
 } from '../../../../constants';
-import { ITextureEditorModel } from '../../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../../util/tour';
 import { SnapMenu } from './components/SnapMenu';
+import { PyramidNetPluginModel } from '../../../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
+import { RawFaceDecorationModel } from '../../../../../renderer/DielineViewer/models/RawFaceDecorationModel';
+import { TextureEditorModel } from '../../models/TextureEditorModel';
+import { TweakableInput } from '../../../../keystone-tweakables/material-ui-controls/TweakableInput';
 
 const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
   <NumberFormat
@@ -95,21 +91,17 @@ const OpenTextureArrangementMenuItem = forwardRef<any, OpenTextureArrangementMen
 export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
-  const { setNeedsTour } = workspaceStore.preferences;
-  const pluginModel:IPyramidNetPluginModel = workspaceStore.selectedStore;
+  const { preferences } = workspaceStore;
+  const pluginModel:PyramidNetPluginModel = workspaceStore.selectedStore;
+  const { history } = pluginModel.pyramidNetSpec;
+  const { textureEditor } = pluginModel;
   const {
-    texture, sendTextureToDielineEditor, saveTextureArrangement, openTextureArrangement,
-    showNodes, setShowNodes, autoRotatePreview, setAutoRotatePreview,
-    shapePreview: { downloadShapeGLTF },
-    assignTextureFromPatternInfo,
-    setTextureArrangementFromFileData,
+    faceDecoration,
+    showNodes, autoRotatePreview,
+    shapePreview,
     shapeName,
-    modifierTracking: { dragMode = undefined } = {},
-    history,
-  } = pluginModel.textureEditor as ITextureEditorModel;
-  const {
-    pattern, rotate: textureRotate, hasPathPattern,
-  } = texture || {};
+  //  TODO: why does code loose type info when destructuring this
+  } = textureEditor as TextureEditorModel;
 
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
@@ -120,7 +112,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
       onFilePicked={async (file) => {
         // TODO: why doesn't file.type match downloadFile mime type 'application/json'
         if (file.type === '') {
-          setTextureArrangementFromFileData(JSON.parse(await file.text()));
+          textureEditor.setTextureArrangementFromFileData(JSON.parse(await file.text()));
         }
         resetFileMenuRef();
         //  TODO: snack bar error if wrong type
@@ -130,12 +122,14 @@ export const TextureControls = observer(({ hasCloseButton }) => {
     </FilePicker>
   ));
 
+  if (faceDecoration instanceof RawFaceDecorationModel || !shapePreview) { return null; }
+
   // TODO: add whitespace, improve button definition and input alignment
   return (
     <>
       <AppBar className={classes.textureEditorControls} color="inherit" position="relative">
         <Toolbar
-          className={clsx(classes.textureToolbar, texture && classes.textureToolbarWithTexture)}
+          className={clsx(classes.textureToolbar, faceDecoration && classes.textureToolbarWithTexture)}
           variant="dense"
         >
           {/* web app uses texture editor as standalone component without drawer */}
@@ -167,25 +161,22 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               if (IS_WEB_BUILD) {
                 return (<ForwardRefdOpenMenuItem />);
               }
-              if (IS_ELECTRON_BUILD) {
-                return (
-                  <OpenTextureArrangementMenuItem onClick={() => {
-                    openTextureArrangement();
-                    resetFileMenuRef();
-                  }}
-                  />
-                );
-              }
-              throw new Error(INVALID_BUILD_ENV_ERROR);
+              return (
+                <OpenTextureArrangementMenuItem onClick={() => {
+                  textureEditor.openTextureArrangement();
+                  resetFileMenuRef();
+                }}
+                />
+              );
             })()}
             {/* Menu component emits error when child is React.Fragment */}
-            { texture
+            { faceDecoration
             && [
               (
                 <MenuItem
                   key={0}
                   onClick={() => {
-                    saveTextureArrangement();
+                    textureEditor.saveTextureArrangement();
                     resetFileMenuRef();
                   }}
                 >
@@ -197,7 +188,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 <MenuItem
                   key={1}
                   onClick={async () => {
-                    await downloadShapeGLTF();
+                    await shapePreview.downloadShapeGLTF();
                     resetFileMenuRef();
                   }}
                 >
@@ -213,7 +204,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               return (
                 <UploadButton onClick={async () => {
                   const patternInfo = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO);
-                  assignTextureFromPatternInfo(patternInfo);
+                  textureEditor.assignTextureFromPatternInfo(patternInfo);
                 }}
                 />
               );
@@ -226,7 +217,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                     if (file) {
                       if (file.type === 'image/svg+xml') {
                         const svgString = await file.text();
-                        assignTextureFromPatternInfo({
+                        textureEditor.assignTextureFromPatternInfo({
                           isPath: true,
                           svgString,
                           sourceFileName: file.name,
@@ -235,7 +226,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                         //  file is either png or jpg
                         const imageData = await toBase64(file);
                         const dimensions = await resolveImageDimensionsFromBase64(imageData);
-                        assignTextureFromPatternInfo({
+                        textureEditor.assignTextureFromPatternInfo({
                           isPath: false,
                           pattern: {
                             imageData,
@@ -252,17 +243,11 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 </FilePicker>
               );
             }
-            throw new Error(INVALID_BUILD_ENV_ERROR);
           })()}
           <ShapeSelect
             className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
             isCompactDisplay
-            value={shapeName}
-            onChange={(e) => {
-              pluginModel.pyramidNetSpec.setPyramidShapeName(e.target.value);
-              pluginModel.textureEditor.refitTextureToFace();
-            }}
-            name="polyhedron-shape"
+            node={shapeName}
           />
           <FormControlLabel
             className={TOUR_ELEMENT_CLASSES.ROTATE_3D}
@@ -271,7 +256,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               <Switch
                 checked={autoRotatePreview}
                 onChange={(e) => {
-                  setAutoRotatePreview(e.target.checked);
+                  textureEditor.setAutoRotatePreview(e.target.checked);
                 }}
                 color="primary"
               />
@@ -281,15 +266,15 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
           {history && (<HistoryButtons history={history} />)}
 
-          {pattern && !hasPathPattern && (
+          {faceDecoration?.pattern && faceDecoration.pattern instanceof ImageFaceDecorationPatternModel && (
           <FormControlLabel
             className={TOUR_ELEMENT_CLASSES.IS_BORDERED}
             labelPlacement="top"
             control={(
               <Switch
-                checked={pattern.isBordered}
+                checked={faceDecoration.pattern.isBordered}
                 onChange={(e) => {
-                  pattern.setIsBordered(e.target.checked);
+                  (faceDecoration.pattern as ImageFaceDecorationPatternModel).setIsBordered(e.target.checked);
                 }}
                 color="primary"
               />
@@ -299,10 +284,10 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           )}
 
           <SnapMenu />
-          {texture && (
+          {faceDecoration && (
           <>
             {/* menu content at bottom section */}
-            {hasPathPattern && (
+            {faceDecoration.pattern instanceof PathFaceDecorationPatternModel && (
             <>
               <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.textureEditorNodeInputs)}>
                 <FormControlLabel
@@ -311,21 +296,16 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                     <Switch
                       checked={showNodes}
                       onChange={(e) => {
-                        setShowNodes(e.target.checked);
+                        textureEditor.setShowNodes(e.target.checked);
                       }}
                       color="primary"
                     />
                     )}
                   label="Node selection"
                 />
-                <PanelSliderComponent
-                  node={pluginModel.textureEditor}
-                  property="nodeScaleMux"
+                <TweakableInput
+                  node={pluginModel.textureEditor.nodeScaleMux}
                   className={classes.nodeScaleMuxSlider}
-                  label="Node size"
-                  min={0.1}
-                  max={10}
-                  step={DEFAULT_SLIDER_STEP}
                 />
               </span>
               <FormControlLabel
@@ -333,9 +313,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 labelPlacement="top"
                 control={(
                   <Switch
-                    checked={pattern.isPositive}
+                    checked={faceDecoration.pattern.isPositive}
                     onChange={(e) => {
-                      pattern.setIsPositive(e.target.checked);
+                      faceDecoration.pattern.setIsPositive(e.target.checked);
                     }}
                     color="primary"
                   />
@@ -347,9 +327,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 labelPlacement="top"
                 control={(
                   <Switch
-                    checked={pattern.useAlphaTexturePreview}
+                    checked={faceDecoration.pattern.useAlphaTexturePreview}
                     onChange={(e) => {
-                      pattern.setUseAlphaTexturePreview(e.target.checked);
+                      faceDecoration.pattern.setUseAlphaTexturePreview(e.target.checked);
                     }}
                     color="primary"
                   />
@@ -362,13 +342,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             <TextField
               className={clsx(classes.rotationInput, TOUR_ELEMENT_CLASSES.ROTATE_INPUT)}
               label="Rotate"
-              value={textureRotate}
+              value={faceDecoration.transform.rotate}
               onChange={({ target: { value } = {} }) => {
                 // TODO: use onKeyPress for enter submission
                 // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
                 // TODO: once above is fixed, use textureRotateDragged as value
                 if (isNumber(value) && !isNaN(value)) {
-                  texture.setRotate(value);
+                  faceDecoration.transform.setRotate(value);
                 }
               }}
               InputProps={{
@@ -382,28 +362,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               }}
               variant="filled"
             />
-            { IS_ELECTRON_BUILD && (
-            <Tooltip title="Send shape decoration to Dieline Editor" arrow>
-              <span>
-                <IconButton
-                  onClick={() => {
-                    sendTextureToDielineEditor();
-                    pluginModel.setTextureEditorOpen(false);
-                  }}
-                  aria-label="send texture"
-                  component="span"
-                >
-                  <TelegramIcon fontSize="large" />
-                </IconButton>
-              </span>
-            </Tooltip>
-            )}
+            {/* TODO: use draft? */}
           </>
           )}
           { IS_WEB_BUILD && (
           <IconButton
             onClick={() => {
-              setNeedsTour(true);
+              preferences.setNeedsTour(true);
             }}
             aria-label="send texture"
             component="span"

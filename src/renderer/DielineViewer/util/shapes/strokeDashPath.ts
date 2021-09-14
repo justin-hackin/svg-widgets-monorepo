@@ -1,11 +1,21 @@
-import { last, range, sum } from 'lodash';
-import { Instance, types } from 'mobx-state-tree';
+// eslint-disable-next-line max-classes-per-file
+import {
+  chunk, last, range, startCase, sum, uniq,
+} from 'lodash';
+import {
+  detach, getRootPath, Model, model, prop, rootRef,
+} from 'mobx-keystone';
 
+import { computed } from 'mobx';
 import {
   distanceFromOrigin, lineLerp, PointLike, subtractPoints,
 } from '../../../../common/util/geom';
 import { PathData } from '../PathData';
-import { StrokeDashPathPatternModel } from '../../data/dash-patterns';
+import { WorkspaceModel } from '../../models/WorkspaceModel';
+import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
+import { ratioSliderProps } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/constants';
+import { DEFAULT_SLIDER_STEP } from '../../../../common/constants';
+import { referenceSelectProp, sliderWithTextProp } from '../../../../common/keystone-tweakables/props';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -16,32 +26,79 @@ export function lineSeries(startEndArray) {
   });
   return path;
 }
+const dasharrays = [[1, 2], [2, 1], [1, 3], [3, 1], [2, 1, 1, 1]];
+if (!uniq(dasharrays)) {
+  throw new Error('dasharrays contents are not unique');
+}
 
-export const defaultStrokeDashSpec = {
-  strokeDashPathPattern: '● 1 ○ 2',
-  strokeDashLength: 11,
-  strokeDashOffsetRatio: 0,
-};
+const STROKE_DASH_PATH_PATTERN_MODEL_TYPE = 'StrokeDashPathPatternModel';
 
-export const DashPatternModel = types.model({
-  strokeDashPathPattern: types.reference(StrokeDashPathPatternModel),
-  strokeDashLength: types.number,
-  strokeDashOffsetRatio: types.number,
+@model(STROKE_DASH_PATH_PATTERN_MODEL_TYPE)
+export class StrokeDashPathPatternModel extends Model({
+  // TODO: even number length typing?
+  relativeStrokeDasharray: prop<number[]>(),
+}) {
+  @computed
+  get label() {
+    return chunk(this.relativeStrokeDasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
+  }
+}
+
+const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
+  onResolvedValueChange(ref, newInst, oldInst) {
+    if (oldInst && !newInst) {
+      // if the todo value we were referencing disappeared then remove the reference
+      // from its parent
+      detach(ref);
+    }
+  },
 });
 
-export interface IDashPatternModel extends Instance<typeof DashPatternModel> {
+export const dashPatternsDefaultFn = () => dasharrays.map((relativeStrokeDasharray) => (new StrokeDashPathPatternModel({
+  relativeStrokeDasharray,
+})));
+
+const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
+@model('DashPatternModel')
+export class DashPatternModel extends Model({
+  strokeDashPathPattern: referenceSelectProp<StrokeDashPathPatternModel>({
+    labelOverride: (node) => {
+      const { path } = getRootPath(node);
+      if (path.length) {
+        const parentName = `${path[path.length - 2]}`;
+        return `${startCase(parentName)} Pattern`;
+      }
+      // this should never happen
+      return node.ownPropertyName;
+    },
+    typeRef: patternRef,
+    // TODO: make root store type generic
+    options: (rootStore) => () => ((rootStore as WorkspaceModel).selectedStore as PyramidNetPluginModel).dashPatterns
+      .map((pattern) => ({
+        value: pattern,
+        label: pattern.label,
+      })),
+    initialSelectionResolver: (options) => options[0],
+  }),
+  strokeDashLength: sliderWithTextProp(11, {
+    ...strokeLengthProps,
+  }),
+  strokeDashOffsetRatio: sliderWithTextProp(0, {
+    ...ratioSliderProps,
+  }),
+}) {
 }
 
 export function strokeDashPathRatios(
-  start: PointLike, end: PointLike, dashSpec: IDashPatternModel,
+  start: PointLike, end: PointLike, dashSpec: DashPatternModel,
 ) {
-  if (!dashSpec) { return [[0, 1]]; }
+  if (!dashSpec?.strokeDashPathPattern?.value) { return [[0, 1]]; }
   const vector = subtractPoints(end, start);
   const vectorLength = distanceFromOrigin(vector);
   const {
-    strokeDashPathPattern: { relativeStrokeDasharray },
-    strokeDashLength,
-    strokeDashOffsetRatio,
+    strokeDashPathPattern: { value: { relativeStrokeDasharray } = {} } = {},
+    strokeDashLength: { value: strokeDashLength },
+    strokeDashOffsetRatio: { value: strokeDashOffsetRatio },
   } = dashSpec;
   const strokeDashLengthToVectorLength = strokeDashLength / vectorLength;
 
@@ -97,7 +154,7 @@ export function strokeDashPathRatios(
 }
 
 export function strokeDashPath(
-  start: PointLike, end: PointLike, dashSpec: IDashPatternModel,
+  start: PointLike, end: PointLike, dashSpec: DashPatternModel,
 ) {
   const ratios = strokeDashPathRatios(start, end, dashSpec);
   return lineSeries(ratios

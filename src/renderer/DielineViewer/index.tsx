@@ -19,12 +19,13 @@ const patternId = 'grid-pattern';
 
 export const DielineViewer = observer(() => {
   const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
+  const workspaceStore = useWorkspaceMst();
   const {
-    preferences: { dielineDocumentDimensions },
+    preferences: { documentWidth: { value: width }, documentHeight: { value: height } },
     selectedStore,
-    SelectedControlledSvgComponent, selectedWidgetName, setSelectedWidgetName,
+    SelectedControlledSvgComponent, selectedWidgetName,
     selectedControlPanelProps, widgetOptions,
-  } = useWorkspaceMst();
+  } = workspaceStore;
 
   const classes = useStyles();
 
@@ -35,7 +36,7 @@ export const DielineViewer = observer(() => {
     <>
       <div className={classes.fullPage}>
         <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
-          <svg {...dielineDocumentDimensions}>
+          <svg width={width} height={height}>
             <GridPattern patternId={patternId} />
             <SelectedControlledSvgComponent />
           </svg>
@@ -66,7 +67,7 @@ export const DielineViewer = observer(() => {
                 key={widgetName}
                 selected={selectedWidgetName === widgetName}
                 onClick={() => {
-                  setSelectedWidgetName(widgetName);
+                  workspaceStore.setSelectedWidgetName(widgetName);
                   setWidgetPickerOpen(false);
                 }}
               >

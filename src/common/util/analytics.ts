@@ -4,7 +4,7 @@ const SHOULD_REPORT = IS_WEB_BUILD && IS_PRODUCTION_BUILD;
 
 export enum TRANSFORM_METHODS {
   DRAG = 'drag',
-  SCROLL = 'scroll'
+  SCROLL = 'scroll',
 }
 
 export enum TRANSFORM_OPERATIONS {

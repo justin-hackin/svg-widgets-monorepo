@@ -3,23 +3,23 @@ import React, { createRef, useEffect } from 'react';
 import parseFraction from 'parse-fraction';
 import { observer } from 'mobx-react';
 
-import { useWorkspaceMst } from '../../renderer/DielineViewer/models/WorkspaceModel';
-import { pxToUnitView, PIXELS_PER_UNIT } from '../util/units';
+import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
+import { pxToUnitView, PIXELS_PER_UNIT } from '../../util/units';
+import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
+import { NumberTextMetadata, SliderWithTextMetadata } from '../types';
 
-export const SubmittableTextInput = observer(({
-  value,
-  setValue,
-  valuePath,
-  labelId,
-  useUnits = false,
-}) => {
-  const { preferences: { displayUnit } } = useWorkspaceMst();
+export const TweakableUnlabelledNumberTextInput = observer(({
+  node, labelId,
+}: { node: TweakablePrimitiveModel<number, (NumberTextMetadata | SliderWithTextMetadata)>, labelId: string }) => {
+  const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
   const inputRef = createRef<HTMLInputElement>();
+  const { value, valuePath, metadata: { useUnits } } = node;
   useEffect(() => {
     if (inputRef.current && useUnits) {
       inputRef.current.value = pxToUnitView(value, displayUnit);
     }
   }, [displayUnit]);
+
   return (
     <Input
       inputRef={inputRef}
@@ -31,14 +31,14 @@ export const SubmittableTextInput = observer(({
           if (useUnits) {
             try {
               const [num, denom] = parseFraction(stringValue);
-              setValue((num / denom) * PIXELS_PER_UNIT[displayUnit]);
+              node.setValue((num / denom) * PIXELS_PER_UNIT[displayUnit]);
               // eslint-disable-next-line no-empty
             } catch (_) {
             }
           } else {
             const parsedFloat = parseFloat(stringValue);
             if (!Number.isNaN(parsedFloat)) {
-              setValue(parsedFloat);
+              node.setValue(parsedFloat);
             }
           }
         }

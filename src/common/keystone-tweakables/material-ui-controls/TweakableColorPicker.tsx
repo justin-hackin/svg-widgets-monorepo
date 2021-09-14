@@ -1,36 +1,34 @@
 import React from 'react';
 import uuid from 'uuid/v1';
-import { startCase } from 'lodash';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import { ChromePicker } from 'react-color';
 
-import { useStyles } from '../style/style';
-import { mstDataToProps } from '../util/mst';
+import { useStyles } from '../../style/style';
+import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
+import { ColorPickerMetadata } from '../types';
+import {observer} from 'mobx-react';
 
-export const PanelColorPicker = ({
-  node, property, label = undefined, ...rest
-}) => {
+export const TweakableColorPicker = observer(({
+  node,
+}: { node: TweakablePrimitiveModel<string, ColorPickerMetadata> }) => {
   const classes = useStyles();
   const labelId = uuid();
-  const { value, setValue } = mstDataToProps(node, property);
-  const resolvedLabel = `${label || startCase(property)}`;
-  if (value === undefined) { return null; }
+  if (node.value === undefined) { return null; }
   return (
     <FormControl className={classes.formControl}>
       <Typography id={labelId} gutterBottom>
-        {resolvedLabel}
+        {node.label}
       </Typography>
 
       <ChromePicker
         className={classes.panelChromePicker}
         name={labelId}
-        color={value}
+        color={node.value}
         onChangeComplete={(color) => {
-          setValue(color.hex);
+          node.setValue(color.hex);
         }}
-        {...rest}
       />
     </FormControl>
   );
-};
+});

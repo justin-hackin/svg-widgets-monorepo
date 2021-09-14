@@ -1,14 +1,18 @@
 import React from 'react';
 
-import { ICylinderLightBoxModel } from '../models';
-import { RawSvgComponentProps } from '../../../models/WorkspaceModel';
+import { CylinderLightBoxModel } from '../models';
 
-export const CylinderLightboxSvg = ({ widgetStore }: RawSvgComponentProps) => {
+export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: CylinderLightBoxModel }) => {
   const {
     shapeDefinition: {
-      sectionPathD, wallPathD, ringRadius, innerRadius, designBoundaryRadius, holderTab,
+      ringRadius: { value: ringRadius },
+      sectionPathD,
+      wallPathD,
+      innerRadius,
+      designBoundaryRadius,
+      holderTab,
     },
-  } = widgetStore as unknown as ICylinderLightBoxModel;
+  } = widgetStore;
 
   return (
     <g>

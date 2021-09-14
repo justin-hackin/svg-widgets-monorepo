@@ -4,15 +4,13 @@ import { Paper, Tab, Tabs } from '@material-ui/core';
 import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
 import { useStyles } from '../../../../../common/style/style';
 import { BaseEdgeTabControls } from '../PyramidNetControlPanel/components/BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from '../PyramidNetControlPanel/components/AscendantEdgeTabsControls';
 import { ScoreControls } from '../PyramidNetControlPanel/components/ScoreControls';
 import { ShapeSelect } from '../../../../../common/components/ShapeSelect';
-import { PanelSliderOrTextInput } from '../../../../../common/components/PanelSliderOrTextInput';
-import { PIXELS_PER_CM } from '../../../../../common/util/units';
-import { PanelSelect } from '../../../../../common/components/PanelSelect';
+import { PyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
+import { TweakableInput } from '../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 
 const controlsTabs = [
   {
@@ -34,7 +32,7 @@ const controlsTabs = [
 
 export const PanelContent = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
+  const store = workspaceStore.selectedStore as PyramidNetPluginModel;
   const classes = useStyles();
   const { pyramidNetSpec } = store;
   const { pyramid } = pyramidNetSpec;
@@ -52,25 +50,13 @@ export const PanelContent = observer(() => {
       <div className={classes.shapeSection}>
         <ShapeSelect
           className={classes.shapeSelect}
-          value={pyramidNetSpec.pyramid.shapeName}
-          onChange={(e) => {
-            pyramidNetSpec.setPyramidShapeName(e.target.value);
-          }}
-          name="polyhedron-shape"
+          node={pyramidNetSpec.pyramid.shapeName}
         />
-        <PanelSliderOrTextInput
+        <TweakableInput
           className={classes.shapeHeightFormControl}
-          node={pyramidNetSpec}
-          property="shapeHeight"
-          min={20 * PIXELS_PER_CM}
-          max={60 * PIXELS_PER_CM}
-          useUnits
+          node={pyramidNetSpec.shapeHeight}
         />
-        <PanelSelect
-          node={pyramid}
-          property="netsPerPyramid"
-          options={pyramid.netsPerPyramidOptions.map((value) => ({ label: value.toString(), value }))}
-        />
+        <TweakableInput node={pyramid.netsPerPyramid} />
       </div>
       <Divider />
       <Paper square>

@@ -5,7 +5,6 @@ import clsx from 'clsx';
 import Joyride, { EVENTS } from 'react-joyride';
 
 import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
 import { theme, useStyles } from '../../style/style';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
@@ -14,22 +13,24 @@ import {
   MyStep, SAMPLE_IMAGE_SNAPSHOT, SAMPLE_PATH_SNAPSHOT, STEP_ACTIONS, TOUR_STEPS,
 } from '../../util/tour';
 import { IS_WEB_BUILD } from '../../constants';
+import { PyramidNetPluginModel } from '../../../renderer/DielineViewer/models/PyramidNetMakerStore';
+import { PathFaceDecorationPatternModel } from '../../models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../../models/ImageFaceDecorationPatternModel';
+import { RawFaceDecorationModel } from '../../../renderer/DielineViewer/models/RawFaceDecorationModel';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
-  const { needsTour, setNeedsTour } = workspaceStore.preferences;
+  const { preferences } = workspaceStore;
+  const { needsTour } = preferences;
   const [stepIndex, setStepIndex] = useState<number>(0);
   const incrementStepIndex = (index) => { setStepIndex(index + 1); };
   const resetStepIndex = () => { setStepIndex(0); };
   const mainAreaRef = useRef<HTMLDivElement>();
-  const pyramidNetPluginStore: IPyramidNetPluginModel = workspaceStore.selectedStore;
-  if (!pyramidNetPluginStore || !pyramidNetPluginStore.textureEditor) {
-    return null;
-  }
+  const pyramidNetPluginStore: PyramidNetPluginModel = workspaceStore.selectedStore;
+  const { history } = pyramidNetPluginStore.pyramidNetSpec;
   // ==================================================================================================================
-  const {
-    setPlacementAreaDimensions, setTextureFromPattern, clearTexture, history,
-  } = pyramidNetPluginStore.textureEditor;
+  const { textureEditor } = pyramidNetPluginStore;
+  const { faceDecoration } = textureEditor;
   useTheme();
   const classes = useStyles();
   // Init
@@ -42,7 +43,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
         width,
         height,
       } = mainAreaRef.current.getBoundingClientRect();
-      setPlacementAreaDimensions({
+      textureEditor.setPlacementAreaDimensions({
         width: width / 2,
         height,
       });
@@ -56,22 +57,26 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
     };
   }, []);
 
+  if (!pyramidNetPluginStore?.textureEditor || faceDecoration instanceof RawFaceDecorationModel) {
+    return null;
+  }
   // TODO: drag and drop functionality, removed in fd71f4aba9dd4a698e5a2667595cff82c8fb5cf5
   // see commit message for rationale
 
   const joyrideCallback = ({ type, step, index }: { type: string, step: MyStep, index: number }) => {
     if (type === EVENTS.TOUR_END) {
-      setNeedsTour(false);
+      preferences.setNeedsTour(false);
       // the user could re-activate the tour, rewind
       resetStepIndex();
-      clearTexture();
-      history.clear();
+      textureEditor.clearTexturePattern();
+      history.clearUndo();
+      history.clearRedo();
     } else if (type === EVENTS.STEP_AFTER) {
       if (step.nextAction === STEP_ACTIONS.ADD_PATH_TEXTURE) {
-        setTextureFromPattern(SAMPLE_PATH_SNAPSHOT);
+        textureEditor.setTextureFromPattern(new PathFaceDecorationPatternModel(SAMPLE_PATH_SNAPSHOT));
         incrementStepIndex(index);
       } else if (step.nextAction === STEP_ACTIONS.ADD_IMAGE_TEXTURE) {
-        setTextureFromPattern(SAMPLE_IMAGE_SNAPSHOT);
+        textureEditor.setTextureFromPattern(new ImageFaceDecorationPatternModel(SAMPLE_IMAGE_SNAPSHOT));
         setTimeout(() => {
           incrementStepIndex(index);
         }, 500);

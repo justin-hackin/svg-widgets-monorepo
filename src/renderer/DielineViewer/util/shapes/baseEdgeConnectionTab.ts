@@ -1,17 +1,22 @@
-import { Instance, types } from 'mobx-state-tree';
-
+// eslint-disable-next-line max-classes-per-file
+import {
+  Model, model, modelAction, prop,
+} from 'mobx-keystone';
 import { PathData } from '../PathData';
 import {
   distanceBetweenPoints,
+  getLineLineIntersection,
   hingedPlot,
   hingedPlotByProjectionDistance,
   hingedPlotLerp,
-  getLineLineIntersection,
-  RawPoint, symmetricHingePlotByProjectionDistance,
+  RawPoint,
+  symmetricHingePlotByProjectionDistance,
 } from '../../../../common/util/geom';
-import { IDashPatternModel, strokeDashPath } from './strokeDashPath';
+import { DashPatternModel, strokeDashPath } from './strokeDashPath';
 import { arrowTabPlots } from './symmetricRoundedTab';
-import { VERY_LARGE_NUMBER } from '../../../../common/constants';
+import { DEFAULT_SLIDER_STEP, VERY_LARGE_NUMBER } from '../../../../common/constants';
+import { ratioSliderProps } from '../../widgets/PyramidNet/PyramidNetControlPanel/components/constants';
+import { sliderProp, sliderWithTextProp, switchProp } from '../../../../common/keystone-tweakables/props';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,
@@ -29,50 +34,69 @@ TODO: use of qualifier *Ratio is inconsistent remove all instances,
  in order to qualify properties, use property metadata which accurately describes
  property relationships and displays as tooltip on controls
 */
-const BendGuideValleyModel = types.model('BendGuideValley', {
-  depthRatio: types.optional(types.number, 0.9),
-  theta: types.optional(types.number, Math.PI / 4),
-});
 
-export const BaseEdgeTabsModel = types.model('BaseEdgeTabs', {
-  finDepthToTabDepth: types.optional(types.number, 1.3),
-  finOffsetRatio: types.optional(types.number, 0.75), // set by applyShapeBasedDefaults
-  holeBreadthToHalfWidth: types.optional(types.number, 0.25), // set by applyShapeBasedDefaults
-  holeDepthToTabDepth: types.optional(types.number, 0.5),
-  holeTaper: types.optional(types.number, 0.97),
-  scoreTabMidline: types.optional(types.boolean, false),
-  roundingDistanceRatio: types.optional(types.number, 0.9),
-  tabDepthToAscendantTabDepth: types.optional(types.number, 1.5),
-  holeTabClearance: types.optional(types.number, 0.1),
-  bendGuideValley: types.maybe(BendGuideValleyModel),
-  tabConjunctionClearance: types.optional(types.number, 0.1),
-}).actions((self) => ({
+@model('BendGuideValleyModel')
+export class BendGuideValleyModel extends Model({
+  depthRatio: sliderProp(0.9, ratioSliderProps),
+  theta: sliderWithTextProp(Math.PI / 4, {
+    min: Math.PI / 16, max: Math.PI / 3, step: DEFAULT_SLIDER_STEP,
+  }),
+}) {}
+
+@model('BaseEdgeTabsModel')
+export class BaseEdgeTabsModel extends Model({
+  roundingDistanceRatio: sliderProp(0.9, {
+    min: 0, max: 1, step: 0.1,
+  }),
+  scoreTabMidline: switchProp(false),
+  finDepthToTabDepth: sliderWithTextProp(1.3, { ...ratioSliderProps, min: 0.05 }),
+  tabDepthToAscendantTabDepth: sliderWithTextProp(1.5, {
+    min: 0.6, max: 2, step: DEFAULT_SLIDER_STEP,
+  }),
+  holeDepthToTabDepth: sliderWithTextProp(0.5, { ...ratioSliderProps, min: 0.05 }),
+  // set by applyShapeBasedDefaults
+  finOffsetRatio: sliderProp(0.75, {...ratioSliderProps, max: 0.99}),
+  holeBreadthToHalfWidth: sliderWithTextProp(0.25, {
+    min: 0.05, max: 0.95, step: DEFAULT_SLIDER_STEP,
+  }),
+  holeTabClearance: sliderWithTextProp(0.1, {
+    min: 0, max: 0.1, step: DEFAULT_SLIDER_STEP,
+  }),
+  // set by applyShapeBasedDefaults,
+  holeTaper: sliderWithTextProp(0.97, {
+    min: Math.PI / 8, max: Math.PI / 3, step: DEFAULT_SLIDER_STEP,
+  }),
+  tabConjunctionClearance: sliderWithTextProp(0.1, {
+    min: 0.05, max: 0.4, step: 0.01,
+  }),
+  bendGuideValley: prop<BendGuideValleyModel | undefined>(() => undefined),
+}) {
+  @modelAction
   unsetBendGuideValley() {
-    self.bendGuideValley = undefined;
-  },
-  resetBendGuideValleyToDefault() {
-    self.bendGuideValley = BendGuideValleyModel.create();
-  },
-}));
+    this.bendGuideValley = null;
+  }
 
-export interface IBaseEdgeTabsModel extends Instance<typeof BaseEdgeTabsModel> {
+  @modelAction
+  resetBendGuideValleyToDefault() {
+    this.bendGuideValley = new BendGuideValleyModel({});
+  }
 }
 
 export function baseEdgeConnectionTab(
   start: RawPoint, end: RawPoint,
-  tabDepth, tabSpec: IBaseEdgeTabsModel, scoreDashSpec: IDashPatternModel,
+  tabDepth, tabSpec: BaseEdgeTabsModel, scoreDashSpec: DashPatternModel,
 ): BaseEdgeConnectionTab {
   const {
-    holeDepthToTabDepth,
-    holeTaper,
-    holeBreadthToHalfWidth,
-    finDepthToTabDepth,
-    finOffsetRatio,
     bendGuideValley,
-    scoreTabMidline,
-    roundingDistanceRatio,
-    holeTabClearance,
-    tabConjunctionClearance,
+    holeDepthToTabDepth: { value: holeDepthToTabDepth },
+    holeTaper: { value: holeTaper },
+    holeBreadthToHalfWidth: { value: holeBreadthToHalfWidth },
+    finDepthToTabDepth: { value: finDepthToTabDepth },
+    finOffsetRatio: { value: finOffsetRatio },
+    scoreTabMidline: { value: scoreTabMidline },
+    roundingDistanceRatio: { value: roundingDistanceRatio },
+    holeTabClearance: { value: holeTabClearance },
+    tabConjunctionClearance: { value: tabConjunctionClearance },
   } = tabSpec;
 
   const boundaryCut = new PathData();
@@ -141,7 +165,7 @@ export function baseEdgeConnectionTab(
   const handleCornerPoints = [handleEdges[0]];
 
   if (bendGuideValley) {
-    const { depthRatio: valleyDepthRatio, theta: valleyTheta } = bendGuideValley;
+    const { depthRatio: { value: valleyDepthRatio }, theta: { value: valleyTheta } } = bendGuideValley;
     const handleValleyDip = hingedPlot(end, mid, Math.PI / 2, valleyDepthRatio * tabDepth);
     const handleValleyEdgeCasters = [
       hingedPlot(mid, handleValleyDip, Math.PI + valleyTheta, VERY_LARGE_NUMBER),

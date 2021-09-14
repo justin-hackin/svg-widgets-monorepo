@@ -6,11 +6,14 @@ import BlurOnIcon from '@material-ui/icons/BlurOn';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
 import { startCase } from 'lodash';
 
+import { fromSnapshot } from 'mobx-keystone';
 import { useWorkspaceMst } from '../../../models/WorkspaceModel';
-import { IPyramidNetPluginModel } from '../../../models/PyramidNetMakerStore';
+import { PyramidNetPluginModel, renderTestTabsToString } from '../../../models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../../../common/util/svg';
 import { useStyles } from '../../../../../common/style/style';
 import { EVENTS, IS_ELECTRON_BUILD } from '../../../../../common/constants';
+import { PositionableFaceDecorationModel } from '../../../models/PositionableFaceDecorationModel';
+import { RawFaceDecorationModel } from '../../../models/RawFaceDecorationModel';
 
 const DOWNLOAD_TEMPLATE_TXT = 'Download face template SVG (current shape)';
 const IMPORT_SVG_DECORATION_TXT = 'Import face cut pattern from SVG';
@@ -19,10 +22,9 @@ const DOWNLOAD_TAB_TESTER_TXT = 'Download tab tester SVG';
 
 export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const workspaceStore = useWorkspaceMst();
-  const { selectedWidgetOptions: { specFileExtension, specFileExtensionName = undefined } } = workspaceStore;
   const preferencesStore = workspaceStore.preferences;
   const classes = useStyles();
-  const store = workspaceStore.selectedStore as IPyramidNetPluginModel;
+  const store = workspaceStore.selectedStore as PyramidNetPluginModel;
 
   return (
     <>
@@ -47,9 +49,12 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       <MenuItem onClick={async () => {
         if (IS_ELECTRON_BUILD) {
           await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_SVG, IMPORT_SVG_DECORATION_TXT)
-            .then((svgString) => {
-              const d = extractCutHolesFromSvgString(svgString);
-              store.pyramidNetSpec.setRawFaceDecoration(d);
+            .then(({ fileString, filePath }) => {
+              const dValue = extractCutHolesFromSvgString(fileString);
+              // This file should have a .svg extension, without an extension this will be ''
+              const baseFileName = filePath.split('.').slice(0, -1).join('.');
+              store.pyramidNetSpec
+                .setFaceDecoration(new RawFaceDecorationModel({ dValue, sourceFileName: baseFileName }));
             });
         }
         resetFileMenuRef();
@@ -65,8 +70,8 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       <MenuItem onClick={async () => {
         const res = await globalThis.ipcRenderer.invoke(EVENTS.DIALOG_OPEN_JSON, {
           message: IMPORT_TEXTURE_TXT,
-        }, specFileExtension, specFileExtensionName);
-        const currentShapeName = store.pyramidNetSpec.pyramid.shapeName;
+        }, 'pnst', 'Pyramid Net Spec Texture');
+        const currentShapeName = store.pyramidNetSpec.pyramid.shapeName.value;
         resetFileMenuRef();
         if (!res) {
           return;
@@ -78,12 +83,12 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
           } but the chosen texture was for ${startCase(fileData.shapeName)
           } shape. Do you want to change the Polyhedron and load its default settings?`);
           if (doIt) {
-            store.pyramidNetSpec.setPyramidShapeName(fileData.shapeName);
+            store.pyramidNetSpec.pyramid.shapeName.setValue(fileData.shapeName);
           } else {
             return;
           }
         }
-        store.pyramidNetSpec.setTextureFaceDecoration(fileData.textureSnapshot);
+        store.pyramidNetSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(fileData.textureSnapshot));
       }}
       >
         <ListItemIcon className={classes.listItemIcon}>
@@ -95,7 +100,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       {/* DOWNLOAD TAB TEST */}
       <MenuItem onClick={async () => {
         await globalThis.ipcRenderer
-          .invoke(EVENTS.DIALOG_SAVE_SVG, store.renderTestTabsToString(store, preferencesStore), {
+          .invoke(EVENTS.DIALOG_SAVE_SVG, renderTestTabsToString(store, preferencesStore), {
             message: DOWNLOAD_TAB_TESTER_TXT,
             defaultPath: `${store.getFileBasename()}--test-tabs.svg`,
           });
