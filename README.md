@@ -78,7 +78,7 @@ Because this project contains abstractions that make it easy to build "tweakable
 
 This is an alpha stage project with some known bugs and lacking features as listed in the [project board](https://github.com/justin-hackin/polyhedral-net-studio/projects/1).
 
-NOTE: KDE users will experience issues with Alt-dragging modifiers in Texture Editor due to the window manager's behaviour.  These issues can be addressed by changing/removing the modifier for all applications or disable the modifier for this application only as discussed in [this post](https://superuser.com/questions/584730/how-can-i-disable-alt-mouse-default-behavior-in-kde).
+KDE users will experience issues with Alt-dragging modifiers in Texture Editor due to the window manager's default behaviour, see [this post](https://superuser.com/questions/584730/how-can-i-disable-alt-mouse-default-behavior-in-kde) for a fix.
 
 ## Developer notes
 

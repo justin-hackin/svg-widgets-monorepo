@@ -44,7 +44,7 @@ export class PyramidModel extends Model({
   // allows multiple nets to build a single pyramid e.g. one face per net
   get netsPerPyramidOptions(): number[] {
     // TODO: re-enable this as integer divisors of face count, integer-divisor npm emits regeneratorRuntime errors
-    return getDivisors(this.faceIsSymmetrical ? this.geometry.faceCount : this.geometry.faceCount / 2 );
+    return getDivisors(this.faceIsSymmetrical ? this.geometry.faceCount : this.geometry.faceCount / 2);
   }
 
   get facesPerNet() {

@@ -27,7 +27,7 @@ import { closedPolygonPath, roundedEdgePath } from '../../../../common/path/shap
 import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../baseEdgeConnectionTab';
 import {
   AscendantEdgeConnectionPaths, ascendantEdgeConnectionTabs,
-  AscendantEdgeTabsModel
+  AscendantEdgeTabsModel,
 } from '../ascendantEdgeConnectionTabs';
 import { PathData } from '../../../../common/path/PathData';
 import { DashPatternModel, strokeDashPath } from '../../../../common/path/shapes/strokeDashPath';

@@ -4,10 +4,10 @@ import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import { ChromePicker } from 'react-color';
 
+import { observer } from 'mobx-react';
 import { useStyles } from '../../style/style';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { ColorPickerMetadata } from '../types';
-import {observer} from 'mobx-react';
 
 export const TweakableColorPicker = observer(({
   node,
