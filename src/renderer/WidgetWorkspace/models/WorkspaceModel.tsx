@@ -157,13 +157,12 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   persistPreferences() {
-    try {
-      persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
-    } catch (e) {
+    return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
+      .catch((e) => {
       // this invalidates localStorage when schema changes
-      this.resetPreferences();
-      persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
-    }
+        this.resetPreferences();
+        return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+      });
   }
 
   @modelAction
