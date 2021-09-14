@@ -4,7 +4,7 @@
 
 A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedral Net Studio is represents the (potential) fulfillment of a wish to share this art/craft with other makers. In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system that enables  was a tedious task that made design iteration difficult. With Polyhedral Net Studio, cutout paths are generated based on algorithms in which every parameter is tweakable. 
 
-<img src="/static/images/widgets/polyhedral-net.jpg" alt="polyhedral lantern sculpture" width="480"/>
+<img src="/static/images/widgets/polyhedral-net.jpg" alt="polyhedral lantern sculpture" width="320"/>
 
 
 ## App info
@@ -68,7 +68,9 @@ Interactively apply cut patterns or print textures to the faces of your shape an
 
 ### Bonus
 
-Another "widget" called Cylinder Lightbox allows one to efficiently construct a cylinder out of flat panels. It has been used to create circular LED lightboxes. It was included in order to hint at the possibility of extension.
+<img src="/static/images/widgets/cylinder-lightbox.jpg" alt="polyhedral lantern sculpture" width="320"/>
+
+Another "widget" called Cylinder Lightbox allows one to efficiently construct a cylinder out of flat panels. You can access it using the gear icon in the bottom left corner. It has been used to create circular LED lightboxes. It was included in order to hint at the possibility of extension.
 
 Because this project contains abstractions that make it easy to build "tweakable" data structures, the creation of a plugin-based architecture which will separate the widgets from the workspace is being explored.
 
