@@ -55,7 +55,7 @@ export class BaseEdgeTabsModel extends Model({
   }),
   holeDepthToTabDepth: sliderWithTextProp(0.5, { ...ratioSliderProps, min: 0.05 }),
   // set by applyShapeBasedDefaults
-  finOffsetRatio: sliderProp(0.75, {...ratioSliderProps, max: 0.99}),
+  finOffsetRatio: sliderProp(0.75, { ...ratioSliderProps, max: 0.99 }),
   holeBreadthToHalfWidth: sliderWithTextProp(0.25, {
     min: 0.05, max: 0.95, step: DEFAULT_SLIDER_STEP,
   }),

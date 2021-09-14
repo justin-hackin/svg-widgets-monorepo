@@ -1,7 +1,7 @@
 import React from 'react';
 import { INPUT_TYPE, TweakableModel } from '../types';
 import { TweakableSlider } from './TweakableSlider';
-import { TweakableRadio} from './TweakableRadio';
+import { TweakableRadio } from './TweakableRadio';
 import { TweakableColorPicker } from './TweakableColorPicker';
 import { TweakableNumberTextInput } from './TweakableNumberTextInput';
 import { TweakableSelect } from './TweakableSelect';

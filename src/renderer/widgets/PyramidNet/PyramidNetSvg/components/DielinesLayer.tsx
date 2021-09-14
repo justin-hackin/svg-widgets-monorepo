@@ -87,9 +87,13 @@ export const DielinesLayer = observer(({
           ? (
             <g key={`${index}-decoration`} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
               {texturePathD && (
-              <path d={texturePathD} transform={pathScaleMatrix.toString()} {
-                ...{...cutProps, strokeWidth: cutProps.strokeWidth / faceLengthAdjustRatio}
-              } />
+              <path
+                d={texturePathD}
+                transform={pathScaleMatrix.toString()}
+                {
+                ...{ ...cutProps, strokeWidth: cutProps.strokeWidth / faceLengthAdjustRatio }
+              }
+              />
               )}
             </g>
           ) : (

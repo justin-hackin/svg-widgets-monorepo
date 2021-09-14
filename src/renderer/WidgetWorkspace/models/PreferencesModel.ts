@@ -5,7 +5,7 @@ import {
   colorPickerProp,
   numberTextProp,
   radioProp,
-  sliderWithTextProp, switchProp
+  sliderWithTextProp, switchProp,
 } from '../../../common/keystone-tweakables/props';
 
 export enum PRINT_REGISTRATION_TYPES {
