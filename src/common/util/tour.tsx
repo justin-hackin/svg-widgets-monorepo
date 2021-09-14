@@ -230,15 +230,11 @@ export const TOUR_STEPS: MyStep[] = [
           >
             this post
           </a>
-          . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and co-create a participatory design community, please reach out in order to join the alpha test group. Playful Geometer is exploring the possibility of assembling a team of artists, product/graphic designers, coders, crafters, gifters and community animators. Only with engagement can this dream come alive.
+          . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and co-create a participatory design community, please reach out in order to join the alpha test group. Playful Geometer is welcoming collaboration with artists, product/graphic designers, coders, crafters, gifters and community animators.
         </p>
         <p>
           If you are interested in using exported 3D models for commercial purposes, please obtain permission by email before doing so.
         </p>
-        <p>
-          Disclosure: this app anonymously logs the frequency of drag, scroll, and image upload, and shape change operations but all image data and file names remain private. Logged data will be used to improve the user experience of this app. Disabling any ad blockers you may have on this site will allow you to contribute to the enhancement of this app.
-        </p>
-        <p />
         <p>
           Should you need to revisit this tour, you can do so by pressing ❔ button in the toolbar. Enjoy!
         </p>
