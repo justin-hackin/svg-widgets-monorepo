@@ -2,7 +2,7 @@
 
 ![polyhedral lantern sculpture](/static/images/widgets/polyhedral-net.jpg)
 
-A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). 
+A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedral Net Studio is represents the (potential) fulfillment of a wish to share this art/craft with other makers.
 
 In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system that enables  was a tedious task that made design iteration difficult. With Polyhedral Net Studio, cutout paths are generated based on algorithms in which every parameter is tweakable.
 
@@ -12,7 +12,11 @@ This app consists of 2 main views:
 
 ### Dieline Editor
 
-![Dieline Editor with vector graphics](/docs/images/dieline_editor_vector.png)![Dieline Editor with raster graphics](/docs/images/dieline_editor_raster.png)
+| ![Dieline Editor with vector graphics](/docs/images/dieline_editor_vector.png) | ![Dieline Editor with raster graphics](/docs/images/dieline_editor_raster.png) |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+|                                                              |                                                              |
+
+
 Allows viewing of the SVG dielines and optional print layer with controls for adjusting every aspect of the design. Each pyramid net consists of several component parts
 
 - **Ascendant edge**: these are the tabs that connect 2 disjunct faces together, allowing it to become a pyramid
@@ -41,7 +45,10 @@ Allows viewing of the SVG dielines and optional print layer with controls for ad
 
 ### Texture Editor
 
-![Texture Editor with vector graphics](/docs/images/texture_editor_vector.png)![Texture Editor with raster graphics](/docs/images/texture_editor_raster.png)
+| ![Texture Editor with vector graphics](/docs/images/texture_editor_vector.png) | ![Texture Editor with raster graphics](/docs/images/texture_editor_raster.png) |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+|                                                              |                                                              |
+
 Interactively apply cut patterns or print textures to the faces of your shape and see a 3D preview of the resultant shape
 
 #### Features
