@@ -1,8 +1,8 @@
 import React from 'react';
 import { Step } from 'react-joyride';
+import { DimensionsModel } from '../../renderer/widgets/PyramidNet/models/DimensionsModel';
 import { theme } from '../style/style';
 import { SAMPLE_TEXTURES } from './sample-textures';
-import { DimensionsModel } from '../models/DimensionsModel';
 
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable max-len */

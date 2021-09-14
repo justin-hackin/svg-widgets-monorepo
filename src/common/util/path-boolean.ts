@@ -3,8 +3,8 @@ import {
   CompoundPath, Path, Size, Project,
 } from 'paper';
 
-import { PathData } from '../../renderer/DielineViewer/util/PathData';
 import { VERY_LARGE_NUMBER } from '../constants';
+import { PathData } from '../path/PathData';
 
 const tinySize = new Size(64, 48);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

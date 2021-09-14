@@ -9,10 +9,10 @@
     "lint": "eslint src/ --ext .ts,.tsx --fix",
     "start": "node node_modules/electron/cli.js .",
     "release": "npm run compile && electron-builder --win --linux",
-    "web-build": "npm run web-clean-dist && webpack --config=src/web/webpack.config.js --mode production",
+    "web-build": "npm run web-clean-dist && webpack --config=src/renderer/widgets/PyramidNet/web/webpack.config.js --mode production",
     "web-clean-dist": "rimraf _static/*",
     "web-start": "npm run web-start-dev",
-    "web-start-dev": "webpack-dev-server --config=src/web/webpack.config.js --mode development",
+    "web-start-dev": "webpack-dev-server --config=src/renderer/widgets/PyramidNet/web/webpack.config.js --mode development",
     "web-start-prod": "npm run web-build && http-server _static/ -p 3000"
   },
   "author": "“Justin Barca <“justin.barca@protonmail.com”>",

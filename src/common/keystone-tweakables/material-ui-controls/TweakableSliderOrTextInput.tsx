@@ -8,10 +8,10 @@ import clsx from 'clsx';
 
 import { useStyles } from '../../style/style';
 import { TweakableUnlabelledNumberTextInput } from './TweakableUnlabelledNumberTextInput';
-import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
+import { useWorkspaceMst } from '../../../renderer/WidgetWorkspace/models/WorkspaceModel';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { SliderWithTextMetadata } from '../types';
-import { TweakableUnlabelledSlider } from '../../TweakableUnlabelledSlider';
+import { TweakableUnlabelledSlider } from './TweakableUnlabelledSlider';
 
 export const TweakableSliderOrTextInput = observer(({
   node, className = undefined,

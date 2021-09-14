@@ -1,7 +1,7 @@
 import { createStyles, makeStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core';
 import { createTheme } from '@material-ui/core/styles';
-import { darkThemeOptions } from '../../renderer/DielineViewer/data/material-ui-themes';
+import { darkThemeOptions } from '../../renderer/WidgetWorkspace/material-ui-themes';
 
 const drawerWidth = 500;
 

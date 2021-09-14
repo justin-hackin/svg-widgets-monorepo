@@ -3,7 +3,7 @@ import React, { createRef, useEffect } from 'react';
 import parseFraction from 'parse-fraction';
 import { observer } from 'mobx-react';
 
-import { useWorkspaceMst } from '../../../renderer/DielineViewer/models/WorkspaceModel';
+import { useWorkspaceMst } from '../../../renderer/WidgetWorkspace/models/WorkspaceModel';
 import { pxToUnitView, PIXELS_PER_UNIT } from '../../util/units';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { NumberTextMetadata, SliderWithTextMetadata } from '../types';

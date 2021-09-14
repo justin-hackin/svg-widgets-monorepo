@@ -1,8 +1,8 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { observer } from 'mobx-react';
-import { DielineViewer } from './DielineViewer';
-import { useWorkspaceMst } from './DielineViewer/models/WorkspaceModel';
+import { WidgetWorkspace } from './WidgetWorkspace';
+import { useWorkspaceMst } from './WidgetWorkspace/models/WorkspaceModel';
 import { ProvidersWrapper } from '../common/components/ProvidersWrapper';
 
 const AllRoutes = observer(() => {
@@ -10,7 +10,7 @@ const AllRoutes = observer(() => {
   const { SelectedAdditionalMainContent } = workspaceStore;
   return (
     <>
-      <DielineViewer />
+      <WidgetWorkspace />
       { SelectedAdditionalMainContent && (<SelectedAdditionalMainContent />)}
     </>
   );
