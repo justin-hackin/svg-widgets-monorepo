@@ -31,7 +31,7 @@ export const ShapePreview = observer(() => {
   const previewContainer = (
     <div
       ref={threeContainerRef}
-      className={clsx(classes.shapePreviewContainer, TOUR_ELEMENT_CLASSES.SHAPE_PREVIEW_AREA)}
+      className={TOUR_ELEMENT_CLASSES.SHAPE_PREVIEW_AREA}
     />
   );
   return IS_ELECTRON_BUILD ? previewContainer : (

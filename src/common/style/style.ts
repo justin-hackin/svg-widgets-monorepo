@@ -207,14 +207,6 @@ export const useStyles = makeStyles((theme: Theme) => {
     printRegistrationTypeToggleButtonGroup: {
       marginLeft: theme.spacing(1),
     },
-    // ======================== TEXTURE EDITOR ========================
-    shapePreviewContainer: {
-      background: 'url(../../static/images/space.jpg) no-repeat center center fixed',
-      '-webkit-background-size': 'cover',
-      '-moz-background-size': 'cover',
-      '-o-background-size': 'cover',
-      'background-size': 'cover',
-    },
     enterFullScreenButton: {
       '&.MuiButtonBase-root': {
         bottom: theme.spacing(1),
