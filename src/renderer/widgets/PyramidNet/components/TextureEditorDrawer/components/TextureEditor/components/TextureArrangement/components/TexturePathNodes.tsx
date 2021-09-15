@@ -2,11 +2,11 @@ import React from 'react';
 import { observer } from 'mobx-react';
 // @ts-ignore
 import clsx from 'clsx';
-import { PyramidNetPluginModel } from '../../../../../models/PyramidNetMakerStore';
-import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
-import { useStyles } from '../../../../../../../../common/style/style';
-import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/models/WorkspaceModel';
-import { PathData } from '../../../../../../../../common/path/PathData';
+import { PyramidNetPluginModel } from '../../../../../../../models/PyramidNetMakerStore';
+import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
+import { useStyles } from '../../../../../../../../../../common/style/style';
+import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
+import { PathData } from '../../../../../../../../../../common/path/PathData';
 
 export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();

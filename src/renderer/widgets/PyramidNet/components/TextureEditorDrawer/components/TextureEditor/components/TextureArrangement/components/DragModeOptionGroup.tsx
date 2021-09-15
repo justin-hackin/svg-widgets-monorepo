@@ -9,9 +9,9 @@ import clsx from 'clsx';
 
 import React from 'react';
 import { observer } from 'mobx-react';
-import { DRAG_MODES } from '../models/ModifierTrackingModel';
-import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
-import { useStyles } from '../../../../../../../../common/style/style';
+import { DRAG_MODES } from '../../../models/ModifierTrackingModel';
+import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../../../common/util/tour';
+import { useStyles } from '../../../../../../../../../../common/style/style';
 
 const extraButtonProps = {
   disableFocusRipple: true,

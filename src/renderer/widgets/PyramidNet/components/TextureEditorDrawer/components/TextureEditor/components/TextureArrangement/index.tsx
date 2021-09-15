@@ -3,19 +3,19 @@ import { useDrag, useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash';
 import { Paper } from '@material-ui/core';
 import { observer } from 'mobx-react';
-import { castCoordToRawPoint } from '../../../../../../../../common/util/geom';
-import { PyramidNetPluginModel } from '../../../../../models/PyramidNetMakerStore';
+import { castCoordToRawPoint } from '../../../../../../../../../common/util/geom';
+import { PyramidNetPluginModel } from '../../../../../../models/PyramidNetMakerStore';
 import {
   incrementTransformTracking,
   TRANSFORM_METHODS,
   TRANSFORM_OPERATIONS,
-} from '../../../../../../../../common/util/analytics';
-import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
-import { DRAG_MODES } from '../models/ModifierTrackingModel';
-import { boundingBoxAttrsToViewBoxStr } from '../../../../../../../../common/util/svg';
-import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/models/WorkspaceModel';
-import { TextureSvg } from './TextureSvg';
-import { DragModeOptionsGroup } from './DragModeOptionGroup';
+} from '../../../../../../../../../common/util/analytics';
+import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../../common/util/tour';
+import { DRAG_MODES } from '../../models/ModifierTrackingModel';
+import { boundingBoxAttrsToViewBoxStr } from '../../../../../../../../../common/util/svg';
+import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
+import { TextureSvg } from './components/TextureSvg';
+import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();

@@ -27,7 +27,7 @@ import React from 'react';
 import {
   Model, model, _async, _await, findParent, modelAction, modelFlow, createContext,
 } from 'mobx-keystone';
-import { TextureSvgUnobserved } from '../components/TextureSvg';
+import { TextureSvgUnobserved } from '../components/TextureArrangement/components/TextureSvg';
 import { TextureEditorModel } from './TextureEditorModel';
 import requireStatic from '../../../../../../../requireStatic';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';

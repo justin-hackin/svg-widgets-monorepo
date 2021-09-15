@@ -3,14 +3,14 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { HookReturnType, UseDragConfig } from 'react-use-gesture/dist/types';
-import { RawPoint, scalePoint } from '../../../../../../../../common/util/geom';
+import { RawPoint, scalePoint } from '../../../../../../../../../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
-import { PyramidNetPluginModel } from '../../../../../models/PyramidNetMakerStore';
-import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
-import { TextureEditorModel } from '../models/TextureEditorModel';
-import { RawFaceDecorationModel } from '../../../../../models/RawFaceDecorationModel';
-import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/models/WorkspaceModel';
-import { PathFaceDecorationPatternModel } from '../../../../../models/PathFaceDecorationPatternModel';
+import { PyramidNetPluginModel } from '../../../../../../../models/PyramidNetMakerStore';
+import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
+import { TextureEditorModel } from '../../../models/TextureEditorModel';
+import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
+import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
+import { PathFaceDecorationPatternModel } from '../../../../../../../models/PathFaceDecorationPatternModel';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';
