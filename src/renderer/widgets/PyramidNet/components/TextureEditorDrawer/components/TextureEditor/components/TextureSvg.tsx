@@ -16,7 +16,6 @@ const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, 
 const HOLES_COLOR = '#000';
 const WHITE = '#fff';
 const MUTED_WHITE = '#aaa';
-const IMAGE_TEXTURE_DESIGN_BOUNDARY_FILL = '#00ff00';
 
 export const TextureSvgUnobserved = ({
   viewBox = undefined,
@@ -71,7 +70,7 @@ export const TextureSvgUnobserved = ({
       return pattern.isPositive ? HOLES_COLOR : materialColor;
     }
     // some of the color shines through at the edge of design boundary
-    return isOnScreen ? IMAGE_TEXTURE_DESIGN_BOUNDARY_FILL : HOLES_COLOR;
+    return isOnScreen ? MUTED_WHITE : HOLES_COLOR;
   })();
 
   return (
