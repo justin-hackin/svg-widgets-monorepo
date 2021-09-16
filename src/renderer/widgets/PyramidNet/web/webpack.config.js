@@ -59,7 +59,7 @@ module.exports = (env, argv) => {
               ],
               plugins: [
                 ['@babel/plugin-proposal-decorators', { legacy: true }],
-                !isProd && ReactRefreshBabel,
+                ...(!isProd ? [ReactRefreshBabel] : []),
               ],
             },
           },
