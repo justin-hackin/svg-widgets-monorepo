@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@material-ui/styles';
 import clsx from 'clsx';
-import Joyride, { EVENTS } from 'react-joyride';
+import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
 
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
@@ -67,8 +67,10 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   // TODO: drag and drop functionality, removed in fd71f4aba9dd4a698e5a2667595cff82c8fb5cf5
   // see commit message for rationale
 
-  const joyrideCallback = ({ type, step, index }: { type: string, step: MyStep, index: number }) => {
-    if (type === EVENTS.TOUR_END) {
+  const joyrideCallback = ({
+    type, step, index, action,
+  }: { type: string, step: MyStep, index: number, action: string }) => {
+    if (type === EVENTS.TOUR_STATUS && action === ACTIONS.SKIP) {
       preferences.setNeedsTour(false);
       // the user could re-activate the tour, rewind
       resetStepIndex();
