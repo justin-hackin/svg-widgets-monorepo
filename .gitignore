@@ -6,3 +6,4 @@ thumbs.db
 _static/
 .eslintcache
 .idea/
+**/tsconfig.tsbuildinfo
