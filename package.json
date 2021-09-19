@@ -24,7 +24,7 @@
     "lint-fix": "eslint . --ext js,ts,tsx --fix",
     "typecheck-main": "tsc --noEmit -p packages/main/tsconfig.json",
     "typecheck-preload": "tsc --noEmit -p packages/preload/tsconfig.json",
-    "typecheck-renderer": "vue-tsc --noEmit -p packages/renderer/tsconfig.json",
+    "typecheck-renderer": "tsc --noEmit -p packages/renderer/tsconfig.json",
     "typecheck": "npm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer"
   },
   "browserslist": [
