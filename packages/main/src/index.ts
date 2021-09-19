@@ -6,7 +6,7 @@ import {
 import debug from 'electron-debug';
 import { EVENTS } from '../../common/constants';
 import { setupIpc } from './ipc';
-import icon from '../../../buildResources/icons/256x256.png';
+import icon from '../../../buildResources/icons/png/512x512.png';
 
 const nativeImageIcon = nativeImage.createFromDataURL(icon);
 
