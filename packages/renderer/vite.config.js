@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-env node */
 import { builtinModules } from 'module';
-import { join } from 'path';
 import reactRefresh from '@vitejs/plugin-react-refresh';
+import { defineConfig } from 'vite';
 
 import { chrome } from '../../electron-vendors.config.json';
 
@@ -12,30 +12,49 @@ const PACKAGE_ROOT = __dirname;
  * @type {import('vite').UserConfig}
  * @see https://vitejs.dev/config/
  */
-const config = {
-  mode: process.env.MODE,
-  root: PACKAGE_ROOT,
-  resolve: {
-    alias: {
-      '/@/': `${join(PACKAGE_ROOT, 'src')}/`,
-    },
+
+const htmlPlugin = (mode) => ({
+  name: 'html-transform',
+  transformIndexHtml() {
+    const isWeb = mode === 'web';
+    return [
+      ...(isWeb ? [
+      //  TODO: google analytics
+      ] : [{
+        tag: 'meta',
+        attrs: {
+          'http-equiv': 'Content-Security-Policy',
+          content: "script-src 'self' blob:",
+        },
+        injectTo: 'head',
+      }])];
   },
-  plugins: [reactRefresh()],
+});
+
+export default defineConfig(({ mode }) => ({
+  mode,
+  root: PACKAGE_ROOT,
+  plugins: [
+    htmlPlugin(mode),
+    ...(mode === 'development' ? [reactRefresh()] : []),
+  ],
   base: '',
-  server: {
+  server: mode === 'web' ? undefined : {
     fs: {
       strict: true,
     },
   },
+  assetsInclude: ['**/*.gltf'],
   build: {
     sourcemap: true,
     target: `chrome${chrome}`,
-    outDir: 'dist',
+    outDir: mode === 'web' ? '../../_static' : 'dist',
     assetsDir: '.',
-    assetsInclude: ['**/*.gltf'],
     dynamicImportVarsOptions: {
-      include: ['static/**/*.jpg', 'static/**/*.png'],
+      include: ['static/**/*.jpg', 'static/**/*.png', 'static/**/*.gltf'],
     },
+    // web mode is also for production
+    minify: mode === 'development' ? false : 'terser',
     terserOptions: {
       ecma: 2020,
       compress: {
@@ -45,12 +64,11 @@ const config = {
     },
     rollupOptions: {
       external: [
-        ...builtinModules,
+        ...(mode === 'web' ? [] : builtinModules),
       ],
     },
     emptyOutDir: true,
     brotliSize: false,
   },
-};
-
-export default config;
+}
+));

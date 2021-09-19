@@ -4,7 +4,6 @@ import React, {
 } from 'react';
 import { persist } from 'mobx-keystone-persist';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import remotedev from 'remotedev';
 import { observer } from 'mobx-react';
 import { computed, observable, reaction } from 'mobx';
 import {
@@ -237,11 +236,16 @@ export function useWorkspaceMst() {
 
 if (IS_DEVELOPMENT_BUILD) {
   if (IS_ELECTRON_BUILD) {
-    // create a connection to the monitor (for example with connectViaExtension)
-    const connection = remotedev.connectViaExtension({
-      name: 'Polyhedral Net Studio',
-    });
+    // if this module is imported in web build,
+    // `import "querystring"` appears in index bundle, breaks app
+    // eslint-disable-next-line import/no-extraneous-dependencies
+    import('remotedev').then(({ default: remotedev }) => {
+      // create a connection to the monitor (for example with connectViaExtension)
+      const connection = remotedev.connectViaExtension({
+        name: 'Polyhedral Net Studio',
+      });
 
-    connectReduxDevTools(remotedev, connection, workspaceStore);
+      connectReduxDevTools(remotedev, connection, workspaceStore);
+    });
   }
 }
