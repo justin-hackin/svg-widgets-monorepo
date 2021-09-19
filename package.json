@@ -35,7 +35,7 @@
     "pre-push": "npm run typecheck"
   },
   "lint-staged": {
-    "*.{js,ts,vue}": "eslint --cache --fix"
+    "*.{js,ts,tsx}": "eslint --cache --fix"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "2.2.0",
