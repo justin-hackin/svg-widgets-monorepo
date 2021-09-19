@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+  },
+  "files": [
+    "src/index.ts",
+    "src/ipc.ts"
+  ],
+}

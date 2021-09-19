@@ -1,10 +1,13 @@
 module.exports = {
+  'env': {
+    'browser': true,
+    'node': false,
+  },
   extends: ['airbnb', 'airbnb-typescript'],
-  // see https://github.com/iamturns/eslint-config-airbnb-typescript for peer dependencies
-  plugins: ['@typescript-eslint'],
-  parser: '@typescript-eslint/parser',
-  rules: {
+  'rules': {
     'import/prefer-default-export': 0,
+    'import/extensions': 0,
+    'import/no-extraneous-dependencies': 0,
     'max-len': ['error', { code: 120 }],
     // TODO: remove below, enforce rule
     'max-classes-per-file': 0,
@@ -23,22 +26,13 @@ module.exports = {
     '@typescript-eslint/naming-convention': 0,
     '@typescript-eslint/no-shadow': 0,
   },
-  settings: {
-    'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
-    'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
+  "parser": "@typescript-eslint/parser",
+  'parserOptions': {
+    'ecmaFeatures': {
+      jsx: true,
     },
-    'react/jsx-filename-extension': [1, {
-      extensions: ['.jsx', '.tsx'],
-    }],
-  },
-  parserOptions: {
-    sourceType: 'module',
-    project: 'tsconfig.json',
-    tsconfigRootDir: __dirname,
-  },
-  globals: {
-    __static: true,
-    dataLayer: true,
-  },
+    'ecmaVersion': 2020,
+    'sourceType': 'module',
+    'project': './**/tsconfig.json',
+  }
 };
