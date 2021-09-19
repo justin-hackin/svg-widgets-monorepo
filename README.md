@@ -1,12 +1,8 @@
 # Polyhedz Studio 
 
-A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedz Studio represents the (potential) fulfillment of a wish to share this art/craft with other makers. In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system  was a tedious task that made design iteration difficult. With Polyhedral Net Studio, cutout paths are generated based on algorithms in which every parameter is tweakable. 
+A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedz Studio represents the (potential) fulfillment of a wish to share this art/craft with other makers. In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system  was a tedious task that made design iteration difficult. With Polyhedz Studio, cutout paths are generated based on algorithms in which every parameter is tweakable. 
 
-<img src="" alt="" width="320"/>
-
-
-
-| ![polyhedral lantern sculpture with print face decoration](/static/images/widgets/polyhedral-net.jpg) | ![polyhedral lantern sculpture with cut holes face decoration](/static/images/widgets/polyhedral-net-vector.jpg) |
+| ![polyhedral lantern sculpture with print face decoration](/packages/renderer/static/images/widgets/polyhedral-net.jpg) | ![polyhedral lantern sculpture with cut holes face decoration](/packages/renderer/static/images/widgets/polyhedral-net-vector.jpg) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 
 
@@ -79,7 +75,7 @@ Because this project contains abstractions that make it easy to build "tweakable
 
 ## Warning
 
-This is an alpha stage project with some known bugs and lacking features as listed in the [project board](https://github.com/justin-hackin/polyhedral-net-studio/projects/1).
+This is an alpha stage project with some known bugs and lacking features as listed in the [project board](https://github.com/justin-hackin/polyhedz-studio/projects/1).
 
 KDE users will experience issues with Alt-dragging modifiers in Texture Editor due to the window manager's default behaviour, see [this post](https://superuser.com/questions/584730/how-can-i-disable-alt-mouse-default-behavior-in-kde) for a fix.
 
@@ -105,19 +101,18 @@ You will not be able to complete this operation unless you have set up GH_TOKEN 
 
 ### Texture editor web port
 
-In the interests of attracting graphic designers and artists to use the texture editing feature without the overhead of downloading the app, the texture editor is also deployed as a [stand-alone web application](https://polyhedral-net-factory-bahby.ondigitalocean.app/). Users can then save the texture arrangement and have a fabricator apply the pattern to the dielines in the desktop app. Splitting the build into an Electron version and a web version using npm workspaces or learna proved to be difficult so a web-based webpack build has been nested inside this project.
+In the interests of attracting graphic designers and artists to use the texture editing feature without the overhead of downloading the app, the texture editor is also deployed as a [stand-alone web application](https://polyhedral-net-factory-bahby.ondigitalocean.app/). Users can then save the texture arrangement and have a fabricator apply the pattern to the dielines in the desktop app.
 
-To host the web texture editor on a development server do:
-
-```
-npm run web-start-dev
-```
-
-or to run the production code on a local server do
+To build the web texture editor do:
 
 ```
-npm run web-start-prod
+npm run web-build
 ```
 
-Pushing code to the branch `web-deploy` will cause DigitalOcean App Platform to fetch the code from the branch and re-deploy. This should only be done from the master branch.
+and to serve the web texture editor do
 
+```
+npm run web-serve
+```
+
+Pushing code to the branch `web-deploy` will cause DigitalOcean App Platform to fetch the code from the branch and re-deploy.
