@@ -2,7 +2,7 @@
   "name": "polyhedral-net-factory",
   "version": "0.0.1-alpha.1",
   "description": "A desktop application for the fabrication of flat-pack interlocking pyramids that form 3D stars and domes (geometric polyhedra).",
-  "author": "“Justin Barca <“justin.barca@protonmail.com”>",
+  "author": "Justin Barca <justinbarca@gmail.com>",
   "license": "MIT",
   "homepage": "http://bit.ly/polyhedz-deco",
   "private": true,
