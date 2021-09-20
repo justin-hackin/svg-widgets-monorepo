@@ -23,6 +23,15 @@ const config = {
   extraMetadata: {
     version: process.env.VITE_APP_VERSION,
   },
+  linux: {
+    icon: 'buildResources/icons/png/512x512.png',
+  },
+  win: {
+    icon: 'buildResources/icons/win/icon.ico',
+  },
+  mac: {
+    icon: 'buildResources/icons/mac/icon.icns',
+  },
 };
 
 module.exports = config;
