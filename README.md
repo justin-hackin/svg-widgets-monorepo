@@ -67,7 +67,7 @@ Interactively apply cut patterns or print textures to the faces of your shape an
 
 ### Bonus
 
-![cylinder lightbox](/static/images/widgets/cylinder-lightbox.jpg)
+![cylinder lightbox](/packages/renderer/static/images/widgets/cylinder-lightbox.jpg)
 Another "widget" called Cylinder Lightbox allows one to efficiently construct a cylinder out of flat panels. You can access it using the wrench icon in the bottom left corner. It has been used to create circular LED lightboxes. It was included in order to hint at the possibility of extension.
 
 Because this project contains abstractions that make it easy to build "tweakable" data structures, the creation of a plugin-based architecture which will separate the widgets from the workspace is being explored.
