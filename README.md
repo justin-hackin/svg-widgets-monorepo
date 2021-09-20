@@ -67,9 +67,8 @@ Interactively apply cut patterns or print textures to the faces of your shape an
 
 ### Bonus
 
-<img src="/static/images/widgets/cylinder-lightbox.jpg" alt="cylinder lightbox" width="320"/>
-
-Another "widget" called Cylinder Lightbox allows one to efficiently construct a cylinder out of flat panels. You can access it using the gear icon in the bottom left corner. It has been used to create circular LED lightboxes. It was included in order to hint at the possibility of extension.
+![cylinder lightbox](/static/images/widgets/cylinder-lightbox.jpg)
+Another "widget" called Cylinder Lightbox allows one to efficiently construct a cylinder out of flat panels. You can access it using the wrench icon in the bottom left corner. It has been used to create circular LED lightboxes. It was included in order to hint at the possibility of extension.
 
 Because this project contains abstractions that make it easy to build "tweakable" data structures, the creation of a plugin-based architecture which will separate the widgets from the workspace is being explored.
 
@@ -116,3 +115,7 @@ npm run web-serve
 ```
 
 Pushing code to the branch `web-deploy` will cause DigitalOcean App Platform to fetch the code from the branch and re-deploy.
+
+## Author's note
+
+These designs are a labor of love for symmetry and craft developed over many years of play and toil. I offer them in the spirit of generosity and mutual care. It would bring me joy to see these manifestations spread with these intentions preserved. Conversely, it would pain me to see these designs exploited for mere commercial gain. Please respect the [Creative Commons Attribution-NonCommercial-ShareAlike](https://creativecommons.org/licenses/by-nc-sa/4.0/) license under which the resultant content is under. If you would like to use these works to raise awareness or funds in the interests of the well-being of humanity, please gain consent first and respect the author's discretion.

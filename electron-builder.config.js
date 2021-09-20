@@ -17,6 +17,14 @@ const config = {
     output: 'dist',
     buildResources: 'buildResources',
   },
+
+  publish: [
+    {
+      provider: 'github',
+      releaseType: 'draft',
+    },
+  ],
+
   files: [
     'packages/**/dist/**',
   ],
@@ -25,6 +33,7 @@ const config = {
   },
   linux: {
     icon: 'buildResources/icons/png/512x512.png',
+    target: 'AppImage',
   },
   win: {
     icon: 'buildResources/icons/win/icon.ico',
