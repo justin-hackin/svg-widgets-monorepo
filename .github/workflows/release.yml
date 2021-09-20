@@ -108,6 +108,14 @@ jobs:
           RELEASE_NOTE: ${{ needs.draft.outputs.release-note }}
         run: echo "$RELEASE_NOTE" >> ./buildResources/release-notes.md
 
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+        # Only install Snapcraft on Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
+        with:
+          # Log in to Snap Store
+          snapcraft_token: ${{ secrets.snapcraft_token }}
+
       # Compile app and upload artifacts
       - name: Compile & release Electron app
         uses: samuelmeuli/action-electron-builder@v1
