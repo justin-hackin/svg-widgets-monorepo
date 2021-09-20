@@ -1,6 +1,6 @@
 {
   "name": "polyhedz-studio",
-  "version": "0.0.1-alpha.3",
+  "version": "0.0.1-alpha.4",
   "description": "A desktop application for the fabrication of flat-pack interlocking pyramids that form 3D stars and domes (geometric polyhedra).",
   "author": "Justin Barca <justinbarca@gmail.com>",
   "license": "MIT",
