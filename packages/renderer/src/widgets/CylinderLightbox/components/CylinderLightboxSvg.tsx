@@ -10,7 +10,7 @@ export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: CylinderLigh
       wallPathD,
       innerRadius,
       designBoundaryRadius,
-      holderTab,
+      holderTabD,
     },
   } = widgetStore;
 
@@ -21,7 +21,7 @@ export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: CylinderLigh
       <circle r={designBoundaryRadius} fill="none" stroke="blue" />
       <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
       <path d={wallPathD} fill="white" stroke="black" />
-      <path d={holderTab.getD()} fill="blue" stroke="black" fillRule="evenodd" />
+      <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
     </g>
   );
 };

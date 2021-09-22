@@ -240,7 +240,7 @@ export class CylinderLightboxModel extends Model({
   }
 
   @computed
-  get holderTab() {
+  get holderTabD() {
     const secondFootStart = this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
     const secondFootEnd = 2 * this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
     const tabTop = -this.materialThickness.value - this.actualHolderTabFeetLength;
@@ -251,7 +251,8 @@ export class CylinderLightboxModel extends Model({
       .line({ x: secondFootStart, y: 0 }) // second foot start
       .line({ x: secondFootEnd, y: 0 }) // second foot end
       .curvedLineSegments([{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
-        0.5, true);
+        0.5, true)
+      .getD();
   }
 
   @computed
