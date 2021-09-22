@@ -13,13 +13,14 @@ import { TextureEditorModel }
   from '../components/TextureEditorDrawer/components/TextureEditor/models/TextureEditorModel';
 import { dashPatternsDefaultFn, StrokeDashPathPatternModel } from '../../../common/path/shapes/strokeDashPath';
 import { DecorationBoundarySVG } from '../components/DecorationBoundarySVG';
+import { WidgetModel } from '../../../WidgetWorkspace/types/WidgetModel';
 
 @model('PyramidNetWidgetModel')
 export class PyramidNetWidgetModel extends Model({
   savedModel: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
   textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),
   dashPatterns: prop<StrokeDashPathPatternModel[]>(dashPatternsDefaultFn),
-}) {
+}) implements WidgetModel {
   @observable
   textureEditorOpen = false;
 

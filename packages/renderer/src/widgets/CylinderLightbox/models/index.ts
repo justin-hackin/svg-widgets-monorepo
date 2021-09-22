@@ -14,6 +14,7 @@ import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
+import { WidgetModel } from '../../../WidgetWorkspace/types/WidgetModel';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -269,7 +270,7 @@ export class CylinderLightboxModel extends Model({
 @model('CylinderLightboxWidgetModel')
 export class CylinderLightboxWidgetModel extends Model({
   savedModel: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
-}) {
+}) implements WidgetModel {
   // eslint-disable-next-line class-methods-use-this
   getFileBasename() {
     return 'cylinder_lightbox';
