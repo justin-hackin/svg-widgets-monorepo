@@ -1,13 +1,10 @@
 import ReactDOMServer from 'react-dom/server';
-import React, {
-  createContext, FC, MutableRefObject, useContext,
-} from 'react';
+import React, { createContext, useContext } from 'react';
 import { persist } from 'mobx-keystone-persist';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { observer } from 'mobx-react';
 import { computed, observable, reaction } from 'mobx';
 import {
-  _Model,
   connectReduxDevTools,
   detach,
   getSnapshot,
@@ -24,34 +21,11 @@ import { CylinderLightboxWidgetOptionsInfo } from '../../widgets/CylinderLightbo
 import { PyramidNetTestTabsOptionsInfo } from '../../widgets/PyramidNetTestTabs';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetMakerStore';
+import { WidgetOptionsCollection } from '../types';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
 const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
-
-export interface RawSvgComponentProps {
-  preferencesStore?: PreferencesModel, widgetStore: PyramidNetWidgetModel,
-}
-
-export interface AdditionalFileMenuItemsProps {
-  resetFileMenuRef: MutableRefObject<undefined>,
-}
-
-export interface WidgetOptions {
-  RawSvgComponent: FC<any>,
-  controlPanelProps: {
-    AdditionalToolbarContent?: FC,
-    AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>,
-    PanelContent: FC,
-  },
-  // TODO: enforce common params
-  WidgetModel: _Model<any, any>,
-  AdditionalMainContent?: FC,
-  specFileExtension: string,
-  specFileExtensionName?: string,
-}
-
-type WidgetOptionsCollection = Record<string, WidgetOptions>;
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({

@@ -1,8 +1,8 @@
 import React from 'react';
 import { PreferencesModel } from '../../WidgetWorkspace/models/PreferencesModel';
 import { getBoundingBoxAttrs } from '../../common/util/svg';
-import { RawSvgComponentProps } from '../../WidgetWorkspace/models/WorkspaceModel';
 import { PyramidNetWidgetModel } from '../PyramidNet/models/PyramidNetMakerStore';
+import { RawSvgComponentProps } from '../../WidgetWorkspace/types';
 
 export const PyramidNetTestTabs = ({
   widgetStore, preferencesStore,

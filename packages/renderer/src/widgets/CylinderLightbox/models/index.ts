@@ -14,7 +14,7 @@ import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
-import { WidgetModel } from '../../../WidgetWorkspace/types/WidgetModel';
+import { WidgetModel } from '../../../WidgetWorkspace/types';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },

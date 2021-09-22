@@ -13,7 +13,7 @@ import { TextureEditorModel }
   from '../components/TextureEditorDrawer/components/TextureEditor/models/TextureEditorModel';
 import { dashPatternsDefaultFn, StrokeDashPathPatternModel } from '../../../common/path/shapes/strokeDashPath';
 import { DecorationBoundarySVG } from '../components/DecorationBoundarySVG';
-import { WidgetModel } from '../../../WidgetWorkspace/types/WidgetModel';
+import { WidgetModel } from '../../../WidgetWorkspace/types';
 
 @model('PyramidNetWidgetModel')
 export class PyramidNetWidgetModel extends Model({

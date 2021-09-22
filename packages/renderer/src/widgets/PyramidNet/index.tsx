@@ -3,8 +3,8 @@ import { PyramidNetWidgetModel } from './models/PyramidNetMakerStore';
 import { AdditionalToolbarContent } from './components/AdditionalToolbarContent';
 import { AdditionalFileMenuItems } from './components/AdditionalFileMenuItems';
 import { PanelContent } from './components/PanelContent';
-import { WidgetOptions } from '../../WidgetWorkspace/models/WorkspaceModel';
 import { TextureEditorDrawer } from './components/TextureEditorDrawer';
+import { WidgetOptions } from '../../WidgetWorkspace/types';
 
 export const PyramidNetOptionsInfo: WidgetOptions = {
   RawSvgComponent: PyramidNet,

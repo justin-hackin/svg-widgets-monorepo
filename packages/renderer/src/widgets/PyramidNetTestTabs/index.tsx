@@ -3,7 +3,7 @@ import { AdditionalToolbarContent } from '../PyramidNet/components/AdditionalToo
 import { AdditionalFileMenuItems } from '../PyramidNet/components/AdditionalFileMenuItems';
 import { PanelContent } from '../PyramidNet/components/PanelContent';
 import { PyramidNetTestTabs } from './PyramidNetTestTabsSvg';
-import { WidgetOptions } from '../../WidgetWorkspace/models/WorkspaceModel';
+import { WidgetOptions } from '../../WidgetWorkspace/types';
 
 export const PyramidNetTestTabsOptionsInfo: WidgetOptions = {
   RawSvgComponent: PyramidNetTestTabs,
