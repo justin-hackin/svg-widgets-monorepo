@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { CylinderLightBoxModel } from '../models';
+import { CylinderLightboxWidgetModel } from '../models';
 
-export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: CylinderLightBoxModel }) => {
+export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: CylinderLightboxWidgetModel }) => {
   const {
-    shapeDefinition: {
+    savedModel: {
       ringRadius: { value: ringRadius },
       sectionPathD,
       wallPathD,

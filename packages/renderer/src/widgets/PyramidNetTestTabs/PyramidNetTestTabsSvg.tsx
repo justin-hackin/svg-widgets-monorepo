@@ -2,14 +2,14 @@ import React from 'react';
 import { PreferencesModel } from '../../WidgetWorkspace/models/PreferencesModel';
 import { getBoundingBoxAttrs } from '../../common/util/svg';
 import { RawSvgComponentProps } from '../../WidgetWorkspace/models/WorkspaceModel';
-import { PyramidNetPluginModel } from '../PyramidNet/models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../PyramidNet/models/PyramidNetMakerStore';
 
 export const PyramidNetTestTabs = ({
   widgetStore, preferencesStore,
 }: RawSvgComponentProps) => {
   // TODO: is the double-conversion here and elsewhere necessary?
   const { scoreProps, cutProps } = preferencesStore as unknown as PreferencesModel;
-  const { pyramidNetSpec: { testAscendantTab, testBaseTab } } = widgetStore as unknown as PyramidNetPluginModel;
+  const { savedModel: { testAscendantTab, testBaseTab } } = widgetStore as unknown as PyramidNetWidgetModel;
   const tabs = [
     {
       id: 'ascendant-female',

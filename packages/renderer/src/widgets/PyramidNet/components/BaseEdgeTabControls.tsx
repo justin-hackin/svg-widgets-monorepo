@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { PyramidNetPluginModel } from '../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../models/PyramidNetMakerStore';
 import { BendGuideValleyModel } from '../baseEdgeConnectionTab';
 import { TweakableChildrenInputs }
   from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
@@ -10,10 +10,10 @@ import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel'
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const {
-    pyramidNetSpec: {
+    savedModel: {
       baseEdgeTabsSpec,
     } = {},
-  } = workspaceStore.selectedStore as PyramidNetPluginModel;
+  } = workspaceStore.selectedStore as PyramidNetWidgetModel;
 
   return (
     <>

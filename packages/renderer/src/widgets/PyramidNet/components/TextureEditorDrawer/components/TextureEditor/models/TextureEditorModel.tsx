@@ -24,7 +24,7 @@ import {
 } from '../../../../../../../../../common/constants';
 import { reportTransformsTally } from '../../../../../../../common/util/analytics';
 import { TransformModel } from '../../../../../models/TransformModel';
-import { PyramidNetPluginModel } from '../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetMakerStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../models/PositionableFaceDecorationModel';
 import { extractCutHolesFromSvgString } from '../../../../../../../common/util/svg';
@@ -95,29 +95,29 @@ export class TextureEditorModel extends Model({
   SEND_ANALYTICS_INTERVAL_MS = 10000;
 
   @computed
-  get parentPyramidNetPluginModel() {
-    return findParent(this, (parentNode) => parentNode instanceof PyramidNetPluginModel);
+  get parentPyramidNetWidgetModel(): PyramidNetWidgetModel {
+    return findParent(this, (parentNode) => parentNode instanceof PyramidNetWidgetModel);
   }
 
   @computed
-  get pyramidNetSpec() {
-    return this.parentPyramidNetPluginModel.pyramidNetSpec;
+  get savedModel() {
+    return this.parentPyramidNetWidgetModel.savedModel;
   }
 
   // if faceDecoration is Raw before opening texture editor, it is reset to PositionableFaceDecorationModel
   @computed
-  get faceDecoration(): PositionableFaceDecorationModel {
-    return this.pyramidNetSpec.faceDecoration;
+  get faceDecoration() {
+    return this.savedModel.faceDecoration as PositionableFaceDecorationModel;
   }
 
   @computed
   get decorationBoundary() {
-    return new BoundaryModel(this.pyramidNetSpec.normalizedDecorationBoundaryPoints);
+    return new BoundaryModel(this.savedModel.normalizedDecorationBoundaryPoints);
   }
 
   @computed
   get shapeName() {
-    return this.pyramidNetSpec.pyramid.shapeName;
+    return this.savedModel.pyramid.shapeName;
   }
 
   @computed
@@ -193,12 +193,12 @@ export class TextureEditorModel extends Model({
 
   @computed
   get borderToInsetRatio() {
-    return this.parentPyramidNetPluginModel.pyramidNetSpec.borderToInsetRatio;
+    return this.savedModel.borderToInsetRatio;
   }
 
   @computed
   get insetToBorderOffset() {
-    return this.parentPyramidNetPluginModel.pyramidNetSpec.insetToBorderOffset;
+    return this.savedModel.insetToBorderOffset;
   }
 
   @modelAction
@@ -417,14 +417,8 @@ export class TextureEditorModel extends Model({
     }
   }
 
-  // TODO: although it may be ok to directly edit the dieline texture in the texture editor, consider using drafts
-  // @modelAction
-  // sendTextureToDielineEditor() {
-  //   if (!this.texture) { return; }
-  //   this.parentPyramidNetPluginModel.pyramidNetSpec.setFaceDecoration(
-  //     fromSnapshot<PositionableFaceDecorationModel>(getSnapshot(this.texture)),
-  //   );
-  // }
+  // TODO: although it may be ok to directly edit the dieline texture in the texture editor,
+  //  consider using drafts with own history or scope history to on opened state of texture
 
   @modelAction
   saveTextureArrangement() {
@@ -451,7 +445,7 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   setTextureFromSnapshot(textureSnapshot) {
-    this.pyramidNetSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
+    this.savedModel.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
   }
 
   // TODO: ts type the patternInfo
@@ -476,7 +470,7 @@ export class TextureEditorModel extends Model({
       return;
     }
     if (shapeName !== this.shapeName.value) {
-      this.parentPyramidNetPluginModel.pyramidNetSpec.pyramid.shapeName.setValue(shapeName);
+      this.parentPyramidNetWidgetModel.savedModel.pyramid.shapeName.setValue(shapeName);
     }
     this.setTextureFromSnapshot(textureSnapshot);
   }

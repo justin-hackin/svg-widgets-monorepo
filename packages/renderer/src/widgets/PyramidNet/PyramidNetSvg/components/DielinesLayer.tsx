@@ -12,7 +12,7 @@ import {
   expandBoundingBoxAttrs, registrationMarksPath,
   toRectangleCoordinatesAttrs,
 } from '../../../../common/util/svg';
-import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../models/PyramidNetMakerStore';
 import { PathFaceDecorationPatternModel } from '../../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../models/PositionableFaceDecorationModel';
@@ -31,7 +31,7 @@ const DielineGroup = ({ children }) => (
 export const DielinesLayer = observer(({
   widgetStore, preferencesStore,
 }: {
-  preferencesStore: PreferencesModel, widgetStore: PyramidNetPluginModel,
+  preferencesStore: PreferencesModel, widgetStore: PyramidNetWidgetModel,
 }) => {
   if (!preferencesStore || !widgetStore) {
     return null;
@@ -39,7 +39,7 @@ export const DielinesLayer = observer(({
   const {
     textureEditor: { faceDecoration },
     boundingBox,
-    pyramidNetSpec: {
+    savedModel: {
       faceLengthAdjustRatio,
       masterBaseTabCut,
       masterBaseTabScore,

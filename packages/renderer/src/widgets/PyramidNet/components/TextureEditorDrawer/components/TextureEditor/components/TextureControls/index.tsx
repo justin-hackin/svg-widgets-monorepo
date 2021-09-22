@@ -41,7 +41,7 @@ import {
 } from '../../../../../../../../../../common/constants';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
 import { HistoryButtons } from '../../../../../HistoryButtons';
-import { PyramidNetPluginModel } from '../../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetMakerStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../models/ImageFaceDecorationPatternModel';
 import { TweakableInput } from '../../../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 import { ShapeSelect } from '../../../../../ShapeSelect';
@@ -95,9 +95,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
   const { preferences } = workspaceStore;
-  const pluginModel:PyramidNetPluginModel = workspaceStore.selectedStore;
-  const { history } = pluginModel.pyramidNetSpec;
-  const { textureEditor } = pluginModel;
+  const widgetModel:PyramidNetWidgetModel = workspaceStore.selectedStore;
+  const { history } = widgetModel.savedModel;
+  const { textureEditor } = widgetModel;
   const {
     faceDecoration,
     showNodes, autoRotatePreview,
@@ -140,7 +140,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           <>
             <IconButton
               onClick={() => {
-                pluginModel.setTextureEditorOpen(false);
+                widgetModel.setTextureEditorOpen(false);
               }}
               aria-label="close texture editor"
               component="span"
@@ -307,7 +307,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                   label="Node selection"
                 />
                 <TweakableInput
-                  node={pluginModel.textureEditor.nodeScaleMux}
+                  node={widgetModel.textureEditor.nodeScaleMux}
                   className={classes.nodeScaleMuxSlider}
                 />
               </span>

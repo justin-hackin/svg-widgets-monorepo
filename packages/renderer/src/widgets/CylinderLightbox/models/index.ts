@@ -265,9 +265,9 @@ export class CylinderLightboxModel extends Model({
   }
 }
 
-@model('CylinderLightBoxModel')
-export class CylinderLightBoxModel extends Model({
-  shapeDefinition: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
+@model('CylinderLightboxWidgetModel')
+export class CylinderLightboxWidgetModel extends Model({
+  savedModel: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
 }) {
   // eslint-disable-next-line class-methods-use-this
   getFileBasename() {

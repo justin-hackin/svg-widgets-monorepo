@@ -23,14 +23,14 @@ import { PyramidNetOptionsInfo } from '../../widgets/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../../widgets/CylinderLightbox';
 import { PyramidNetTestTabsOptionsInfo } from '../../widgets/PyramidNetTestTabs';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
-import { PyramidNetPluginModel } from '../../widgets/PyramidNet/models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetMakerStore';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
 const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
 
 export interface RawSvgComponentProps {
-  preferencesStore?: PreferencesModel, widgetStore: PyramidNetPluginModel,
+  preferencesStore?: PreferencesModel, widgetStore: PyramidNetWidgetModel,
 }
 
 export interface AdditionalFileMenuItemsProps {
@@ -57,7 +57,7 @@ type WidgetOptionsCollection = Record<string, WidgetOptions>;
 export class WorkspaceModel extends Model({
   selectedWidgetName: prop('polyhedral-net'),
   preferences: prop<PreferencesModel>(() => (new PreferencesModel({}))),
-  selectedStore: prop<any>(() => (new PyramidNetPluginModel({}))).withSetter(),
+  selectedStore: prop<any>(() => (new PyramidNetWidgetModel({}))).withSetter(),
 }) {
   widgetOptions = {
     'polyhedral-net': PyramidNetOptionsInfo,
@@ -120,7 +120,7 @@ export class WorkspaceModel extends Model({
     // instead flagging history records with the associated file name upon save
     // + creating a middleware variable currentSnapshotIsSaved
     // this will also allow history to become preserved across files with titlebar accuracy
-    const currentSnapshot = getSnapshot(this.selectedStore.shapeDefinition);
+    const currentSnapshot = getSnapshot(this.selectedStore.savedModel);
     // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
     return JSON.stringify(this.savedSnapshot) === JSON.stringify(currentSnapshot);
   }
@@ -135,7 +135,7 @@ export class WorkspaceModel extends Model({
 
   @computed
   get selectedShapeName() {
-    return this.selectedStore?.shapeDefinition?.$modelType;
+    return this.selectedStore?.savedModel?.$modelType;
   }
 
   @computed
@@ -216,7 +216,7 @@ export class WorkspaceModel extends Model({
 // TODO: instantiating this store directly in the module causes unintended side-effects in texture editor:
 // reaction for title bar runs there too but workspace model is only the concern of dieline editor
 // consider this side-effect has the advantage of displaying model name in texture editor -> it doesn't have
-// access to shapeDefinition's model name otherwise
+// access to savedModel's model name otherwise
 export const workspaceStore = new WorkspaceModel({});
 registerRootStore(workspaceStore);
 // workspaceStore.persistPreferences();

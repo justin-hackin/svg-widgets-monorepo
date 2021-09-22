@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { HookReturnType, UseDragConfig } from 'react-use-gesture/dist/types';
 import { RawPoint, scalePoint } from '../../../../../../../../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
-import { PyramidNetPluginModel } from '../../../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetMakerStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
 import { TextureEditorModel } from '../../../models/TextureEditorModel';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
@@ -35,7 +35,7 @@ export const TextureSvgUnobserved = ({
     faceBoundary,
     faceFittingScale,
     placementAreaDimensions,
-  } = store || (useWorkspaceMst().selectedStore as PyramidNetPluginModel).textureEditor;
+  } = store || (useWorkspaceMst().selectedStore as PyramidNetWidgetModel).textureEditor;
   if (
     !decorationBoundaryPathD || faceDecoration instanceof RawFaceDecorationModel
     || !faceBoundary || !decorationBoundaryPathD

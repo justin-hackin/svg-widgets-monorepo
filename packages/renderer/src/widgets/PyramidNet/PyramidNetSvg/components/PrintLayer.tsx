@@ -10,7 +10,7 @@ import {
   boundingBoxMinPoint,
 } from '../../../../common/util/svg';
 import { pointToTranslateString, scalePoint } from '../../../../common/util/geom';
-import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../models/PyramidNetMakerStore';
 import { ImageFaceDecorationPatternModel } from '../../models/ImageFaceDecorationPatternModel';
 import { closedPolygonPath } from '../../../../common/path/shapes/generic';
 
@@ -27,14 +27,14 @@ const PrintGroup = ({ children }) => (
 export const PrintLayer = observer(({
   widgetStore, preferencesStore,
 }: {
-  preferencesStore: PreferencesModel, widgetStore: PyramidNetPluginModel,
+  preferencesStore: PreferencesModel, widgetStore: PyramidNetWidgetModel,
 }) => {
   if (!preferencesStore || !widgetStore) {
     return null;
   }
   const {
     boundingBox,
-    pyramidNetSpec: {
+    savedModel: {
       borderInsetFaceHoleTransformMatrix,
       faceDecoration,
       faceDecorationTransformMatricies,

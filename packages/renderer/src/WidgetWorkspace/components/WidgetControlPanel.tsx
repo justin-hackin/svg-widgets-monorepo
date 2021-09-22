@@ -19,13 +19,11 @@ import {
   AppBar, Button, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@material-ui/core';
 
-import { applySnapshot, getSnapshot, SnapshotOutOfModel } from 'mobx-keystone';
+import { applySnapshot, getSnapshot } from 'mobx-keystone';
 import { useStyles } from '../../common/style/style';
 import { useWorkspaceMst } from '../models/WorkspaceModel';
 import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
-import { PyramidNetPluginModel } from '../../widgets/PyramidNet/models/PyramidNetMakerStore';
-import { PyramidNetModel } from '../../widgets/PyramidNet/models/PyramidNetStore';
 import { electronApi } from '../../../../common/electron';
 
 const OPEN_TXT = 'Open';
@@ -36,7 +34,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
   useTheme();
   const workspaceStore = useWorkspaceMst();
   const { selectedWidgetOptions: { specFileExtension, specFileExtensionName } } = workspaceStore;
-  const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetPluginModel;
+  const { selectedStore } = workspaceStore;
 
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
@@ -59,23 +57,19 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
     const res = await electronApi.getJsonFromDialog(OPEN_TXT, specFileExtension, specFileExtensionName);
     if (res) {
       const { fileData, filePath } = res;
-      if (workspaceStore.selectedStore.onFileOpen) {
-        workspaceStore.selectedStore.onFileOpen(filePath, fileData);
-      } else {
-        applySnapshot(pyramidNetPluginStore.shapeDefinition, fileData as SnapshotOutOfModel<PyramidNetModel>);
-      }
+      applySnapshot(selectedStore.savedModel, fileData);
       workspaceStore.setCurrentFileData(filePath, fileData);
     }
     resetFileMenuRef();
   };
 
   const saveAsHandler = async () => {
-    const snapshot = getSnapshot(pyramidNetPluginStore.shapeDefinition);
+    const snapshot = getSnapshot(selectedStore.savedModel);
     const filePath = await electronApi.saveSvgAndModelWithDialog(
       workspaceStore.renderWidgetToString(),
       snapshot,
       'Save widget svg with json data',
-      `${pyramidNetPluginStore.getFileBasename()}.${specFileExtension}`,
+      `${selectedStore.getFileBasename()}.${specFileExtension}`,
       specFileExtension,
       specFileExtensionName,
     );
@@ -91,7 +85,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, Additiona
       await saveAsHandler();
       return;
     }
-    const snapshot = getSnapshot(pyramidNetPluginStore.shapeDefinition);
+    const snapshot = getSnapshot(selectedStore.savedModel);
     const filePath = await electronApi.saveSvgAndModel(
       workspaceStore.renderWidgetToString(), snapshot, workspaceStore.currentFilePath,
       SAVE_TXT, specFileExtension, specFileExtensionName,

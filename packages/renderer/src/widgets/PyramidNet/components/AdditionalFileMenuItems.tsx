@@ -7,14 +7,23 @@ import HowToVoteIcon from '@material-ui/icons/HowToVote';
 import { startCase } from 'lodash';
 
 import { fromSnapshot, SnapshotOutOf } from 'mobx-keystone';
+import ReactDOMServer from 'react-dom/server';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { PyramidNetPluginModel, renderTestTabsToString } from '../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../models/PyramidNetMakerStore';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { useStyles } from '../../../common/style/style';
 import { IS_ELECTRON_BUILD } from '../../../../../common/constants';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
 import { RawFaceDecorationModel } from '../models/RawFaceDecorationModel';
 import { electronApi } from '../../../../../common/electron';
+import { SVGWrapper } from '../../../WidgetWorkspace/components/SVGWrapper';
+import { PyramidNetTestTabs } from '../../PyramidNetTestTabs/PyramidNetTestTabsSvg';
+
+export const renderTestTabsToString = (widgetStore, preferencesStore): string => ReactDOMServer.renderToString(
+  <SVGWrapper>
+    <PyramidNetTestTabs preferencesStore={preferencesStore} widgetStore={widgetStore} />
+  </SVGWrapper>,
+);
 
 export interface TextureArrangementJsonData {
   shapeName: string,
@@ -30,7 +39,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const workspaceStore = useWorkspaceMst();
   const preferencesStore = workspaceStore.preferences;
   const classes = useStyles();
-  const store = workspaceStore.selectedStore as PyramidNetPluginModel;
+  const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
 
   return (
     <>
@@ -40,7 +49,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
           await electronApi.saveSvgFromDialog(
             store.renderDecorationBoundaryToString(),
             DOWNLOAD_TEMPLATE_TXT,
-            `${store.pyramidNetSpec.pyramid.shapeName}__template.svg`,
+            `${store.savedModel.pyramid.shapeName}__template.svg`,
           );
         }
         resetFileMenuRef();
@@ -61,7 +70,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
             const dValue = extractCutHolesFromSvgString(fileString);
             // This file should have a .svg extension, without an extension this will be ''
             const baseFileName = filePath.split('.').slice(0, -1).join('.');
-            store.pyramidNetSpec
+            store.savedModel
               .setFaceDecoration(new RawFaceDecorationModel({ dValue, sourceFileName: baseFileName }));
           }
         }
@@ -77,7 +86,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       {/* LOAD TEXTURE JSON */}
       <MenuItem onClick={async () => {
         const res = await electronApi.getJsonFromDialog(IMPORT_TEXTURE_TXT, 'pnst', 'Pyramid Net Spec Texture');
-        const currentShapeName = store.pyramidNetSpec.pyramid.shapeName.value;
+        const currentShapeName = store.savedModel.pyramid.shapeName.value;
         resetFileMenuRef();
         if (res === undefined) {
           return;
@@ -89,12 +98,12 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
           } but the chosen texture was for ${startCase(fileData.shapeName)
           } shape. Do you want to change the Polyhedron and load its default settings?`);
           if (doIt) {
-            store.pyramidNetSpec.pyramid.shapeName.setValue(fileData.shapeName);
+            store.savedModel.pyramid.shapeName.setValue(fileData.shapeName);
           } else {
             return;
           }
         }
-        store.pyramidNetSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(fileData.textureSnapshot));
+        store.savedModel.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(fileData.textureSnapshot));
       }}
       >
         <ListItemIcon className={classes.listItemIcon}>

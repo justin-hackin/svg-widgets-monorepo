@@ -2,7 +2,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { Drawer } from '@material-ui/core';
-import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../models/PyramidNetMakerStore';
 import { useStyles } from '../../../../common/style/style';
 import { useWorkspaceMst } from '../../../../WidgetWorkspace/models/WorkspaceModel';
 import { TextureEditor } from './components/TextureEditor';
@@ -11,7 +11,7 @@ import { TextureEditor } from './components/TextureEditor';
 
 export const TextureEditorDrawer = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const pyramidNetPluginStore:PyramidNetPluginModel = workspaceStore.selectedStore;
+  const pyramidNetPluginStore:PyramidNetWidgetModel = workspaceStore.selectedStore;
   if (!pyramidNetPluginStore) { return null; }
   const classes = useStyles();
   return (
