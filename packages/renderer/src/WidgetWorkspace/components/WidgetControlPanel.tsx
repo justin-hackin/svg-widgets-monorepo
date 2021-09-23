@@ -25,6 +25,7 @@ import { useWorkspaceMst } from '../models/WorkspaceModel';
 import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
 import { electronApi } from '../../../../common/electron';
+import { TweakableChildrenInputs } from '../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
@@ -183,7 +184,7 @@ export const WidgetControlPanel = observer(() => {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <PanelContent />
+        {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
       </Drawer>
     </>
   );

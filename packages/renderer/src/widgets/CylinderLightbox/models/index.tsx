@@ -3,11 +3,7 @@ import { computed } from 'mobx';
 import { model, Model, prop } from 'mobx-keystone';
 import React from 'react';
 import {
-  angleRelativeToOrigin,
-  getOriginPoint,
-  lineLerp,
-  pointFromPolar,
-  sumPoints,
+  angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
 } from '../../../common/util/geom';
 import { subtractDValues, unifyDValues } from '../../../common/util/path-boolean';
 import { PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
@@ -16,7 +12,6 @@ import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakab
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
 import { WidgetModel } from '../../../WidgetWorkspace/types';
-import { CylinderLightboxPanelContent } from '../components/CylinderLightboxPanelContent';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -34,7 +29,9 @@ export class CylinderLightboxModel extends Model({
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,
   }),
-  holeWidthRatio: prop(0.5),
+  holeWidthRatio: sliderProp(0.5, {
+    min: 0.1, max: 0.9, step: DEFAULT_SLIDER_STEP,
+  }),
   arcsPerRing: sliderProp(4, {
     min: 2, max: 16, step: 1,
   }),
@@ -91,7 +88,7 @@ export class CylinderLightboxModel extends Model({
 
   @computed
   get actualHoleWidth() {
-    return this.maxHoleWidth * this.holeWidthRatio;
+    return this.maxHoleWidth * this.holeWidthRatio.value;
   }
 
   @computed
@@ -310,6 +307,4 @@ export class CylinderLightboxWidgetModel extends Model({
       </g>
     );
   };
-
-  PanelContent = CylinderLightboxPanelContent;
 }

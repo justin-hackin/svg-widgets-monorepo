@@ -15,7 +15,7 @@ export interface WidgetModel {
   AdditionalToolbarContent?: () => JSX.Element,
   AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>,
   AdditionalMainContent?: FC,
-  PanelContent: FC,
+  PanelContent?: FC,
   specFileExtension: string,
   specFileExtensionName?: string,
   [prop: string]: any,
