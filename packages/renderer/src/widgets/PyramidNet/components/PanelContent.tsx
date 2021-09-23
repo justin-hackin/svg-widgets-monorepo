@@ -9,7 +9,7 @@ import { BaseEdgeTabControls } from './BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './AscendantEdgeTabsControls';
 import { ScoreControls } from './ScoreControls';
 import { ShapeSelect } from './ShapeSelect';
-import { PyramidNetPluginModel } from '../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { TweakableInput } from '../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 
 const controlsTabs = [
@@ -32,12 +32,12 @@ const controlsTabs = [
 
 export const PanelContent = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as PyramidNetPluginModel;
+  const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const classes = useStyles();
-  const { pyramidNetSpec } = store;
-  const { pyramid } = pyramidNetSpec;
+  const { savedModel } = store;
+  const { pyramid } = savedModel;
 
-  if (!pyramidNetSpec) { return null; }
+  if (!savedModel) { return null; }
 
   const [activeControlsIndex, setActiveControlsIndex] = React.useState(0);
 
@@ -50,11 +50,11 @@ export const PanelContent = observer(() => {
       <div className={classes.shapeSection}>
         <ShapeSelect
           className={classes.shapeSelect}
-          node={pyramidNetSpec.pyramid.shapeName}
+          node={savedModel.pyramid.shapeName}
         />
         <TweakableInput
           className={classes.shapeHeightFormControl}
-          node={pyramidNetSpec.shapeHeight}
+          node={savedModel.shapeHeight}
         />
         <TweakableInput node={pyramid.netsPerPyramid} />
       </div>

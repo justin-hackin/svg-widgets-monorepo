@@ -4,7 +4,7 @@ import { clamp } from 'lodash';
 import { Paper } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { castCoordToRawPoint } from '../../../../../../../../common/util/geom';
-import { PyramidNetPluginModel } from '../../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import {
   incrementTransformTracking,
   TRANSFORM_METHODS,
@@ -20,7 +20,7 @@ import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorati
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const pyramidNetPluginStore:PyramidNetPluginModel = workspaceStore.selectedStore;
+  const pyramidNetPluginStore:PyramidNetWidgetModel = workspaceStore.selectedStore;
   const { textureEditor } = pyramidNetPluginStore;
   const {
     faceDecoration,

@@ -47,7 +47,7 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-@model('PyramidNetModel')
+@model('PyramidNet')
 export class PyramidNetModel extends Model({
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),

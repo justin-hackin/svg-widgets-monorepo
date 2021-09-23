@@ -1,13 +1,7 @@
 import ReactDOMServer from 'react-dom/server';
-import React, {
-  createContext, FC, MutableRefObject, useContext,
-} from 'react';
-import { persist } from 'mobx-keystone-persist';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { observer } from 'mobx-react';
+import React, { createContext, useContext } from 'react';
 import { computed, observable, reaction } from 'mobx';
 import {
-  _Model,
   connectReduxDevTools,
   detach,
   getSnapshot,
@@ -17,53 +11,38 @@ import {
   prop,
   registerRootStore,
 } from 'mobx-keystone';
+import { persist } from 'mobx-keystone-persist';
+import { startCase } from 'lodash';
 import { SVGWrapper } from '../components/SVGWrapper';
-import { PreferencesModel } from './PreferencesModel';
-import { PyramidNetOptionsInfo } from '../../widgets/PyramidNet';
-import { CylinderLightboxWidgetOptionsInfo } from '../../widgets/CylinderLightbox';
-import { PyramidNetTestTabsOptionsInfo } from '../../widgets/PyramidNetTestTabs';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
-import { PyramidNetPluginModel } from '../../widgets/PyramidNet/models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
+import { radioProp } from '../../common/keystone-tweakables/props';
+import { UNITS } from '../../common/util/units';
+import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
-const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
 
-export interface RawSvgComponentProps {
-  preferencesStore?: PreferencesModel, widgetStore: PyramidNetPluginModel,
-}
+@model('WorkspacePreferencesModel')
+class WorkspacePreferencesModel extends Model({
+    displayUnit: radioProp(UNITS.cm, {
+      options: Object.values(UNITS).map((unit) => ({ value: unit, label: unit })),
+      isRow: true,
+    }),
+  }) {}
 
-export interface AdditionalFileMenuItemsProps {
-  resetFileMenuRef: MutableRefObject<undefined>,
-}
-
-export interface WidgetOptions {
-  RawSvgComponent: FC<any>,
-  controlPanelProps: {
-    AdditionalToolbarContent?: FC,
-    AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>,
-    PanelContent: FC,
-  },
-  // TODO: enforce common params
-  WidgetModel: _Model<any, any>,
-  AdditionalMainContent?: FC,
-  specFileExtension: string,
-  specFileExtensionName?: string,
-}
-
-type WidgetOptionsCollection = Record<string, WidgetOptions>;
+const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedWidgetName: prop('polyhedral-net'),
-  preferences: prop<PreferencesModel>(() => (new PreferencesModel({}))),
-  selectedStore: prop<any>(() => (new PyramidNetPluginModel({}))).withSetter(),
+  selectedWidgetName: prop('polyhedral-net').withSetter(),
+  selectedStore: prop<any>(() => (new PyramidNetWidgetModel({}))).withSetter(),
+  preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
   widgetOptions = {
-    'polyhedral-net': PyramidNetOptionsInfo,
-    'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
-    'polyhedral-net-test-tabs': PyramidNetTestTabsOptionsInfo,
-  } as WidgetOptionsCollection;
+    'polyhedral-net': PyramidNetWidgetModel,
+    'cylinder-lightbox': CylinderLightboxWidgetModel,
+  };
 
   @observable
   savedSnapshot = undefined;
@@ -72,13 +51,16 @@ export class WorkspaceModel extends Model({
   currentFilePath = undefined;
 
   onAttachedToRootStore():(() => void) {
-    this.persistPreferences();
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
         // @ts-ignore
         document.title = this.titleBarText;
       }, { fireImmediately: true }),
+      reaction(() => [this.selectedWidgetName], () => {
+        this.clearCurrentFileData();
+        this.resetModelToDefault();
+      }),
     ];
 
     return () => {
@@ -89,29 +71,8 @@ export class WorkspaceModel extends Model({
   }
 
   @computed
-  get selectedWidgetOptions() {
-    return this.widgetOptions[this.selectedWidgetName];
-  }
-
-  @computed
-  get SelectedRawSvgComponent() {
-    return this.selectedWidgetOptions.RawSvgComponent;
-  }
-
-  // TODO: these shortcuts to selectedWidgetOptions properties are unnecessary
-  @computed
-  get selectedControlPanelProps() {
-    return this.selectedWidgetOptions.controlPanelProps;
-  }
-
-  @computed
-  get SelectedAdditionalMainContent() {
-    return this.selectedWidgetOptions.AdditionalMainContent;
-  }
-
-  @computed
-  get selectedSpecFileExtension() {
-    return this.selectedWidgetOptions.specFileExtension;
+  get selectedWidgetNameReadable() {
+    return startCase(this.selectedWidgetName);
   }
 
   @computed
@@ -120,27 +81,14 @@ export class WorkspaceModel extends Model({
     // instead flagging history records with the associated file name upon save
     // + creating a middleware variable currentSnapshotIsSaved
     // this will also allow history to become preserved across files with titlebar accuracy
-    const currentSnapshot = getSnapshot(this.selectedStore.shapeDefinition);
+    const currentSnapshot = getSnapshot(this.selectedStore.savedModel);
     // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
     return JSON.stringify(this.savedSnapshot) === JSON.stringify(currentSnapshot);
   }
 
   @computed
-  get SelectedControlledSvgComponent() {
-    const ObservedSvgComponent = observer(this.SelectedRawSvgComponent);
-
-    return observer(() => (
-      <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={this.preferences} />));
-  }
-
-  @computed
-  get selectedShapeName() {
-    return this.selectedStore?.shapeDefinition?.$modelType;
-  }
-
-  @computed
   get currentFileName() {
-    return this.currentFilePath ? baseFileName(this.currentFilePath).name : `New ${this.selectedShapeName}`;
+    return this.currentFilePath ? baseFileName(this.currentFilePath).name : `New ${this.selectedWidgetNameReadable}`;
   }
 
   @computed
@@ -151,7 +99,12 @@ export class WorkspaceModel extends Model({
   @computed
   get titleBarText() {
     return IS_ELECTRON_BUILD
-      ? `${this.selectedShapeName} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
+      ? `${this.selectedWidgetNameReadable} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
+  }
+
+  @computed
+  get SelectedModel() {
+    return this.widgetOptions[this.selectedWidgetName];
   }
 
   @modelAction
@@ -167,22 +120,11 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
-  setSelectedWidgetName(name) {
-    this.selectedWidgetName = name;
-    this.clearCurrentFileData();
-    this.resetModelToDefault();
-  }
-
-  @modelAction
   renderWidgetToString() {
-    const { SelectedRawSvgComponent } = this;
-    const { documentWidth: { value: width }, documentHeight: { value: height } } = this.preferences;
+    const { WidgetSVG, documentAreaProps } = this.selectedStore;
     return ReactDOMServer.renderToString(
-      <SVGWrapper width={width} height={height}>
-        <SelectedRawSvgComponent
-          preferencesStore={this.preferences}
-          widgetStore={this.selectedStore}
-        />
+      <SVGWrapper {...documentAreaProps}>
+        <WidgetSVG />
       </SVGWrapper>,
     );
   }
@@ -190,14 +132,14 @@ export class WorkspaceModel extends Model({
   @modelAction
   resetPreferences() {
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
-    this.preferences = new PreferencesModel({});
-    this.persistPreferences();
+    this.preferences = new WorkspacePreferencesModel({});
+    return this.persistPreferences();
   }
 
   @modelAction
   resetModelToDefault() {
     detach(this.selectedStore);
-    this.setSelectedStore(new this.selectedWidgetOptions.WidgetModel({}));
+    this.setSelectedStore(new this.SelectedModel({}));
   }
 
   @modelAction
@@ -213,15 +155,8 @@ export class WorkspaceModel extends Model({
   }
 }
 
-// TODO: instantiating this store directly in the module causes unintended side-effects in texture editor:
-// reaction for title bar runs there too but workspace model is only the concern of dieline editor
-// consider this side-effect has the advantage of displaying model name in texture editor -> it doesn't have
-// access to shapeDefinition's model name otherwise
 export const workspaceStore = new WorkspaceModel({});
 registerRootStore(workspaceStore);
-// workspaceStore.persistPreferences();
-// @ts-ignore
-window.workpsaceStore = workspaceStore;
 const WorkspaceStoreContext = createContext<WorkspaceModel>(workspaceStore);
 
 export const { Provider: WorkspaceProvider } = WorkspaceStoreContext;
@@ -235,6 +170,8 @@ export function useWorkspaceMst() {
 }
 
 if (IS_DEVELOPMENT_BUILD) {
+  // @ts-ignore
+  window.workpsaceStore = workspaceStore;
   if (IS_ELECTRON_BUILD) {
     // if this module is imported in web build,
     // `import "querystring"` appears in index bundle, breaks app

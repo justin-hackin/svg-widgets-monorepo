@@ -1,12 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
 import { computed } from 'mobx';
 import { model, Model, prop } from 'mobx-keystone';
+import React from 'react';
 import {
-  angleRelativeToOrigin,
-  getOriginPoint,
-  lineLerp,
-  pointFromPolar,
-  sumPoints,
+  angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
 } from '../../../common/util/geom';
 import { subtractDValues, unifyDValues } from '../../../common/util/path-boolean';
 import { PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
@@ -14,6 +11,7 @@ import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
+import { WidgetModel } from '../../../WidgetWorkspace/types';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -26,12 +24,14 @@ const rectanglePathCenteredOnOrigin = (width: number, height:number) => closedPo
 
 const polygonSideLength = (numSides: number, inRadius: number) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
-@model('CylinderLightboxModel')
+@model('CylinderLightbox')
 export class CylinderLightboxModel extends Model({
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,
   }),
-  holeWidthRatio: prop(0.5),
+  holeWidthRatio: sliderProp(0.5, {
+    min: 0.1, max: 0.9, step: DEFAULT_SLIDER_STEP,
+  }),
   arcsPerRing: sliderProp(4, {
     min: 2, max: 16, step: 1,
   }),
@@ -88,7 +88,7 @@ export class CylinderLightboxModel extends Model({
 
   @computed
   get actualHoleWidth() {
-    return this.maxHoleWidth * this.holeWidthRatio;
+    return this.maxHoleWidth * this.holeWidthRatio.value;
   }
 
   @computed
@@ -240,7 +240,7 @@ export class CylinderLightboxModel extends Model({
   }
 
   @computed
-  get holderTab() {
+  get holderTabD() {
     const secondFootStart = this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
     const secondFootEnd = 2 * this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
     const tabTop = -this.materialThickness.value - this.actualHolderTabFeetLength;
@@ -251,7 +251,8 @@ export class CylinderLightboxModel extends Model({
       .line({ x: secondFootStart, y: 0 }) // second foot start
       .line({ x: secondFootEnd, y: 0 }) // second foot end
       .curvedLineSegments([{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
-        0.5, true);
+        0.5, true)
+      .getD();
   }
 
   @computed
@@ -265,12 +266,45 @@ export class CylinderLightboxModel extends Model({
   }
 }
 
-@model('CylinderLightBoxModel')
-export class CylinderLightBoxModel extends Model({
-  shapeDefinition: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
-}) {
+@model('CylinderLightboxWidgetModel')
+export class CylinderLightboxWidgetModel extends Model({
+  savedModel: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
+}) implements WidgetModel {
   // eslint-disable-next-line class-methods-use-this
   getFileBasename() {
     return 'cylinder_lightbox';
   }
+
+  specFileExtension = 'cyl';
+
+  @computed
+  get documentAreaProps() {
+    const ringRadiusVal = this.savedModel.ringRadius.value;
+    return {
+      viewBox: `${-ringRadiusVal} ${-ringRadiusVal} ${ringRadiusVal * 2} ${ringRadiusVal * 2}`,
+    };
+  }
+
+  WidgetSVG = () => {
+    const {
+      savedModel: {
+        ringRadius: { value: ringRadius },
+        sectionPathD,
+        wallPathD,
+        innerRadius,
+        designBoundaryRadius,
+        holderTabD,
+      },
+    } = this;
+    return (
+      <g>
+        <circle r={ringRadius} fill="none" stroke="red" />
+        <circle r={innerRadius} fill="none" stroke="green" />
+        <circle r={designBoundaryRadius} fill="none" stroke="blue" />
+        <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
+        <path d={wallPathD} fill="white" stroke="black" />
+        <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
+      </g>
+    );
+  };
 }

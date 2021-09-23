@@ -3,7 +3,7 @@ import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 import { Button, Menu, MenuItem } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { range } from 'lodash';
-import { PyramidNetPluginModel } from '../../../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../../common/util/tour';
 import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
 
@@ -12,8 +12,8 @@ export const SnapMenu = observer(() => {
   const [positionSnapMenuAnchorEl, setPositionSnapMenuAnchorEl] = useState(null);
 
   const workspaceStore = useWorkspaceMst();
-  const pluginModel:PyramidNetPluginModel = workspaceStore.selectedStore;
-  const { textureEditor } = pluginModel;
+  const widgetModel:PyramidNetWidgetModel = workspaceStore.selectedStore;
+  const { textureEditor } = widgetModel;
 
   const {
     faceDecoration, decorationBoundary,

@@ -2,7 +2,7 @@
 
 A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedz Studio represents the (potential) fulfillment of a wish to share this art/craft with other makers. In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system  was a tedious task that made design iteration difficult. With Polyhedz Studio, cutout paths are generated based on algorithms in which every parameter is tweakable. 
 
-| ![polyhedral lantern sculpture with print face decoration](/packages/renderer/static/images/widgets/polyhedral-net.jpg) | ![polyhedral lantern sculpture with cut holes face decoration](/packages/renderer/static/images/widgets/polyhedral-net-vector.jpg) |
+| ![polyhedral lantern sculpture with print face decoration](/packages/renderer/static/images/widgets/polyhedral-net.jpg) | ![polyhedral lantern sculpture with cut holes face decoration](/docs/images/polyhedral-net-vector.jpg) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 
 

@@ -1,18 +1,14 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 
-import { PreferencesModel, PRINT_REGISTRATION_TYPES } from '../../../../WidgetWorkspace/models/PreferencesModel';
-import { PositionableFaceDecorationModel } from '../../models/PositionableFaceDecorationModel';
-import { theme } from '../../../../common/style/style';
-import {
-  expandBoundingBoxAttrs,
-  registrationMarksPath,
-  boundingBoxMinPoint,
-} from '../../../../common/util/svg';
-import { pointToTranslateString, scalePoint } from '../../../../common/util/geom';
-import { PyramidNetPluginModel } from '../../models/PyramidNetMakerStore';
-import { ImageFaceDecorationPatternModel } from '../../models/ImageFaceDecorationPatternModel';
-import { closedPolygonPath } from '../../../../common/path/shapes/generic';
+import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
+import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
+import { theme } from '../../../common/style/style';
+import { boundingBoxMinPoint, expandBoundingBoxAttrs, registrationMarksPath } from '../../../common/util/svg';
+import { pointToTranslateString, scalePoint } from '../../../common/util/geom';
+import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
+import { closedPolygonPath } from '../../../common/path/shapes/generic';
 
 const PrintGroup = ({ children }) => (
   <g {...{
@@ -25,29 +21,29 @@ const PrintGroup = ({ children }) => (
   </g>
 );
 export const PrintLayer = observer(({
-  widgetStore, preferencesStore,
+  widgetStore,
 }: {
-  preferencesStore: PreferencesModel, widgetStore: PyramidNetPluginModel,
+  widgetStore: PyramidNetWidgetModel,
 }) => {
-  if (!preferencesStore || !widgetStore) {
+  if (!widgetStore) {
     return null;
   }
   const {
     boundingBox,
-    pyramidNetSpec: {
+    savedModel: {
       borderInsetFaceHoleTransformMatrix,
       faceDecoration,
       faceDecorationTransformMatricies,
       faceLengthAdjustRatio,
       faceBoundaryPoints,
     },
+    preferences: {
+      registrationPadding: { value: registrationPadding },
+      printRegistrationType: { value: printRegistrationType },
+      registrationMarkLength: { value: registrationMarkLength },
+    },
   } = widgetStore;
 
-  const {
-    registrationPadding: { value: registrationPadding },
-    printRegistrationType: { value: printRegistrationType },
-    registrationMarkLength: { value: registrationMarkLength },
-  } = preferencesStore;
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
   const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER

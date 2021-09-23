@@ -9,11 +9,11 @@ import { TextureEditor } from './widgets/PyramidNet/components/TextureEditorDraw
 
 const AllRoutes = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const { SelectedAdditionalMainContent } = workspaceStore;
+  const { AdditionalMainContent } = workspaceStore.selectedStore;
   return (
     <>
       <WidgetWorkspace />
-      { SelectedAdditionalMainContent && (<SelectedAdditionalMainContent />)}
+      { AdditionalMainContent && (<AdditionalMainContent />)}
     </>
   );
 });

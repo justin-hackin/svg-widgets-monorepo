@@ -13,7 +13,7 @@ export const toBase64 = (file): Promise<string> => (new Promise((resolve, reject
   reader.onerror = (error) => reject(error);
 }));
 
-interface dimensions {width: number, height: number}
+export interface dimensions {width: number, height: number}
 
 export const resolveImageDimensionsFromBase64 = (base64): Promise<dimensions> => (
   new Promise((resolve) => {

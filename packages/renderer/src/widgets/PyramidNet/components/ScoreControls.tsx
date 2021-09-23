@@ -1,23 +1,23 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { PyramidNetPluginModel } from '../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { SimpleSwitch } from '../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
 import { TweakableChildrenInputs }
   from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 
 export const ScoreControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const selectedStore = workspaceStore.selectedStore as PyramidNetPluginModel;
-  const { pyramidNetSpec } = selectedStore;
-  const { useDottedStroke, interFaceScoreDashSpec, baseScoreDashSpec } = pyramidNetSpec;
+  const selectedStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const { savedModel } = selectedStore;
+  const { useDottedStroke, interFaceScoreDashSpec, baseScoreDashSpec } = savedModel;
 
   return (
     <>
       <SimpleSwitch
         value={useDottedStroke}
-        name="pyramidNetSpec.useDottedStroke"
-        onChange={(e) => { pyramidNetSpec.setUseDottedStroke(e.target.checked); }}
+        name="savedModel.useDottedStroke"
+        onChange={(e) => { savedModel.setUseDottedStroke(e.target.checked); }}
         label="Use dotted stroke"
       />
       {useDottedStroke && (

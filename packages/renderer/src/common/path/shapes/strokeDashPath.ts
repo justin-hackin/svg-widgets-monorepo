@@ -14,7 +14,7 @@ import { PathData } from '../PathData';
 import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { referenceSelectProp, sliderWithTextProp } from '../../keystone-tweakables/props';
 import { WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { PyramidNetPluginModel } from '../../../widgets/PyramidNet/models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { ratioSliderProps } from '../../../widgets/PyramidNet/constants';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
@@ -73,7 +73,7 @@ export class DashPatternModel extends Model({
     },
     typeRef: patternRef,
     // TODO: make root store type generic
-    options: (rootStore) => () => ((rootStore as WorkspaceModel).selectedStore as PyramidNetPluginModel).dashPatterns
+    options: (rootStore) => () => ((rootStore as WorkspaceModel).selectedStore as PyramidNetWidgetModel).dashPatterns
       .map((pattern) => ({
         value: pattern,
         label: pattern.label,
