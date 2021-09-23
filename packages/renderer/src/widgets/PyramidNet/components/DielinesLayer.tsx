@@ -1,21 +1,19 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { PRINT_REGISTRATION_TYPES, PreferencesModel } from '../../../../WidgetWorkspace/models/PreferencesModel';
+import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
 import {
-  lineLerp,
-  matrixWithTransformOrigin,
-  pointToTranslateString,
-  scalePoint,
-} from '../../../../common/util/geom';
+  lineLerp, matrixWithTransformOrigin, pointToTranslateString, scalePoint,
+} from '../../../common/util/geom';
 import {
   boundingBoxMinPoint,
-  expandBoundingBoxAttrs, registrationMarksPath,
+  expandBoundingBoxAttrs,
+  registrationMarksPath,
   toRectangleCoordinatesAttrs,
-} from '../../../../common/util/svg';
-import { PyramidNetWidgetModel } from '../../models/PyramidNetMakerStore';
-import { PathFaceDecorationPatternModel } from '../../models/PathFaceDecorationPatternModel';
-import { ImageFaceDecorationPatternModel } from '../../models/ImageFaceDecorationPatternModel';
-import { PositionableFaceDecorationModel } from '../../models/PositionableFaceDecorationModel';
+} from '../../../common/util/svg';
+import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import { PathFaceDecorationPatternModel } from '../models/PathFaceDecorationPatternModel';
+import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
+import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
 
 const DielineGroup = ({ children }) => (
   <g {...{
@@ -29,11 +27,11 @@ const DielineGroup = ({ children }) => (
 );
 
 export const DielinesLayer = observer(({
-  widgetStore, preferencesStore,
+  widgetStore,
 }: {
-  preferencesStore: PreferencesModel, widgetStore: PyramidNetWidgetModel,
+  widgetStore: PyramidNetWidgetModel,
 }) => {
-  if (!preferencesStore || !widgetStore) {
+  if (!widgetStore) {
     return null;
   }
   const {
@@ -51,17 +49,16 @@ export const DielinesLayer = observer(({
       faceBoundaryPoints,
       femaleAscendantFlap, ascendantEdgeTabs, nonTabbedAscendantScores,
     },
+    preferences: {
+      cutProps, scoreProps,
+      useClonesForBaseTabs: { value: useClonesForBaseTabs },
+      useClonesForDecoration: { value: useClonesForDecoration },
+      printRegistrationType: { value: printRegistrationType },
+      registrationPadding: { value: registrationPadding },
+      registrationStrokeColor: { value: registrationStrokeColor },
+      registrationMarkLength: { value: registrationMarkLength },
+    },
   } = widgetStore;
-
-  const {
-    cutProps, scoreProps,
-    useClonesForBaseTabs: { value: useClonesForBaseTabs },
-    useClonesForDecoration: { value: useClonesForDecoration },
-    printRegistrationType: { value: printRegistrationType },
-    registrationPadding: { value: registrationPadding },
-    registrationStrokeColor: { value: registrationStrokeColor },
-    registrationMarkLength: { value: registrationMarkLength },
-  } = preferencesStore as PreferencesModel;
 
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);

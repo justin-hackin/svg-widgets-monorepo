@@ -1,6 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { computed } from 'mobx';
 import { model, Model, prop } from 'mobx-keystone';
+import React from 'react';
 import {
   angleRelativeToOrigin,
   getOriginPoint,
@@ -275,4 +276,35 @@ export class CylinderLightboxWidgetModel extends Model({
   getFileBasename() {
     return 'cylinder_lightbox';
   }
+
+  @computed
+  get documentAreaProps() {
+    const ringRadiusVal = this.savedModel.ringRadius.value;
+    return {
+      viewBox: `${-ringRadiusVal} ${-ringRadiusVal} ${ringRadiusVal * 2} ${ringRadiusVal * 2}`,
+    };
+  }
+
+  WidgetSVG = () => {
+    const {
+      savedModel: {
+        ringRadius: { value: ringRadius },
+        sectionPathD,
+        wallPathD,
+        innerRadius,
+        designBoundaryRadius,
+        holderTabD,
+      },
+    } = this;
+    return (
+      <g>
+        <circle r={ringRadius} fill="none" stroke="red" />
+        <circle r={innerRadius} fill="none" stroke="green" />
+        <circle r={designBoundaryRadius} fill="none" stroke="blue" />
+        <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
+        <path d={wallPathD} fill="white" stroke="black" />
+        <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
+      </g>
+    );
+  };
 }

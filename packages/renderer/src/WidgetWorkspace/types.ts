@@ -1,16 +1,14 @@
 import { FC, MutableRefObject } from 'react';
 import { _Model } from 'mobx-keystone';
-import { PreferencesModel } from './models/PreferencesModel';
-import { PyramidNetWidgetModel } from '../widgets/PyramidNet/models/PyramidNetMakerStore';
+import { dimensions } from '../common/util/data';
+
+interface viewBoxProps { viewBox: string }
 
 export interface WidgetModel {
   savedModel: object,
-  getFileBasename: (...any) => string,
-}
-
-export interface RawSvgComponentProps {
-  preferencesStore?: PreferencesModel,
-  widgetStore: PyramidNetWidgetModel,
+  getFileBasename: () => string,
+  WidgetSVG: () => JSX.Element,
+  documentAreaProps: dimensions | viewBoxProps
 }
 
 export interface AdditionalFileMenuItemsProps {
@@ -18,7 +16,6 @@ export interface AdditionalFileMenuItemsProps {
 }
 
 export interface WidgetOptions {
-  RawSvgComponent: FC<any>,
   controlPanelProps: {
     AdditionalToolbarContent?: FC,
     AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>,

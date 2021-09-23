@@ -5,7 +5,7 @@ import React from 'react';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { HistoryButtons } from './HistoryButtons';
 import { useStyles } from '../../../common/style/style';
-import { PyramidNetWidgetModel } from '../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
 export const AdditionalToolbarContent = () => {
   const workspaceStore = useWorkspaceMst();

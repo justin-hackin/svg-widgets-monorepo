@@ -17,21 +17,24 @@ import {
 import { theme, useStyles } from '../../../../../../common/style/style';
 import { RawFaceDecorationModel } from '../../../../models/RawFaceDecorationModel';
 import { IS_WEB_BUILD } from '../../../../../../../../common/constants';
-import { PyramidNetWidgetModel } from '../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { useWorkspaceMst } from '../../../../../../WidgetWorkspace/models/WorkspaceModel';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
-  const { preferences } = workspaceStore;
-  const { needsTour } = preferences;
+
   const [stepIndex, setStepIndex] = useState<number>(0);
   const incrementStepIndex = (index) => { setStepIndex(index + 1); };
   const resetStepIndex = () => { setStepIndex(0); };
+
   const mainAreaRef = useRef<HTMLDivElement>();
+
   const pyramidNetPluginStore: PyramidNetWidgetModel = workspaceStore.selectedStore;
   const { history } = pyramidNetPluginStore.savedModel;
+  const { preferences } = pyramidNetPluginStore;
+  const { needsTour } = preferences;
   // ==================================================================================================================
   const { textureEditor } = pyramidNetPluginStore;
   const { faceDecoration } = textureEditor;

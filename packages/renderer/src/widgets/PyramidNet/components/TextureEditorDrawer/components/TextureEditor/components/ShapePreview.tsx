@@ -5,7 +5,7 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen';
 
 import clsx from 'clsx';
 import { IconButton } from '@material-ui/core';
-import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../common/util/tour';
 import { IS_ELECTRON_BUILD } from '../../../../../../../../../common/constants';
 import { useStyles } from '../../../../../../../common/style/style';

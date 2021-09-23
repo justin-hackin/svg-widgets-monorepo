@@ -4,7 +4,7 @@ import { clamp } from 'lodash';
 import { Paper } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import { castCoordToRawPoint } from '../../../../../../../../common/util/geom';
-import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import {
   incrementTransformTracking,
   TRANSFORM_METHODS,

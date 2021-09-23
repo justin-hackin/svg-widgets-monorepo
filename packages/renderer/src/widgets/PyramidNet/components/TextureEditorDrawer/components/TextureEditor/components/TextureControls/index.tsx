@@ -41,7 +41,7 @@ import {
 } from '../../../../../../../../../../common/constants';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
 import { HistoryButtons } from '../../../../../HistoryButtons';
-import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../models/ImageFaceDecorationPatternModel';
 import { TweakableInput } from '../../../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 import { ShapeSelect } from '../../../../../ShapeSelect';
@@ -94,10 +94,9 @@ const OpenTextureArrangementMenuItem = forwardRef<any, OpenTextureArrangementMen
 export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
-  const { preferences } = workspaceStore;
   const widgetModel:PyramidNetWidgetModel = workspaceStore.selectedStore;
   const { history } = widgetModel.savedModel;
-  const { textureEditor } = widgetModel;
+  const { textureEditor, preferences } = widgetModel;
   const {
     faceDecoration,
     showNodes, autoRotatePreview,

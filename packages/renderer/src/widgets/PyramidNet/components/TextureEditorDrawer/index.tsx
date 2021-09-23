@@ -2,7 +2,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { Drawer } from '@material-ui/core';
-import { PyramidNetWidgetModel } from '../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../models/PyramidNetWidgetStore';
 import { useStyles } from '../../../../common/style/style';
 import { useWorkspaceMst } from '../../../../WidgetWorkspace/models/WorkspaceModel';
 import { TextureEditor } from './components/TextureEditor';

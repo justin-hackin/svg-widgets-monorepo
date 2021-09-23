@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { observer } from 'mobx-react';
 import {
   Dialog, Fab, List, ListItem, ListItemText, DialogTitle, ListItemAvatar, Avatar,
@@ -18,25 +18,29 @@ const patternId = 'grid-pattern';
 export const WidgetWorkspace = observer(() => {
   const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
   const workspaceStore = useWorkspaceMst();
+  const classes = useStyles();
+
+  if (!workspaceStore.selectedStore) {
+    return null;
+  }
   const {
-    preferences: { documentWidth: { value: width }, documentHeight: { value: height } },
-    selectedStore,
-    SelectedControlledSvgComponent, selectedWidgetName,
+    selectedStore: {
+      WidgetSVG, documentAreaProps,
+    },
+    selectedWidgetName,
     selectedControlPanelProps, widgetOptions,
   } = workspaceStore;
 
-  const classes = useStyles();
+  // wrap with observer here so WidgetSVG can be rendered with ReactDOMServer for saving to string
+  const ObserverWidgetSVG = useMemo(() => (observer(WidgetSVG)), [WidgetSVG]);
 
-  if (!selectedStore) {
-    return null;
-  }
   return (
     <>
       <div className={classes.fullPage}>
         <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
-          <svg width={width} height={height}>
+          <svg {...documentAreaProps}>
             <GridPattern patternId={patternId} />
-            <SelectedControlledSvgComponent />
+            <ObserverWidgetSVG />
           </svg>
         </ResizableZoomPan>
         <Fab

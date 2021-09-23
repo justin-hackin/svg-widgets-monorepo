@@ -24,7 +24,7 @@ import {
 } from '../../../../../../../../../common/constants';
 import { reportTransformsTally } from '../../../../../../../common/util/analytics';
 import { TransformModel } from '../../../../../models/TransformModel';
-import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../models/PositionableFaceDecorationModel';
 import { extractCutHolesFromSvgString } from '../../../../../../../common/util/svg';

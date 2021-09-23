@@ -9,7 +9,7 @@ import { startCase } from 'lodash';
 import { fromSnapshot, SnapshotOutOf } from 'mobx-keystone';
 import ReactDOMServer from 'react-dom/server';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { PyramidNetWidgetModel } from '../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { useStyles } from '../../../common/style/style';
 import { IS_ELECTRON_BUILD } from '../../../../../common/constants';
@@ -17,11 +17,11 @@ import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecor
 import { RawFaceDecorationModel } from '../models/RawFaceDecorationModel';
 import { electronApi } from '../../../../../common/electron';
 import { SVGWrapper } from '../../../WidgetWorkspace/components/SVGWrapper';
-import { PyramidNetTestTabs } from '../../PyramidNetTestTabs/PyramidNetTestTabsSvg';
+import { PyramidNetTestTabs } from './PyramidNetTestTabsSvg';
 
-export const renderTestTabsToString = (widgetStore, preferencesStore): string => ReactDOMServer.renderToString(
+export const renderTestTabsToString = (widgetStore): string => ReactDOMServer.renderToString(
   <SVGWrapper>
-    <PyramidNetTestTabs preferencesStore={preferencesStore} widgetStore={widgetStore} />
+    <PyramidNetTestTabs widgetStore={widgetStore} />
   </SVGWrapper>,
 );
 
@@ -37,7 +37,6 @@ const DOWNLOAD_TAB_TESTER_TXT = 'Download tab tester SVG';
 
 export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const workspaceStore = useWorkspaceMst();
-  const preferencesStore = workspaceStore.preferences;
   const classes = useStyles();
   const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
 
@@ -115,7 +114,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       {/* DOWNLOAD TAB TEST */}
       <MenuItem onClick={async () => {
         await electronApi.saveSvgFromDialog(
-          renderTestTabsToString(store, preferencesStore),
+          renderTestTabsToString(store),
           DOWNLOAD_TAB_TESTER_TXT,
           `${store.getFileBasename()}--test-tabs.svg`,
         );

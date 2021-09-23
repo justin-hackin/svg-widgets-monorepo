@@ -11,6 +11,7 @@ export const TweakableChildrenInputs = (
   { parentNode, childrenFilter }:
   { parentNode: object, childrenFilter?: childrenFilter },
 ) => {
+  if (!parentNode) { return null; }
   const children = findChildren(parentNode, (child) => (
     INPUT_TYPES_VALUES.includes((child as TweakableModel)?.metadata?.type)
     && (!childrenFilter || childrenFilter(child))));

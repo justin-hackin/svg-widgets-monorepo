@@ -1,8 +1,6 @@
 import ReactDOMServer from 'react-dom/server';
 import React, { createContext, useContext } from 'react';
-import { persist } from 'mobx-keystone-persist';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { observer } from 'mobx-react';
 import { computed, observable, reaction } from 'mobx';
 import {
   connectReduxDevTools,
@@ -14,29 +12,38 @@ import {
   prop,
   registerRootStore,
 } from 'mobx-keystone';
+import { persist } from 'mobx-keystone-persist';
 import { SVGWrapper } from '../components/SVGWrapper';
-import { PreferencesModel } from './PreferencesModel';
 import { PyramidNetOptionsInfo } from '../../widgets/PyramidNet';
 import { CylinderLightboxWidgetOptionsInfo } from '../../widgets/CylinderLightbox';
-import { PyramidNetTestTabsOptionsInfo } from '../../widgets/PyramidNetTestTabs';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
-import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { WidgetOptionsCollection } from '../types';
+import { radioProp } from '../../common/keystone-tweakables/props';
+import { UNITS } from '../../common/util/units';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
-const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
+
+@model('WorkspacePreferencesModel')
+class WorkspacePreferencesModel extends Model({
+    displayUnit: radioProp(UNITS.cm, {
+      options: Object.values(UNITS).map((unit) => ({ value: unit, label: unit })),
+      isRow: true,
+    }),
+  }) {}
+
+const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
   selectedWidgetName: prop('polyhedral-net'),
-  preferences: prop<PreferencesModel>(() => (new PreferencesModel({}))),
   selectedStore: prop<any>(() => (new PyramidNetWidgetModel({}))).withSetter(),
+  preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
   widgetOptions = {
     'polyhedral-net': PyramidNetOptionsInfo,
     'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
-    'polyhedral-net-test-tabs': PyramidNetTestTabsOptionsInfo,
   } as WidgetOptionsCollection;
 
   @observable
@@ -46,7 +53,6 @@ export class WorkspaceModel extends Model({
   currentFilePath = undefined;
 
   onAttachedToRootStore():(() => void) {
-    this.persistPreferences();
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
@@ -65,11 +71,6 @@ export class WorkspaceModel extends Model({
   @computed
   get selectedWidgetOptions() {
     return this.widgetOptions[this.selectedWidgetName];
-  }
-
-  @computed
-  get SelectedRawSvgComponent() {
-    return this.selectedWidgetOptions.RawSvgComponent;
   }
 
   // TODO: these shortcuts to selectedWidgetOptions properties are unnecessary
@@ -97,14 +98,6 @@ export class WorkspaceModel extends Model({
     const currentSnapshot = getSnapshot(this.selectedStore.savedModel);
     // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
     return JSON.stringify(this.savedSnapshot) === JSON.stringify(currentSnapshot);
-  }
-
-  @computed
-  get SelectedControlledSvgComponent() {
-    const ObservedSvgComponent = observer(this.SelectedRawSvgComponent);
-
-    return observer(() => (
-      <ObservedSvgComponent widgetStore={this.selectedStore} preferencesStore={this.preferences} />));
   }
 
   @computed
@@ -149,14 +142,10 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   renderWidgetToString() {
-    const { SelectedRawSvgComponent } = this;
-    const { documentWidth: { value: width }, documentHeight: { value: height } } = this.preferences;
+    const { WidgetSVG, documentAreaProps } = this.selectedStore;
     return ReactDOMServer.renderToString(
-      <SVGWrapper width={width} height={height}>
-        <SelectedRawSvgComponent
-          preferencesStore={this.preferences}
-          widgetStore={this.selectedStore}
-        />
+      <SVGWrapper {...documentAreaProps}>
+        <WidgetSVG />
       </SVGWrapper>,
     );
   }
@@ -164,8 +153,8 @@ export class WorkspaceModel extends Model({
   @modelAction
   resetPreferences() {
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
-    this.preferences = new PreferencesModel({});
-    this.persistPreferences();
+    this.preferences = new WorkspacePreferencesModel({});
+    return this.persistPreferences();
   }
 
   @modelAction

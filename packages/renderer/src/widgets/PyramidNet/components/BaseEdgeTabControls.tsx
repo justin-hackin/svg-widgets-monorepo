@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { PyramidNetWidgetModel } from '../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { BendGuideValleyModel } from '../baseEdgeConnectionTab';
 import { TweakableChildrenInputs }
   from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';

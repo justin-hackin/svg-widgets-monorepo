@@ -14,7 +14,7 @@ import { PathData } from '../PathData';
 import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { referenceSelectProp, sliderWithTextProp } from '../../keystone-tweakables/props';
 import { WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { PyramidNetWidgetModel } from '../../../widgets/PyramidNet/models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { ratioSliderProps } from '../../../widgets/PyramidNet/constants';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);

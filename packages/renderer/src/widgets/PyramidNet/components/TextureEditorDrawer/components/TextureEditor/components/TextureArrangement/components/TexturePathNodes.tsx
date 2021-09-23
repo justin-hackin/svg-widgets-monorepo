@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 // @ts-ignore
 import clsx from 'clsx';
-import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetMakerStore';
+import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
 import { useStyles } from '../../../../../../../../../common/style/style';
 import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/models/WorkspaceModel';

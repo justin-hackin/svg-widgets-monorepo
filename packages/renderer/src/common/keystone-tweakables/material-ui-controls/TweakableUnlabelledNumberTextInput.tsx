@@ -4,7 +4,7 @@ import parseFraction from 'parse-fraction';
 import { observer } from 'mobx-react';
 
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { pxToUnitView, PIXELS_PER_UNIT } from '../../util/units';
+import { PIXELS_PER_UNIT, pxToUnitView } from '../../util/units';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { NumberTextMetadata, SliderWithTextMetadata } from '../types';
 
