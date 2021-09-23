@@ -7,6 +7,8 @@ import {
 } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
+import { Button, Tooltip } from '@material-ui/core';
+import BrushIcon from '@material-ui/icons/Brush';
 import { PyramidNetModel } from './PyramidNetStore';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
@@ -18,6 +20,8 @@ import { WidgetModel } from '../../../WidgetWorkspace/types';
 import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
+import { useStyles } from '../../../common/style/style';
+import { HistoryButtons } from '../components/HistoryButtons';
 
 const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
 
@@ -95,4 +99,24 @@ export class PyramidNetWidgetModel extends Model({
       <DielinesLayer widgetStore={this} />
     </>
   );
+
+  AdditionalToolbarContent = () => {
+    const classes = useStyles();
+    const { savedModel: { history } } = this;
+    return (
+      <>
+        { history && (<HistoryButtons history={history} />)}
+
+        <Tooltip title="Open texture editor" arrow>
+          <Button
+            className={classes.dielinePanelButton}
+            startIcon={<BrushIcon />}
+            onClick={() => { this.setTextureEditorOpen(true); }}
+          >
+            Texture
+          </Button>
+        </Tooltip>
+      </>
+    );
+  };
 }

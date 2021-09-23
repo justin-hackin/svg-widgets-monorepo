@@ -29,12 +29,13 @@ import { electronApi } from '../../../../common/electron';
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
 
-export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, AdditionalToolbarContent, PanelContent }) => {
+export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, PanelContent }) => {
   const classes = useStyles();
   useTheme();
   const workspaceStore = useWorkspaceMst();
   const { selectedWidgetOptions: { specFileExtension, specFileExtensionName } } = workspaceStore;
   const { selectedStore } = workspaceStore;
+  const { AdditionalToolbarContent } = selectedStore;
 
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };

@@ -8,6 +8,7 @@ export interface WidgetModel {
   savedModel: object,
   getFileBasename: () => string,
   WidgetSVG: () => JSX.Element,
+  AdditionalToolbarContent?: () => JSX.Element,
   documentAreaProps: dimensions | viewBoxProps
 }
 
@@ -17,7 +18,6 @@ export interface AdditionalFileMenuItemsProps {
 
 export interface WidgetOptions {
   controlPanelProps: {
-    AdditionalToolbarContent?: FC,
     AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>,
     PanelContent: FC,
   },
