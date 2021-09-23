@@ -1,5 +1,4 @@
 import { FC, MutableRefObject } from 'react';
-import { _Model } from 'mobx-keystone';
 import { dimensions } from '../common/util/data';
 
 interface viewBoxProps { viewBox: string }
@@ -19,11 +18,5 @@ export interface WidgetModel {
   PanelContent: FC,
   specFileExtension: string,
   specFileExtensionName?: string,
+  [prop: string]: any,
 }
-
-export interface WidgetOptions {
-  // TODO: enforce common params
-  WidgetModel: _Model<any, any>,
-}
-
-export type WidgetOptionsCollection = Record<string, WidgetOptions>;

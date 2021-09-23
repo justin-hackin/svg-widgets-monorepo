@@ -13,14 +13,13 @@ import {
   registerRootStore,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
+import { startCase } from 'lodash';
 import { SVGWrapper } from '../components/SVGWrapper';
-import { PyramidNetOptionsInfo } from '../../widgets/PyramidNet';
-import { CylinderLightboxWidgetOptionsInfo } from '../../widgets/CylinderLightbox';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
-import { WidgetOptionsCollection } from '../types';
 import { radioProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
+import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
@@ -37,14 +36,14 @@ const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedWidgetName: prop('polyhedral-net'),
+  selectedWidgetName: prop('polyhedral-net').withSetter(),
   selectedStore: prop<any>(() => (new PyramidNetWidgetModel({}))).withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
   widgetOptions = {
-    'polyhedral-net': PyramidNetOptionsInfo,
-    'cylinder-lightbox': CylinderLightboxWidgetOptionsInfo,
-  } as WidgetOptionsCollection;
+    'polyhedral-net': PyramidNetWidgetModel,
+    'cylinder-lightbox': CylinderLightboxWidgetModel,
+  };
 
   @observable
   savedSnapshot = undefined;
@@ -59,6 +58,10 @@ export class WorkspaceModel extends Model({
         // @ts-ignore
         document.title = this.titleBarText;
       }, { fireImmediately: true }),
+      reaction(() => [this.selectedWidgetName], () => {
+        this.clearCurrentFileData();
+        this.resetModelToDefault();
+      }),
     ];
 
     return () => {
@@ -69,8 +72,8 @@ export class WorkspaceModel extends Model({
   }
 
   @computed
-  get selectedWidgetOptions() {
-    return this.widgetOptions[this.selectedWidgetName];
+  get selectedWidgetNameReadable() {
+    return startCase(this.selectedWidgetName);
   }
 
   @computed
@@ -85,13 +88,8 @@ export class WorkspaceModel extends Model({
   }
 
   @computed
-  get selectedShapeName() {
-    return this.selectedStore?.savedModel?.$modelType;
-  }
-
-  @computed
   get currentFileName() {
-    return this.currentFilePath ? baseFileName(this.currentFilePath).name : `New ${this.selectedShapeName}`;
+    return this.currentFilePath ? baseFileName(this.currentFilePath).name : `New ${this.selectedWidgetNameReadable}`;
   }
 
   @computed
@@ -102,7 +100,12 @@ export class WorkspaceModel extends Model({
   @computed
   get titleBarText() {
     return IS_ELECTRON_BUILD
-      ? `${this.selectedShapeName} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
+      ? `${this.selectedWidgetNameReadable} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
+  }
+
+  @computed
+  get SelectedModel() {
+    return this.widgetOptions[this.selectedWidgetName];
   }
 
   @modelAction
@@ -115,13 +118,6 @@ export class WorkspaceModel extends Model({
         this.resetPreferences();
         return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
       });
-  }
-
-  @modelAction
-  setSelectedWidgetName(name) {
-    this.selectedWidgetName = name;
-    this.clearCurrentFileData();
-    this.resetModelToDefault();
   }
 
   @modelAction
@@ -144,7 +140,7 @@ export class WorkspaceModel extends Model({
   @modelAction
   resetModelToDefault() {
     detach(this.selectedStore);
-    this.setSelectedStore(new this.selectedWidgetOptions.WidgetModel({}));
+    this.setSelectedStore(new this.SelectedModel({}));
   }
 
   @modelAction
