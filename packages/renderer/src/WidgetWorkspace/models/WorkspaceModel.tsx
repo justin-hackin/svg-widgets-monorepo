@@ -1,6 +1,5 @@
 import ReactDOMServer from 'react-dom/server';
 import React, { createContext, useContext } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { computed, observable, reaction } from 'mobx';
 import {
   connectReduxDevTools,
@@ -156,15 +155,8 @@ export class WorkspaceModel extends Model({
   }
 }
 
-// TODO: instantiating this store directly in the module causes unintended side-effects in texture editor:
-// reaction for title bar runs there too but workspace model is only the concern of dieline editor
-// consider this side-effect has the advantage of displaying model name in texture editor -> it doesn't have
-// access to savedModel's model name otherwise
 export const workspaceStore = new WorkspaceModel({});
 registerRootStore(workspaceStore);
-// workspaceStore.persistPreferences();
-// @ts-ignore
-window.workpsaceStore = workspaceStore;
 const WorkspaceStoreContext = createContext<WorkspaceModel>(workspaceStore);
 
 export const { Provider: WorkspaceProvider } = WorkspaceStoreContext;
@@ -178,6 +170,8 @@ export function useWorkspaceMst() {
 }
 
 if (IS_DEVELOPMENT_BUILD) {
+  // @ts-ignore
+  window.workpsaceStore = workspaceStore;
   if (IS_ELECTRON_BUILD) {
     // if this module is imported in web build,
     // `import "querystring"` appears in index bundle, breaks app
