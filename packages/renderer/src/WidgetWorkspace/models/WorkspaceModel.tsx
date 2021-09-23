@@ -73,22 +73,6 @@ export class WorkspaceModel extends Model({
     return this.widgetOptions[this.selectedWidgetName];
   }
 
-  // TODO: these shortcuts to selectedWidgetOptions properties are unnecessary
-  @computed
-  get selectedControlPanelProps() {
-    return this.selectedWidgetOptions.controlPanelProps;
-  }
-
-  @computed
-  get SelectedAdditionalMainContent() {
-    return this.selectedWidgetOptions.AdditionalMainContent;
-  }
-
-  @computed
-  get selectedSpecFileExtension() {
-    return this.selectedWidgetOptions.specFileExtension;
-  }
-
   @computed
   get selectedStoreIsSaved() {
     // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,

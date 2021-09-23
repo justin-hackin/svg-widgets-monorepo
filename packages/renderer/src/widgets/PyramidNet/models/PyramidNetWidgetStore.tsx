@@ -7,8 +7,6 @@ import {
 } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
-import { Button, Tooltip } from '@material-ui/core';
-import BrushIcon from '@material-ui/icons/Brush';
 import { PyramidNetModel } from './PyramidNetStore';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
@@ -20,8 +18,10 @@ import { WidgetModel } from '../../../WidgetWorkspace/types';
 import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
-import { useStyles } from '../../../common/style/style';
-import { HistoryButtons } from '../components/HistoryButtons';
+import { AdditionalFileMenuItems } from '../components/AdditionalFileMenuItems';
+import { PanelContent } from '../components/PanelContent';
+import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
+import { AdditionalToolbarContent } from '../components/AdditionalToolbarContent';
 
 const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
 
@@ -34,6 +34,10 @@ export class PyramidNetWidgetModel extends Model({
 }) implements WidgetModel {
   @observable
   textureEditorOpen = false;
+
+  specFileExtension = 'pns';
+
+  specFileExtensionName = 'Pyramid net spec';
 
   onAttachedToRootStore() {
     this.persistPreferences();
@@ -100,23 +104,11 @@ export class PyramidNetWidgetModel extends Model({
     </>
   );
 
-  AdditionalToolbarContent = () => {
-    const classes = useStyles();
-    const { savedModel: { history } } = this;
-    return (
-      <>
-        { history && (<HistoryButtons history={history} />)}
+  PanelContent = PanelContent;
 
-        <Tooltip title="Open texture editor" arrow>
-          <Button
-            className={classes.dielinePanelButton}
-            startIcon={<BrushIcon />}
-            onClick={() => { this.setTextureEditorOpen(true); }}
-          >
-            Texture
-          </Button>
-        </Tooltip>
-      </>
-    );
-  };
+  AdditionalToolbarContent = AdditionalToolbarContent;
+
+  AdditionalFileMenuItems = AdditionalFileMenuItems;
+
+  AdditionalMainContent = TextureEditorDrawer;
 }

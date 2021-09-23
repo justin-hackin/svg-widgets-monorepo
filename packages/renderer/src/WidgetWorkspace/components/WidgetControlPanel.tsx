@@ -29,13 +29,14 @@ import { electronApi } from '../../../../common/electron';
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
 
-export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, PanelContent }) => {
+export const WidgetControlPanel = observer(() => {
   const classes = useStyles();
   useTheme();
   const workspaceStore = useWorkspaceMst();
-  const { selectedWidgetOptions: { specFileExtension, specFileExtensionName } } = workspaceStore;
   const { selectedStore } = workspaceStore;
-  const { AdditionalToolbarContent } = selectedStore;
+  const {
+    AdditionalToolbarContent, AdditionalFileMenuItems, PanelContent, specFileExtension, specFileExtensionName,
+  } = selectedStore;
 
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
@@ -48,6 +49,7 @@ export const WidgetControlPanel = observer(({ AdditionalFileMenuItems, PanelCont
   const handleSettingsDialogOpen = () => { setSettingsDialogIsOpen(true); };
   const handleSettingsDialogClose = () => { setSettingsDialogIsOpen(false); };
 
+  // TODO: move handler logic into WorkspaceModel actions
   const newHandler = () => {
     workspaceStore.resetModelToDefault();
     workspaceStore.clearCurrentFileData();

@@ -28,7 +28,7 @@ export const WidgetWorkspace = observer(() => {
       WidgetSVG, documentAreaProps,
     },
     selectedWidgetName,
-    selectedControlPanelProps, widgetOptions,
+    widgetOptions,
   } = workspaceStore;
 
   // wrap with observer here so WidgetSVG can be rendered with ReactDOMServer for saving to string
@@ -53,8 +53,7 @@ export const WidgetWorkspace = observer(() => {
         >
           <BuildIcon />
         </Fab>
-        {/* @ts-ignore */}
-        <WidgetControlPanel {...selectedControlPanelProps} />
+        <WidgetControlPanel />
       </div>
       <Dialog
         open={widgetPickerOpen}

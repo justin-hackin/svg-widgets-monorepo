@@ -16,6 +16,7 @@ import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakab
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
 import { WidgetModel } from '../../../WidgetWorkspace/types';
+import { CylinderLightboxPanelContent } from '../components/CylinderLightboxPanelContent';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -28,7 +29,7 @@ const rectanglePathCenteredOnOrigin = (width: number, height:number) => closedPo
 
 const polygonSideLength = (numSides: number, inRadius: number) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
-@model('CylinderLightboxModel')
+@model('CylinderLightbox')
 export class CylinderLightboxModel extends Model({
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,
@@ -277,6 +278,8 @@ export class CylinderLightboxWidgetModel extends Model({
     return 'cylinder_lightbox';
   }
 
+  specFileExtension = 'cyl';
+
   @computed
   get documentAreaProps() {
     const ringRadiusVal = this.savedModel.ringRadius.value;
@@ -307,4 +310,6 @@ export class CylinderLightboxWidgetModel extends Model({
       </g>
     );
   };
+
+  PanelContent = CylinderLightboxPanelContent;
 }
