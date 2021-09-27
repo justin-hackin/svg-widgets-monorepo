@@ -61,6 +61,12 @@ export const expandBoundingBoxAttrs = (vb: BoundingBoxAttrs, margin: number) => 
 export const boundingBoxMinPoint = (bb: BoundingBoxAttrs) => ({ x: bb.xmin, y: bb.ymin });
 export const viewBoxMaxPoint = (bb: BoundingBoxAttrs) => ({ x: bb.xmax, y: bb.ymax });
 
+export const viewBoxStrToViewBoxAttrs = (viewBoxStr: string): BoundingBoxAttrs => {
+  const [xmin, ymin, width, height] = viewBoxStr.split(' ').map((str) => parseFloat(str.trim()));
+  return {
+    xmin, ymin, width, height, xmax: xmin + width, ymax: ymin + height,
+  };
+};
 export const boundingBoxAttrsToViewBoxStr = (bb:BoundingBoxAttrs) => `${bb.xmin} ${bb.ymin} ${bb.width} ${bb.height}`;
 
 export const pathDToViewBoxStr = (d:string) => boundingBoxAttrsToViewBoxStr(getBoundingBoxAttrs(d));

@@ -1,6 +1,8 @@
 // eslint-disable-next-line max-classes-per-file
 import { computed } from 'mobx';
-import { model, Model, prop } from 'mobx-keystone';
+import {
+  ExtendedModel, model, Model, prop,
+} from 'mobx-keystone';
 import React from 'react';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
@@ -11,6 +13,7 @@ import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
+import { BaseWidgetClass, SolitaryAssetDefinition } from '../../../WidgetWorkspace/types';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -266,7 +269,7 @@ export class CylinderLightboxModel extends Model({
 }
 
 @model('CylinderLightboxWidgetModel')
-export class CylinderLightboxWidgetModel extends Model({
+export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
   savedModel: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
 }) {
   // eslint-disable-next-line class-methods-use-this
@@ -282,11 +285,11 @@ export class CylinderLightboxWidgetModel extends Model({
 
   @computed
   get assetDefinition() {
-    return {
-      documentAreaProps: {
+    return new SolitaryAssetDefinition(
+      {
         viewBox: `${-this.ringRadiusVal} ${-this.ringRadiusVal} ${this.ringRadiusVal * 2} ${this.ringRadiusVal * 2}`,
       },
-      Component: () => {
+      () => {
         const {
           savedModel: {
             ringRadius: { value: ringRadius },
@@ -309,6 +312,6 @@ export class CylinderLightboxWidgetModel extends Model({
           </g>
         );
       },
-    };
+    );
   }
 }

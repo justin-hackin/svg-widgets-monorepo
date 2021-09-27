@@ -31,17 +31,19 @@ export abstract class BaseWidgetClass extends Model({}) {
 
   abstract getFileBasename(): string;
 
-  abstract AdditionalToolbarContent?: () => JSX.Element;
+  // seems abstract properties can't be optional
+  // see https://github.com/Microsoft/TypeScript/issues/6413#issuecomment-361869751
+  AdditionalToolbarContent?: () => JSX.Element;
 
-  abstract AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>;
+  AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>;
 
-  abstract AdditionalMainContent?: FC;
+  AdditionalMainContent?: FC;
 
-  abstract PanelContent?: FC;
+  PanelContent?: FC;
 
   abstract specFileExtension: string;
 
-  abstract specFileExtensionName?: string;
+  specFileExtensionName?: string;
 
   abstract get assetDefinition(): AssetDefinition;
 }
@@ -146,7 +148,7 @@ class DisjunctAssetsDefinition implements BaseAssetDefinition {
   }
 }
 
-class SolitaryAssetDefinition implements BaseAssetDefinition {
+export class SolitaryAssetDefinition implements BaseAssetDefinition {
   constructor(
     public documentAreaProps: DocumentAreaProps,
     public Component: WidgetSVGComponent,
