@@ -285,33 +285,30 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
 
   @computed
   get assetDefinition() {
+    const {
+      savedModel: {
+        ringRadius: { value: ringRadius },
+        sectionPathD,
+        wallPathD,
+        innerRadius,
+        designBoundaryRadius,
+        holderTabD,
+      },
+    } = this;
     return new SolitaryAssetDefinition(
       {
         viewBox: `${-this.ringRadiusVal} ${-this.ringRadiusVal} ${this.ringRadiusVal * 2} ${this.ringRadiusVal * 2}`,
       },
-      () => {
-        const {
-          savedModel: {
-            ringRadius: { value: ringRadius },
-            sectionPathD,
-            wallPathD,
-            innerRadius,
-            designBoundaryRadius,
-            holderTabD,
-          },
-        } = this;
-
-        return (
-          <g>
-            <circle r={ringRadius} fill="none" stroke="red" />
-            <circle r={innerRadius} fill="none" stroke="green" />
-            <circle r={designBoundaryRadius} fill="none" stroke="blue" />
-            <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
-            <path d={wallPathD} fill="white" stroke="black" />
-            <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
-          </g>
-        );
-      },
+      () => (
+        <g>
+          <circle r={ringRadius} fill="none" stroke="red" />
+          <circle r={innerRadius} fill="none" stroke="green" />
+          <circle r={designBoundaryRadius} fill="none" stroke="blue" />
+          <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
+          <path d={wallPathD} fill="white" stroke="black" />
+          <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
+        </g>
+      ),
     );
   }
 }
