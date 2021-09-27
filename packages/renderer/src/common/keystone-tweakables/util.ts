@@ -26,6 +26,9 @@ export function createOptionsGetter(
   node: TweakablePrimitiveWithOptionsModel<any, any> | TweakableReferenceWithOptionsModel<any, any>,
   rootStore: object,
 ) {
+  // TODO: remove early exit when remove-modelId PR of mobx-keystone merged
+  // @ts-ignore
+  if (node.options) { return; }
   Object.defineProperty(node, 'options', {
     get: optionsIsListResolver(node.metadata.options)
       ? node.metadata.options(rootStore, node)

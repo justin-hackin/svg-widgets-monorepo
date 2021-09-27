@@ -14,10 +14,10 @@ import FlareIcon from '@material-ui/icons/Flare';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
-
 import {
   AppBar, Button, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@material-ui/core';
+import { isObject, merge } from 'lodash';
 
 import { applySnapshot, getSnapshot } from 'mobx-keystone';
 import { useStyles } from '../../common/style/style';
@@ -68,12 +68,30 @@ export const WidgetControlPanel = observer(() => {
         // eslint-disable-next-line max-len
         throw new Error(`$modelName of file "${fileData.$modelName}" does not match $modelName of selectedStore "${workspaceStore.selectedStore.$modelName}"`);
       }
+      const existingSnapShot = getSnapshot(selectedStore.savedModel);
+      // TODO: this code is very brittle, upgrade mobx-keystone after this merges and it won't be needed
+      // https://github.com/xaviergonz/mobx-keystone/pull/318
+      const deleteModelIdsRecursively = function deleteModelIdsRecursively(obj) {
+        if (obj.$modelId
+          && !['PositionableFaceDecorationModel',
+            'RawFaceDecorationModel',
+            'ImageFaceDecorationPatternModel',
+            'PathFaceDecorationPatternModel',
+          ].includes(obj.$modelType)) {
+          delete obj.$modelId;
+        }
+        Object.values(obj)
+          .filter((value) => isObject(value))
+          .forEach((value) => { deleteModelIdsRecursively(value); });
+      };
+      deleteModelIdsRecursively(fileData);
+      const applicatorSnapshot = merge(existingSnapShot, fileData);
       applySnapshot(
         selectedStore.savedModel,
         // TODO: upgrading mobx-keystone will obviate need for id overwrite
         // @ts-ignore
         // eslint-disable-next-line max-len
-        { ...fileData, $modelId: selectedStore.savedModel.$modelId },
+        applicatorSnapshot,
       );
       workspaceStore.setCurrentFileData(filePath, fileData);
     }
