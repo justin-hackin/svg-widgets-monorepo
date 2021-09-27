@@ -86,18 +86,27 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
   }
 
   getAssetsFileData(fileBaseName: string) {
-    return this.members.map(({
+    return this.members.reduce((acc, {
       Component,
       name,
       copies,
-    }) => ({
-      filePath: filePathConstructor(fileBaseName, name, copies),
-      fileString: ReactDOMServer.renderToString(
-        <SVGWrapper {...this.documentAreaProps}>
-          <Component />
-        </SVGWrapper>,
-      ),
-    }));
+    }) => {
+      // TODO: any way to reduce redundancy of rendering Component twice?
+      //  XML syntax escaped when stringified so can't use it inside SVGWrapper
+      // don't save components that don't render anything
+      const componentStr = ReactDOMServer.renderToString(<Component />);
+      if (componentStr) {
+        acc.push({
+          filePath: filePathConstructor(fileBaseName, name, copies),
+          fileString: ReactDOMServer.renderToString(
+            <SVGWrapper {...this.documentAreaProps}>
+              <Component />
+            </SVGWrapper>,
+          ),
+        });
+      }
+      return acc;
+    }, []);
   }
 }
 
