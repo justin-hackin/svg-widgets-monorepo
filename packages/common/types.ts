@@ -23,7 +23,14 @@ export interface dialogOpenJsonRes {
   filePath: string,
 }
 
-export interface dialogOpenSvgRes {
+export interface ParsedFilePathData {
+  path: string,
+  extname: string,
+  basename: string,
+  dirname: string,
+}
+
+export interface TxtFileInfo {
   fileString: string,
   filePath: string,
 }

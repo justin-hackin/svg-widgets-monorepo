@@ -430,7 +430,7 @@ export class TextureEditorModel extends Model({
     const defaultPath = `${this.shapeName.value
     }__${this.faceDecoration.pattern.sourceFileName}.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`;
     if (IS_ELECTRON_BUILD) {
-      electronApi.saveJsonFromDialog(
+      electronApi.saveJsonFileWithDialog(
         fileData,
         'Save texture arrangement',
         defaultPath,

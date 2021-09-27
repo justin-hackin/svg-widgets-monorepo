@@ -1,4 +1,3 @@
-import ReactDOMServer from 'react-dom/server';
 import React, { createContext, useContext } from 'react';
 import { computed, observable, reaction } from 'mobx';
 import {
@@ -13,7 +12,6 @@ import {
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash';
-import { SVGWrapper } from '../components/SVGWrapper';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { radioProp } from '../../common/keystone-tweakables/props';
@@ -36,7 +34,7 @@ const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
   selectedWidgetName: prop('polyhedral-net').withSetter(),
-  selectedStore: prop<any>(() => (new PyramidNetWidgetModel({}))).withSetter(),
+  selectedStore: prop(() => (new PyramidNetWidgetModel({}))).withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
   widgetOptions = {
@@ -107,6 +105,12 @@ export class WorkspaceModel extends Model({
     return this.widgetOptions[this.selectedWidgetName];
   }
 
+  getSelectedModelAssetsFileData() {
+    return this.selectedStore.assetDefinition.getAssetsFileData(
+      this.selectedStore.getFileBasename(),
+    );
+  }
+
   @modelAction
   persistPreferences() {
     return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
@@ -119,15 +123,15 @@ export class WorkspaceModel extends Model({
       });
   }
 
-  @modelAction
-  renderWidgetToString() {
-    const { WidgetSVG, documentAreaProps } = this.selectedStore;
-    return ReactDOMServer.renderToString(
-      <SVGWrapper {...documentAreaProps}>
-        <WidgetSVG />
-      </SVGWrapper>,
-    );
-  }
+  // @modelAction
+  // renderWidgetToString() {
+  //   const { WidgetSVG, documentAreaProps } = this.selectedStore;
+  //   return ReactDOMServer.renderToString(
+  //     <SVGWrapper {...documentAreaProps}>
+  //       <WidgetSVG />
+  //     </SVGWrapper>,
+  //   );
+  // }
 
   @modelAction
   resetPreferences() {

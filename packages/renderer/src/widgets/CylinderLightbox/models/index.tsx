@@ -11,7 +11,6 @@ import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
-import { WidgetModel } from '../../../WidgetWorkspace/types';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -269,7 +268,7 @@ export class CylinderLightboxModel extends Model({
 @model('CylinderLightboxWidgetModel')
 export class CylinderLightboxWidgetModel extends Model({
   savedModel: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
-}) implements WidgetModel {
+}) {
   // eslint-disable-next-line class-methods-use-this
   getFileBasename() {
     return 'cylinder_lightbox';
@@ -277,34 +276,39 @@ export class CylinderLightboxWidgetModel extends Model({
 
   specFileExtension = 'cyl';
 
-  @computed
-  get documentAreaProps() {
-    const ringRadiusVal = this.savedModel.ringRadius.value;
-    return {
-      viewBox: `${-ringRadiusVal} ${-ringRadiusVal} ${ringRadiusVal * 2} ${ringRadiusVal * 2}`,
-    };
+  get ringRadiusVal() {
+    return this.savedModel.ringRadius.value;
   }
 
-  WidgetSVG = () => {
-    const {
-      savedModel: {
-        ringRadius: { value: ringRadius },
-        sectionPathD,
-        wallPathD,
-        innerRadius,
-        designBoundaryRadius,
-        holderTabD,
+  @computed
+  get assetDefinition() {
+    return {
+      documentAreaProps: {
+        viewBox: `${-this.ringRadiusVal} ${-this.ringRadiusVal} ${this.ringRadiusVal * 2} ${this.ringRadiusVal * 2}`,
       },
-    } = this;
-    return (
-      <g>
-        <circle r={ringRadius} fill="none" stroke="red" />
-        <circle r={innerRadius} fill="none" stroke="green" />
-        <circle r={designBoundaryRadius} fill="none" stroke="blue" />
-        <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
-        <path d={wallPathD} fill="white" stroke="black" />
-        <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
-      </g>
-    );
-  };
+      Component: () => {
+        const {
+          savedModel: {
+            ringRadius: { value: ringRadius },
+            sectionPathD,
+            wallPathD,
+            innerRadius,
+            designBoundaryRadius,
+            holderTabD,
+          },
+        } = this;
+
+        return (
+          <g>
+            <circle r={ringRadius} fill="none" stroke="red" />
+            <circle r={innerRadius} fill="none" stroke="green" />
+            <circle r={designBoundaryRadius} fill="none" stroke="blue" />
+            <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
+            <path d={wallPathD} fill="white" stroke="black" />
+            <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
+          </g>
+        );
+      },
+    };
+  }
 }

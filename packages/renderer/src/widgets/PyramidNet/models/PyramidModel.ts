@@ -50,4 +50,8 @@ export class PyramidModel extends Model({
   get facesPerNet() {
     return this.geometry.faceCount / this.netsPerPyramid.value;
   }
+
+  get copiesNeeded() {
+    return this.geometry.pyramidsPerShape * this.netsPerPyramid.value;
+  }
 }
