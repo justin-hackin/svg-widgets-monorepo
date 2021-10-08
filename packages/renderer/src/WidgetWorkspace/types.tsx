@@ -1,6 +1,8 @@
 import React, { FC, ReactElement } from 'react';
 import { Model, ModelProp } from 'mobx-keystone';
-import { computed, makeObservable } from 'mobx';
+import {
+  action, computed, makeObservable, observable,
+} from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import { dimensions } from '../common/util/data';
 import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';
@@ -64,11 +66,14 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
     public documentAreaProps: DocumentAreaProps,
     public members: RegisteredWidgetAssetMember[],
   ) {
-    makeObservable(this);
+    makeObservable(this, { memberVisibility: observable, setMemberVisibility: action });
     this.memberVisibility = Array(members.length).fill(true);
   }
 
   setMemberVisibility(index: number, isVisible: boolean) {
+    if (this.memberVisibility[index] === undefined) {
+      throw new Error('out of range index while setting member visibility');
+    }
     this.memberVisibility[index] = isVisible;
   }
 
@@ -112,12 +117,16 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
   }
 }
 
-class DisjunctAssetsDefinition implements BaseAssetDefinition {
+export class DisjunctAssetsDefinition implements BaseAssetDefinition {
   constructor(
     public members: DisjunctWidgetAssetMember[],
     public selectedMember: number,
   ) {
-    makeObservable(this);
+    makeObservable(this, { selectedMember: observable });
+  }
+
+  setSelectedMember(selectedIndex: number) {
+    this.selectedMember = selectedIndex;
   }
 
   @computed

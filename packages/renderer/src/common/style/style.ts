@@ -61,6 +61,13 @@ export const useStyles = makeStyles((theme: Theme) => {
       overflow: 'auto',
       padding: theme.spacing(1),
     },
+    assetListItemText: {
+      paddingRight: '1em',
+    },
+    assetsAccordionDetailsRoot: {
+      paddingTop: 0,
+      paddingBottom: '0.5em',
+    },
     dielinePanelFab: {
       top: theme.spacing(1),
       right: theme.spacing(1),

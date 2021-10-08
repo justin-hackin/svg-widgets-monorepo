@@ -27,6 +27,7 @@ import { PreferencesControls } from '../../widgets/PyramidNet/components/Prefere
 import { electronApi } from '../../../../common/electron';
 import { TweakableChildrenInputs } from '../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 import { BaseWidgetClass } from '../types';
+import { AssetsAccordion } from './AssetsAccordion';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
@@ -213,6 +214,7 @@ export const WidgetControlPanel = observer(() => {
             </IconButton>
           </Toolbar>
         </AppBar>
+        <AssetsAccordion assetDefinition={selectedStore.assetDefinition} />
         {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
       </Drawer>
     </>
