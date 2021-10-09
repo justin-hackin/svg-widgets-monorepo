@@ -13,7 +13,9 @@ import { DEFAULT_SLIDER_STEP } from '../../../../../common/constants';
 import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
-import { BaseWidgetClass, SolitaryAssetDefinition } from '../../../WidgetWorkspace/types';
+import { pathDToViewBoxStr } from '../../../common/util/svg';
+import { BaseWidgetClass } from '../../../WidgetWorkspace/widget-types/BaseWidgetClass';
+import { DisjunctAssetsDefinition } from '../../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -288,6 +290,9 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     const {
       savedModel: {
         ringRadius: { value: ringRadius },
+        wallsPerArc: { value: wallsPerArc },
+        arcsPerRing: { value: arcsPerRing },
+        holderTabsPerArc: { value: holderTabsPerArc },
         sectionPathD,
         wallPathD,
         innerRadius,
@@ -295,20 +300,51 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
         holderTabD,
       },
     } = this;
-    return new SolitaryAssetDefinition(
+    return new DisjunctAssetsDefinition([
       {
-        viewBox: `${-this.ringRadiusVal} ${-this.ringRadiusVal} ${this.ringRadiusVal * 2} ${this.ringRadiusVal * 2}`,
+        name: 'Face boundaries',
+        documentAreaProps: {
+          viewBox: `${-this.ringRadiusVal} ${-this.ringRadiusVal} ${this.ringRadiusVal * 2} ${this.ringRadiusVal * 2}`,
+        },
+        Component: () => (
+          <g>
+            <circle r={ringRadius} fill="none" stroke="red" />
+            <circle r={innerRadius} fill="none" stroke="green" />
+            <circle r={designBoundaryRadius} fill="none" stroke="blue" />
+          </g>
+        ),
+        copies: 1,
       },
-      () => (
-        <g>
-          <circle r={ringRadius} fill="none" stroke="red" />
-          <circle r={innerRadius} fill="none" stroke="green" />
-          <circle r={designBoundaryRadius} fill="none" stroke="blue" />
-          <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
-          <path d={wallPathD} fill="white" stroke="black" />
-          <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
-        </g>
-      ),
-    );
+      {
+        name: 'Wall',
+        Component: () => (
+          <g>
+            <path d={wallPathD} fill="white" stroke="black" />
+          </g>
+        ),
+        documentAreaProps: { viewBox: pathDToViewBoxStr(wallPathD) },
+        copies: wallsPerArc * arcsPerRing,
+      },
+      {
+        name: 'Arc',
+        Component: () => (
+          <g>
+            <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
+          </g>
+        ),
+        documentAreaProps: { viewBox: pathDToViewBoxStr(sectionPathD) },
+        copies: arcsPerRing * 2,
+      },
+      {
+        name: 'Diffuser holder',
+        Component: () => (
+          <g>
+            <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
+          </g>
+        ),
+        documentAreaProps: { viewBox: pathDToViewBoxStr(holderTabD) },
+        copies: holderTabsPerArc * arcsPerRing,
+      },
+    ], 1, true);
   }
 }

@@ -67,6 +67,7 @@ export const useStyles = makeStyles((theme: Theme) => {
     assetsAccordionDetailsRoot: {
       paddingTop: 0,
       paddingBottom: '0.5em',
+      display: 'block',
     },
     dielinePanelFab: {
       top: theme.spacing(1),

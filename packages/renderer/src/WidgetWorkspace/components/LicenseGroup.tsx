@@ -1,12 +1,12 @@
 // @ts-nocheck
 /* eslint-disable max-len,jsx-a11y/anchor-is-valid */
 import React from 'react';
-import { viewBoxStrToViewBoxAttrs } from '../../common/util/svg';
+import { viewBoxStrToBoundingBoxAttrs } from '../../common/util/svg';
 
 export const LicenseGroup = ({ viewBox }: { viewBox: string | undefined }) => {
   let transformVal;
   if (viewBox) {
-    const { xmin, ymin } = viewBoxStrToViewBoxAttrs(viewBox);
+    const { xmin, ymin } = viewBoxStrToBoundingBoxAttrs(viewBox);
     transformVal = `translate(${xmin}, ${ymin})`;
   }
   return (

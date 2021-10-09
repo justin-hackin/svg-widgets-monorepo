@@ -26,8 +26,8 @@ import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-contr
 import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
 import { electronApi } from '../../../../common/electron';
 import { TweakableChildrenInputs } from '../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
-import { BaseWidgetClass } from '../types';
 import { AssetsAccordion } from './AssetsAccordion';
+import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';

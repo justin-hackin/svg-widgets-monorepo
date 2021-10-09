@@ -16,12 +16,11 @@ import React from 'react';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { observer } from 'mobx-react';
 import { useStyles } from '../../common/style/style';
-import {
-  AssetDefinition,
-  DisjunctAssetsDefinition,
-  RegisteredAssetsDefinition,
-  SolitaryAssetDefinition,
-} from '../types';
+import { AssetDefinition } from '../widget-types/types';
+import { RegisteredAssetsDefinition } from '../widget-types/RegisteredAssetsDefinition';
+import { DisjunctAssetsDefinition } from '../widget-types/DisjunctAssetsDefinition';
+import { SolitaryAssetDefinition } from '../widget-types/SolitaryAssetDefinition';
+import { SimpleSwitch } from '../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
 
 export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition: AssetDefinition }) => {
   const classes = useStyles();
@@ -41,6 +40,16 @@ export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition
         root: classes.assetsAccordionDetailsRoot,
       }}
       >
+        {assetDefinition instanceof DisjunctAssetsDefinition && assetDefinition.allowOverlayMode && (
+          <SimpleSwitch
+            name="overlayModeEnabled"
+            label="Overlay mode"
+            value={assetDefinition.overlayModeEnabled}
+            onChange={(_, checked) => {
+              assetDefinition.setOverlayModeEnabled(checked);
+            }}
+          />
+        )}
         <List disablePadding>
           {assetDefinition.members.map((member, index) => {
             const labelId = `visibility-label-${member.name}`;
@@ -53,7 +62,8 @@ export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition
                   onClick: () => {
                     assetDefinition.setSelectedMember(index);
                   },
-                  selected: assetDefinition.selectedMember === index,
+                  disabled: assetDefinition.overlayModeEnabled,
+                  selected: !assetDefinition.overlayModeEnabled && assetDefinition.selectedMember === index,
                 } : undefined)}
               >
                 {assetDefinition instanceof RegisteredAssetsDefinition && (

@@ -30,7 +30,7 @@ export const getDimensionsFromPathD = (d) => {
   };
 };
 
-interface BoundingBoxAttrs {
+export interface BoundingBoxAttrs {
   xmin: number
   ymin: number
   xmax: number
@@ -61,7 +61,7 @@ export const expandBoundingBoxAttrs = (vb: BoundingBoxAttrs, margin: number) => 
 export const boundingBoxMinPoint = (bb: BoundingBoxAttrs) => ({ x: bb.xmin, y: bb.ymin });
 export const viewBoxMaxPoint = (bb: BoundingBoxAttrs) => ({ x: bb.xmax, y: bb.ymax });
 
-export const viewBoxStrToViewBoxAttrs = (viewBoxStr: string): BoundingBoxAttrs => {
+export const viewBoxStrToBoundingBoxAttrs = (viewBoxStr: string): BoundingBoxAttrs => {
   const [xmin, ymin, width, height] = viewBoxStr.split(' ').map((str) => parseFloat(str.trim()));
   return {
     xmin, ymin, width, height, xmax: xmin + width, ymax: ymin + height,
@@ -90,4 +90,17 @@ export const registrationMarksPath = (bb: BoundingBoxAttrs, markLength: number, 
     .move({ x: leftLegsRight, y: bb.ymax })
     .line({ x: bb.xmin, y: bb.ymax })
     .line({ x: bb.xmin, y: bottomLegsTop });
+};
+
+export const boundingBoxOfBoundingBoxes = (bbs: BoundingBoxAttrs[]): BoundingBoxAttrs => {
+  const noDimBB = bbs.reduce((acc, bb) => {
+    Object.keys(acc).forEach((key) => {
+      const isMax = key.endsWith('max');
+      acc[key] = Math[isMax ? 'max' : 'min'](bb[key], acc[key]);
+    });
+    return acc;
+  }, {
+    xmin: Infinity, ymin: Infinity, xmax: -Infinity, ymax: -Infinity,
+  });
+  return { ...noDimBB, width: noDimBB.xmax - noDimBB.xmin, height: noDimBB.ymax - noDimBB.ymin };
 };

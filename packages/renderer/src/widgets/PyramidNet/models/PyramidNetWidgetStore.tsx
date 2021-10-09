@@ -14,7 +14,6 @@ import { TextureEditorModel }
   from '../components/TextureEditorDrawer/components/TextureEditor/models/TextureEditorModel';
 import { dashPatternsDefaultFn, StrokeDashPathPatternModel } from '../../../common/path/shapes/strokeDashPath';
 import { DecorationBoundarySVG } from '../components/DecorationBoundarySVG';
-import { BaseWidgetClass, RegisteredAssetsDefinition } from '../../../WidgetWorkspace/types';
 import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
@@ -22,6 +21,8 @@ import { AdditionalFileMenuItems } from '../components/AdditionalFileMenuItems';
 import { PanelContent } from '../components/PanelContent';
 import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
 import { AdditionalToolbarContent } from '../components/AdditionalToolbarContent';
+import { BaseWidgetClass } from '../../../WidgetWorkspace/widget-types/BaseWidgetClass';
+import { RegisteredAssetsDefinition } from '../../../WidgetWorkspace/widget-types/RegisteredAssetsDefinition';
 
 const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
 
