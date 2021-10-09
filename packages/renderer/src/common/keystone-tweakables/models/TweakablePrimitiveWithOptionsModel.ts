@@ -13,7 +13,6 @@ export class TweakablePrimitiveWithOptionsModel<T, M extends WithOptionsMetadata
 
   // @ts-ignore
   onAttachedToRootStore(rootStore) {
-    super.onAttachedToRootStore(rootStore);
     createOptionsGetter(this, rootStore);
   }
 }
