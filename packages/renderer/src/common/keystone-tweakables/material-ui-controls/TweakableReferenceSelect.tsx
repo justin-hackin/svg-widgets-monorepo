@@ -9,7 +9,7 @@ export const TweakableReferenceSelect = observer(({
   const { valuePath, label, options } = node;
 
   const idToOptions = useMemo(() => options.reduce((acc, option) => {
-    acc[option.value.$modelId] = option;
+    acc[option.value.getRefId()] = option;
     return acc;
   }, {}), [options]);
 
@@ -21,12 +21,12 @@ export const TweakableReferenceSelect = observer(({
         },
         options: options.map(({
           label: optionLabel,
-          value: { $modelId },
+          value,
         }) => ({
-          value: $modelId,
+          value: value.getRefId(),
           label: optionLabel,
         })),
-        value: node.value.$modelId,
+        value: node.value.getRefId(),
         label,
         name: valuePath,
       }}

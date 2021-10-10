@@ -42,6 +42,10 @@ export class StrokeDashPathPatternModel extends Model({
   get label() {
     return chunk(this.relativeStrokeDasharray, 2).map(([stroke, gap]) => `● ${stroke} ○ ${gap}`).join(' ');
   }
+
+  getRefId() {
+    return this.label;
+  }
 }
 
 const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
