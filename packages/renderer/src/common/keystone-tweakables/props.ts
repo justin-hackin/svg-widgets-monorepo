@@ -1,24 +1,28 @@
 import { prop } from 'mobx-keystone';
-import uuid from 'uuid/v4';
 
 import { TweakablePrimitiveModel } from './models/TweakablePrimitiveModel';
 import { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
 import { propertyMetadataCtx } from './data';
 import { TweakableReferenceWithOptionsModel } from './models/TweakableReferenceWithOptionsModel';
 import {
-  ColorPickerMetadata, INPUT_TYPE,
+  ColorPickerMetadata,
+  INPUT_TYPE,
   NumberTextMetadata,
-  PrimitiveMetadata, RadioMetadata,
+  PrimitiveMetadata,
+  RadioMetadata,
   ReferenceRadioMetadata,
-  ReferenceSelectMetadata, SelectMetadata, SliderMetadata,
-  SliderWithTextMetadata, SwitchMetadata, WithOptionsMetadata,
+  ReferenceSelectMetadata,
+  SelectMetadata,
+  SliderMetadata,
+  SliderWithTextMetadata,
+  SwitchMetadata,
+  WithOptionsMetadata,
 } from './types';
 
 export function controllablePrimitiveProp<T, M extends PrimitiveMetadata>(value: T, metadata: M) {
   return prop<TweakablePrimitiveModel<T, M>>(() => propertyMetadataCtx.apply(
     () => new TweakablePrimitiveModel<T, M>({
       value,
-      $modelId: uuid(),
     }), metadata,
   ));
 }
@@ -43,7 +47,6 @@ function controllablePrimitiveWithOptionsProp<T, M extends WithOptionsMetadata<T
   return prop<TweakablePrimitiveWithOptionsModel<T, M>>(() => propertyMetadataCtx.apply(
     () => new TweakablePrimitiveWithOptionsModel<T, M>({
       value,
-      $modelId: uuid(),
     }), metadata,
   ));
 }
