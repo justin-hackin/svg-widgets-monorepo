@@ -30,15 +30,15 @@ Allows viewing of the SVG dielines and optional print layer with controls for ad
 - Supports fractional display/input of inches or cm
 - Customized cut and score stroke properties
 - User settings persisted across sessions
-- Save the dielines as SVG alongside a .pns file that will allow you to re-open your parameter settings later
-- Image-based textures are exported as separate Inkscape-compatible layer so you can print and cut with the same document
+- View print/cut components separately with the Assets accordion
+- Save the dielines file and optional print file SVG alongside a .pns file that will allow you to re-open your parameter settings later
+- Image-based textures are exported as separate file
 - Image registration modes
     - Laser cutter: cut registration marks onto the laser cutter bed, trim print to expose its registration corners, and line up the print with the bed
     - Craft Robo: export a bounding box in dielines for use with Craft Robo Pro Illustrator plugin
 - Test tabs' connections efficiently without having to cut out a whole pyramid
 - Break a single pyramid net up into multiple sections (nets per pyramid), allowing maximum shape size with limited cutting area
 - View test tabs via multi-widget interface
-- .pns file can also be opened in the test tabs widget
 - Download/import SVG template for editing cut paths with your own vector editor of choice as an alternative to texture editor
 - Optional path scoring: adjust the dasharray pattern ratios independent of length of the pattern repetition and offset. Instead of simply styling a solid path to look like dashes, this feature makes a series of `<path>` lines that can be sent directly to a laser cutter
 
@@ -71,8 +71,9 @@ Interactively apply cut patterns or print textures to the faces of your shape an
   <img src="/packages/renderer/static/images/widgets/cylinder-lightbox.jpg" />
 </p>
 
+Another "widget" called Cylinder Lightbox allows one to efficiently construct a cylinder out of flat panels. You can access it using the wrench icon in the bottom left corner. It has been used to create circular LED lightboxes. It was included in order to hint at the possibility of extension. This widget has a different UI configuration in the Assets accordion. 
 
-Another "widget" called Cylinder Lightbox allows one to efficiently construct a cylinder out of flat panels. You can access it using the wrench icon in the bottom left corner. It has been used to create circular LED lightboxes. It was included in order to hint at the possibility of extension.
+The different assets of the design can either be viewed all at once, or independently. This allows the user to see all changes to any widget parameter but also examine each component independently with less clicks than the per-asset visibility toggle. 
 
 Because this project contains abstractions that make it easy to build "tweakable" data structures, the creation of a plugin-based architecture which will separate the widgets from the workspace is being explored.
 
@@ -121,5 +122,5 @@ npm run web-serve
 Pushing code to the branch `web-deploy` will cause DigitalOcean App Platform to fetch the code from the branch and re-deploy.
 
 ## Author's note
-
-These designs are a labor of love for symmetry and craft developed over many years of play and toil. I offer them in the spirit of generosity and mutual care. It would bring me joy to see these manifestations spread with these intentions preserved. Conversely, it would pain me to see these designs exploited for mere commercial gain. Please respect the [Creative Commons Attribution-NonCommercial-ShareAlike](https://creativecommons.org/licenses/by-nc-sa/4.0/) license under which the resultant content is under. If you would like to use these works to raise awareness or funds in the interests of the well-being of humanity, please gain consent first and respect the author's discretion.
+ 
+These designs are a labor of love for symmetry and craft developed over many years of play and toil. I offer them in the spirit of generosity and mutual care. It would bring me joy to see these manifestations spread with these intentions preserved. Please respect the [Creative Commons Attribution-NonCommercial-ShareAlike](https://creativecommons.org/licenses/by-nc-sa/4.0/) license under which the resultant content is under or please reach out if you would like to be granted further rights to use these designs. Collaborators are welcomed.
