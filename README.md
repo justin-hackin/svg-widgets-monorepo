@@ -65,17 +65,25 @@ Interactively apply cut patterns or print textures to the faces of your shape an
 - Intelligent defaults for all files names (encodes shape name and texture file name)
 
 
-### Bonus
+### Bonus Widgets
 
+Using the wrench icon in the lower left corner allows you to access some additional "widgets" that have been authored using the same structure as the polyhedral net.
+
+#### Cylinder Lightbox
 <p alt="cylinder lightbox" align="center">
   <img src="/packages/renderer/static/images/widgets/cylinder-lightbox.jpg" />
 </p>
 
-Another "widget" called Cylinder Lightbox allows one to efficiently construct a cylinder out of flat panels. You can access it using the wrench icon in the bottom left corner. It has been used to create circular LED lightboxes. It was included in order to hint at the possibility of extension. This widget has a different UI configuration in the Assets accordion. 
+An open polygon prism box with ring-shaped sleeve edges. This allows one to efficiently construct a (roughly) cylindrical form out of flat panels. It has been used to create circular LED lightboxes. 
 
-The different assets of the design can either be viewed all at once, or independently. This allows the user to see all changes to any widget parameter but also examine each component independently with less clicks than the per-asset visibility toggle. 
+This widget has a different UI configuration in the Assets accordion known as a "Disjunct Asset Definition" (as opposed to the "Registered Asset Definition" of the pyramid net). The different assets of the design can either be viewed all at once, or independently. This allows the user to see all changes to any widget parameter but also examine each component independently with less clicks than the per-asset visibility toggle. 
 
-Because this project contains abstractions that make it easy to build "tweakable" data structures, the creation of a plugin-based architecture which will separate the widgets from the workspace is being explored.
+#### Crosshatch Shelves
+
+<p alt="crosshatch shelf" align="center">
+  <img src="/packages/renderer/static/images/widgets/crosshatch-shelf.jpg" />
+</p>
+Enables the creation of slotted cross-hatched shelving inserts. Target application: spatial organization, storage of many bottles and/or cans within larger shelf section. 
 
 ## Warning
 
