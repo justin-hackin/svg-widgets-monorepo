@@ -54,8 +54,11 @@ export class WorkspaceModel extends Model({
   @observable
   currentFilePath = undefined;
 
-  onAttachedToRootStore():(() => void) {
-    this.selectedStore = new widgetOptions[defaultWidgetName]({});
+  onAttachedToRootStore() {
+    this.persistPreferences()
+      .then(() => {
+        this.assignDefaultStore();
+      });
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
@@ -82,6 +85,7 @@ export class WorkspaceModel extends Model({
 
   @computed
   get selectedStoreIsSaved() {
+    if (!this.selectedStore) { return false; }
     // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,
     // instead flagging history records with the associated file name upon save
     // + creating a middleware variable currentSnapshotIsSaved
@@ -119,13 +123,18 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
+  assignDefaultStore() {
+    this.selectedStore = new widgetOptions[defaultWidgetName]({});
+  }
+
+  @modelAction
   persistPreferences() {
     return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
-      .catch((e) => {
+      .catch(async (e) => {
         // eslint-disable-next-line no-console
         console.warn('Failed to persist preferences, likely due to data schema changes, '
           + 'resetting preferences to defaults: ', e.message);
-        this.resetPreferences();
+        await this.resetPreferences();
         return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
       });
   }
