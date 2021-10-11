@@ -17,6 +17,8 @@ import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNe
 import { radioProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
 import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
+import { CrosshatchShelvesWidgetModel } from '../../widgets/CrosshatchShelves/CrosshatchShelvesWidgetModel';
+import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
@@ -30,17 +32,21 @@ class WorkspacePreferencesModel extends Model({
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
+const widgetOptions = {
+  'polyhedral-net': PyramidNetWidgetModel,
+  'cylinder-lightbox': CylinderLightboxWidgetModel,
+  'crosshatch-shelf': CrosshatchShelvesWidgetModel,
+};
+
+const defaultWidgetName = 'crosshatch-shelf';
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedWidgetName: prop('polyhedral-net').withSetter(),
-  selectedStore: prop(() => (new PyramidNetWidgetModel({}))).withSetter(),
+  selectedWidgetName: prop(defaultWidgetName).withSetter(),
+  selectedStore: prop<BaseWidgetClass>().withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
-  widgetOptions = {
-    'polyhedral-net': PyramidNetWidgetModel,
-    'cylinder-lightbox': CylinderLightboxWidgetModel,
-  };
+  widgetOptions = widgetOptions;
 
   @observable
   savedSnapshot = undefined;
@@ -49,6 +55,7 @@ export class WorkspaceModel extends Model({
   currentFilePath = undefined;
 
   onAttachedToRootStore():(() => void) {
+    this.selectedStore = new widgetOptions[defaultWidgetName]({});
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
