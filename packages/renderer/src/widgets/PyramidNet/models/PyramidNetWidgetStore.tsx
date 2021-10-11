@@ -24,7 +24,7 @@ import { AdditionalToolbarContent } from '../components/AdditionalToolbarContent
 import { BaseWidgetClass } from '../../../WidgetWorkspace/widget-types/BaseWidgetClass';
 import { RegisteredAssetsDefinition } from '../../../WidgetWorkspace/widget-types/RegisteredAssetsDefinition';
 
-const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
+const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
 @model('PyramidNetWidgetModel')
 export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {

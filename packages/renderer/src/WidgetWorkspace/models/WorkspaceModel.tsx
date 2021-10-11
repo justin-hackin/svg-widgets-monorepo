@@ -12,6 +12,10 @@ import {
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash';
+import {
+  fitToViewer, // @ts-ignore
+  INITIAL_VALUE, Tool, TOOL_PAN, Value,
+} from 'react-svg-pan-zoom';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { radioProp } from '../../common/keystone-tweakables/props';
@@ -53,6 +57,12 @@ export class WorkspaceModel extends Model({
 
   @observable
   currentFilePath = undefined;
+
+  @observable
+  zoomPanValue: Value = INITIAL_VALUE;
+
+  @observable
+  zoomPanTool: Tool = TOOL_PAN;
 
   onAttachedToRootStore() {
     this.persistPreferences()
@@ -120,6 +130,21 @@ export class WorkspaceModel extends Model({
     return this.selectedStore.assetDefinition.getAssetsFileData(
       this.selectedStore.getFileBasename(),
     );
+  }
+
+  @modelAction
+  fitToDocument() {
+    this.setZoomPanValue(fitToViewer(this.zoomPanValue));
+  }
+
+  @modelAction
+  setZoomPanTool(tool: Tool) {
+    this.zoomPanTool = tool;
+  }
+
+  @modelAction
+  setZoomPanValue(value: Value) {
+    this.zoomPanValue = value;
   }
 
   @modelAction
