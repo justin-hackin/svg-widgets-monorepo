@@ -42,11 +42,11 @@ const widgetOptions = {
   'crosshatch-shelf': CrosshatchShelvesWidgetModel,
 };
 
-const defaultWidgetName = 'crosshatch-shelf';
+const defaultWidgetName = 'polyhedral-net';
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedWidgetName: prop(defaultWidgetName).withSetter(),
+  selectedWidgetName: prop<string>().withSetter(),
   selectedStore: prop<BaseWidgetClass>().withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
@@ -65,10 +65,6 @@ export class WorkspaceModel extends Model({
   zoomPanTool: Tool = TOOL_PAN;
 
   onAttachedToRootStore() {
-    this.persistPreferences()
-      .then(() => {
-        this.assignDefaultStore();
-      });
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
@@ -80,6 +76,16 @@ export class WorkspaceModel extends Model({
         this.resetModelToDefault();
       }),
     ];
+
+    this.persistPreferences()
+      .then(() => {
+        this.setSelectedWidgetName(defaultWidgetName);
+        // TODO: get rid of this
+        //  why doesn't useLayoutEffect in workspace view cover first render case?
+        setTimeout(() => {
+          this.fitToDocument();
+        }, 300);
+      });
 
     return () => {
       for (const disposer of disposers) {
@@ -148,11 +154,6 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
-  assignDefaultStore() {
-    this.selectedStore = new widgetOptions[defaultWidgetName]({});
-  }
-
-  @modelAction
   persistPreferences() {
     return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
       .catch(async (e) => {
@@ -173,7 +174,9 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetModelToDefault() {
-    detach(this.selectedStore);
+    if (this.selectedStore) {
+      detach(this.selectedStore);
+    }
     this.setSelectedStore(new this.SelectedModel({}));
   }
 

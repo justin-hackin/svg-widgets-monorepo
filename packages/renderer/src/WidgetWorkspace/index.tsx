@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import {
   Avatar, Dialog, DialogTitle, Fab, List, ListItem, ListItemAvatar, ListItemText,
@@ -18,6 +18,10 @@ export const WidgetWorkspace = observer(() => {
   const { selectedStore, selectedWidgetName, widgetOptions } = workspaceStore;
 
   const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
+
+  useLayoutEffect(() => {
+    workspaceStore.fitToDocument();
+  }, [workspaceStore?.selectedWidgetName]);
 
   if (!selectedStore) { return null; }
   const { WorkspaceView } = selectedStore.assetDefinition;
