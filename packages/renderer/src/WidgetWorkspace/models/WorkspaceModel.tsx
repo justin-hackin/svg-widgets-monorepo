@@ -130,16 +130,6 @@ export class WorkspaceModel extends Model({
       });
   }
 
-  // @modelAction
-  // renderWidgetToString() {
-  //   const { WidgetSVG, documentAreaProps } = this.selectedStore;
-  //   return ReactDOMServer.renderToString(
-  //     <SVGWrapper {...documentAreaProps}>
-  //       <WidgetSVG />
-  //     </SVGWrapper>,
-  //   );
-  // }
-
   @modelAction
   resetPreferences() {
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
