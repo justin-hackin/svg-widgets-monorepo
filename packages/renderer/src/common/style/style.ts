@@ -61,6 +61,17 @@ export const useStyles = makeStyles((theme: Theme) => {
       overflow: 'auto',
       padding: theme.spacing(1),
     },
+    assetListItemText: {
+      paddingRight: '1em',
+    },
+    assetsAccordionDetailsRoot: {
+      paddingTop: 0,
+      paddingBottom: '0.5em',
+      display: 'block',
+    },
+    dielinePanelContent: {
+      overflowY: 'auto',
+    },
     dielinePanelFab: {
       top: theme.spacing(1),
       right: theme.spacing(1),
@@ -139,8 +150,6 @@ export const useStyles = makeStyles((theme: Theme) => {
       display: 'flex',
       padding: theme.spacing(1),
       flexDirection: 'column',
-      overflowY: 'auto',
-      overflowX: 'hidden',
     },
     shapeSection: {
       padding: theme.spacing(1),

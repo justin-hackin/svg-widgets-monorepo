@@ -3,6 +3,7 @@ import { TweakableReferenceModel } from './TweakableReferenceModel';
 import { createOptionsGetter } from '../util';
 import { OptionsListItem, ReferenceWithOptionsMetadata } from '../types';
 
+// NOTE: controls depend on reference models having a defined id via getRefId
 @model('TweakableReferenceWithOptionsModel')
 export class TweakableReferenceWithOptionsModel<T extends object, M extends ReferenceWithOptionsMetadata<T> >
   extends ExtendedModel(<T extends object, M extends ReferenceWithOptionsMetadata<T>>() => ({
@@ -12,7 +13,6 @@ export class TweakableReferenceWithOptionsModel<T extends object, M extends Refe
   readonly options: OptionsListItem<T>[] | undefined;
 
   onAttachedToRootStore(rootStore) {
-    super.onAttachedToRootStore(rootStore);
     createOptionsGetter(this, rootStore);
 
     if (this.value === undefined && this.metadata.initialSelectionResolver !== undefined) {

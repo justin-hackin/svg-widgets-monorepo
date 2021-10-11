@@ -26,6 +26,7 @@ export function createOptionsGetter(
   node: TweakablePrimitiveWithOptionsModel<any, any> | TweakableReferenceWithOptionsModel<any, any>,
   rootStore: object,
 ) {
+  if (node.options) { return; }
   Object.defineProperty(node, 'options', {
     get: optionsIsListResolver(node.metadata.options)
       ? node.metadata.options(rootStore, node)

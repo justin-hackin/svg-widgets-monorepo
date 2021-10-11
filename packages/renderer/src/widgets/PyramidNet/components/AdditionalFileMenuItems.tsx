@@ -45,7 +45,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       {/* NEW */}
       <MenuItem onClick={async () => {
         if (IS_ELECTRON_BUILD) {
-          await electronApi.saveSvgFromDialog(
+          await electronApi.saveSvgWithDialog(
             store.renderDecorationBoundaryToString(),
             DOWNLOAD_TEMPLATE_TXT,
             `${store.savedModel.pyramid.shapeName}__template.svg`,
@@ -113,7 +113,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
       {/* DOWNLOAD TAB TEST */}
       <MenuItem onClick={async () => {
-        await electronApi.saveSvgFromDialog(
+        await electronApi.saveSvgWithDialog(
           renderTestTabsToString(store),
           DOWNLOAD_TAB_TESTER_TXT,
           `${store.getFileBasename()}--test-tabs.svg`,

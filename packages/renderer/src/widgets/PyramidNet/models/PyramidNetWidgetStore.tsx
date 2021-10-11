@@ -3,7 +3,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import {
-  model, Model, modelAction, prop,
+  ExtendedModel, model, modelAction, prop,
 } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
@@ -14,7 +14,6 @@ import { TextureEditorModel }
   from '../components/TextureEditorDrawer/components/TextureEditor/models/TextureEditorModel';
 import { dashPatternsDefaultFn, StrokeDashPathPatternModel } from '../../../common/path/shapes/strokeDashPath';
 import { DecorationBoundarySVG } from '../components/DecorationBoundarySVG';
-import { WidgetModel } from '../../../WidgetWorkspace/types';
 import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
@@ -22,16 +21,18 @@ import { AdditionalFileMenuItems } from '../components/AdditionalFileMenuItems';
 import { PanelContent } from '../components/PanelContent';
 import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
 import { AdditionalToolbarContent } from '../components/AdditionalToolbarContent';
+import { BaseWidgetClass } from '../../../WidgetWorkspace/widget-types/BaseWidgetClass';
+import { RegisteredAssetsDefinition } from '../../../WidgetWorkspace/widget-types/RegisteredAssetsDefinition';
 
-const PREFERENCES_LOCALSTORE_NAME = 'preferencesStoreLocal';
+const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
 @model('PyramidNetWidgetModel')
-export class PyramidNetWidgetModel extends Model({
+export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   savedModel: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
   textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),
   dashPatterns: prop<StrokeDashPathPatternModel[]>(dashPatternsDefaultFn),
   preferences: prop(() => (new PyramidNetPreferencesModel({}))),
-}) implements WidgetModel {
+}) {
   @observable
   textureEditorOpen = false;
 
@@ -51,6 +52,29 @@ export class PyramidNetWidgetModel extends Model({
   @computed
   get documentAreaProps() {
     return { width: this.preferences.documentWidth.value, height: this.preferences.documentHeight.value };
+  }
+
+  @computed
+  get assetDefinition() {
+    const documentAreaProps = {
+      width: this.preferences.documentWidth.value,
+      height: this.preferences.documentHeight.value,
+    };
+    return new RegisteredAssetsDefinition(
+      documentAreaProps,
+      [
+        {
+          name: 'Print',
+          Component: () => (<PrintLayer widgetStore={this} />),
+          copies: this.savedModel.pyramid.copiesNeeded,
+        },
+        {
+          name: 'Dielines',
+          Component: () => (<DielinesLayer widgetStore={this} />),
+          copies: this.savedModel.pyramid.copiesNeeded,
+        },
+      ],
+    );
   }
 
   @modelAction
@@ -96,13 +120,6 @@ export class PyramidNetWidgetModel extends Model({
     this.preferences = new PyramidNetPreferencesModel({});
     this.persistPreferences();
   }
-
-  WidgetSVG = () => (
-    <>
-      <PrintLayer widgetStore={this} />
-      <DielinesLayer widgetStore={this} />
-    </>
-  );
 
   PanelContent = PanelContent;
 

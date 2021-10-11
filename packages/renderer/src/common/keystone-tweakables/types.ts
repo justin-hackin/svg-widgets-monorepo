@@ -52,6 +52,7 @@ export interface RadioMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.RADIO,
   options: MetadataOptions<T>,
   isRow?: boolean,
+  valueParser?: (value: string)=>T,
 }
 
 export interface SelectMetadata<T> extends BasePrimitiveMetadata {

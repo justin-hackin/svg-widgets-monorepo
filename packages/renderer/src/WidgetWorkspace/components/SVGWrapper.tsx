@@ -24,7 +24,7 @@ const namedviewAttributes = {
 export const SVGWrapper = ({ children, ...rest }) => (
   <svg {...rest} {...svgNamespaceAttributes}>
     <DocumentMetadata />
-    <LicenseGroup />
+    <LicenseGroup viewBox={rest.viewBox} />
     <SodipodiNamedview {...namedviewAttributes} />
     {children}
   </svg>

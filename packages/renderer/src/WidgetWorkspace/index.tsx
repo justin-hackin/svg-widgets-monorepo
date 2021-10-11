@@ -1,47 +1,38 @@
-import React, { useMemo, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Dialog, Fab, List, ListItem, ListItemText, DialogTitle, ListItemAvatar, Avatar,
+  Avatar, Dialog, DialogTitle, Fab, List, ListItem, ListItemAvatar, ListItemText,
 } from '@material-ui/core';
 import BuildIcon from '@material-ui/icons/Build';
 import { startCase } from 'lodash';
-
-import { GridPattern } from './components/ResizableZoomPan/components/GridPattern';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
 import { useWorkspaceMst } from './models/WorkspaceModel';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
 import { useStyles } from '../common/style/style';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
-const patternId = 'grid-pattern';
 
 export const WidgetWorkspace = observer(() => {
-  const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
-  const workspaceStore = useWorkspaceMst();
   const classes = useStyles();
+  const workspaceStore = useWorkspaceMst();
+  const { selectedStore, selectedWidgetName, widgetOptions } = workspaceStore;
 
-  if (!workspaceStore.selectedStore) {
-    return null;
-  }
-  const {
-    selectedStore: {
-      WidgetSVG, documentAreaProps,
-    },
-    selectedWidgetName,
-    widgetOptions,
-  } = workspaceStore;
+  const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
+
+  useLayoutEffect(() => {
+    workspaceStore.fitToDocument();
+  }, [workspaceStore?.selectedWidgetName]);
+
+  if (!selectedStore) { return null; }
+  const { WorkspaceView } = selectedStore.assetDefinition;
 
   // wrap with observer here so WidgetSVG can be rendered with ReactDOMServer for saving to string
-  const ObserverWidgetSVG = useMemo(() => (observer(WidgetSVG)), [WidgetSVG]);
 
   return (
     <>
       <div className={classes.fullPage}>
-        <ResizableZoomPan SVGBackground={`url(#${patternId})`}>
-          <svg {...documentAreaProps}>
-            <GridPattern patternId={patternId} />
-            <ObserverWidgetSVG />
-          </svg>
+        <ResizableZoomPan SVGBackground="url(#grid-pattern)">
+          { WorkspaceView }
         </ResizableZoomPan>
         <Fab
           color="inherit"

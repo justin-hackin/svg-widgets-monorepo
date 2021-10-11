@@ -1,4 +1,3 @@
-import ReactDOMServer from 'react-dom/server';
 import React, { createContext, useContext } from 'react';
 import { computed, observable, reaction } from 'mobx';
 import {
@@ -13,12 +12,17 @@ import {
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash';
-import { SVGWrapper } from '../components/SVGWrapper';
+import {
+  fitToViewer, // @ts-ignore
+  INITIAL_VALUE, Tool, TOOL_PAN, Value,
+} from 'react-svg-pan-zoom';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { radioProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
 import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
+import { CrosshatchShelvesWidgetModel } from '../../widgets/CrosshatchShelves/CrosshatchShelvesWidgetModel';
+import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
@@ -32,17 +36,21 @@ class WorkspacePreferencesModel extends Model({
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
+const widgetOptions = {
+  'polyhedral-net': PyramidNetWidgetModel,
+  'cylinder-lightbox': CylinderLightboxWidgetModel,
+  'crosshatch-shelf': CrosshatchShelvesWidgetModel,
+};
+
+const defaultWidgetName = 'polyhedral-net';
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedWidgetName: prop('polyhedral-net').withSetter(),
-  selectedStore: prop<any>(() => (new PyramidNetWidgetModel({}))).withSetter(),
+  selectedWidgetName: prop<string>().withSetter(),
+  selectedStore: prop<BaseWidgetClass>().withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
-  widgetOptions = {
-    'polyhedral-net': PyramidNetWidgetModel,
-    'cylinder-lightbox': CylinderLightboxWidgetModel,
-  };
+  widgetOptions = widgetOptions;
 
   @observable
   savedSnapshot = undefined;
@@ -50,7 +58,13 @@ export class WorkspaceModel extends Model({
   @observable
   currentFilePath = undefined;
 
-  onAttachedToRootStore():(() => void) {
+  @observable
+  zoomPanValue: Value = INITIAL_VALUE;
+
+  @observable
+  zoomPanTool: Tool = TOOL_PAN;
+
+  onAttachedToRootStore() {
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
@@ -62,6 +76,16 @@ export class WorkspaceModel extends Model({
         this.resetModelToDefault();
       }),
     ];
+
+    this.persistPreferences()
+      .then(() => {
+        this.setSelectedWidgetName(defaultWidgetName);
+        // TODO: get rid of this
+        //  why doesn't useLayoutEffect in workspace view cover first render case?
+        setTimeout(() => {
+          this.fitToDocument();
+        }, 300);
+      });
 
     return () => {
       for (const disposer of disposers) {
@@ -77,6 +101,7 @@ export class WorkspaceModel extends Model({
 
   @computed
   get selectedStoreIsSaved() {
+    if (!this.selectedStore) { return false; }
     // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,
     // instead flagging history records with the associated file name upon save
     // + creating a middleware variable currentSnapshotIsSaved
@@ -107,26 +132,37 @@ export class WorkspaceModel extends Model({
     return this.widgetOptions[this.selectedWidgetName];
   }
 
-  @modelAction
-  persistPreferences() {
-    return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
-      .catch((e) => {
-        // eslint-disable-next-line no-console
-        console.warn('Failed to persist preferences, likely due to data schema changes, '
-          + 'resetting preferences to defaults: ', e.message);
-        this.resetPreferences();
-        return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
-      });
+  getSelectedModelAssetsFileData() {
+    return this.selectedStore.assetDefinition.getAssetsFileData(
+      this.selectedStore.getFileBasename(),
+    );
   }
 
   @modelAction
-  renderWidgetToString() {
-    const { WidgetSVG, documentAreaProps } = this.selectedStore;
-    return ReactDOMServer.renderToString(
-      <SVGWrapper {...documentAreaProps}>
-        <WidgetSVG />
-      </SVGWrapper>,
-    );
+  fitToDocument() {
+    this.setZoomPanValue(fitToViewer(this.zoomPanValue));
+  }
+
+  @modelAction
+  setZoomPanTool(tool: Tool) {
+    this.zoomPanTool = tool;
+  }
+
+  @modelAction
+  setZoomPanValue(value: Value) {
+    this.zoomPanValue = value;
+  }
+
+  @modelAction
+  persistPreferences() {
+    return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
+      .catch(async (e) => {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to persist preferences, likely due to data schema changes, '
+          + 'resetting preferences to defaults: ', e.message);
+        await this.resetPreferences();
+        return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences);
+      });
   }
 
   @modelAction
@@ -138,7 +174,9 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetModelToDefault() {
-    detach(this.selectedStore);
+    if (this.selectedStore) {
+      detach(this.selectedStore);
+    }
     this.setSelectedStore(new this.SelectedModel({}));
   }
 

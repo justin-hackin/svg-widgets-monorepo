@@ -10,7 +10,8 @@ export const TweakableRadio = observer((
   <SimpleRadio
     {...{
       onChange: (e) => {
-        node.setValue(e.target.value);
+        const value = node.metadata.valueParser ? node.metadata.valueParser(e.target.value) : e.target.value;
+        node.setValue(value);
       },
       options: node.options,
       row: node.metadata.isRow,

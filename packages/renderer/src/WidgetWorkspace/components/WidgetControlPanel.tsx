@@ -14,7 +14,6 @@ import FlareIcon from '@material-ui/icons/Flare';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
-
 import {
   AppBar, Button, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@material-ui/core';
@@ -26,6 +25,8 @@ import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-contr
 import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
 import { electronApi } from '../../../../common/electron';
 import { TweakableChildrenInputs } from '../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
+import { AssetsAccordion } from './AssetsAccordion';
+import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
@@ -34,7 +35,7 @@ export const WidgetControlPanel = observer(() => {
   const classes = useStyles();
   useTheme();
   const workspaceStore = useWorkspaceMst();
-  const { selectedStore } = workspaceStore;
+  const { selectedStore }: { selectedStore: BaseWidgetClass } = workspaceStore;
   const {
     AdditionalToolbarContent, AdditionalFileMenuItems, PanelContent, specFileExtension, specFileExtensionName,
   } = selectedStore;
@@ -59,9 +60,19 @@ export const WidgetControlPanel = observer(() => {
 
   const openSpecHandler = async () => {
     const res = await electronApi.getJsonFromDialog(OPEN_TXT, specFileExtension, specFileExtensionName);
-    if (res) {
+    if (res !== undefined) {
       const { fileData, filePath } = res;
-      applySnapshot(selectedStore.savedModel, fileData);
+      // @ts-ignore
+      if (fileData.$modelName !== workspaceStore.selectedStore.$modelName) {
+        // @ts-ignore
+        // eslint-disable-next-line max-len
+        throw new Error(`$modelName of file "${fileData.$modelName}" does not match $modelName of selectedStore "${workspaceStore.selectedStore.$modelName}"`);
+      }
+      applySnapshot(
+        selectedStore.savedModel,
+        // @ts-ignore
+        fileData,
+      );
       workspaceStore.setCurrentFileData(filePath, fileData);
     }
     resetFileMenuRef();
@@ -69,10 +80,10 @@ export const WidgetControlPanel = observer(() => {
 
   const saveAsHandler = async () => {
     const snapshot = getSnapshot(selectedStore.savedModel);
-    const filePath = await electronApi.saveSvgAndModelWithDialog(
-      workspaceStore.renderWidgetToString(),
+    const filePath = await electronApi.saveSvgAndAssetsWithDialog(
+      workspaceStore.getSelectedModelAssetsFileData(),
       snapshot,
-      'Save widget svg with json data',
+      'Save assets svg with widget settings',
       `${selectedStore.getFileBasename()}.${specFileExtension}`,
       specFileExtension,
       specFileExtensionName,
@@ -90,13 +101,11 @@ export const WidgetControlPanel = observer(() => {
       return;
     }
     const snapshot = getSnapshot(selectedStore.savedModel);
-    const filePath = await electronApi.saveSvgAndModel(
-      workspaceStore.renderWidgetToString(), snapshot, workspaceStore.currentFilePath,
-      SAVE_TXT, specFileExtension, specFileExtensionName,
+    await electronApi.saveSvgAndModel(
+      workspaceStore.getSelectedModelAssetsFileData(), snapshot, workspaceStore.currentFilePath,
     );
-    if (filePath) {
-      workspaceStore.setCurrentFileData(filePath, snapshot);
-    }
+    // TODO: lose redundant setting of currentFilePath
+    workspaceStore.setCurrentFileData(workspaceStore.currentFilePath, snapshot);
     resetFileMenuRef();
   };
 
@@ -184,7 +193,10 @@ export const WidgetControlPanel = observer(() => {
             </IconButton>
           </Toolbar>
         </AppBar>
-        {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
+        <AssetsAccordion assetDefinition={selectedStore.assetDefinition} />
+        <div className={classes.dielinePanelContent}>
+          {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
+        </div>
       </Drawer>
     </>
   );

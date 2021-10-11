@@ -20,7 +20,7 @@ import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorati
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const pyramidNetPluginStore:PyramidNetWidgetModel = workspaceStore.selectedStore;
+  const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const { textureEditor } = pyramidNetPluginStore;
   const {
     faceDecoration,

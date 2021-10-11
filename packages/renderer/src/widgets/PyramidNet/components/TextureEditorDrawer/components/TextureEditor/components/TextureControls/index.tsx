@@ -94,7 +94,7 @@ const OpenTextureArrangementMenuItem = forwardRef<any, OpenTextureArrangementMen
 export const TextureControls = observer(({ hasCloseButton }) => {
   const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
-  const widgetModel:PyramidNetWidgetModel = workspaceStore.selectedStore;
+  const widgetModel = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const { history } = widgetModel.savedModel;
   const { textureEditor, preferences } = widgetModel;
   const {
