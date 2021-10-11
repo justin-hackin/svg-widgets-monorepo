@@ -9,7 +9,7 @@ import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 export const PreferencesControls = observer(() => {
   const workspaceStore: WorkspaceModel = useWorkspaceMst();
   const workspacePreferences = workspaceStore.preferences;
-  const { selectedStore } : { selectedStore: PyramidNetWidgetModel } = workspaceStore;
+  const selectedStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const widgetPreferences = selectedStore.preferences;
 
   return (

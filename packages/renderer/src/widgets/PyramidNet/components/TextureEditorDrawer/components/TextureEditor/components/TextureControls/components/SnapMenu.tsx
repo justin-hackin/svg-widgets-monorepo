@@ -12,7 +12,7 @@ export const SnapMenu = observer(() => {
   const [positionSnapMenuAnchorEl, setPositionSnapMenuAnchorEl] = useState(null);
 
   const workspaceStore = useWorkspaceMst();
-  const widgetModel:PyramidNetWidgetModel = workspaceStore.selectedStore;
+  const widgetModel = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const { textureEditor } = widgetModel;
 
   const {

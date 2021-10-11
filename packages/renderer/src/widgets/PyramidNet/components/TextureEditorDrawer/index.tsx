@@ -11,7 +11,7 @@ import { TextureEditor } from './components/TextureEditor';
 
 export const TextureEditorDrawer = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const pyramidNetPluginStore:PyramidNetWidgetModel = workspaceStore.selectedStore;
+  const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
   if (!pyramidNetPluginStore) { return null; }
   const classes = useStyles();
   return (

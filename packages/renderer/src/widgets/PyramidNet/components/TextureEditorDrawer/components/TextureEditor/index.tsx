@@ -31,7 +31,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
 
   const mainAreaRef = useRef<HTMLDivElement>();
 
-  const pyramidNetPluginStore: PyramidNetWidgetModel = workspaceStore.selectedStore;
+  const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const { history } = pyramidNetPluginStore.savedModel;
   const { preferences } = pyramidNetPluginStore;
   const { needsTour } = preferences;
