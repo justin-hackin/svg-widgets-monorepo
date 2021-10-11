@@ -194,7 +194,9 @@ export const WidgetControlPanel = observer(() => {
           </Toolbar>
         </AppBar>
         <AssetsAccordion assetDefinition={selectedStore.assetDefinition} />
-        {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
+        <div className={classes.dielinePanelContent}>
+          {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
+        </div>
       </Drawer>
     </>
   );
