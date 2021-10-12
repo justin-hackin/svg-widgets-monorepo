@@ -1,6 +1,6 @@
 import React, { forwardRef, useState } from 'react';
 import {
-  AppBar,
+  AppBar, Button,
   Divider,
   FormControlLabel,
   IconButton,
@@ -48,7 +48,6 @@ import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/models/
 import { PathFaceDecorationPatternModel } from '../../../../../../models/PathFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../../models/PositionableFaceDecorationModel';
 import { electronApi } from '../../../../../../../../../../common/electron';
-import { PanelButton } from '../../../../../../../../common/style/style';
 
 // @ts-ignore
 const NumberFormatDecimalDegrees = forwardRef(({ onChange, ...other }, ref) => (
@@ -187,7 +186,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             <Divider />
           </>
           )}
-          <PanelButton
+          <Button
             className={TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU}
             startIcon={<FolderIcon />}
             onClick={(e) => {
@@ -195,7 +194,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             }}
           >
             File
-          </PanelButton>
+          </Button>
           <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
             {(() => {
               if (IS_WEB_BUILD) {

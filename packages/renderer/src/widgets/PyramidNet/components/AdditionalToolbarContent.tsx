@@ -1,8 +1,7 @@
-import { Tooltip } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
 import BrushIcon from '@mui/icons-material/Brush';
 import React from 'react';
 
-import { PanelButton } from '../../../common/style/style';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { HistoryButtons } from './HistoryButtons';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
@@ -16,12 +15,12 @@ export const AdditionalToolbarContent = () => {
       { history && (<HistoryButtons history={history} />)}
 
       <Tooltip title="Open texture editor" arrow>
-        <PanelButton
+        <Button
           startIcon={<BrushIcon />}
           onClick={() => { pyramidNetStore.setTextureEditorOpen(true); }}
         >
           Texture
-        </PanelButton>
+        </Button>
       </Tooltip>
     </>
   );

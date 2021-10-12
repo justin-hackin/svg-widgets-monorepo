@@ -18,7 +18,6 @@ import {
 
 import { applySnapshot, getSnapshot } from 'mobx-keystone';
 import { styled } from '@mui/material/styles';
-import { panelButtonStyles } from '../../common/style/style';
 import { useWorkspaceMst } from '../models/WorkspaceModel';
 import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
@@ -29,10 +28,6 @@ import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
-
-const MyIconButton = styled(IconButton)({
-  ...panelButtonStyles,
-});
 
 const drawerWidth = '500px';
 const CLASS_BASE = 'control-panel';
@@ -209,20 +204,20 @@ export const WidgetControlPanel = observer(() => {
               </MenuItem>
               {AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
             </Menu>
-            <MyIconButton
+            <IconButton
               onClick={handleSettingsDialogOpen}
             >
               <SettingsIcon />
-            </MyIconButton>
+            </IconButton>
             <SimpleDialog isOpen={settingsDialogIsOpen} handleClose={handleSettingsDialogClose} title="Settings">
               <PreferencesControls />
             </SimpleDialog>
-            <MyIconButton
+            <IconButton
               className={classes.closePanelButton}
               onClick={handleDrawerClose}
             >
               <CloseSharpIcon />
-            </MyIconButton>
+            </IconButton>
           </Toolbar>
         </AppBar>
         <AssetsAccordion assetDefinition={selectedStore.assetDefinition} />
