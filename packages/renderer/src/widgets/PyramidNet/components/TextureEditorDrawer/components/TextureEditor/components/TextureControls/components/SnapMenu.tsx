@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
-import { Button, Menu, MenuItem } from '@mui/material';
+import {
+  IconButton, Menu, MenuItem, Tooltip,
+} from '@mui/material';
 import { observer } from 'mobx-react';
 import { range } from 'lodash';
 import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
@@ -80,15 +82,16 @@ export const SnapMenu = observer(() => {
 
   return (
     <>
-      <Button
-        className={TOUR_ELEMENT_CLASSES.SNAP_MENU}
-        startIcon={<TrackChangesIcon />}
-        aria-controls="simple-menu"
-        aria-haspopup="true"
-        onClick={handleCornerSnapMenuClick}
-      >
-        Snap
-      </Button>
+      <Tooltip title="Snap...">
+        <IconButton
+          className={TOUR_ELEMENT_CLASSES.SNAP_MENU}
+          aria-controls="simple-menu"
+          aria-haspopup="true"
+          onClick={handleCornerSnapMenuClick}
+        >
+          <TrackChangesIcon />
+        </IconButton>
+      </Tooltip>
 
       {/* ===================== SNAP MENU ===================== */}
       <Menu

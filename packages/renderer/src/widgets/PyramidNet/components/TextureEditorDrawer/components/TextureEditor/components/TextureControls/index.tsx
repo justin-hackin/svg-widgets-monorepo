@@ -1,6 +1,6 @@
 import React, { forwardRef, useState } from 'react';
 import {
-  AppBar, Button,
+  AppBar,
   Divider,
   FormControlLabel,
   IconButton,
@@ -10,7 +10,7 @@ import {
   MenuItem,
   Switch,
   TextField,
-  Toolbar,
+  Toolbar, Tooltip,
   Typography,
 } from '@mui/material';
 import { observer } from 'mobx-react';
@@ -69,15 +69,17 @@ const NumberFormatDecimalDegrees = forwardRef(({ onChange, ...other }, ref) => (
 ));
 
 const UploadButton = ({ onClick = undefined }) => (
-  <IconButton
-    className={TOUR_ELEMENT_CLASSES.UPLOAD_IMAGE}
-    onClick={onClick}
-    aria-label="send texture"
-    component="span"
-    size="large"
-  >
-    <PublishIcon fontSize="large" />
-  </IconButton>
+  <Tooltip title="Upload raster/vector graphics...">
+    <IconButton
+      className={TOUR_ELEMENT_CLASSES.UPLOAD_IMAGE}
+      onClick={onClick}
+      aria-label="send texture"
+      component="span"
+      size="large"
+    >
+      <PublishIcon fontSize="large" />
+    </IconButton>
+  </Tooltip>
 );
 
 const classes = {
@@ -186,15 +188,16 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             <Divider />
           </>
           )}
-          <Button
-            className={TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU}
-            startIcon={<FolderIcon />}
-            onClick={(e) => {
-              setFileMenuRef(e.currentTarget);
-            }}
-          >
-            File
-          </Button>
+          <Tooltip title="File...">
+            <IconButton
+              className={TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU}
+              onClick={(e) => {
+                setFileMenuRef(e.currentTarget);
+              }}
+            >
+              <FolderIcon />
+            </IconButton>
+          </Tooltip>
           <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
             {(() => {
               if (IS_WEB_BUILD) {
@@ -237,8 +240,8 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             ),
           ]}
           </Menu>
-          {/*  @ts-ignore */}
-          {(() => { // eslint-disable-line consistent-return
+
+          {(() => {
             if (IS_ELECTRON_BUILD) {
               return (
                 <UploadButton onClick={async () => {
@@ -282,6 +285,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 </FilePicker>
               );
             }
+            throw new Error('unexpected build environment');
           })()}
           <ShapeSelect
             className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}

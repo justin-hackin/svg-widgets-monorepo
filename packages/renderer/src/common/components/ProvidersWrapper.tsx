@@ -1,7 +1,8 @@
 import { StyledEngineProvider, Theme, ThemeProvider } from '@mui/material/styles';
 import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-import { WorkspaceStoreProvider } from '../../WidgetWorkspace/models/WorkspaceModel';
+import { observer } from 'mobx-react';
+import { useWorkspaceMst, WorkspaceStoreProvider } from '../../WidgetWorkspace/models/WorkspaceModel';
 import { theme } from '../style/style';
 
 declare module '@mui/styles/defaultTheme' {
@@ -9,13 +10,23 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-export const ProvidersWrapper = ({ children }) => (
-  <StyledEngineProvider injectFirst>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <WorkspaceStoreProvider>
+const StylesWrapper = observer(({ children }) => {
+  const workspaceStore = useWorkspaceMst();
+  const darkModeEnabled = workspaceStore.preferences.darkModeEnabled.value;
+  return (
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme(darkModeEnabled)}>
+        <CssBaseline />
         {children}
-      </WorkspaceStoreProvider>
-    </ThemeProvider>
-  </StyledEngineProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
+  );
+});
+
+export const ProvidersWrapper = ({ children }) => (
+  <WorkspaceStoreProvider>
+    <StylesWrapper>
+      {children}
+    </StylesWrapper>
+  </WorkspaceStoreProvider>
 );

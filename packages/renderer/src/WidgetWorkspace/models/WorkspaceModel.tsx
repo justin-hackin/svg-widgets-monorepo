@@ -18,7 +18,7 @@ import {
 } from 'react-svg-pan-zoom';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
-import { radioProp } from '../../common/keystone-tweakables/props';
+import { radioProp, switchProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
 import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
 import { CrosshatchShelvesWidgetModel } from '../../widgets/CrosshatchShelves/CrosshatchShelvesWidgetModel';
@@ -33,6 +33,7 @@ class WorkspacePreferencesModel extends Model({
       options: Object.values(UNITS).map((unit) => ({ value: unit, label: unit })),
       isRow: true,
     }),
+    darkModeEnabled: switchProp(true),
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Step } from 'react-joyride';
-import { theme } from '../style/style';
+import { styled } from '@mui/styles';
 import { SAMPLE_TEXTURES } from './sample-textures';
 import { DimensionsModel } from '../../widgets/PyramidNet/models/DimensionsModel';
 
@@ -34,11 +34,11 @@ export enum STEP_ACTIONS {
   ADD_PATH_TEXTURE,
   ADD_IMAGE_TEXTURE,
 }
+const TourLink = styled('a')(({ theme }) => ({ color: theme.palette.primary.main }));
 
 // TODO: consider custom component for tour using Material UI Popper
 
 // TODO: use MUI global style (scoped to tour elements) instead of linkStyle
-const linkStyle = { color: theme.palette.primary.main };
 export const TOUR_STEPS: MyStep[] = [
   {
     target: 'body',
@@ -68,7 +68,7 @@ export const TOUR_STEPS: MyStep[] = [
         <p>
           Your image shows up here, superimposed upon the shape face triangle. The sample SVG path applied here is a member of a downloadable collection of
           {' '}
-          <a style={linkStyle} target="_blank" href="https://github.com/justin-hackin/stroke-filled-regular-tilings" rel="noreferrer">Stroke-Filled Regular Tilings</a>
+          <TourLink target="_blank" href="https://github.com/justin-hackin/stroke-filled-regular-tilings" rel="noreferrer">Stroke-Filled Regular Tilings</TourLink>
           {' '}
           that you can use to get started with polyhedral decoration.
         </p>
@@ -101,27 +101,25 @@ export const TOUR_STEPS: MyStep[] = [
           scrolling can have ergonomic benefits and there are workarounds to the browser default behaviours. You can
           disable ctrl+scroll in Chrome with
           {' '}
-          <a
-            style={linkStyle}
+          <TourLink
             href="https://chrome.google.com/webstore/detail/disable-ctrl-%20-scroll-whe/mdpfkohgfpidohkakdbpmnngaocglmhl"
           >
             this extension
-          </a>
+          </TourLink>
           {' '}
           or with
           {' '}
-          <a style={linkStyle} href="https://duntuk.com/disable-scroll-wheel-zoom-firefox">a setting in Firefox</a>
+          <TourLink href="https://duntuk.com/disable-scroll-wheel-zoom-firefox">a setting in Firefox</TourLink>
           .
         </p>
         <p>
           A must for KDE Linux users: disable alt+drag window move feature (see
           {' '}
-          <a
-            style={linkStyle}
+          <TourLink
             href="https://superuser.com/questions/584730/how-can-i-disable-alt-mouse-default-behavior-in-kde"
           >
             this question
-          </a>
+          </TourLink>
           {' '}
           for tips).
         </p>
@@ -156,7 +154,7 @@ export const TOUR_STEPS: MyStep[] = [
           This menu also allows you to download a 3D model of the sape in .glb format.
           Not sure what to do with a .glb file? Why not drag and drop it into a virtual meeting room on
           {' '}
-          <a style={linkStyle} target="_blank" href="http://hubs.mozilla.com" rel="noreferrer">http://hubs.mozilla.com</a>
+          <TourLink target="_blank" href="http://hubs.mozilla.com" rel="noreferrer">http://hubs.mozilla.com</TourLink>
           {' '}
           and invite your friends to come see your creation.
         </p>
@@ -218,18 +216,17 @@ export const TOUR_STEPS: MyStep[] = [
         <p>
           This app is a work-in-progress so your feedback would be greatly appreciated. You can report bugs and make feature suggestions by emailing
           {' '}
-          <a style={linkStyle} href="mailto:playful.geometer@protonmail.com">Playful Geometer</a>
+          <TourLink href="mailto:playful.geometer@protonmail.com">Playful Geometer</TourLink>
           .
         </p>
         <p>
           If you would also like to try building a sample model from pyramid net dielines, you can take a look at
           {' '}
-          <a
-            style={linkStyle}
+          <TourLink
             href="https://www.hylo.com/groups/stellar-coinciders/post/37875"
           >
             this post
-          </a>
+          </TourLink>
           . If you want to help create more cultural artifacts like this, get your hands on the desktop application, and co-create a participatory design community, please reach out in order to join the alpha test group. Playful Geometer is welcoming collaboration with artists, product/graphic designers, coders, crafters, gifters and community animators.
         </p>
         <p>

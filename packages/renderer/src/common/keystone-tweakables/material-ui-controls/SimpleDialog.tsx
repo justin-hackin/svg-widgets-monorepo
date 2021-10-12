@@ -14,11 +14,11 @@ const classes = {
 
 const MyDialog = styled(Dialog)(({ theme }) => ({
   maxHeight: '90%',
-  [`& ${classes.dialogContent}`]: {
+  [`& .${classes.dialogContent}`]: {
     overflow: 'auto',
     padding: theme.spacing(1),
   },
-  [`& ${classes.closeIconButton}`]: {
+  [`& .${classes.closeIconButton}`]: {
     position: 'absolute',
     right: theme.spacing(1),
     top: theme.spacing(1),

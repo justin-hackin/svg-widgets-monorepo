@@ -1,4 +1,4 @@
-import { Button, Tooltip } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import BrushIcon from '@mui/icons-material/Brush';
 import React from 'react';
 
@@ -15,12 +15,11 @@ export const AdditionalToolbarContent = () => {
       { history && (<HistoryButtons history={history} />)}
 
       <Tooltip title="Open texture editor" arrow>
-        <Button
-          startIcon={<BrushIcon />}
+        <IconButton
           onClick={() => { pyramidNetStore.setTextureEditorOpen(true); }}
         >
-          Texture
-        </Button>
+          <BrushIcon />
+        </IconButton>
       </Tooltip>
     </>
   );

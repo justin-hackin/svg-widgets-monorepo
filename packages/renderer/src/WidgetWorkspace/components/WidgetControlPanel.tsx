@@ -13,7 +13,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SaveIcon from '@mui/icons-material/Save';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import {
-  AppBar, Button, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
+  AppBar, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@mui/material';
 
 import { applySnapshot, getSnapshot } from 'mobx-keystone';
@@ -40,6 +40,12 @@ const classes = {
   panelToolbar: `${CLASS_BASE}__panel-toolbar`,
 };
 
+const PanelOpenFab = styled(Fab)(({ theme }) => ({
+  top: theme.spacing(1),
+  right: theme.spacing(1),
+  position: 'absolute',
+}));
+
 const ControlPanelDrawer = styled(Drawer)(({ theme }) => ({
   [`& .${classes.drawerPaper}`]: {
     width: drawerWidth,
@@ -48,11 +54,6 @@ const ControlPanelDrawer = styled(Drawer)(({ theme }) => ({
   },
   [`& .${classes.dielinePanelContent}`]: {
     overflowY: 'auto',
-  },
-  [`& .${classes.panelOpenFab}`]: {
-    top: theme.spacing(1),
-    right: theme.spacing(1),
-    position: 'absolute',
   },
   [`& .${classes.closePanelButton}`]: {
     marginLeft: 'auto',
@@ -144,13 +145,13 @@ export const WidgetControlPanel = observer(() => {
 
   return (
     <>
-      <Fab
+      <PanelOpenFab
         className={classes.panelOpenFab}
         aria-label="open drawer"
         onClick={handleDrawerOpen}
       >
         <MenuIcon />
-      </Fab>
+      </PanelOpenFab>
       <ControlPanelDrawer
         variant="persistent"
         anchor="right"
@@ -160,14 +161,13 @@ export const WidgetControlPanel = observer(() => {
         <AppBar position="relative">
           <Toolbar className={classes.panelToolbar} variant="dense">
             <Tooltip title="File ..." arrow>
-              <Button
-                startIcon={<FolderIcon />}
+              <IconButton
                 onClick={(e) => {
                   setFileMenuRef(e.currentTarget);
                 }}
               >
-                File
-              </Button>
+                <FolderIcon />
+              </IconButton>
             </Tooltip>
             {/*
               By default disabled elements like Button do not trigger user interactions

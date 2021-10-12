@@ -13,7 +13,7 @@ import {
   STEP_ACTIONS,
   TOUR_STEPS,
 } from '../../../../../../common/util/tour';
-import { FullPageDiv, theme } from '../../../../../../common/style/style';
+import { FullPageDiv } from '../../../../../../common/style/style';
 import { RawFaceDecorationModel } from '../../../../models/RawFaceDecorationModel';
 import { IS_WEB_BUILD } from '../../../../../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
@@ -38,7 +38,7 @@ const TextureEditorRoot = styled(FullPageDiv)(({ theme }) => ({
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
-
+  const theme = useTheme();
   const [stepIndex, setStepIndex] = useState<number>(0);
   const incrementStepIndex = (index) => { setStepIndex(index + 1); };
   const resetStepIndex = () => { setStepIndex(0); };
