@@ -1,5 +1,5 @@
 import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/lab/ToggleButtonGroup/ToggleButtonGroup';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import CachedIcon from '@mui/icons-material/Cached';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
 import AspectRatioIcon from '@mui/icons-material/AspectRatio';
