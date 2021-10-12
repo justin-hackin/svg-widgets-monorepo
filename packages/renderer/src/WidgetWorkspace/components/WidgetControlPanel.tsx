@@ -34,36 +34,41 @@ const MyIconButton = styled(IconButton)({
   ...panelButtonStyles,
 });
 
-const CloseIconButton = styled(MyIconButton)({
-  marginLeft: 'auto',
-});
-
-const DielinePanelFab = styled(Fab)(({ theme }) => ({
-  top: theme.spacing(1),
-  right: theme.spacing(1),
-  position: 'absolute',
-}));
-
-const DielinePanelContent = styled('div')({
-  overflowY: 'auto',
-});
-
 const drawerWidth = '500px';
-const drawerPaperClass = 'control-panel-paper';
-const ControlPanelDrawer = styled(Drawer)({
-  [`& .${drawerPaperClass}`]: {
+const CLASS_BASE = 'control-panel';
+const classes = {
+  drawerPaper: `${CLASS_BASE}__paper`,
+  dielinePanelContent: `${CLASS_BASE}__panel-content`,
+  panelOpenFab: `${CLASS_BASE}__panel-open-fab`,
+  closePanelButton: `${CLASS_BASE}__close-panel-button`,
+  listItemIcon: `${CLASS_BASE}__list-item-icon`,
+  panelToolbar: `${CLASS_BASE}__panel-toolbar`,
+};
+
+const ControlPanelDrawer = styled(Drawer)(({ theme }) => ({
+  [`& .${classes.drawerPaper}`]: {
     width: drawerWidth,
     overflow: 'unset',
     position: 'absolute',
   },
-});
+  [`& .${classes.dielinePanelContent}`]: {
+    overflowY: 'auto',
+  },
+  [`& .${classes.panelOpenFab}`]: {
+    top: theme.spacing(1),
+    right: theme.spacing(1),
+    position: 'absolute',
+  },
+  [`& .${classes.closePanelButton}`]: {
+    marginLeft: 'auto',
+  },
+  [`& .${classes.listItemIcon}`]: {
+    minWidth: theme.spacing(4),
+  },
+  [`& .${classes.panelToolbar}`]: {
+    padding: `0 ${theme.spacing(1)}`,
+  },
 
-const MyListItemIcon = styled(ListItemIcon)(({ theme }) => ({
-  minWidth: theme.spacing(4),
-}));
-
-const ControlPanelToolbar = styled(Toolbar)(({ theme }) => ({
-  padding: `0 ${theme.spacing(1)}`,
 }));
 
 export const WidgetControlPanel = observer(() => {
@@ -144,20 +149,21 @@ export const WidgetControlPanel = observer(() => {
 
   return (
     <>
-      <DielinePanelFab
+      <Fab
+        className={classes.panelOpenFab}
         aria-label="open drawer"
         onClick={handleDrawerOpen}
       >
         <MenuIcon />
-      </DielinePanelFab>
+      </Fab>
       <ControlPanelDrawer
         variant="persistent"
         anchor="right"
         open={drawerIsOpen}
-        classes={{ paper: drawerPaperClass }}
+        classes={{ paper: classes.drawerPaper }}
       >
         <AppBar position="relative">
-          <ControlPanelToolbar variant="dense">
+          <Toolbar className={classes.panelToolbar} variant="dense">
             <Tooltip title="File ..." arrow>
               <Button
                 startIcon={<FolderIcon />}
@@ -175,30 +181,30 @@ export const WidgetControlPanel = observer(() => {
             {AdditionalToolbarContent && <AdditionalToolbarContent />}
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={newHandler}>
-                <MyListItemIcon>
+                <ListItemIcon className={classes.listItemIcon}>
                   <FlareIcon fontSize="small" />
-                </MyListItemIcon>
+                </ListItemIcon>
                 <Typography variant="inherit">New</Typography>
               </MenuItem>
               <MenuItem onClick={openSpecHandler}>
-                <MyListItemIcon>
+                <ListItemIcon className={classes.listItemIcon}>
                   <FolderOpenIcon fontSize="small" />
-                </MyListItemIcon>
+                </ListItemIcon>
                 <Typography variant="inherit">{OPEN_TXT}</Typography>
               </MenuItem>
               <MenuItem onClick={saveHandler}>
-                <MyListItemIcon>
+                <ListItemIcon className={classes.listItemIcon}>
                   <SaveIcon fontSize="small" />
-                </MyListItemIcon>
+                </ListItemIcon>
                 <Typography variant="inherit">{SAVE_TXT}</Typography>
               </MenuItem>
               <MenuItem
                 disabled={!workspaceStore.currentFileName}
                 onClick={saveAsHandler}
               >
-                <MyListItemIcon>
+                <ListItemIcon className={classes.listItemIcon}>
                   <SaveAltIcon fontSize="small" />
-                </MyListItemIcon>
+                </ListItemIcon>
                 <Typography variant="inherit">Save as ...</Typography>
               </MenuItem>
               {AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
@@ -211,17 +217,18 @@ export const WidgetControlPanel = observer(() => {
             <SimpleDialog isOpen={settingsDialogIsOpen} handleClose={handleSettingsDialogClose} title="Settings">
               <PreferencesControls />
             </SimpleDialog>
-            <CloseIconButton
+            <MyIconButton
+              className={classes.closePanelButton}
               onClick={handleDrawerClose}
             >
               <CloseSharpIcon />
-            </CloseIconButton>
-          </ControlPanelToolbar>
+            </MyIconButton>
+          </Toolbar>
         </AppBar>
         <AssetsAccordion assetDefinition={selectedStore.assetDefinition} />
-        <DielinePanelContent>
+        <div className={classes.dielinePanelContent}>
           {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
-        </DielinePanelContent>
+        </div>
       </ControlPanelDrawer>
     </>
   );
