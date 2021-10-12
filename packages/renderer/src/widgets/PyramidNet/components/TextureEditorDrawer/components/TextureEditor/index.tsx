@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '@material-ui/styles';
-import clsx from 'clsx';
+import { styled, useTheme } from '@mui/styles';
 import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
 
 import { TextureControls } from './components/TextureControls';
@@ -14,13 +13,28 @@ import {
   STEP_ACTIONS,
   TOUR_STEPS,
 } from '../../../../../../common/util/tour';
-import { theme, useStyles } from '../../../../../../common/style/style';
+import { FullPageDiv, theme } from '../../../../../../common/style/style';
 import { RawFaceDecorationModel } from '../../../../models/RawFaceDecorationModel';
 import { IS_WEB_BUILD } from '../../../../../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { useWorkspaceMst } from '../../../../../../WidgetWorkspace/models/WorkspaceModel';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
+
+const classes = { mainArea: 'main-area' };
+const TextureEditorRoot = styled(FullPageDiv)(({ theme }) => ({
+  backgroundColor: theme.palette.grey.A400,
+  height: '100%',
+  color: theme.palette.grey['300'],
+  [`& .${classes.mainArea}`]: {
+    flex: '1 1 auto',
+    display: 'grid',
+    gridTemplateColumns: '50% 50%',
+    gridTemplateRows: '100%',
+    height: '100%',
+    width: '100%',
+  },
+}));
 
 export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const workspaceStore = useWorkspaceMst();
@@ -39,7 +53,6 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const { textureEditor } = pyramidNetPluginStore;
   const { faceDecoration } = textureEditor;
   useTheme();
-  const classes = useStyles();
   // Init
   useEffect(() => {
     const resizeHandler = () => {
@@ -99,7 +112,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   };
 
   return (
-    <div className={clsx(classes.fullPage, classes.textureEditorRoot)}>
+    <TextureEditorRoot>
       <Joyride
         steps={TOUR_STEPS}
         stepIndex={stepIndex}
@@ -119,10 +132,10 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
         hideBackButton
       />
       <TextureControls hasCloseButton={hasCloseButton} />
-      <div ref={mainAreaRef} className={classes.textureEditorMainArea}>
+      <div ref={mainAreaRef} className={classes.mainArea}>
         <TextureArrangement />
         <ShapePreview />
       </div>
-    </div>
+    </TextureEditorRoot>
   );
 });

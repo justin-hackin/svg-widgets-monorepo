@@ -1,7 +1,6 @@
 import React, { forwardRef, useState } from 'react';
 import {
   AppBar,
-  Button,
   Divider,
   FormControlLabel,
   IconButton,
@@ -13,27 +12,27 @@ import {
   TextField,
   Toolbar,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { observer } from 'mobx-react';
-import CachedIcon from '@material-ui/icons/Cached';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import FolderIcon from '@material-ui/icons/Folder';
-import FolderOpenIcon from '@material-ui/icons/FolderOpen';
-import SaveIcon from '@material-ui/icons/Save';
-import PublishIcon from '@material-ui/icons/Publish';
+import CachedIcon from '@mui/icons-material/Cached';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import FolderIcon from '@mui/icons-material/Folder';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import SaveIcon from '@mui/icons-material/Save';
+import PublishIcon from '@mui/icons-material/Publish';
 import FilePicker from '@mavedev/react-file-picker';
-import HelpIcon from '@material-ui/icons/Help';
+import HelpIcon from '@mui/icons-material/Help';
 
 import { isNaN, isNumber } from 'lodash';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
+import { styled } from '@mui/styles';
 import { SnapMenu } from './components/SnapMenu';
 import { TextureEditorModel } from '../../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../../../../../common/util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
-import { useStyles } from '../../../../../../../../common/style/style';
 import {
   IS_ELECTRON_BUILD,
   IS_WEB_BUILD,
@@ -49,14 +48,17 @@ import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/models/
 import { PathFaceDecorationPatternModel } from '../../../../../../models/PathFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../../models/PositionableFaceDecorationModel';
 import { electronApi } from '../../../../../../../../../../common/electron';
+import { PanelButton } from '../../../../../../../../common/style/style';
 
-const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
+// @ts-ignore
+const NumberFormatDecimalDegrees = forwardRef(({ onChange, ...other }, ref) => (
   <NumberFormat
     {...other}
-    getInputRef={inputRef}
+    getInputRef={ref}
     onValueChange={(values) => {
       onChange({
         target: {
+          // @ts-ignore
           name: other.name,
           value: values.floatValue,
         },
@@ -65,7 +67,7 @@ const NumberFormatDecimalDegrees = ({ inputRef, onChange, ...other }) => (
     decimalScale={1}
     suffix="°"
   />
-);
+));
 
 const UploadButton = ({ onClick = undefined }) => (
   <IconButton
@@ -73,10 +75,46 @@ const UploadButton = ({ onClick = undefined }) => (
     onClick={onClick}
     aria-label="send texture"
     component="span"
+    size="large"
   >
     <PublishIcon fontSize="large" />
   </IconButton>
 );
+
+const classes = {
+  toolbar: 'texture-editor__toolbar',
+  toolbarWithTexture: 'texture-editor__toolbar--with-texture',
+  nodeInputs: 'texture-editor__node-inputs',
+  nodeScaleMuxSlider: 'texture-editor__node-scale-mux-slider',
+  rotationInput: 'texture-editor__rotation-input',
+};
+
+const TextureEditorAppBar = styled(AppBar)(({ theme }) => ({
+  '&.MuiAppBar-root': {
+    // so that the toolbar goes under the tour tooltips
+    // https://mui.com/guides/migration-v4/#appbar
+    // zIndex: 100,
+  },
+  [`& .${classes.toolbar}`]: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    position: 'initial',
+    [`&.${classes.toolbarWithTexture}`]: {
+      [theme.breakpoints.down('lg')]: {
+        justifyContent: 'space-around',
+      },
+    },
+    [`& .${classes.nodeInputs}`]: {
+      display: 'inline-flex',
+    },
+    [`& .${classes.nodeScaleMuxSlider}`]: {
+      width: theme.spacing(10),
+    },
+    [`& .${classes.rotationInput}`]: {
+      width: '6.5em',
+    },
+  },
+}));
 
 type OpenTextureArrangementMenuItemProps = { onClick?: () => void, };
 
@@ -92,7 +130,6 @@ const OpenTextureArrangementMenuItem = forwardRef<any, OpenTextureArrangementMen
 );
 
 export const TextureControls = observer(({ hasCloseButton }) => {
-  const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
   const widgetModel = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const { history } = widgetModel.savedModel;
@@ -129,9 +166,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   // TODO: add whitespace, improve button definition and input alignment
   return (
     <>
-      <AppBar className={classes.textureEditorControls} color="inherit" position="relative">
+      <TextureEditorAppBar position="relative">
         <Toolbar
-          className={clsx(classes.textureToolbar, faceDecoration && classes.textureToolbarWithTexture)}
+          className={clsx(classes.toolbar, faceDecoration && classes.toolbarWithTexture)}
           variant="dense"
         >
           {/* web app uses texture editor as standalone component without drawer */}
@@ -143,21 +180,22 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               }}
               aria-label="close texture editor"
               component="span"
+              size="large"
             >
               <ArrowForwardIcon fontSize="large" />
             </IconButton>
             <Divider />
           </>
           )}
-          <Button
-            className={clsx(classes.dielinePanelButton, TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU)}
+          <PanelButton
+            className={TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU}
             startIcon={<FolderIcon />}
             onClick={(e) => {
               setFileMenuRef(e.currentTarget);
             }}
           >
             File
-          </Button>
+          </PanelButton>
           <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
             {(() => {
               if (IS_WEB_BUILD) {
@@ -173,32 +211,32 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             })()}
             {/* Menu component emits error when child is React.Fragment */}
             { faceDecoration
-            && [
-              (
-                <MenuItem
-                  key={0}
-                  onClick={() => {
-                    textureEditor.saveTextureArrangement();
-                    resetFileMenuRef();
-                  }}
-                >
-                  <ListItemIcon><SaveIcon fontSize="small" /></ListItemIcon>
-                  <Typography variant="inherit">Save texture arrangement </Typography>
-                </MenuItem>
-              ),
-              (
-                <MenuItem
-                  key={1}
-                  onClick={async () => {
-                    await shapePreview.downloadShapeGLTF();
-                    resetFileMenuRef();
-                  }}
-                >
-                  <ListItemIcon><GetAppIcon fontSize="small" /></ListItemIcon>
-                  <Typography variant="inherit">Download 3D model GLB</Typography>
-                </MenuItem>
-              ),
-            ]}
+          && [
+            (
+              <MenuItem
+                key={0}
+                onClick={() => {
+                  textureEditor.saveTextureArrangement();
+                  resetFileMenuRef();
+                }}
+              >
+                <ListItemIcon><SaveIcon fontSize="small" /></ListItemIcon>
+                <Typography variant="inherit">Save texture arrangement </Typography>
+              </MenuItem>
+            ),
+            (
+              <MenuItem
+                key={1}
+                onClick={async () => {
+                  await shapePreview.downloadShapeGLTF();
+                  resetFileMenuRef();
+                }}
+              >
+                <ListItemIcon><GetAppIcon fontSize="small" /></ListItemIcon>
+                <Typography variant="inherit">Download 3D model GLB</Typography>
+              </MenuItem>
+            ),
+          ]}
           </Menu>
           {/*  @ts-ignore */}
           {(() => { // eslint-disable-line consistent-return
@@ -262,7 +300,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 }}
                 color="primary"
               />
-          )}
+        )}
             label="Rotate 3D"
           />
 
@@ -280,10 +318,10 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 }}
                 color="primary"
               />
-            )}
+          )}
             label="Bordered"
           />
-          )}
+        )}
 
           <SnapMenu />
           {faceDecoration instanceof PositionableFaceDecorationModel && (
@@ -291,7 +329,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             {/* menu content at bottom section */}
             {faceDecoration.pattern instanceof PathFaceDecorationPatternModel && (
             <>
-              <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.textureEditorNodeInputs)}>
+              <span className={clsx(TOUR_ELEMENT_CLASSES.NODE_INPUTS, classes.nodeInputs)}>
                 <FormControlLabel
                   labelPlacement="top"
                   control={(
@@ -302,7 +340,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                       }}
                       color="primary"
                     />
-                    )}
+                  )}
                   label="Node selection"
                 />
                 <TweakableInput
@@ -317,12 +355,12 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                   <Switch
                     checked={faceDecoration.pattern.isPositive}
                     onChange={(e) => {
-                      // @ts-ignore why no inference?
+                    // @ts-ignore why no inference?
                       faceDecoration.pattern.setIsPositive(e.target.checked);
                     }}
                     color="primary"
                   />
-                  )}
+                )}
                 label="Fill is positive"
               />
               <FormControlLabel
@@ -332,12 +370,12 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                   <Switch
                     checked={faceDecoration.pattern.useAlphaTexturePreview}
                     onChange={(e) => {
-                      // @ts-ignore
+                    // @ts-ignore
                       faceDecoration.pattern.setUseAlphaTexturePreview(e.target.checked);
                     }}
                     color="primary"
                   />
-                  )}
+                )}
                 label="Use Alpha Texture"
               />
             </>
@@ -348,9 +386,9 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               label="Rotate"
               value={faceDecoration.transform.rotate}
               onChange={({ target: { value } = {} }) => {
-                // TODO: use onKeyPress for enter submission
-                // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
-                // TODO: once above is fixed, use textureRotateDragged as value
+              // TODO: use onKeyPress for enter submission
+              // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
+              // TODO: once above is fixed, use textureRotateDragged as value
                 if (isNumber(value) && !isNaN(value)) {
                   faceDecoration.transform.setRotate(value);
                 }
@@ -376,12 +414,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             }}
             aria-label="send texture"
             component="span"
+            size="large"
           >
             <HelpIcon fontSize="large" />
           </IconButton>
           )}
         </Toolbar>
-      </AppBar>
+      </TextureEditorAppBar>
     </>
   );
 });

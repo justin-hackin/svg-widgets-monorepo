@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import TrackChangesIcon from '@material-ui/icons/TrackChanges';
-import { Button, Menu, MenuItem } from '@material-ui/core';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import { Button, Menu, MenuItem } from '@mui/material';
 import { observer } from 'mobx-react';
 import { range } from 'lodash';
 import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';

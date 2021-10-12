@@ -1,17 +1,50 @@
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import uuid from 'uuid/v1';
-import FormControl from '@material-ui/core/FormControl';
 import React from 'react';
-import { Avatar, ListItemAvatar, Typography } from '@material-ui/core';
+import { Avatar, ListItemAvatar, ListItemText } from '@mui/material';
 import { observer } from 'mobx-react';
-import clsx from 'clsx';
 
-import { useStyles } from '../../../common/style/style';
+import { styled } from '@mui/styles';
 import { TweakablePrimitiveWithOptionsModel }
   from '../../../common/keystone-tweakables/models/TweakablePrimitiveWithOptionsModel';
 import { WithOptionsMetadata } from '../../../common/keystone-tweakables/types';
+import { MyFormControl } from '../../../common/style/style';
+
+const classes = {
+  shapeSelectDisplay: 'shape-select-display',
+  shapeName: 'shape-select-shape-name',
+  shapeAvatar: 'shape-select-shape-avatar',
+  isCompact: 'shape-select-display--compact',
+};
+
+const ShapeSelectFormControl = styled(MyFormControl)(({ theme }) => ({
+  marginTop: theme.spacing(1),
+  [`& .${classes.shapeAvatar}`]: {
+    width: '128px',
+    height: '128px',
+  },
+  [`& .${classes.shapeSelectDisplay}`]: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    padding: 0,
+  },
+  [`&.${classes.isCompact}`]: {
+    width: '80px',
+    [`& .${classes.shapeSelectDisplay}`]: {
+      paddingRight: theme.spacing(1),
+      [`& .${classes.shapeName}`]: {
+        display: 'none',
+      },
+      [`& .${classes.shapeAvatar}`]: {
+        width: '50px',
+        height: '50px',
+      },
+    },
+  },
+}));
 
 export const ShapeSelect = observer(({
   node, className = undefined, isCompactDisplay = false,
@@ -19,13 +52,10 @@ export const ShapeSelect = observer(({
   node: TweakablePrimitiveWithOptionsModel<string, WithOptionsMetadata<any>>,
   className?: string, isCompactDisplay?: boolean
 }) => {
-  const classes = useStyles();
   const labelId = `${node.label}__${uuid()}`;
-  const classNames = clsx(
-    className, classes.shapeSelect, classes.formControl, isCompactDisplay && classes.compactShapeSelect,
-  );
+
   return (
-    <FormControl className={classNames}>
+    <ShapeSelectFormControl className={`${isCompactDisplay ? classes.isCompact : ''} ${className}`}>
       { !isCompactDisplay && <InputLabel id={labelId}>{ node.label }</InputLabel>}
       <Select
         {...{
@@ -34,8 +64,9 @@ export const ShapeSelect = observer(({
           value: node.value,
           name: node.valuePath,
         }}
+        label={isCompactDisplay ? undefined : node.label}
         SelectDisplayProps={{
-          className: clsx(classes.shapeSelectDisplay, isCompactDisplay && classes.compactShapeSelect),
+          className: classes.shapeSelectDisplay,
         }}
       >
         {node.options.map(({ value, label }, i) => (
@@ -48,10 +79,10 @@ export const ShapeSelect = observer(({
                 src={new URL(`../../../../static/images/model-previews/${value}.png`, import.meta.url).href}
               />
             </ListItemAvatar>
-            <Typography variant="inherit" className={classes.shapeName}>{label}</Typography>
+            <ListItemText className={classes.shapeName} primary={label} />
           </MenuItem>
         ))}
       </Select>
-    </FormControl>
+    </ShapeSelectFormControl>
   );
 });

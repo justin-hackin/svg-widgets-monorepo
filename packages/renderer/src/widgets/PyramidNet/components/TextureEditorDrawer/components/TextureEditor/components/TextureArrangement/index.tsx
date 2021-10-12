@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag, useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash';
-import { Paper } from '@material-ui/core';
+import { Paper } from '@mui/material';
 import { observer } from 'mobx-react';
 import { castCoordToRawPoint } from '../../../../../../../../common/util/geom';
 import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';

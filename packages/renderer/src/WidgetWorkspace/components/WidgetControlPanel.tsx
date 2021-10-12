@@ -1,25 +1,24 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import clsx from 'clsx';
-import { useTheme } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import IconButton from '@material-ui/core/IconButton';
-import Fab from '@material-ui/core/Fab';
-import MenuIcon from '@material-ui/icons/Menu';
-import FolderIcon from '@material-ui/icons/Folder';
-import Toolbar from '@material-ui/core/Toolbar';
-import CloseSharpIcon from '@material-ui/icons/CloseSharp';
-import SettingsIcon from '@material-ui/icons/Settings';
-import FlareIcon from '@material-ui/icons/Flare';
-import FolderOpenIcon from '@material-ui/icons/FolderOpen';
-import SaveIcon from '@material-ui/icons/Save';
-import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import Fab from '@mui/material/Fab';
+import MenuIcon from '@mui/icons-material/Menu';
+import FolderIcon from '@mui/icons-material/Folder';
+import Toolbar from '@mui/material/Toolbar';
+import CloseSharpIcon from '@mui/icons-material/CloseSharp';
+import SettingsIcon from '@mui/icons-material/Settings';
+import FlareIcon from '@mui/icons-material/Flare';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import SaveIcon from '@mui/icons-material/Save';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import {
   AppBar, Button, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { applySnapshot, getSnapshot } from 'mobx-keystone';
-import { useStyles } from '../../common/style/style';
+import { styled } from '@mui/material/styles';
+import { panelButtonStyles } from '../../common/style/style';
 import { useWorkspaceMst } from '../models/WorkspaceModel';
 import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
@@ -31,9 +30,43 @@ import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
 
+const MyIconButton = styled(IconButton)({
+  ...panelButtonStyles,
+});
+
+const CloseIconButton = styled(MyIconButton)({
+  marginLeft: 'auto',
+});
+
+const DielinePanelFab = styled(Fab)(({ theme }) => ({
+  top: theme.spacing(1),
+  right: theme.spacing(1),
+  position: 'absolute',
+}));
+
+const DielinePanelContent = styled('div')({
+  overflowY: 'auto',
+});
+
+const drawerWidth = '500px';
+const drawerPaperClass = 'control-panel-paper';
+const ControlPanelDrawer = styled(Drawer)({
+  [`& .${drawerPaperClass}`]: {
+    width: drawerWidth,
+    overflow: 'unset',
+    position: 'absolute',
+  },
+});
+
+const MyListItemIcon = styled(ListItemIcon)(({ theme }) => ({
+  minWidth: theme.spacing(4),
+}));
+
+const ControlPanelToolbar = styled(Toolbar)(({ theme }) => ({
+  padding: `0 ${theme.spacing(1)}`,
+}));
+
 export const WidgetControlPanel = observer(() => {
-  const classes = useStyles();
-  useTheme();
   const workspaceStore = useWorkspaceMst();
   const { selectedStore }: { selectedStore: BaseWidgetClass } = workspaceStore;
   const {
@@ -111,28 +144,22 @@ export const WidgetControlPanel = observer(() => {
 
   return (
     <>
-      <Fab
-        color="inherit"
+      <DielinePanelFab
         aria-label="open drawer"
         onClick={handleDrawerOpen}
-        className={clsx(classes.dielinePanelFab, drawerIsOpen && classes.hide)}
       >
         <MenuIcon />
-      </Fab>
-      <Drawer
-        className={classes.drawer}
+      </DielinePanelFab>
+      <ControlPanelDrawer
         variant="persistent"
         anchor="right"
         open={drawerIsOpen}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
+        classes={{ paper: drawerPaperClass }}
       >
         <AppBar position="relative">
-          <Toolbar className={classes.toolbar} variant="dense">
+          <ControlPanelToolbar variant="dense">
             <Tooltip title="File ..." arrow>
               <Button
-                className={classes.dielinePanelButton}
                 startIcon={<FolderIcon />}
                 onClick={(e) => {
                   setFileMenuRef(e.currentTarget);
@@ -148,56 +175,54 @@ export const WidgetControlPanel = observer(() => {
             {AdditionalToolbarContent && <AdditionalToolbarContent />}
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={newHandler}>
-                <ListItemIcon className={classes.listItemIcon}>
+                <MyListItemIcon>
                   <FlareIcon fontSize="small" />
-                </ListItemIcon>
+                </MyListItemIcon>
                 <Typography variant="inherit">New</Typography>
               </MenuItem>
               <MenuItem onClick={openSpecHandler}>
-                <ListItemIcon className={classes.listItemIcon}>
+                <MyListItemIcon>
                   <FolderOpenIcon fontSize="small" />
-                </ListItemIcon>
+                </MyListItemIcon>
                 <Typography variant="inherit">{OPEN_TXT}</Typography>
               </MenuItem>
               <MenuItem onClick={saveHandler}>
-                <ListItemIcon className={classes.listItemIcon}>
+                <MyListItemIcon>
                   <SaveIcon fontSize="small" />
-                </ListItemIcon>
+                </MyListItemIcon>
                 <Typography variant="inherit">{SAVE_TXT}</Typography>
               </MenuItem>
               <MenuItem
                 disabled={!workspaceStore.currentFileName}
                 onClick={saveAsHandler}
               >
-                <ListItemIcon className={classes.listItemIcon}>
+                <MyListItemIcon>
                   <SaveAltIcon fontSize="small" />
-                </ListItemIcon>
+                </MyListItemIcon>
                 <Typography variant="inherit">Save as ...</Typography>
               </MenuItem>
               {AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
             </Menu>
-            <IconButton
-              className={classes.dielinePanelButton}
+            <MyIconButton
               onClick={handleSettingsDialogOpen}
             >
               <SettingsIcon />
-            </IconButton>
+            </MyIconButton>
             <SimpleDialog isOpen={settingsDialogIsOpen} handleClose={handleSettingsDialogClose} title="Settings">
               <PreferencesControls />
             </SimpleDialog>
-            <IconButton
-              className={clsx(classes.closeDielineControlsIcon, classes.dielinePanelButton)}
+            <CloseIconButton
               onClick={handleDrawerClose}
             >
               <CloseSharpIcon />
-            </IconButton>
-          </Toolbar>
+            </CloseIconButton>
+          </ControlPanelToolbar>
         </AppBar>
         <AssetsAccordion assetDefinition={selectedStore.assetDefinition} />
-        <div className={classes.dielinePanelContent}>
+        <DielinePanelContent>
           {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
-        </div>
-      </Drawer>
+        </DielinePanelContent>
+      </ControlPanelDrawer>
     </>
   );
 });
