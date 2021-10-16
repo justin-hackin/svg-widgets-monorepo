@@ -1,8 +1,9 @@
-import { model, Model } from 'mobx-keystone';
+import { ExtendedModel, model } from 'mobx-keystone';
 import { computed } from 'mobx';
 import { PathData } from '../../common/path/PathData';
-import { numberTextProp, radioProp } from '../../common/keystone-tweakables/props';
-import { PointTuple } from '../../common/util/geom';
+import { radioProp } from '../../common/keystone-tweakables/props';
+import { DividerBaseSavedModel } from './DividerBaseSavedModel';
+import { getMarginLength, centeredNotchPanel } from './util';
 
 enum REMAINDER_SIZES {
   SMALL = 'small',
@@ -10,53 +11,10 @@ enum REMAINDER_SIZES {
   LARGE = 'large',
 }
 
-const getMarginLength = (panelLength: number, numNotches: number, notchSpacing: number, notchThickness: number) => {
-  const notchesCoverage = (numNotches - 1) * notchSpacing + numNotches * notchThickness;
-  return (panelLength - notchesCoverage) / 2;
-};
-
-const PIXELS_PER_INCH = 96;
-const notchedPanel = (
-  panelLength: number, panelDepth: number,
-  numNotches: number, notchSpacing: number, notchThickness: number, invertXY = false,
-):PathData => {
-  const pt = (x:number, y: number) => (invertXY ? [y, x] : [x, y]) as PointTuple;
-  const path = new PathData();
-  const notchMargins = getMarginLength(panelLength, numNotches, notchSpacing, notchThickness);
-  const notchDepth = panelDepth / 2;
-  path.move([0, 0]);
-  for (let i = 0; i < numNotches; i += 1) {
-    const notchStartX = i * (notchThickness + notchSpacing) + notchMargins;
-    path.line(pt(notchStartX, 0))
-      .line(pt(notchStartX, notchDepth))
-      .line(pt(notchStartX + notchThickness, notchDepth))
-      .line(pt(notchStartX + notchThickness, 0));
-  }
-  return path
-    .line(pt(panelLength, 0))
-    .line(pt(panelLength, panelDepth))
-    .line(pt(0, panelDepth)).close();
-};
-
 const cubbiesDecrementOptions = Object.values(REMAINDER_SIZES).map((size, index) => ({ value: index, label: size }));
 
-@model('CrosshatchShelvesSavedModel')
-export class CrosshatchShelvesSavedModel extends Model({
-  shelfWidth: numberTextProp(96 * PIXELS_PER_INCH, {
-    useUnits: true,
-  }),
-  shelfHeight: numberTextProp(48 * PIXELS_PER_INCH, {
-    useUnits: true,
-  }),
-  shelfDepth: numberTextProp(24 * PIXELS_PER_INCH, {
-    useUnits: true,
-  }),
-  cubbyWidth: numberTextProp(8 * PIXELS_PER_INCH, {
-    useUnits: true,
-  }),
-  materialThickness: numberTextProp(0.5 * PIXELS_PER_INCH, {
-    useUnits: true,
-  }),
+@model('SquareGridDividerSavedModel')
+export class SquareGridDividerSavedModel extends ExtendedModel(DividerBaseSavedModel, {
   widthCubbiesDecrement: radioProp(0, {
     labelOverride: 'Left/right section size',
     options: cubbiesDecrementOptions,
@@ -84,7 +42,7 @@ export class CrosshatchShelvesSavedModel extends Model({
 
   @computed
   get horizontalPanel() {
-    return notchedPanel(
+    return centeredNotchPanel(
       this.shelfWidth.value, this.shelfDepth.value,
       this.numCubbiesWide + 1, this.cubbyWidth.value, this.materialThickness.value,
     );
@@ -92,7 +50,7 @@ export class CrosshatchShelvesSavedModel extends Model({
 
   @computed
   get verticalPanel() {
-    return notchedPanel(
+    return centeredNotchPanel(
       this.shelfHeight.value, this.shelfDepth.value,
       this.numCubbiesHigh + 1, this.cubbyWidth.value, this.materialThickness.value, true,
     );

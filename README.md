@@ -78,17 +78,12 @@ An open polygon prism box with ring-shaped sleeve edges. This allows one to effi
 
 This widget has a different UI configuration in the Assets accordion known as a "Disjunct Asset Definition" (as opposed to the "Registered Asset Definition" of the pyramid net). The different assets of the design can either be viewed all at once, or independently. This allows the user to see all changes to any widget parameter but also examine each component independently with less clicks than the per-asset visibility toggle. 
 
-#### Crosshatch Shelves
+#### Grid dividers
 
 <p alt="crosshatch shelf" align="center">
-  <img width="160px" src="/packages/renderer/static/images/widgets/crosshatch-shelf.jpg" />
+  <img width="160px" src="/packages/renderer/static/images/widgets/square-grid-divider.jpg" /><img width="160px" src="/packages/renderer/static/images/widgets/diamond-grid-divider.jpg" />
 </p>
-Enables the creation of slotted cross-hatched shelving inserts. Target application: spatial organization, storage of many bottles and/or cans within larger shelf section. 
-
-##### Components
-- white grid is the profile view of the shelves
-- green path is a horizontal shelf section
-- red path is a vertical shelf section
+Enables the creation of slotted cross-hatched shelving inserts. One widget creates square grids while the other creates "diamond" (45° rotated square) grid. Target application: spatial organization, storage of many bottles and/or cans within larger shelf section, collectibles box divider.
 
 ## Warning
 

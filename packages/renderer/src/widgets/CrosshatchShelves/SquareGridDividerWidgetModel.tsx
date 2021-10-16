@@ -2,12 +2,12 @@ import { ExtendedModel, model, prop } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
 import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
-import { CrosshatchShelvesSavedModel } from './CrosshatchShelvesSavedModel';
+import { SquareGridDividerSavedModel } from './SquareGridDividerSavedModel';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 
-@model('CrosshatchShelvesWidgetModel')
-export class CrosshatchShelvesWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  savedModel: prop<CrosshatchShelvesSavedModel>(() => new CrosshatchShelvesSavedModel({})),
+@model('SquareGridDividerWidgetModel')
+export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
+  savedModel: prop<SquareGridDividerSavedModel>(() => new SquareGridDividerSavedModel({})),
 }) {
   specFileExtension = 'cxh';
 
