@@ -76,8 +76,8 @@ const projectPointOntoLine = (l: Line, pt: Point):Point => {
 };
 
 export const getNumNotches = (
-  panelWidth: number, matThickness: number, cubbyWidth: number,
-) => Math.ceil((panelWidth - matThickness) / (cubbyWidth + matThickness));
+  panelWidth: number, notchThickness: number, cubbyWidth: number,
+) => Math.ceil((panelWidth - notchThickness) / (cubbyWidth + notchThickness));
 
 export const getPositiveSlopeSlatSegments = (
   width: number, height: number, cubbyWidth: number, matThickness: number,
