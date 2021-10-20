@@ -9,10 +9,10 @@ export enum TRI_NOTCH_LEVEL {
   TOP,
 }
 
-export const calculateAngledNotchWidth = (angleOfIncidence: number, materialThichness: number) => {
+export const calculateAngledNotchWidth = (angleOfIncidence: number, materialThickness: number) => {
   const aii = Math.PI - angleOfIncidence;
-  const lenInsideIntersection = materialThichness / Math.tan(aii);
-  const lenOutsideIntersection = materialThichness / Math.sin(aii);
+  const lenInsideIntersection = materialThickness / Math.abs(Math.tan(aii));
+  const lenOutsideIntersection = materialThickness / Math.abs(Math.sin(aii));
   return lenInsideIntersection + lenOutsideIntersection;
 };
 
@@ -22,33 +22,32 @@ export const triNotchPanel = (
 ): PathData => {
   const notchThickness = calculateAngledNotchWidth((4 / 3) * Math.PI, materialThickness);
   const path = new PathData();
-  const topNotchDepth = triNotchLevel === TRI_NOTCH_LEVEL.TOP
+  const topNotchBottomY = triNotchLevel === TRI_NOTCH_LEVEL.TOP
     ? null
     : (panelDepth * ((triNotchLevel === TRI_NOTCH_LEVEL.BOTTOM ? 2 : 1) / 3));
   path.move([0, 0]);
-  const bottomNotchDepth = triNotchLevel === TRI_NOTCH_LEVEL.BOTTOM ? null
-    : ((triNotchLevel === TRI_NOTCH_LEVEL.TOP ? 2 : 1) / 3);
+  const bottomNotchTopY = triNotchLevel === TRI_NOTCH_LEVEL.BOTTOM ? null
+    : panelDepth - panelDepth * ((triNotchLevel === TRI_NOTCH_LEVEL.TOP ? 2 : 1) / 3);
 
-  if (topNotchDepth !== null) {
+  if (topNotchBottomY !== null) {
     for (const notchCenterDistance of notchCenterDistances) {
       const notchStartX = notchCenterDistance - notchThickness / 2;
       const notchEndX = notchCenterDistance + notchThickness / 2;
-
       path.line(point(notchStartX, 0))
-        .line(point(notchStartX, topNotchDepth))
-        .line(point(notchEndX, topNotchDepth))
+        .line(point(notchStartX, topNotchBottomY))
+        .line(point(notchEndX, topNotchBottomY))
         .line(point(notchEndX, 0));
     }
   }
 
   path.line(point(panelLength, 0)).line(point(panelLength, panelDepth));
-  if (bottomNotchDepth !== null) {
+  if (bottomNotchTopY !== null) {
     for (const notchCenterDistance of notchCenterDistances) {
       const notchStartX = panelLength - notchCenterDistance + notchThickness / 2;
       const notchEndX = panelLength - notchCenterDistance - notchThickness / 2;
       path.line(point(notchStartX, panelDepth))
-        .line(point(notchStartX, panelDepth - bottomNotchDepth))
-        .line(point(notchEndX, panelDepth - bottomNotchDepth))
+        .line(point(notchStartX, bottomNotchTopY))
+        .line(point(notchEndX, bottomNotchTopY))
         .line(point(notchEndX, panelDepth));
     }
   }
