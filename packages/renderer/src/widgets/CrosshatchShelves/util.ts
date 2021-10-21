@@ -1,6 +1,6 @@
 import Flatten from '@flatten-js/core';
 import { PathData } from '../../common/path/PathData';
-import { hingedPlot, PointTuple, polygonWithFace } from '../../common/util/geom';
+import { hingedPlot, polygonWithFace } from '../../common/util/geom';
 import Segment = Flatten.Segment;
 import Point = Flatten.Point;
 import Line = Flatten.Line;
@@ -18,33 +18,32 @@ export const getMarginLength = (
 
 export const notchPanel = (
   firstNotchCenter: number, panelLength: number, panelDepth: number,
-  numNotches: number, notchSpacing: number, notchThickness: number, invertXY = false,
+  numNotches: number, notchSpacing: number, notchThickness: number,
 ): PathData => {
-  const pt = (x: number, y: number) => (invertXY ? [y, x] : [x, y]) as PointTuple;
   const path = new PathData();
   const notchDepth = panelDepth / 2;
   path.move([0, 0]);
   const firstNotchStart = firstNotchCenter - (notchThickness / 2);
   for (let i = 0; i < numNotches; i += 1) {
     const notchStartX = i * (notchThickness + notchSpacing) + firstNotchStart;
-    path.line(pt(notchStartX, 0))
-      .line(pt(notchStartX, notchDepth))
-      .line(pt(notchStartX + notchThickness, notchDepth))
-      .line(pt(notchStartX + notchThickness, 0));
+    path.line(point(notchStartX, 0))
+      .line(point(notchStartX, notchDepth))
+      .line(point(notchStartX + notchThickness, notchDepth))
+      .line(point(notchStartX + notchThickness, 0));
   }
   return path
-    .line(pt(panelLength, 0))
-    .line(pt(panelLength, panelDepth))
-    .line(pt(0, panelDepth))
+    .line(point(panelLength, 0))
+    .line(point(panelLength, panelDepth))
+    .line(point(0, panelDepth))
     .close();
 };
 
 export const centeredNotchPanel = (
   panelLength: number, panelDepth: number,
-  numNotches: number, notchSpacing: number, notchThickness: number, invertXY = false,
+  numNotches: number, notchSpacing: number, notchThickness: number,
 ) => {
   const firstNotchCenter = getMarginLength(panelLength, numNotches, notchSpacing, notchThickness) + notchThickness / 2;
-  return notchPanel(firstNotchCenter, panelLength, panelDepth, numNotches, notchSpacing, notchThickness, invertXY);
+  return notchPanel(firstNotchCenter, panelLength, panelDepth, numNotches, notchSpacing, notchThickness);
 };
 
 export const getLineLineIntersection = (l1p1: Point, l1p2: Point, l2p1: Point, l2p2: Point) => {

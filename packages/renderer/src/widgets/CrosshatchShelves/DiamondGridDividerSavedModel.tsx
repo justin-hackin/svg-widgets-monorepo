@@ -26,6 +26,8 @@ interface SegmentInfo {
 export class DiamondGridDividerSavedModel extends ExtendedModel(DividerBaseSavedModel, {
   flushPostProcess: switchProp(false),
 }) {
+  panelSpacingRatio = 1.1;
+
   @computed
   get positiveCrosshatchSegments() {
     return getPositiveSlopeSlatSegments(
@@ -103,13 +105,14 @@ export class DiamondGridDividerSavedModel extends ExtendedModel(DividerBaseSaved
         this.cubbyWidth.value, this.materialThickness.value,
       );
       const d = path.getD();
+      const transY = (this.shelfHeight.value + (index * this.shelfDepth.value)) * this.panelSpacingRatio;
       const { width, height } = getBoundingBoxAttrs(d);
       return {
         name: `Panel ${index + 1}`,
-        documentAreaProps: { width, height },
+        documentAreaProps: { viewBox: `0 ${transY} ${width} ${height}` },
         copies,
         Component: () => (
-          <g>
+          <g transform={`translate(0, ${transY})`}>
             <path d={d} fill="none" stroke="red" strokeWidth={4} />
           </g>
         ),

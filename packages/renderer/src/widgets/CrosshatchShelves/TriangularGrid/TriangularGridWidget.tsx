@@ -51,7 +51,7 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
 const POLYGON_SIDES = 6;
 @model('TriangularGridDividerSavedModel')
 export class TriangularGridDividerSavedModel extends Model({
-  hexagonHeight: numberTextProp(24 * PIXELS_PER_INCH, {
+  hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,
   }),
   hexagonDepth: numberTextProp(12 * PIXELS_PER_INCH, {
@@ -65,9 +65,21 @@ export class TriangularGridDividerSavedModel extends Model({
   }),
   postProcessVertexEdges: switchProp(false),
 }) {
+  spacingMarginRatio = 1.1;
+
+  @computed
+  get hexagonRadius() {
+    return this.hexagonWidth.value / 2;
+  }
+
   @computed
   get wallVertices() {
-    return getPolygonPoints(this.hexagonHeight.value / 2, POLYGON_SIDES);
+    return getPolygonPoints(this.hexagonRadius, POLYGON_SIDES);
+  }
+
+  @computed
+  get hexagonHeight() {
+    return 2 * Math.sin(Math.PI / 3) * this.hexagonRadius;
   }
 
   @computed
@@ -150,12 +162,14 @@ export class TriangularGridDividerSavedModel extends Model({
           // first item will have double the copies because it it same as last
           const panelPathD = triNotchPanel(segment.length, this.hexagonDepth.value,
             this.panelIntersectionDistances[index], this.materialThickness.value, notchLevel).getD();
+          const transX = (notchLevel - 0.5) * this.hexagonHeight * this.spacingMarginRatio;
+          const transY = (index * this.hexagonDepth.value + (this.hexagonHeight / 2)) * this.spacingMarginRatio;
           return {
             name: `${triNotchLevelToLabel(notchLevel)}_${index + 1}`,
-            documentAreaProps: { viewBox: pathDToViewBoxStr(panelPathD) },
+            documentAreaProps: { viewBox: `${transX} ${transY} ${segment.length} ${this.hexagonDepth.value}` },
             copies: isMiddleOfRange(index, this.subdivisions.value + 1) ? 3 : 6,
             Component: () => (
-              <g>
+              <g transform={`translate(${transX}, ${transY})`}>
                 <path fill="none" strokeWidth={this.materialThickness.value / 20} stroke="red" d={panelPathD} />
               </g>
             ),

@@ -52,7 +52,7 @@ export class SquareGridDividerSavedModel extends ExtendedModel(DividerBaseSavedM
   get verticalPanel() {
     return centeredNotchPanel(
       this.shelfHeight.value, this.shelfDepth.value,
-      this.numCubbiesHigh + 1, this.cubbyWidth.value, this.materialThickness.value, true,
+      this.numCubbiesHigh + 1, this.cubbyWidth.value, this.materialThickness.value,
     );
   }
 

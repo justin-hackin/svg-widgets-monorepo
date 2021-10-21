@@ -11,6 +11,8 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
 }) {
   specFileExtension = 'cxh';
 
+  panelSpacingRatio = 1.1;
+
   // eslint-disable-next-line class-methods-use-this
   getFileBasename() {
     return 'CrossHatchShelves';
@@ -18,6 +20,9 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
 
   @computed
   get assetDefinition() {
+    const vertTransY = this.savedModel.shelfHeight.value * this.panelSpacingRatio;
+    const horizTransY = (this.savedModel.shelfHeight.value + this.savedModel.shelfDepth.value) * this.panelSpacingRatio;
+
     return new DisjunctAssetsDefinition([
       {
         name: 'Cross-section',
@@ -40,11 +45,10 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
         name: 'Vertical pane',
         copies: this.savedModel.numCubbiesWide + 1,
         documentAreaProps: {
-          height: this.savedModel.shelfHeight.value,
-          width: this.savedModel.shelfDepth.value,
+          viewBox: `${0} ${vertTransY} ${this.savedModel.shelfHeight.value} ${this.savedModel.shelfDepth.value}`,
         },
         Component: () => (
-          <g>
+          <g transform={`translate(0, ${vertTransY})`}>
             <path
               d={this.savedModel.verticalPanel.getD()}
               fill="none"
@@ -58,15 +62,14 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
         name: 'Horizontal pane',
         copies: this.savedModel.numCubbiesHigh + 1,
         documentAreaProps: {
-          width: this.savedModel.shelfWidth.value,
-          height: this.savedModel.shelfDepth.value,
+          viewBox: `${0} ${horizTransY} ${this.savedModel.shelfWidth.value} ${this.savedModel.shelfDepth.value}`,
         },
         Component: () => (
-          <g>
+          <g transform={`translate(0, ${horizTransY})`}>
             <path
               d={this.savedModel.horizontalPanel.getD()}
               fill="none"
-              stroke="green"
+              stroke="red"
               strokeWidth={this.savedModel.strokeWidth}
             />
           </g>
