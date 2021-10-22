@@ -52,6 +52,7 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
   ) {
     if (allowOverlayMode) { this.overlayModeEnabled = true; }
     makeObservable(this, {
+      selectedMember: observable,
       setSelectedMember: action,
       overlayModeEnabled: observable,
       setOverlayModeEnabled: action,
