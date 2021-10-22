@@ -26,7 +26,7 @@ import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 import { DiamondGridDividerWidgetModel } from
   '../../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
 import { TriangularGridWidgetModel }
-  from '../../widgets/CrosshatchShelves/TriangularGrid/TriangularGridWidget';
+  from '../../widgets/CrosshatchShelves/TriangularGrid';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
