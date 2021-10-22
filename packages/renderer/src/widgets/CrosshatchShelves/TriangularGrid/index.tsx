@@ -215,6 +215,6 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
         ),
       },
       ...this.savedModel.panelAssetMembers,
-    ], 0, true);
+    ]);
   }
 }

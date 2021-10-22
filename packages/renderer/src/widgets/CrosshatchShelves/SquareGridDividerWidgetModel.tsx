@@ -158,6 +158,6 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
           </g>
         ),
       },
-    ], 0, true);
+    ]);
   }
 }

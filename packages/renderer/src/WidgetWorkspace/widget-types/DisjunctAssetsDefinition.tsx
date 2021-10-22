@@ -44,14 +44,14 @@ const castDocumentAreaPropsToBoundingBoxAttrs = (dap: DocumentAreaProps): Boundi
 export class DisjunctAssetsDefinition implements BaseAssetDefinition {
   public overlayModeEnabled = false;
 
+  public selectedMember = 0;
+
   constructor(
     public members: DisjunctWidgetAssetMember[],
-    public selectedMember: number,
     public allowOverlayMode: boolean = true,
   ) {
     if (allowOverlayMode) { this.overlayModeEnabled = true; }
     makeObservable(this, {
-      selectedMember: observable,
       setSelectedMember: action,
       overlayModeEnabled: observable,
       setOverlayModeEnabled: action,

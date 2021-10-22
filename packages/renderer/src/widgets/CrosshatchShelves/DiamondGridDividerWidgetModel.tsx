@@ -155,7 +155,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
           ),
         },
         ...this.savedModel.panelAssetMembers,
-      ], 0, true,
+      ],
     );
   }
 }
