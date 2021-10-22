@@ -21,8 +21,12 @@ import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNe
 import { radioProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
 import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
-import { CrosshatchShelvesWidgetModel } from '../../widgets/CrosshatchShelves/CrosshatchShelvesWidgetModel';
+import { SquareGridDividerWidgetModel } from '../../widgets/CrosshatchShelves/SquareGridDividerWidgetModel';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
+import { DiamondGridDividerWidgetModel } from
+  '../../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
+import { TriangularGridWidgetModel }
+  from '../../widgets/CrosshatchShelves/TriangularGrid';
 
 // this assumes a file extension exists
 const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
@@ -39,7 +43,9 @@ const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 const widgetOptions = {
   'polyhedral-net': PyramidNetWidgetModel,
   'cylinder-lightbox': CylinderLightboxWidgetModel,
-  'crosshatch-shelf': CrosshatchShelvesWidgetModel,
+  'square-grid-divider': SquareGridDividerWidgetModel,
+  'diamond-grid-divider': DiamondGridDividerWidgetModel,
+  'triangle-grid-divider': TriangularGridWidgetModel,
 };
 
 const defaultWidgetName = 'polyhedral-net';

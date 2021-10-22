@@ -2,7 +2,7 @@
 
 A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedz Studio represents the (potential) fulfillment of a wish to share this art/craft with other makers. In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system  was a tedious task that made design iteration difficult. With Polyhedz Studio, cutout paths are generated based on algorithms in which every parameter is tweakable.  The [latest release](https://github.com/justin-hackin/polyhedz-studio/releases/latest) is available for Windows, OSX, or Linux. 
 
-| ![polyhedral lantern sculpture with print face decoration](/packages/renderer/static/images/widgets/polyhedral-net.jpg) | ![polyhedral lantern sculpture with cut holes face decoration](/docs/images/polyhedral-net-vector.jpg) |
+| ![polyhedral lantern sculpture with print face decoration](/packages/renderer/static/images/widgets/polyhedral-net.png) | ![polyhedral lantern sculpture with cut holes face decoration](/docs/images/polyhedral-net-vector.png) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 
 
@@ -71,24 +71,19 @@ Using the wrench icon in the lower left corner allows you to access some additio
 
 #### Cylinder Lightbox
 <p alt="cylinder lightbox" align="center">
-  <img width="160px" src="/packages/renderer/static/images/widgets/cylinder-lightbox.jpg" />
+  <img width="160px" src="/packages/renderer/static/images/widgets/cylinder-lightbox.png" />
 </p>
 
 An open polygon prism box with ring-shaped sleeve edges. This allows one to efficiently construct a (roughly) cylindrical form out of flat panels. It has been used to create circular LED lightboxes. 
 
 This widget has a different UI configuration in the Assets accordion known as a "Disjunct Asset Definition" (as opposed to the "Registered Asset Definition" of the pyramid net). The different assets of the design can either be viewed all at once, or independently. This allows the user to see all changes to any widget parameter but also examine each component independently with less clicks than the per-asset visibility toggle. 
 
-#### Crosshatch Shelves
+#### Grid dividers
 
 <p alt="crosshatch shelf" align="center">
-  <img width="160px" src="/packages/renderer/static/images/widgets/crosshatch-shelf.jpg" />
+  <img width="160px" src="/packages/renderer/static/images/widgets/square-grid-divider.png" /><img width="160px" src="/packages/renderer/static/images/widgets/diamond-grid-divider.png" />
 </p>
-Enables the creation of slotted cross-hatched shelving inserts. Target application: spatial organization, storage of many bottles and/or cans within larger shelf section. 
-
-##### Components
-- white grid is the profile view of the shelves
-- green path is a horizontal shelf section
-- red path is a vertical shelf section
+Enables the creation of slotted cross-hatched shelving inserts. One widget creates square grids while the other creates "diamond" (45° rotated square) grid. Target application: spatial organization, storage of many bottles and/or cans within larger shelf section, collectibles box divider.
 
 ## Warning
 

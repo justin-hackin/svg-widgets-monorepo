@@ -3,6 +3,7 @@ import {
 } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import { observer } from 'mobx-react';
 import { GridPattern } from '../components/ResizableZoomPan/components/GridPattern';
 import {
   BoundingBoxAttrs,
@@ -43,9 +44,10 @@ const castDocumentAreaPropsToBoundingBoxAttrs = (dap: DocumentAreaProps): Boundi
 export class DisjunctAssetsDefinition implements BaseAssetDefinition {
   public overlayModeEnabled = false;
 
+  public selectedMember = 0;
+
   constructor(
     public members: DisjunctWidgetAssetMember[],
-    public selectedMember: number,
     public allowOverlayMode: boolean = true,
   ) {
     if (allowOverlayMode) { this.overlayModeEnabled = true; }
@@ -71,13 +73,17 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
       Component,
       documentAreaProps,
     } = this.members[this.selectedMember];
+    const SelectedObserverComponent = observer(Component);
     return (
       <svg {...(this.overlayModeEnabled ? this.allAssetsDocumentAreaProps : documentAreaProps)}>
         <GridPattern patternId="grid-pattern" />
         {
           this.overlayModeEnabled
-            ? this.members.map(({ Component }, index) => (<Component key={index} />))
-            : (<Component />)
+            ? this.members.map(({ Component }, index) => {
+              const ThisObserverComponent = observer(Component);
+              return (<ThisObserverComponent key={index} />);
+            })
+            : (<SelectedObserverComponent />)
         }
       </svg>
     );

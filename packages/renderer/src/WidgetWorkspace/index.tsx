@@ -67,7 +67,7 @@ export const WidgetWorkspace = observer(() => {
                   <Avatar
                     alt={startCase(widgetName)}
                     className={classes.widgetAvatar}
-                    src={new URL(`../../static/images/widgets/${widgetName}.jpg`, import.meta.url).href}
+                    src={new URL(`../../static/images/widgets/${widgetName}.png`, import.meta.url).href}
                   />
                 </ListItemAvatar>
                 <ListItemText
