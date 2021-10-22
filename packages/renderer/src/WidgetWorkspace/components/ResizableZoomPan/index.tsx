@@ -1,12 +1,12 @@
 import React from 'react';
 import { POSITION_LEFT, ReactSVGPanZoom } from 'react-svg-pan-zoom';
 import { observer } from 'mobx-react';
+import { useTheme } from '@mui/styles';
 import { ResizeDetector } from './components/ResizeDetector';
 import { useWorkspaceMst } from '../../models/WorkspaceModel';
 
-const BACKGROUND_COLOR = '#454545';
-
 export const ResizableZoomPan = observer(({ children, ...props }) => {
+  const theme = useTheme();
   const workspaceStore = useWorkspaceMst();
   const value = workspaceStore.zoomPanValue;
   const tool = workspaceStore.zoomPanTool;
@@ -15,7 +15,7 @@ export const ResizableZoomPan = observer(({ children, ...props }) => {
       {(dimensions) => (
         <ReactSVGPanZoom
           value={value}
-          background={BACKGROUND_COLOR}
+          background={theme.palette.grey['900']}
           tool={tool}
           toolbarProps={{ position: POSITION_LEFT }}
           customMiniature={() => null}
