@@ -48,7 +48,7 @@ const widgetOptions = {
   'triangle-grid-divider': TriangularGridWidgetModel,
 };
 
-const defaultWidgetName = 'triangle-grid-divider';
+const defaultWidgetName = 'polyhedral-net';
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
