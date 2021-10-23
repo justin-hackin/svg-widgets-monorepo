@@ -15,7 +15,7 @@ export const ResizableZoomPan = observer(({ children, ...props }) => {
       {(dimensions) => (
         <ReactSVGPanZoom
           value={value}
-          background={theme.palette.grey['900']}
+          background={theme.palette.mode === 'dark' ? theme.palette.grey['900'] : theme.palette.grey.A400}
           tool={tool}
           toolbarProps={{ position: POSITION_LEFT }}
           customToolbar={() => null}

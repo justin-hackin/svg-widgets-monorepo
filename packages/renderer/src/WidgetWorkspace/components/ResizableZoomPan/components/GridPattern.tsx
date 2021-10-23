@@ -3,7 +3,8 @@ import { useTheme } from '@mui/styles';
 
 export const GridPattern = ({ patternId }) => {
   const theme = useTheme();
-  const lineColor = theme.palette.common.white;
+  const lineColor = theme.palette.mode === 'dark'
+    ? theme.palette.common.white : theme.palette.common.black;
   return (
     <defs>
       <pattern id={patternId} patternUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
