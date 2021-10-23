@@ -25,8 +25,8 @@ const TOOL_ICON_MAP = {
 const PaperStyled = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   position: 'fixed',
-  top: theme.spacing(2),
-  left: theme.spacing(2),
+  top: theme.spacing(1),
+  left: theme.spacing(1),
   padding: theme.spacing(0.5),
 }));
 
