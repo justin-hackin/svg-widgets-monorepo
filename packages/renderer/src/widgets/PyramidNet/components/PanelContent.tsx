@@ -1,10 +1,10 @@
 import React from 'react';
-import Divider from '@material-ui/core/Divider';
-import { Paper, Tab, Tabs } from '@material-ui/core';
+import Divider from '@mui/material/Divider';
+import { Paper, Tab, Tabs } from '@mui/material';
 import { observer } from 'mobx-react';
 
+import { styled } from '@mui/styles';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { useStyles } from '../../../common/style/style';
 import { BaseEdgeTabControls } from './BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './AscendantEdgeTabsControls';
 import { ScoreControls } from './ScoreControls';
@@ -29,11 +29,30 @@ const controlsTabs = [
     component: ScoreControls,
   },
 ];
+const classes = {
+  shapeHeightFormControl: 'shape-height-form-control',
+};
+
+const TabContent = styled('div')(({ theme }) => ({
+  display: 'flex',
+  padding: theme.spacing(1),
+  flexDirection: 'column',
+}));
+const ShapeSection = styled('div')(({ theme }) => ({
+  padding: theme.spacing(1),
+  display: 'flex',
+  flexDirection: 'column',
+  [`& .${classes.shapeHeightFormControl}`]: {
+    // additional specificity not needed in dev build but this style not applied in production build
+    '&.MuiFormControl-root': {
+      marginTop: theme.spacing(3),
+    },
+  },
+}));
 
 export const PanelContent = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
-  const classes = useStyles();
   const { savedModel } = store;
   const { pyramid } = savedModel;
 
@@ -47,9 +66,8 @@ export const PanelContent = observer(() => {
 
   return (
     <>
-      <div className={classes.shapeSection}>
+      <ShapeSection>
         <ShapeSelect
-          className={classes.shapeSelect}
           node={savedModel.pyramid.shapeName}
         />
         <TweakableInput
@@ -57,7 +75,7 @@ export const PanelContent = observer(() => {
           node={savedModel.shapeHeight}
         />
         <TweakableInput node={pyramid.netsPerPyramid} />
-      </div>
+      </ShapeSection>
       <Divider />
       <Paper square>
         <Tabs
@@ -71,10 +89,10 @@ export const PanelContent = observer(() => {
             <Tab label={label} key={index} />))}
         </Tabs>
       </Paper>
-      <div className={classes.tabContent}>
+      <TabContent>
         <h3>{controlsTabs[activeControlsIndex].title}</h3>
         {React.createElement(controlsTabs[activeControlsIndex].component)}
-      </div>
+      </TabContent>
     </>
   );
 });

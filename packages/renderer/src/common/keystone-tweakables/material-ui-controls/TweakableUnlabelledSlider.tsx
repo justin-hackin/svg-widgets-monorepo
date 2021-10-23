@@ -1,4 +1,4 @@
-import { Slider, Tooltip } from '@material-ui/core';
+import { Slider, Tooltip } from '@mui/material';
 import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
@@ -70,6 +70,9 @@ export const TweakableUnlabelledSlider = observer(({
           endHistoryGroupAndClear();
         }
       })}
+      components={{
+        ValueLabel: ValueLabelComponent,
+      }}
       valueLabelFormat={useUnits ? UNIT_LABEL_FORMAT[displayUnit] : undefined}
       name={valuePath}
       min={min}
@@ -78,7 +81,6 @@ export const TweakableUnlabelledSlider = observer(({
       key={valuePath}
       aria-labelledby={labelId}
       valueLabelDisplay="auto"
-      ValueLabelComponent={ValueLabelComponent}
 
     />
   );

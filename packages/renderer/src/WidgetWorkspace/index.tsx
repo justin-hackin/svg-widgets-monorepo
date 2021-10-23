@@ -2,18 +2,46 @@ import React, { useLayoutEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import {
   Avatar, Dialog, DialogTitle, Fab, List, ListItem, ListItemAvatar, ListItemText,
-} from '@material-ui/core';
-import BuildIcon from '@material-ui/icons/Build';
+} from '@mui/material';
+import BuildIcon from '@mui/icons-material/Build';
 import { startCase } from 'lodash';
+import { styled } from '@mui/styles';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
 import { useWorkspaceMst } from './models/WorkspaceModel';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
-import { useStyles } from '../common/style/style';
+import { FullPageDiv } from '../common/style/style';
+import { DielineViewToolbar } from './components/DielineViewToolbar';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
+const CLASS_BASE = 'workspace';
+const classes = {
+  widgetFab: `${CLASS_BASE}__widget-fab`,
+  widgetAvatar: `${CLASS_BASE}__widget-avatar`,
+  widgetName: `${CLASS_BASE}__widget-name`,
+};
+
+const WidgetWorkspaceStyled = styled(FullPageDiv)(({ theme }) => ({
+  [`& .${classes.widgetFab}`]: {
+    bottom: theme.spacing(1),
+    left: theme.spacing(1),
+    position: 'absolute',
+  },
+
+}));
+
+const DialogStyled = styled(Dialog)(({ theme }) => ({
+  [`& .${classes.widgetAvatar}`]: {
+    bottom: theme.spacing(1),
+    left: theme.spacing(1),
+    position: 'absolute',
+  },
+  [`& .${classes.widgetName}`]: {
+    marginLeft: theme.spacing(3),
+    fontSize: '2em',
+  },
+}));
 
 export const WidgetWorkspace = observer(() => {
-  const classes = useStyles();
   const workspaceStore = useWorkspaceMst();
   const { selectedStore, selectedWidgetName, widgetOptions } = workspaceStore;
 
@@ -30,12 +58,11 @@ export const WidgetWorkspace = observer(() => {
 
   return (
     <>
-      <div className={classes.fullPage}>
+      <WidgetWorkspaceStyled>
         <ResizableZoomPan SVGBackground="url(#grid-pattern)">
           { WorkspaceView }
         </ResizableZoomPan>
         <Fab
-          color="inherit"
           aria-label="open widget picker"
           onClick={() => {
             setWidgetPickerOpen(true);
@@ -45,8 +72,9 @@ export const WidgetWorkspace = observer(() => {
           <BuildIcon />
         </Fab>
         <WidgetControlPanel />
-      </div>
-      <Dialog
+        <DielineViewToolbar />
+      </WidgetWorkspaceStyled>
+      <DialogStyled
         open={widgetPickerOpen}
         aria-labelledby={WIDGET_DIALOG_TITLE_ID}
         onClose={() => { setWidgetPickerOpen(false); }}
@@ -78,7 +106,7 @@ export const WidgetWorkspace = observer(() => {
             ))
           }
         </List>
-      </Dialog>
+      </DialogStyled>
     </>
   );
 });

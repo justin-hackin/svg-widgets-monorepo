@@ -1,7 +1,7 @@
 import { getParent, Model, model } from 'mobx-keystone';
 import { isInteger, sortBy, startCase } from 'lodash';
 import { polyhedra } from '../polyhedra';
-import { selectProp } from '../../../common/keystone-tweakables/props';
+import { radioProp, selectProp } from '../../../common/keystone-tweakables/props';
 
 const getDivisors = (num) => {
   if (!isInteger(num)) {
@@ -26,9 +26,8 @@ export class PyramidModel extends Model({
     options: sortBy(Object.keys(polyhedra))
       .map((shapeId) => ({ value: shapeId, label: startCase(shapeId) })),
   }),
-  netsPerPyramid: selectProp(1, {
-    // can't use type PyramidModel because of TS2310 (but it's better than using hard-coded paths)
-    // context: https://github.com/microsoft/TypeScript/issues/40315
+  netsPerPyramid: radioProp(1, {
+    isRow: true,
     options: (_, self) => () => (getParent(self).netsPerPyramidOptions as number[])
       .map((value) => ({ value, label: value.toString() })),
   }),

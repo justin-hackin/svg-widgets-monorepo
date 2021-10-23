@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import { useWorkspaceMst, WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { TweakableChildrenInputs }
   from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
@@ -19,7 +19,6 @@ export const PreferencesControls = observer(() => {
 
       <Button
         variant="contained"
-        color="primary"
         onClick={async () => {
           await workspaceStore.resetPreferences();
           if (selectedStore.resetPreferences) {

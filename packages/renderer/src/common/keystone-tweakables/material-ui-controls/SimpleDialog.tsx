@@ -1,31 +1,47 @@
 import React from 'react';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import { Typography } from '@material-ui/core';
-import { useStyles } from '../../style/style';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import { Typography } from '@mui/material';
+import { styled } from '@mui/styles';
+
+const CLASS_BASE = 'simple-dialog';
+const classes = {
+  dialogContent: `${CLASS_BASE}__dialog-content`,
+  closeIconButton: `${CLASS_BASE}__close-icon-button`,
+};
+
+const DialogStyled = styled(Dialog)(({ theme }) => ({
+  maxHeight: '90%',
+  [`& .${classes.dialogContent}`]: {
+    overflow: 'auto',
+    padding: theme.spacing(1),
+  },
+  [`& .${classes.closeIconButton}`]: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+  },
+}));
 
 export const SimpleDialog = ({
   isOpen, handleClose, title, children,
-}) => {
-  const classes = useStyles();
-
-  return (
-    <Dialog className={classes.simpleDialog} aria-labelledby="simple-dialog-title" open={isOpen}>
-      <DialogTitle disableTypography id="simple-dialog-title">
-        <Typography variant="h6">{title}</Typography>
-        <IconButton
-          aria-label="close"
-          className={classes.closeDialogButton}
-          onClick={handleClose}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <div className={classes.simpleDialogContent}>
-        { children }
-      </div>
-    </Dialog>
-  );
-};
+}) => (
+  <DialogStyled aria-labelledby="simple-dialog-title" open={isOpen}>
+    <DialogTitle id="simple-dialog-title">
+      <Typography>{title}</Typography>
+      <IconButton
+        className={classes.closeIconButton}
+        aria-label="close"
+        onClick={handleClose}
+        size="large"
+      >
+        <CloseIcon />
+      </IconButton>
+    </DialogTitle>
+    <div className={classes.dialogContent}>
+      { children }
+    </div>
+  </DialogStyled>
+);

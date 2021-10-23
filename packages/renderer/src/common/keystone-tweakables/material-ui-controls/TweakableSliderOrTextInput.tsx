@@ -1,22 +1,41 @@
 import uuid from 'uuid/v1';
 import React, { useState } from 'react';
-import { FormControl, IconButton, Typography } from '@material-ui/core';
-import TuneIcon from '@material-ui/icons/Tune';
-import KeyboardIcon from '@material-ui/icons/Keyboard';
+import { IconButton, Typography } from '@mui/material';
+import TuneIcon from '@mui/icons-material/Tune';
+import KeyboardIcon from '@mui/icons-material/Keyboard';
 import { observer } from 'mobx-react';
-import clsx from 'clsx';
 
-import { useStyles } from '../../style/style';
+import { styled } from '@mui/styles';
+import { FormControlStyled } from '../../style/style';
 import { TweakableUnlabelledNumberTextInput } from './TweakableUnlabelledNumberTextInput';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { SliderWithTextMetadata } from '../types';
 import { TweakableUnlabelledSlider } from './TweakableUnlabelledSlider';
 
+const classes = {
+  inputContainer: 'input-container',
+  textInputToggle: 'text-input-toggle',
+  textInput: 'text-input',
+};
+
+const InputFormControl = styled(FormControlStyled)(({ theme }) => ({
+  [`& .${classes.inputContainer}`]: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  [`& .${classes.textInputToggle}`]: {
+    flex: '0 0 0',
+  },
+  [`& .${classes.textInput}`]: {
+    flex: '1 0 0',
+    paddingRight: theme.spacing(1),
+  },
+}));
+
 export const TweakableSliderOrTextInput = observer(({
   node, className = undefined,
 }: { node: TweakablePrimitiveModel<number, SliderWithTextMetadata>, className?: string }) => {
-  const classes = useStyles();
   const labelId = uuid();
   const { label, metadata: { useUnits } } = node;
   const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
@@ -25,22 +44,26 @@ export const TweakableSliderOrTextInput = observer(({
   const toggleIsSlider = () => { setIsSlider(!isSlider); };
 
   return (
-    <FormControl className={clsx(className, classes.formControl)}>
+    <InputFormControl className={className}>
       <Typography id={labelId} gutterBottom>
         {resolvedLabel}
       </Typography>
-      <div className={classes.sliderTextInputContainer}>
-        <div className={classes.sliderTextInput}>
+      <div className={classes.inputContainer}>
+        <div className={classes.textInput}>
           {(isSlider) ? (
             <TweakableUnlabelledSlider node={node} labelId={labelId} />
           ) : (
             <TweakableUnlabelledNumberTextInput node={node} labelId={labelId} />
           ) }
         </div>
-        <IconButton className={classes.sliderTextInputToggle} onClick={toggleIsSlider}>
+        <IconButton
+          className={classes.textInputToggle}
+          onClick={toggleIsSlider}
+          size="large"
+        >
           {isSlider ? (<KeyboardIcon />) : (<TuneIcon />)}
         </IconButton>
       </div>
-    </FormControl>
+    </InputFormControl>
   );
 });

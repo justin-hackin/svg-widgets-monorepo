@@ -1,17 +1,17 @@
 import React from 'react';
-import { ListItemIcon, MenuItem, Typography } from '@material-ui/core';
-import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
-import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
-import BlurOnIcon from '@material-ui/icons/BlurOn';
-import HowToVoteIcon from '@material-ui/icons/HowToVote';
+import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
+import ChangeHistoryIcon from '@mui/icons-material/ChangeHistory';
+import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
+import BlurOnIcon from '@mui/icons-material/BlurOn';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import { startCase } from 'lodash';
 
 import { fromSnapshot, SnapshotOutOf } from 'mobx-keystone';
 import ReactDOMServer from 'react-dom/server';
+import { styled } from '@mui/styles';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
-import { useStyles } from '../../../common/style/style';
 import { IS_ELECTRON_BUILD } from '../../../../../common/constants';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
 import { RawFaceDecorationModel } from '../models/RawFaceDecorationModel';
@@ -35,9 +35,12 @@ const IMPORT_SVG_DECORATION_TXT = 'Import face cut pattern from SVG';
 const IMPORT_TEXTURE_TXT = 'Import texture from texture editor export';
 const DOWNLOAD_TAB_TESTER_TXT = 'Download tab tester SVG';
 
+const ListItemIconStyled = styled(ListItemIcon)(({ theme }) => ({
+  minWidth: theme.spacing(4),
+}));
+
 export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
   const workspaceStore = useWorkspaceMst();
-  const classes = useStyles();
   const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
 
   return (
@@ -54,10 +57,10 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         resetFileMenuRef();
       }}
       >
-        <ListItemIcon className={classes.listItemIcon}>
+        <ListItemIconStyled>
           <ChangeHistoryIcon fontSize="small" />
-        </ListItemIcon>
-        <Typography variant="inherit">{DOWNLOAD_TEMPLATE_TXT}</Typography>
+        </ListItemIconStyled>
+        <ListItemText primary={DOWNLOAD_TEMPLATE_TXT} />
       </MenuItem>
 
       {/* OPEN RAW SVG FACE DECORATION */}
@@ -76,10 +79,10 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         resetFileMenuRef();
       }}
       >
-        <ListItemIcon className={classes.listItemIcon}>
+        <ListItemIconStyled>
           <OpenInBrowserIcon fontSize="small" />
-        </ListItemIcon>
-        <Typography variant="inherit">{IMPORT_SVG_DECORATION_TXT}</Typography>
+        </ListItemIconStyled>
+        <ListItemText primary={IMPORT_SVG_DECORATION_TXT} />
       </MenuItem>
 
       {/* LOAD TEXTURE JSON */}
@@ -105,10 +108,10 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         store.savedModel.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(fileData.textureSnapshot));
       }}
       >
-        <ListItemIcon className={classes.listItemIcon}>
+        <ListItemIconStyled>
           <BlurOnIcon fontSize="small" />
-        </ListItemIcon>
-        <Typography variant="inherit">{IMPORT_TEXTURE_TXT}</Typography>
+        </ListItemIconStyled>
+        <ListItemText primary={IMPORT_TEXTURE_TXT} />
       </MenuItem>
 
       {/* DOWNLOAD TAB TEST */}
@@ -121,10 +124,10 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         resetFileMenuRef();
       }}
       >
-        <ListItemIcon className={classes.listItemIcon}>
+        <ListItemIconStyled>
           <HowToVoteIcon fontSize="small" />
-        </ListItemIcon>
-        <Typography variant="inherit">{DOWNLOAD_TAB_TESTER_TXT}</Typography>
+        </ListItemIconStyled>
+        <ListItemText primary={DOWNLOAD_TAB_TESTER_TXT} />
       </MenuItem>
     </>
   );
