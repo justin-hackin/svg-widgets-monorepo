@@ -54,7 +54,7 @@ export const DielineViewToolbar = observer(() => {
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
-      <Divider flexItem orientation="horizontal" sx={{ my: 0.5 }} />
+      <Divider flexItem orientation="horizontal" sx={{ my: 1, mx: 0.5 }} />
       <IconButton
         sx={{ mx: 0.5 }}
         onClick={() => {
