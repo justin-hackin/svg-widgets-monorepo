@@ -18,6 +18,7 @@ export const ResizableZoomPan = observer(({ children, ...props }) => {
           background={theme.palette.grey['900']}
           tool={tool}
           toolbarProps={{ position: POSITION_LEFT }}
+          customToolbar={() => null}
           customMiniature={() => null}
           onChangeValue={(val) => {
             workspaceStore.setZoomPanValue(val);

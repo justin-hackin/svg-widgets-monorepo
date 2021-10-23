@@ -10,6 +10,7 @@ import { ResizableZoomPan } from './components/ResizableZoomPan';
 import { useWorkspaceMst } from './models/WorkspaceModel';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
 import { FullPageDiv } from '../common/style/style';
+import { DielineViewToolbar } from './components/DielineViewToolbar';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
 const CLASS_BASE = 'workspace';
@@ -71,6 +72,7 @@ export const WidgetWorkspace = observer(() => {
           <BuildIcon />
         </Fab>
         <WidgetControlPanel />
+        <DielineViewToolbar />
       </MyWidgetWorkspace>
       <MyDialog
         open={widgetPickerOpen}
