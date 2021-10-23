@@ -301,7 +301,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                 onChange={(e) => {
                   textureEditor.setAutoRotatePreview(e.target.checked);
                 }}
-                color="primary"
+                color="secondary"
               />
         )}
             label="Rotate 3D"
