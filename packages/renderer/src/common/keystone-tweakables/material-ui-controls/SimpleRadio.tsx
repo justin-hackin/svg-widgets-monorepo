@@ -3,12 +3,12 @@ import {
   FormControlLabel, FormLabel, Radio, RadioGroup,
 } from '@mui/material';
 import React from 'react';
-import { MyFormControl } from '../../style/style';
+import { FormControlStyled } from '../../style/style';
 
 export const SimpleRadio = observer(({
   value, onChange, options, label, name, row = false,
 }) => (
-  <MyFormControl>
+  <FormControlStyled>
     <FormLabel component="legend">{label}</FormLabel>
     <RadioGroup
       {...{
@@ -25,5 +25,5 @@ export const SimpleRadio = observer(({
         <FormControlLabel key={optionValue} value={optionValue} control={<Radio />} label={optionLabel} />
       ))}
     </RadioGroup>
-  </MyFormControl>
+  </FormControlStyled>
 ));

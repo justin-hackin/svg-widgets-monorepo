@@ -21,7 +21,7 @@ const classes = {
   rotateButton: 'drag-mode-rotate-button',
 };
 
-const MyToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+const ToggleButtonGroupStyled = styled(ToggleButtonGroup)(({ theme }) => ({
   height: 'fit-content',
   margin: '0.5em',
   position: 'fixed',
@@ -40,7 +40,7 @@ const MyToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
 }));
 
 export const DragModeOptionsGroup = observer(({ dragMode }) => (
-  <MyToggleButtonGroup
+  <ToggleButtonGroupStyled
     className={TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR}
     value={dragMode}
     orientation="vertical"
@@ -95,5 +95,5 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => (
     >
       <AspectRatioIcon />
     </ToggleButton>
-  </MyToggleButtonGroup>
+  </ToggleButtonGroupStyled>
 ));

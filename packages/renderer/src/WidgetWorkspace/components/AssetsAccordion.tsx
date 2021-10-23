@@ -31,7 +31,7 @@ const classes = {
 
 };
 
-const MyAccordion = styled(Accordion)(({ theme }) => ({
+const AccordionStyled = styled(Accordion)(({ theme }) => ({
   [`& .${classes.heading}`]: {
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightRegular,
@@ -51,7 +51,7 @@ export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition
     return null;
   }
   return (
-    <MyAccordion>
+    <AccordionStyled>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-controls="assets-accordion-content"
@@ -112,6 +112,6 @@ export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition
           })}
         </List>
       </AccordionDetails>
-    </MyAccordion>
+    </AccordionStyled>
   );
 });

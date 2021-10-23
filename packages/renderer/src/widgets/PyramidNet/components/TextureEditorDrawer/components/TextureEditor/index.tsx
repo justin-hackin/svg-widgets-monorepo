@@ -7,7 +7,7 @@ import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
 import {
-  MyStep,
+  StepWithNextAction,
   SAMPLE_IMAGE_SNAPSHOT,
   SAMPLE_PATH_SNAPSHOT,
   STEP_ACTIONS,
@@ -85,7 +85,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
 
   const joyrideCallback = ({
     type, step, index, action,
-  }: { type: string, step: MyStep, index: number, action: string }) => {
+  }: { type: string, step: StepWithNextAction, index: number, action: string }) => {
     if (type === EVENTS.TOUR_STATUS && action === ACTIONS.SKIP) {
       preferences.setNeedsTour(false);
       // the user could re-activate the tour, rewind

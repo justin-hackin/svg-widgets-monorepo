@@ -20,7 +20,7 @@ const classes = {
   widgetName: `${CLASS_BASE}__widget-name`,
 };
 
-const MyWidgetWorkspace = styled(FullPageDiv)(({ theme }) => ({
+const WidgetWorkspaceStyled = styled(FullPageDiv)(({ theme }) => ({
   [`& .${classes.widgetFab}`]: {
     bottom: theme.spacing(1),
     left: theme.spacing(1),
@@ -29,7 +29,7 @@ const MyWidgetWorkspace = styled(FullPageDiv)(({ theme }) => ({
 
 }));
 
-const MyDialog = styled(Dialog)(({ theme }) => ({
+const DialogStyled = styled(Dialog)(({ theme }) => ({
   [`& .${classes.widgetAvatar}`]: {
     bottom: theme.spacing(1),
     left: theme.spacing(1),
@@ -58,7 +58,7 @@ export const WidgetWorkspace = observer(() => {
 
   return (
     <>
-      <MyWidgetWorkspace>
+      <WidgetWorkspaceStyled>
         <ResizableZoomPan SVGBackground="url(#grid-pattern)">
           { WorkspaceView }
         </ResizableZoomPan>
@@ -73,8 +73,8 @@ export const WidgetWorkspace = observer(() => {
         </Fab>
         <WidgetControlPanel />
         <DielineViewToolbar />
-      </MyWidgetWorkspace>
-      <MyDialog
+      </WidgetWorkspaceStyled>
+      <DialogStyled
         open={widgetPickerOpen}
         aria-labelledby={WIDGET_DIALOG_TITLE_ID}
         onClose={() => { setWidgetPickerOpen(false); }}
@@ -106,7 +106,7 @@ export const WidgetWorkspace = observer(() => {
             ))
           }
         </List>
-      </MyDialog>
+      </DialogStyled>
     </>
   );
 });

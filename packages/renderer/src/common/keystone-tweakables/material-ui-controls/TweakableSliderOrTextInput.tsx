@@ -6,7 +6,7 @@ import KeyboardIcon from '@mui/icons-material/Keyboard';
 import { observer } from 'mobx-react';
 
 import { styled } from '@mui/styles';
-import { MyFormControl } from '../../style/style';
+import { FormControlStyled } from '../../style/style';
 import { TweakableUnlabelledNumberTextInput } from './TweakableUnlabelledNumberTextInput';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
@@ -19,7 +19,7 @@ const classes = {
   textInput: 'text-input',
 };
 
-const InputFormControl = styled(MyFormControl)(({ theme }) => ({
+const InputFormControl = styled(FormControlStyled)(({ theme }) => ({
   [`& .${classes.inputContainer}`]: {
     display: 'flex',
     alignItems: 'center',

@@ -4,7 +4,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import React from 'react';
 import uuid from 'uuid/v1';
-import { MyFormControl } from '../../style/style';
+import { FormControlStyled } from '../../style/style';
 
 export const SimpleSelect = observer(({
   value,
@@ -20,7 +20,7 @@ export const SimpleSelect = observer(({
     return null;
   }
   return (
-    <MyFormControl>
+    <FormControlStyled>
       <InputLabel id={labelId}>{label}</InputLabel>
       <Select {...{
         labelId,
@@ -38,6 +38,6 @@ export const SimpleSelect = observer(({
           <MenuItem key={optionValue} value={optionValue}>{optionLabel}</MenuItem>
         ))}
       </Select>
-    </MyFormControl>
+    </FormControlStyled>
   );
 });

@@ -12,7 +12,7 @@ const classes = {
   closeIconButton: `${CLASS_BASE}__close-icon-button`,
 };
 
-const MyDialog = styled(Dialog)(({ theme }) => ({
+const DialogStyled = styled(Dialog)(({ theme }) => ({
   maxHeight: '90%',
   [`& .${classes.dialogContent}`]: {
     overflow: 'auto',
@@ -28,7 +28,7 @@ const MyDialog = styled(Dialog)(({ theme }) => ({
 export const SimpleDialog = ({
   isOpen, handleClose, title, children,
 }) => (
-  <MyDialog aria-labelledby="simple-dialog-title" open={isOpen}>
+  <DialogStyled aria-labelledby="simple-dialog-title" open={isOpen}>
     <DialogTitle id="simple-dialog-title">
       <Typography>{title}</Typography>
       <IconButton
@@ -43,5 +43,5 @@ export const SimpleDialog = ({
     <div className={classes.dialogContent}>
       { children }
     </div>
-  </MyDialog>
+  </DialogStyled>
 );

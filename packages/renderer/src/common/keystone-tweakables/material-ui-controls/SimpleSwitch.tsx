@@ -3,7 +3,7 @@ import uuid from 'uuid/v1';
 import Typography from '@mui/material/Typography';
 import { Switch } from '@mui/material';
 import React from 'react';
-import { MyFormControl } from '../../style/style';
+import { FormControlStyled } from '../../style/style';
 
 export const SimpleSwitch = observer(({
   value,
@@ -17,7 +17,7 @@ export const SimpleSwitch = observer(({
   }
 
   return (
-    <MyFormControl>
+    <FormControlStyled>
       <Typography id={labelId} gutterBottom>
         {label}
       </Typography>
@@ -27,6 +27,6 @@ export const SimpleSwitch = observer(({
         aria-labelledby={labelId}
         onChange={onChange}
       />
-    </MyFormControl>
+    </FormControlStyled>
   );
 });

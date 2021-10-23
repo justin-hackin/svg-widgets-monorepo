@@ -8,7 +8,7 @@ import { useWorkspaceMst } from '../../../../WidgetWorkspace/models/WorkspaceMod
 import { TextureEditor } from './components/TextureEditor';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
-const MyDrawer = styled(Drawer)({
+const DrawerStyled = styled(Drawer)({
   '& .MuiDrawer-paper': {
     width: '100%',
     overflowY: 'unset',
@@ -21,7 +21,7 @@ export const TextureEditorDrawer = observer(() => {
   const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
   if (!pyramidNetPluginStore) { return null; }
   return (
-    <MyDrawer
+    <DrawerStyled
       anchor="right"
       variant="persistent"
       open={pyramidNetPluginStore.textureEditorOpen}
@@ -29,6 +29,6 @@ export const TextureEditorDrawer = observer(() => {
     >
       {/* eslint-disable-next-line react/jsx-no-undef */}
       <TextureEditor hasCloseButton />
-    </MyDrawer>
+    </DrawerStyled>
   );
 });

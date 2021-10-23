@@ -26,7 +26,7 @@ export enum TOUR_ELEMENT_CLASSES {
   SHAPE_PREVIEW_AREA = 'shape-preview-area',
 }
 
-export interface MyStep extends Step {
+export interface StepWithNextAction extends Step {
   nextAction?: number
 }
 
@@ -39,7 +39,7 @@ const TourLink = styled('a')(({ theme }) => ({ color: theme.palette.primary.main
 // TODO: consider custom component for tour using Material UI Popper
 
 // TODO: use MUI global style (scoped to tour elements) instead of linkStyle
-export const TOUR_STEPS: MyStep[] = [
+export const TOUR_STEPS: StepWithNextAction[] = [
   {
     target: 'body',
     title: 'Welcome to Polyhedral Decoration Studio!',

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 
 // used to present underlying pixel values as unit-specific conversions
 // TODO: round up/down max/min/step based on unit (so that all values are divisible by the step)
-import { MyFormControl } from '../../style/style';
+import { FormControlStyled } from '../../style/style';
 import { TweakableUnlabelledNumberTextInput } from './TweakableUnlabelledNumberTextInput';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { NumberTextMetadata, SliderWithTextMetadata } from '../types';
@@ -15,7 +15,7 @@ export const TweakableNumberTextInput = observer((
 ) => {
   const labelId = uuid();
   return (
-    <MyFormControl>
+    <FormControlStyled>
       <Typography id={labelId} gutterBottom>
         {node.label}
       </Typography>
@@ -23,6 +23,6 @@ export const TweakableNumberTextInput = observer((
         node={node}
         labelId={labelId}
       />
-    </MyFormControl>
+    </FormControlStyled>
   );
 });

@@ -10,7 +10,7 @@ import { styled } from '@mui/styles';
 import { TweakablePrimitiveWithOptionsModel }
   from '../../../common/keystone-tweakables/models/TweakablePrimitiveWithOptionsModel';
 import { WithOptionsMetadata } from '../../../common/keystone-tweakables/types';
-import { MyFormControl } from '../../../common/style/style';
+import { FormControlStyled } from '../../../common/style/style';
 
 const classes = {
   shapeSelectDisplay: 'shape-select-display',
@@ -19,7 +19,7 @@ const classes = {
   isCompact: 'shape-select-display--compact',
 };
 
-const ShapeSelectFormControl = styled(MyFormControl)(({ theme }) => ({
+const ShapeSelectFormControl = styled(FormControlStyled)(({ theme }) => ({
   marginTop: theme.spacing(1),
   [`& .${classes.shapeAvatar}`]: {
     width: '128px',

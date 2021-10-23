@@ -35,7 +35,7 @@ const IMPORT_SVG_DECORATION_TXT = 'Import face cut pattern from SVG';
 const IMPORT_TEXTURE_TXT = 'Import texture from texture editor export';
 const DOWNLOAD_TAB_TESTER_TXT = 'Download tab tester SVG';
 
-const MyListItemIcon = styled(ListItemIcon)(({ theme }) => ({
+const ListItemIconStyled = styled(ListItemIcon)(({ theme }) => ({
   minWidth: theme.spacing(4),
 }));
 
@@ -57,9 +57,9 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         resetFileMenuRef();
       }}
       >
-        <MyListItemIcon>
+        <ListItemIconStyled>
           <ChangeHistoryIcon fontSize="small" />
-        </MyListItemIcon>
+        </ListItemIconStyled>
         <ListItemText primary={DOWNLOAD_TEMPLATE_TXT} />
       </MenuItem>
 
@@ -79,9 +79,9 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         resetFileMenuRef();
       }}
       >
-        <MyListItemIcon>
+        <ListItemIconStyled>
           <OpenInBrowserIcon fontSize="small" />
-        </MyListItemIcon>
+        </ListItemIconStyled>
         <ListItemText primary={IMPORT_SVG_DECORATION_TXT} />
       </MenuItem>
 
@@ -108,9 +108,9 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         store.savedModel.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(fileData.textureSnapshot));
       }}
       >
-        <MyListItemIcon>
+        <ListItemIconStyled>
           <BlurOnIcon fontSize="small" />
-        </MyListItemIcon>
+        </ListItemIconStyled>
         <ListItemText primary={IMPORT_TEXTURE_TXT} />
       </MenuItem>
 
@@ -124,9 +124,9 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         resetFileMenuRef();
       }}
       >
-        <MyListItemIcon>
+        <ListItemIconStyled>
           <HowToVoteIcon fontSize="small" />
-        </MyListItemIcon>
+        </ListItemIconStyled>
         <ListItemText primary={DOWNLOAD_TAB_TESTER_TXT} />
       </MenuItem>
     </>

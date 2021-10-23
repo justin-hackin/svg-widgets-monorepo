@@ -32,7 +32,7 @@ export const FullPageDiv = styled('div')({
   width: '100%', height: '100%', position: 'absolute', overflow: 'hidden',
 });
 
-export const MyFormControl = styled(FormControl)(({ theme }) => ({
+export const FormControlStyled = styled(FormControl)(({ theme }) => ({
   margin: theme.spacing(1),
   display: 'flex',
   flexDirection: 'column',
