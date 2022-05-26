@@ -105,8 +105,8 @@ export class TriangularGridDividerSavedModel extends Model({
       return range(0, subs + 1).map((j) => {
         const fencepostWidth = segLen / subs;
         const traversal = j * fencepostWidth;
-        const startPt = j === 0 ? startSeg.ps.clone() : startSeg.pointAtLength(traversal);
-        const endPt = j === 0 ? endSeg.pe.clone() : endSeg.pointAtLength(segLen - traversal);
+        const startPt = j === 0 ? startSeg.ps.clone() : startSeg.pointAtLength(Math.min(traversal, startSeg.length));
+        const endPt = j === 0 ? endSeg.pe.clone() : endSeg.pointAtLength(Math.min(segLen - traversal, endSeg.length));
         const toWallSegment = segment(startPt, endPt);
         return [0, subs].includes(j)
           ? augmentSegmentEndpoints(toWallSegment, -1 * this.cornerFittingRetractionDistance)
