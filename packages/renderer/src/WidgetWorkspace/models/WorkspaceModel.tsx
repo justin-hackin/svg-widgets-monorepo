@@ -28,9 +28,6 @@ import { DiamondGridDividerWidgetModel } from
 import { TriangularGridWidgetModel }
   from '../../widgets/CrosshatchShelves/TriangularGrid';
 
-// this assumes a file extension exists
-const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
-
 @model('WorkspacePreferencesModel')
 class WorkspacePreferencesModel extends Model({
     displayUnit: radioProp(UNITS.cm, {
@@ -120,7 +117,7 @@ export class WorkspaceModel extends Model({
 
   @computed
   get currentFileName() {
-    return this.currentFilePath ? baseFileName(this.currentFilePath).name : `New ${this.selectedWidgetNameReadable}`;
+    return this.currentFilePath ? this.currentFilePath : `New ${this.selectedWidgetNameReadable}`;
   }
 
   @computed

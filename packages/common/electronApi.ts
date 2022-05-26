@@ -59,9 +59,13 @@ export const _electronApi = {
     assetSVGData: TxtFileInfo[], snapshot: object, message: string,
     defaultPath: string, modelExtension: string, modelExtensionName: string,
   ): Promise<string | undefined> => {
-    const { path, dirname } = await _electronApi.saveJsonFileWithDialog(
+    const res = await _electronApi.saveJsonFileWithDialog(
       snapshot, message, defaultPath, modelExtension, modelExtensionName,
     );
+    if (!res) {
+      return undefined;
+    }
+    const { path, dirname } = res;
     await saveSvgAssets(assetSVGData, dirname);
     return path;
   },
@@ -69,7 +73,7 @@ export const _electronApi = {
   saveSvgAndModel: async (
     assetSVGData: TxtFileInfo[], snapshot: object, path: string,
   ): Promise<void> => {
-    const { dirname } = await ipcRenderer.invoke(EVENTS.SAVE_TXT_FILE, path, snapshot);
+    const { dirname } = await ipcRenderer.invoke(EVENTS.SAVE_TXT_FILE, path, JSON.stringify(snapshot));
     await saveSvgAssets(assetSVGData, dirname);
   },
 
