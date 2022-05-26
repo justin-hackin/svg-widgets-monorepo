@@ -1,29 +1,46 @@
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup/ToggleButtonGroup';
-import CachedIcon from '@material-ui/icons/Cached';
-import OpenWithIcon from '@material-ui/icons/OpenWith';
-import AspectRatioIcon from '@material-ui/icons/AspectRatio';
-import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
-import HeightIcon from '@material-ui/icons/Height';
-import clsx from 'clsx';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import CachedIcon from '@mui/icons-material/Cached';
+import OpenWithIcon from '@mui/icons-material/OpenWith';
+import AspectRatioIcon from '@mui/icons-material/AspectRatio';
+import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
+import HeightIcon from '@mui/icons-material/Height';
 
 import React from 'react';
 import { observer } from 'mobx-react';
+import { styled } from '@mui/styles';
+import { Paper } from '@mui/material';
 import { DRAG_MODES } from '../../../models/ModifierTrackingModel';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../../common/util/tour';
-import { useStyles } from '../../../../../../../../../common/style/style';
 
 const extraButtonProps = {
   disableFocusRipple: true,
   disableRipple: true,
   style: { cursor: 'default' },
 };
+const classes = {
+  rotateButton: 'drag-mode-rotate-button',
+};
 
-export const DragModeOptionsGroup = observer(({ dragMode }) => {
-  const classes = useStyles();
-  return (
-    <ToggleButtonGroup
-      className={clsx(TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR, classes.dragModeOptionsGroup)}
+const ToggleButtonGroupStyled = styled(ToggleButtonGroup)(({ theme }) => ({
+  height: 'fit-content',
+  margin: theme.spacing(0.5),
+  [`& .${classes.rotateButton}`]: {
+    transform: 'rotate(90deg)',
+  },
+}));
+
+const PaperStyled = styled(Paper)(({ theme }) => ({
+  position: 'relative',
+  top: theme.spacing(1),
+  left: theme.spacing(1),
+  width: theme.spacing(7),
+}));
+
+export const DragModeOptionsGroup = observer(({ dragMode }) => (
+  <PaperStyled elevation={3}>
+    <ToggleButtonGroupStyled
+      className={TOUR_ELEMENT_CLASSES.DRAG_MODE_INDICATOR}
       value={dragMode}
       orientation="vertical"
       exclusive
@@ -77,6 +94,6 @@ export const DragModeOptionsGroup = observer(({ dragMode }) => {
       >
         <AspectRatioIcon />
       </ToggleButton>
-    </ToggleButtonGroup>
-  );
-});
+    </ToggleButtonGroupStyled>
+  </PaperStyled>
+));

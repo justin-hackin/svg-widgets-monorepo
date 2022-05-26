@@ -345,6 +345,6 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
         documentAreaProps: { viewBox: pathDToViewBoxStr(holderTabD) },
         copies: holderTabsPerArc * arcsPerRing,
       },
-    ], 1, true);
+    ]);
   }
 }

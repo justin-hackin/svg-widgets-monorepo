@@ -2,12 +2,27 @@ import React from 'react';
 import { observer } from 'mobx-react';
 // @ts-ignore
 import clsx from 'clsx';
+import { styled } from '@mui/styles';
 import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
-import { useStyles } from '../../../../../../../../../common/style/style';
 import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
 import { PathData } from '../../../../../../../../../common/path/PathData';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
+
+const classes = {
+  textureNode: 'texture-node',
+  selected: 'texture-node--selected',
+  highlight: 'texture-node-highlight',
+};
+
+const NodesGroup = styled('g')({
+  [`& .${classes.textureNode}`]: {
+    fill: '#00A9F4',
+    [`&.${classes.selected}`]: {
+      fill: '#ff00ff',
+    },
+  },
+});
 
 export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();
@@ -16,7 +31,6 @@ export const TexturePathNodes = observer(() => {
     faceDecoration, selectedTextureNodeIndex, showNodes, imageCoverScale,
     nodeScaleMux: { value: nodeScaleMux },
   } = textureEditor;
-  const classes = useStyles();
 
   if (
     !showNodes || faceDecoration instanceof RawFaceDecorationModel
@@ -25,7 +39,7 @@ export const TexturePathNodes = observer(() => {
 
   const points = (new PathData(faceDecoration.pattern.pathD)).getDestinationPoints();
   return (
-    <>
+    <NodesGroup>
       {
         points.map(({ x: cx, y: cy }, index) => {
           const longerTextureSideLength = imageCoverScale.widthIsClamp
@@ -41,8 +55,8 @@ export const TexturePathNodes = observer(() => {
               <circle
                 {...{ cx, cy }}
                 stroke="none"
-                className={`${classes.textureNodeHighlight
-                } ${index === selectedTextureNodeIndex ? 'selected' : undefined
+                className={`${classes.highlight
+                } ${index === selectedTextureNodeIndex ? classes.selected : undefined
                 }`}
                 r={(nodeScaleMux * longerTextureSideLength) / 100}
                 onClick={() => {
@@ -53,6 +67,6 @@ export const TexturePathNodes = observer(() => {
           );
         })
       }
-    </>
+    </NodesGroup>
   );
 });

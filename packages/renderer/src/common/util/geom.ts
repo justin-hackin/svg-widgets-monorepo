@@ -194,7 +194,8 @@ export const distanceBetweenPoints = (pt1: PointLike, pt2: PointLike):number => 
   subtractPoints(pt2, pt1),
 );
 export const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
-const polygonWithFace = (faceVertices: PointLike[]) => {
+
+export const polygonWithFace = (faceVertices: PointLike[]) => {
   if (faceVertices.length < 3) {
     throw new Error('polygonWithFace: face parameter must have 3 or more elements');
   }

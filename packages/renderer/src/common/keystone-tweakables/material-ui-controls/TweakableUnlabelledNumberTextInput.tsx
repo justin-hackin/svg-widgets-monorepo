@@ -1,4 +1,4 @@
-import { Input } from '@material-ui/core';
+import { Input } from '@mui/material';
 import React, { createRef, useEffect } from 'react';
 import parseFraction from 'parse-fraction';
 import { observer } from 'mobx-react';

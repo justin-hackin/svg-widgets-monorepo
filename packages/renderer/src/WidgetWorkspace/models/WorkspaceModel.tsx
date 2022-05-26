@@ -18,14 +18,15 @@ import {
 } from 'react-svg-pan-zoom';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
-import { radioProp } from '../../common/keystone-tweakables/props';
+import { radioProp, switchProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
 import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
-import { CrosshatchShelvesWidgetModel } from '../../widgets/CrosshatchShelves/CrosshatchShelvesWidgetModel';
+import { SquareGridDividerWidgetModel } from '../../widgets/CrosshatchShelves/SquareGridDividerWidgetModel';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
-
-// this assumes a file extension exists
-const baseFileName = (fileName) => fileName.split('.').slice(0, -1).join('.');
+import { DiamondGridDividerWidgetModel } from
+  '../../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
+import { TriangularGridWidgetModel }
+  from '../../widgets/CrosshatchShelves/TriangularGrid';
 
 @model('WorkspacePreferencesModel')
 class WorkspacePreferencesModel extends Model({
@@ -33,13 +34,16 @@ class WorkspacePreferencesModel extends Model({
       options: Object.values(UNITS).map((unit) => ({ value: unit, label: unit })),
       isRow: true,
     }),
+    darkModeEnabled: switchProp(true),
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 const widgetOptions = {
   'polyhedral-net': PyramidNetWidgetModel,
   'cylinder-lightbox': CylinderLightboxWidgetModel,
-  'crosshatch-shelf': CrosshatchShelvesWidgetModel,
+  'square-grid-divider': SquareGridDividerWidgetModel,
+  'diamond-grid-divider': DiamondGridDividerWidgetModel,
+  'triangle-grid-divider': TriangularGridWidgetModel,
 };
 
 const defaultWidgetName = 'polyhedral-net';
@@ -113,7 +117,7 @@ export class WorkspaceModel extends Model({
 
   @computed
   get currentFileName() {
-    return this.currentFilePath ? baseFileName(this.currentFilePath).name : `New ${this.selectedWidgetNameReadable}`;
+    return this.currentFilePath ? this.currentFilePath : `New ${this.selectedWidgetNameReadable}`;
   }
 
   @computed

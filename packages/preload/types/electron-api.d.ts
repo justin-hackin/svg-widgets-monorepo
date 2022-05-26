@@ -1,8 +1,11 @@
+import { Theme } from '@mui/material/styles';
+
 interface ElectronApi {
   readonly versions: Readonly<NodeJS.ProcessVersions>
 }
 
 declare interface Window {
   electron: Readonly<ElectronApi>
-  electronRequire?: NodeRequire
+  electronRequire?: NodeRequire,
+  theme: Theme,
 }

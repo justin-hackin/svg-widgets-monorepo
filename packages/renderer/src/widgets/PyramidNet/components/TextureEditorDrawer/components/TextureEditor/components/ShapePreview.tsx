@@ -1,22 +1,32 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import { IconButton } from '@mui/material';
+import { styled } from '@mui/styles';
 import clsx from 'clsx';
-import { IconButton } from '@material-ui/core';
 import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../common/util/tour';
 import { IS_ELECTRON_BUILD } from '../../../../../../../../../common/constants';
-import { useStyles } from '../../../../../../../common/style/style';
 import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/models/WorkspaceModel';
+
+const classes = {
+  enterFullScreenButton: 'shape-preview__enter-full-screen-button',
+};
+
+const WebContainer = styled('div')(({ theme }) => ({
+  [`& .${classes.enterFullScreenButton} .MuiButtonBase-root`]: {
+    bottom: theme.spacing(1),
+    right: theme.spacing(1),
+    position: 'absolute',
+  },
+}));
 
 const { useEffect, useRef } = React;
 
 export const ShapePreview = observer(() => {
   const handle = IS_ELECTRON_BUILD ? null : useFullScreenHandle();
   const workspaceStore = useWorkspaceMst();
-  const classes = useStyles();
 
   const { textureEditor } = workspaceStore.selectedStore as PyramidNetWidgetModel;
 
@@ -35,11 +45,12 @@ export const ShapePreview = observer(() => {
     />
   );
   return IS_ELECTRON_BUILD ? previewContainer : (
-    <>
+    <WebContainer>
       <IconButton
         className={clsx(classes.enterFullScreenButton, TOUR_ELEMENT_CLASSES.FULL_SCREEN_BUTTON)}
         onClick={handle.enter}
         component="span"
+        size="large"
       >
         <FullscreenIcon fontSize="large" />
       </IconButton>
@@ -51,6 +62,6 @@ export const ShapePreview = observer(() => {
       >
         {previewContainer}
       </FullScreen>
-    </>
+    </WebContainer>
   );
 });

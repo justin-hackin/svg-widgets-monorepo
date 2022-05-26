@@ -1,13 +1,32 @@
-import { ThemeProvider } from '@material-ui/styles';
+import { StyledEngineProvider, Theme, ThemeProvider } from '@mui/material/styles';
 import React from 'react';
-
-import { WorkspaceStoreProvider } from '../../WidgetWorkspace/models/WorkspaceModel';
+import CssBaseline from '@mui/material/CssBaseline';
+import { observer } from 'mobx-react';
+import { useWorkspaceMst, WorkspaceStoreProvider } from '../../WidgetWorkspace/models/WorkspaceModel';
 import { theme } from '../style/style';
 
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
+
+const StylesWrapper = observer(({ children }) => {
+  const workspaceStore = useWorkspaceMst();
+  const darkModeEnabled = workspaceStore.preferences.darkModeEnabled.value;
+  return (
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme(darkModeEnabled)}>
+        <CssBaseline />
+        {children}
+      </ThemeProvider>
+    </StyledEngineProvider>
+  );
+});
+
 export const ProvidersWrapper = ({ children }) => (
-  <ThemeProvider theme={theme}>
-    <WorkspaceStoreProvider>
+  <WorkspaceStoreProvider>
+    <StylesWrapper>
       {children}
-    </WorkspaceStoreProvider>
-  </ThemeProvider>
+    </StylesWrapper>
+  </WorkspaceStoreProvider>
 );

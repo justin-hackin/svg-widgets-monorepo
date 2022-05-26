@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 
+import { useTheme } from '@mui/styles';
 import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
-import { theme } from '../../../common/style/style';
 import { boundingBoxMinPoint, expandBoundingBoxAttrs, registrationMarksPath } from '../../../common/util/svg';
 import { pointToTranslateString, scalePoint } from '../../../common/util/geom';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
@@ -25,6 +25,7 @@ export const PrintLayer = observer(({
 }: {
   widgetStore: PyramidNetWidgetModel,
 }) => {
+  const theme = useTheme();
   if (!widgetStore) {
     return null;
   }

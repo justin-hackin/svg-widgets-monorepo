@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag, useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash';
-import { Paper } from '@material-ui/core';
+import { Paper } from '@mui/material';
 import { observer } from 'mobx-react';
 import { castCoordToRawPoint } from '../../../../../../../../common/util/geom';
 import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
@@ -138,17 +138,16 @@ export const TextureArrangement = observer(() => {
   if (!placementAreaDimensions || !decorationBoundary) { return null; }
 
   return (
-    <>
-      <DragModeOptionsGroup dragMode={dragMode} />
+    <div>
       <Paper
         className={TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}
       // @ts-ignore
         component="svg"
         square
-        elevation={10}
-        width="100%"
+        elevation={2}
+        width="50%"
         height="100%"
-        style={{ overflow: 'hidden' }}
+        style={{ overflow: 'hidden', position: 'absolute' }}
         {...viewUseWheel()}
         {...textureTransformationUseDrag()}
       >
@@ -163,6 +162,7 @@ export const TextureArrangement = observer(() => {
           <TextureSvg {...{ transformOriginUseDrag, textureTransformationUseDrag }} />
         </svg>
       </Paper>
-    </>
+      <DragModeOptionsGroup dragMode={dragMode} />
+    </div>
   );
 });
