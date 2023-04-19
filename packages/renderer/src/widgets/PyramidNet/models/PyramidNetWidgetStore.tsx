@@ -92,8 +92,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: this }));
   }
 
-  @modelAction
-  getFileBasename() {
+  get fileBasename() {
     return `${
       this.savedModel.pyramid.shapeName.value || 'shape'
     }__${

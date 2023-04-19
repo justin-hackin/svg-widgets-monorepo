@@ -366,7 +366,7 @@ export class ShapePreviewModel extends Model({
   });
 
   async downloadShapeGLTF() {
-    const defaultPath = `${this.parentTextureEditor.getFileBasename()}.glb`;
+    const defaultPath = `${this.parentTextureEditor.fileBasename}.glb`;
     return this.gltfExporter
       // @ts-ignore
       .parse(this.shapeMesh, async (shapeGLTF: ArrayBuffer) => {

@@ -119,7 +119,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
         await electronApi.saveSvgWithDialog(
           renderTestTabsToString(store),
           DOWNLOAD_TAB_TESTER_TXT,
-          `${store.getFileBasename()}--test-tabs.svg`,
+          `${store.fileBasename}--test-tabs.svg`,
         );
         resetFileMenuRef();
       }}

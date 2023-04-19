@@ -275,7 +275,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   savedModel: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
 }) {
   // eslint-disable-next-line class-methods-use-this
-  getFileBasename() {
+  get fileBasename() {
     return 'cylinder_lightbox';
   }
 

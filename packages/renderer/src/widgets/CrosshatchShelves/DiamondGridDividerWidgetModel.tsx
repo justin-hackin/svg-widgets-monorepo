@@ -130,7 +130,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
   savedModel: prop(() => new DiamondGridDividerSavedModel({})),
 }) {
   // eslint-disable-next-line class-methods-use-this
-  getFileBasename() {
+  get fileBasename() {
     return 'DiamondShelves';
   }
 

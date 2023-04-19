@@ -300,8 +300,7 @@ export class TextureEditorModel extends Model({
   }
 
   // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
-  @modelAction
-  getFileBasename() {
+  get fileBasename() {
     return `${this.shapeName.value || 'shape'}__${
       tryResolvePath(this, ['texture', 'pattern', 'sourceFileName']) || 'undecorated'}`;
   }

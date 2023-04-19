@@ -183,7 +183,7 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
   savedModel: prop(() => new TriangularGridDividerSavedModel({})),
 }) {
   // eslint-disable-next-line class-methods-use-this
-  getFileBasename() {
+  get fileBasename() {
     return 'TriangularGrid';
   }
 

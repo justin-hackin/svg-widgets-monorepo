@@ -118,7 +118,7 @@ export const WidgetControlPanel = observer(() => {
       workspaceStore.getSelectedModelAssetsFileData(),
       snapshot,
       'Save assets svg with widget settings',
-      `${selectedStore.getFileBasename()}.${specFileExtension}`,
+      `${selectedStore.fileBasename}.${specFileExtension}`,
       specFileExtension,
       specFileExtensionName,
     );

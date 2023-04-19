@@ -97,7 +97,7 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
   panelSpacingRatio = 1.1;
 
   // eslint-disable-next-line class-methods-use-this
-  getFileBasename() {
+  get fileBasename() {
     return 'CrossHatchShelves';
   }
 

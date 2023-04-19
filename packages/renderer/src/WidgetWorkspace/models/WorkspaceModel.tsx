@@ -138,7 +138,7 @@ export class WorkspaceModel extends Model({
 
   getSelectedModelAssetsFileData() {
     return this.selectedStore.assetDefinition.getAssetsFileData(
-      this.selectedStore.getFileBasename(),
+      this.selectedStore.fileBasename,
     );
   }
 

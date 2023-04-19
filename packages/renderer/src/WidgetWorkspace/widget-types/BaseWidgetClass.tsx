@@ -5,7 +5,7 @@ import { AdditionalFileMenuItemsProps, AssetDefinition } from './types';
 export abstract class BaseWidgetClass extends Model({}) {
   abstract savedModel: ModelProp<any, any, false, false, true>;
 
-  abstract getFileBasename(): string;
+  abstract get fileBasename(): string;
 
   // seems abstract properties can't be optional
   // see https://github.com/Microsoft/TypeScript/issues/6413#issuecomment-361869751
