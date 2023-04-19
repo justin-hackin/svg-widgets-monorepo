@@ -187,8 +187,6 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
     return 'TriangularGrid';
   }
 
-  specFileExtension = 'hexd';
-
   @computed
   get assetDefinition() {
     return new DisjunctAssetsDefinition([

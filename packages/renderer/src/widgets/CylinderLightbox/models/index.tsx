@@ -279,8 +279,6 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     return 'cylinder_lightbox';
   }
 
-  specFileExtension = 'cyl';
-
   get ringRadiusVal() {
     return this.savedModel.ringRadius.value;
   }

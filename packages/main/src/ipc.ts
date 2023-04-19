@@ -29,16 +29,16 @@ const glbFilters = [{ name: 'GLB 3D model', extensions: ['glb'] }];
 // TODO: type safety between invoke and handle parameters
 
 export const setupIpc = (ipcMain) => {
-  ipcMain.handle(EVENTS.DIALOG_SAVE_TXT_FILE,
+  ipcMain.handle(EVENTS.DIALOG_SAVE_JSON_FILE,
     async (
-      e, fileStr, dialogOptions, extension, extensionName,
+      e, fileStr, dialogOptions,
     ): Promise<ParsedFilePathData | undefined> => {
       const { canceled, filePath } = await dialog.showSaveDialog({
         ...dialogOptions,
-        filters: [{ name: extensionName || extension, extensions: [extension] }],
+        filters: [{ name: 'JSON', extensions: ['json'] }],
       });
       if (canceled) { return undefined; }
-      const resolvedFilePath = castToFilePathWithExtension(filePath, extension);
+      const resolvedFilePath = castToFilePathWithExtension(filePath, 'json');
       await fsPromises.writeFile(resolvedFilePath, fileStr);
       const ext = extname(resolvedFilePath);
       return {

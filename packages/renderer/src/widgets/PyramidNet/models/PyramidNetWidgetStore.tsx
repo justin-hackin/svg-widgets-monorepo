@@ -36,10 +36,6 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   @observable
   textureEditorOpen = false;
 
-  specFileExtension = 'pns';
-
-  specFileExtensionName = 'Pyramid net spec';
-
   onAttachedToRootStore() {
     this.persistPreferences();
   }

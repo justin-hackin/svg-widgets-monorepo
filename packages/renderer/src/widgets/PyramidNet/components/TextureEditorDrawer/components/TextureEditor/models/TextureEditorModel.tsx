@@ -20,7 +20,6 @@ import {
   DEFAULT_SLIDER_STEP,
   IS_ELECTRON_BUILD,
   IS_WEB_BUILD,
-  TEXTURE_ARRANGEMENT_FILE_EXTENSION,
 } from '../../../../../../../../../common/constants';
 import { reportTransformsTally } from '../../../../../../../common/util/analytics';
 import { TransformModel } from '../../../../../models/TransformModel';
@@ -56,8 +55,6 @@ const getFitScale = (bounds, image) => {
     scale: widthIsClamp ? bounds.width / image.width : bounds.height / image.height,
   };
 };
-
-const specFileExtensionName = 'Texture for Pyramid Net Spec';
 
 @model('TextureEditorModel')
 export class TextureEditorModel extends Model({
@@ -426,19 +423,16 @@ export class TextureEditorModel extends Model({
       shapeName: this.shapeName.value,
       textureSnapshot: getSnapshot(this.faceDecoration),
     };
-    const defaultPath = `${this.shapeName.value
-    }__${this.faceDecoration.pattern.sourceFileName}.${TEXTURE_ARRANGEMENT_FILE_EXTENSION}`;
+    const defaultBasename = `${this.shapeName.value}__${this.faceDecoration.pattern.sourceFileName}`;
     if (IS_ELECTRON_BUILD) {
       electronApi.saveJsonFileWithDialog(
         fileData,
         'Save texture arrangement',
-        defaultPath,
-        TEXTURE_ARRANGEMENT_FILE_EXTENSION,
-        specFileExtensionName,
+        defaultBasename,
       );
     }
     if (IS_WEB_BUILD) {
-      fileDownload(JSON.stringify(fileData), defaultPath, 'application/json');
+      fileDownload(JSON.stringify(fileData), `${defaultBasename}.json`, 'application/json');
     }
   }
 
@@ -476,9 +470,7 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   async openTextureArrangement() {
-    const res = await electronApi.getJsonFromDialog(
-      'Import texture arrangement', TEXTURE_ARRANGEMENT_FILE_EXTENSION, specFileExtensionName,
-    );
+    const res = await electronApi.getJsonFromDialog('Import texture arrangement');
     if (res === undefined) { return; }
 
     const { fileData } = res;

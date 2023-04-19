@@ -1,5 +1,5 @@
 export enum EVENTS {
-  DIALOG_SAVE_TXT_FILE = 'dialog-save-txt-file',
+  DIALOG_SAVE_JSON_FILE = 'dialog-save-json-file',
   SAVE_TXT_FILE = 'save-txt-file',
   DIALOG_OPEN_TXT_FILE = 'dialog-open-txt-file',
   OPEN_TXT_FILE = 'open-txt-file',
@@ -10,8 +10,6 @@ export enum EVENTS {
 
 export const DEFAULT_SLIDER_STEP = 0.01;
 export const VERY_LARGE_NUMBER = 1000000000000000;
-
-export const TEXTURE_ARRANGEMENT_FILE_EXTENSION = 'pnst';
 
 export const IS_ELECTRON_BUILD = import.meta.env.VITE_BUILD_ENV === 'electron';
 export const IS_WEB_BUILD = import.meta.env.VITE_BUILD_ENV === 'web';

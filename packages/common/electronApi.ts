@@ -21,10 +21,10 @@ const saveSvgAssets = (assetSVGData: TxtFileInfo[], dirname: string) => Promise.
 
 export const _electronApi = {
   getJsonFromDialog: async (
-    message: string, extension: string, extensionName: string,
+    message: string,
   ): Promise<dialogOpenJsonRes> => {
     const res = await ipcRenderer.invoke(
-      EVENTS.DIALOG_OPEN_TXT_FILE, { message }, extension, extensionName,
+      EVENTS.DIALOG_OPEN_TXT_FILE, { message }, 'json', 'JSON',
     );
     if (!res) { return undefined; }
     const { fileString, filePath } = res;
@@ -36,19 +36,17 @@ export const _electronApi = {
   saveSvgWithDialog: (
     svgString: string, message: string, defaultPath: string,
   ): Promise<string | undefined> => ipcRenderer
-    .invoke(EVENTS.DIALOG_SAVE_TXT_FILE, svgString, {
+    .invoke(EVENTS.DIALOG_SAVE_JSON_FILE, svgString, {
       message,
       defaultPath,
     }, SVG_EXT, SVG_EXT_NAME),
 
   saveJsonFileWithDialog: (
-    fileData: object, message: string, defaultPath: string,
-    fileExtension: string, extensionName: string,
+    fileData: object, message: string, defaultBasename: string,
   ): Promise<ParsedFilePathData | undefined> => ipcRenderer.invoke(
-    EVENTS.DIALOG_SAVE_TXT_FILE,
+    EVENTS.DIALOG_SAVE_JSON_FILE,
     formattedJSONStringify(fileData),
-    { message, defaultPath },
-    fileExtension, extensionName,
+    { message, defaultPath: `${defaultBasename}.json` },
   ),
 
   saveGlbWithDialog: (shapeGLTF: ArrayBuffer, message: string, defaultPath: string) => ipcRenderer.invoke(
@@ -57,10 +55,10 @@ export const _electronApi = {
 
   saveSvgAndAssetsWithDialog: async (
     assetSVGData: TxtFileInfo[], snapshot: object, message: string,
-    defaultPath: string, modelExtension: string, modelExtensionName: string,
+    defaultBasename: string,
   ): Promise<string | undefined> => {
     const res = await _electronApi.saveJsonFileWithDialog(
-      snapshot, message, defaultPath, modelExtension, modelExtensionName,
+      snapshot, message, defaultBasename,
     );
     if (!res) {
       return undefined;

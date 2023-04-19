@@ -71,7 +71,7 @@ export const WidgetControlPanel = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { selectedStore }: { selectedStore: BaseWidgetClass } = workspaceStore;
   const {
-    AdditionalToolbarContent, AdditionalFileMenuItems, PanelContent, specFileExtension, specFileExtensionName,
+    AdditionalToolbarContent, AdditionalFileMenuItems, PanelContent,
   } = selectedStore;
 
   const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
@@ -93,7 +93,7 @@ export const WidgetControlPanel = observer(() => {
   };
 
   const openSpecHandler = async () => {
-    const res = await electronApi.getJsonFromDialog(OPEN_TXT, specFileExtension, specFileExtensionName);
+    const res = await electronApi.getJsonFromDialog(OPEN_TXT);
     if (res !== undefined) {
       const { fileData, filePath } = res;
       // @ts-ignore
@@ -118,9 +118,7 @@ export const WidgetControlPanel = observer(() => {
       workspaceStore.getSelectedModelAssetsFileData(),
       snapshot,
       'Save assets svg with widget settings',
-      `${selectedStore.fileBasename}.${specFileExtension}`,
-      specFileExtension,
-      specFileExtensionName,
+      selectedStore.fileBasename,
     );
 
     if (filePath) {

@@ -17,9 +17,5 @@ export abstract class BaseWidgetClass extends Model({}) {
 
   PanelContent?: FC;
 
-  abstract specFileExtension: string;
-
-  specFileExtensionName?: string;
-
   abstract get assetDefinition(): AssetDefinition;
 }

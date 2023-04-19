@@ -92,8 +92,6 @@ export class SquareGridDividerSavedModel extends ExtendedModel(DividerBaseSavedM
 export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
   savedModel: prop<SquareGridDividerSavedModel>(() => new SquareGridDividerSavedModel({})),
 }) {
-  specFileExtension = 'cxh';
-
   panelSpacingRatio = 1.1;
 
   // eslint-disable-next-line class-methods-use-this

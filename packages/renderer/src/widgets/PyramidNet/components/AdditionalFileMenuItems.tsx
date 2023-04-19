@@ -87,7 +87,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
 
       {/* LOAD TEXTURE JSON */}
       <MenuItem onClick={async () => {
-        const res = await electronApi.getJsonFromDialog(IMPORT_TEXTURE_TXT, 'pnst', 'Pyramid Net Spec Texture');
+        const res = await electronApi.getJsonFromDialog(IMPORT_TEXTURE_TXT);
         const currentShapeName = store.savedModel.pyramid.shapeName.value;
         resetFileMenuRef();
         if (res === undefined) {

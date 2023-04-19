@@ -51,7 +51,7 @@ export class DiamondGridDividerSavedModel extends ExtendedModel(DividerBaseSaved
 
   @computed
   get uniqueSegmentsInfo(): SegmentInfo[] {
-    // could iterate over only half but this complicates case of centerd crosshatch
+    // could iterate over only half but this complicates case of centered crosshatch
     return this.positiveCrosshatchSegments
       .map((segment) => round(segment.length, 10))
       .reduce((acc, segLen, index) => {
@@ -133,8 +133,6 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
   get fileBasename() {
     return 'DiamondShelves';
   }
-
-  specFileExtension = 'dsx';
 
   @computed
   get assetDefinition() {
