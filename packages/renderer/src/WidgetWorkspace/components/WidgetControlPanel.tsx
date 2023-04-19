@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode, useState } from 'react';
 import { observer } from 'mobx-react';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -16,7 +16,9 @@ import {
   AppBar, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@mui/material';
 
-import { applySnapshot, getSnapshot } from 'mobx-keystone';
+import {
+  applySnapshot, getSnapshot, SnapshotInOfModel,
+} from 'mobx-keystone';
 import { styled } from '@mui/material/styles';
 import { useWorkspaceMst } from '../models/WorkspaceModel';
 import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
@@ -71,19 +73,34 @@ export const WidgetControlPanel = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { selectedStore }: { selectedStore: BaseWidgetClass } = workspaceStore;
   const {
-    AdditionalToolbarContent, AdditionalFileMenuItems, PanelContent,
+    AdditionalToolbarContent,
+    AdditionalFileMenuItems,
+    PanelContent,
   } = selectedStore;
 
-  const [fileMenuRef, setFileMenuRef] = React.useState<HTMLElement>(null);
-  const resetFileMenuRef = () => { setFileMenuRef(null); };
+  const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
+  const resetFileMenuRef = () => {
+    setFileMenuRef(null);
+  };
 
-  const [drawerIsOpen, setDrawerIsOpen] = React.useState(true);
-  const handleDrawerOpen = () => { setDrawerIsOpen(true); };
-  const handleDrawerClose = () => { setDrawerIsOpen(false); };
+  const [drawerIsOpen, setDrawerIsOpen] = useState(true);
+  const handleDrawerOpen = () => {
+    setDrawerIsOpen(true);
+  };
+  const handleDrawerClose = () => {
+    setDrawerIsOpen(false);
+  };
 
-  const [settingsDialogIsOpen, setSettingsDialogIsOpen] = React.useState(false);
-  const handleSettingsDialogOpen = () => { setSettingsDialogIsOpen(true); };
-  const handleSettingsDialogClose = () => { setSettingsDialogIsOpen(false); };
+  const [alertDialogContent, setAlertDialogContent] = useState<ReactNode>(null);
+  const closeAlertDialog = () => setAlertDialogContent(null);
+
+  const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false);
+  const handleSettingsDialogOpen = () => {
+    setSettingsDialogIsOpen(true);
+  };
+  const handleSettingsDialogClose = () => {
+    setSettingsDialogIsOpen(false);
+  };
 
   // TODO: move handler logic into WorkspaceModel actions
   const newHandler = () => {
@@ -95,12 +112,16 @@ export const WidgetControlPanel = observer(() => {
   const openSpecHandler = async () => {
     const res = await electronApi.getJsonFromDialog(OPEN_TXT);
     if (res !== undefined) {
-      const { fileData, filePath } = res;
+      const { filePath } = res;
+      const fileData = res.fileData as SnapshotInOfModel<any>;
+      const fileModelType = fileData?.$modelType;
+
       // @ts-ignore
-      if (fileData.$modelName !== workspaceStore.selectedStore.$modelName) {
-        // @ts-ignore
-        // eslint-disable-next-line max-len
-        throw new Error(`$modelName of file "${fileData.$modelName}" does not match $modelName of selectedStore "${workspaceStore.selectedStore.$modelName}"`);
+      const storeType = getSnapshot(selectedStore.savedModel).$modelType;
+      if (fileModelType !== storeType) {
+        resetFileMenuRef();
+        setAlertDialogContent(`Invalid spec file: JSON data must contain top-level property $modelType with value "${
+          storeType}" but instead saw "${fileModelType}"`);
       }
       applySnapshot(
         selectedStore.savedModel,
@@ -207,6 +228,9 @@ export const WidgetControlPanel = observer(() => {
             >
               <SettingsIcon />
             </IconButton>
+            <SimpleDialog isOpen={!!alertDialogContent} handleClose={closeAlertDialog} title="Error">
+              {alertDialogContent}
+            </SimpleDialog>
             <SimpleDialog isOpen={settingsDialogIsOpen} handleClose={handleSettingsDialogClose} title="Settings">
               <PreferencesControls />
             </SimpleDialog>
