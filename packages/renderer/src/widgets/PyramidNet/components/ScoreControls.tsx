@@ -9,15 +9,15 @@ import { TweakableChildrenInputs }
 export const ScoreControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const selectedStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
-  const { savedModel } = selectedStore;
-  const { useDottedStroke, interFaceScoreDashSpec, baseScoreDashSpec } = savedModel;
+  const { persistedSpec } = selectedStore;
+  const { useDottedStroke, interFaceScoreDashSpec, baseScoreDashSpec } = persistedSpec;
 
   return (
     <>
       <SimpleSwitch
         value={useDottedStroke}
-        name="savedModel.useDottedStroke"
-        onChange={(e) => { savedModel.setUseDottedStroke(e.target.checked); }}
+        name="persistedSpec.useDottedStroke"
+        onChange={(e) => { persistedSpec.setUseDottedStroke(e.target.checked); }}
         label="Use dotted stroke"
       />
       {useDottedStroke && (

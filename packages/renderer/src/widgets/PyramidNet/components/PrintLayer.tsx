@@ -31,7 +31,7 @@ export const PrintLayer = observer(({
   }
   const {
     boundingBox,
-    savedModel: {
+    persistedSpec: {
       borderInsetFaceHoleTransformMatrix,
       faceDecoration,
       faceDecorationTransformMatricies,

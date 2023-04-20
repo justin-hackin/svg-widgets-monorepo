@@ -2,8 +2,8 @@ import { Model, model } from 'mobx-keystone';
 import { numberTextProp } from '../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../common/util/units';
 
-@model('DividerBaseSavedModel')
-export class DividerBaseSavedModel extends Model({
+@model('DividerBasePersistedSpec')
+export class DividerBasePersistedSpec extends Model({
   shelfWidth: numberTextProp(96 * PIXELS_PER_INCH, {
     useUnits: true,
   }),

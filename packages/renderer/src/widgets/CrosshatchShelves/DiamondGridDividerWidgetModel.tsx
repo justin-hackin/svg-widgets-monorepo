@@ -8,7 +8,7 @@ import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
 } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { DividerBaseSavedModel } from './DividerBaseSavedModel';
+import { DividerBasePersistedSpec } from './DividerBasePersistedSpec';
 import { augmentSegmentEndpoints, getPositiveSlopeSlatSegments, notchPanel } from './util';
 import { PathData } from '../../common/path/PathData';
 import { getBoundingBoxAttrs } from '../../common/util/svg';
@@ -26,8 +26,8 @@ interface SegmentInfo {
   firstIndex: number,
 }
 
-@model('DiamondGridDividerSavedModel')
-export class DiamondGridDividerSavedModel extends ExtendedModel(DividerBaseSavedModel, {
+@model('DiamondGridDividerPersistedSpec')
+export class DiamondGridDividerPersistedSpec extends ExtendedModel(DividerBasePersistedSpec, {
   flushPostProcess: switchProp(false),
 }) {
   panelSpacingRatio = 1.1;
@@ -127,7 +127,7 @@ export class DiamondGridDividerSavedModel extends ExtendedModel(DividerBaseSaved
 
 @model('DiamondGridDividerWidgetModel')
 export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  savedModel: prop(() => new DiamondGridDividerSavedModel({})),
+  persistedSpec: prop(() => new DiamondGridDividerPersistedSpec({})),
 }) {
   // eslint-disable-next-line class-methods-use-this
   get fileBasename() {
@@ -140,19 +140,22 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
       [
         {
           name: 'Profile view',
-          documentAreaProps: { width: this.savedModel.shelfWidth.value, height: this.savedModel.shelfHeight.value },
+          documentAreaProps: {
+            width: this.persistedSpec.shelfWidth.value,
+            height: this.persistedSpec.shelfHeight.value,
+          },
           Component: () => (
             <g>
               <path
-                d={this.savedModel.crosshatchProfilePath.getD()}
+                d={this.persistedSpec.crosshatchProfilePath.getD()}
                 fill="none"
                 stroke="#ddd"
-                strokeWidth={this.savedModel.materialThickness.value}
+                strokeWidth={this.persistedSpec.materialThickness.value}
               />
             </g>
           ),
         },
-        ...this.savedModel.panelAssetMembers,
+        ...this.persistedSpec.panelAssetMembers,
       ],
     );
   }

@@ -272,7 +272,7 @@ export class CylinderLightboxModel extends Model({
 
 @model('CylinderLightboxWidgetModel')
 export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  savedModel: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
+  persistedSpec: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
 }) {
   // eslint-disable-next-line class-methods-use-this
   get fileBasename() {
@@ -280,13 +280,13 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   }
 
   get ringRadiusVal() {
-    return this.savedModel.ringRadius.value;
+    return this.persistedSpec.ringRadius.value;
   }
 
   @computed
   get assetDefinition() {
     const {
-      savedModel: {
+      persistedSpec: {
         ringRadius: { value: ringRadius },
         wallsPerArc: { value: wallsPerArc },
         arcsPerRing: { value: arcsPerRing },

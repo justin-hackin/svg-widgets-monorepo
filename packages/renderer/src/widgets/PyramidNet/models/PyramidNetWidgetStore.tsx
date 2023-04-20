@@ -28,7 +28,7 @@ const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
 @model('PyramidNetWidgetModel')
 export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  savedModel: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
+  persistedSpec: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
   textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),
   dashPatterns: prop<StrokeDashPathPatternModel[]>(dashPatternsDefaultFn),
   preferences: prop(() => (new PyramidNetPreferencesModel({}))),
@@ -42,7 +42,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   @computed
   get boundingBox() {
-    return getBoundingBoxAttrs(this.savedModel.netPaths.cut.getD());
+    return getBoundingBoxAttrs(this.persistedSpec.netPaths.cut.getD());
   }
 
   @computed
@@ -62,12 +62,12 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
         {
           name: 'Print',
           Component: () => (<PrintLayer widgetStore={this} />),
-          copies: this.savedModel.pyramid.copiesNeeded,
+          copies: this.persistedSpec.pyramid.copiesNeeded,
         },
         {
           name: 'Dielines',
           Component: () => (<DielinesLayer widgetStore={this} />),
-          copies: this.savedModel.pyramid.copiesNeeded,
+          copies: this.persistedSpec.pyramid.copiesNeeded,
         },
       ],
     );
@@ -75,9 +75,9 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   @modelAction
   setTextureEditorOpen(isOpen) {
-    if (this.savedModel.faceDecoration instanceof RawFaceDecorationModel) {
+    if (this.persistedSpec.faceDecoration instanceof RawFaceDecorationModel) {
       // texture editor directly references faceDecoration and will not render TextureSvg if it is Raw
-      this.savedModel.resetFaceDecoration();
+      this.persistedSpec.resetFaceDecoration();
     }
     this.textureEditorOpen = isOpen;
   }
@@ -90,9 +90,9 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   get fileBasename() {
     return `${
-      this.savedModel.pyramid.shapeName.value || 'shape'
+      this.persistedSpec.pyramid.shapeName.value || 'shape'
     }__${
-      this.savedModel.faceDecorationSourceFileName || 'undecorated'
+      this.persistedSpec.faceDecorationSourceFileName || 'undecorated'
     }`;
   }
 

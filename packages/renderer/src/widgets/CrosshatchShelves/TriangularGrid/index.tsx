@@ -49,8 +49,8 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
   .map((index) => polarPoint(index * (1 / 3) * Math.PI, radius));
 
 const POLYGON_SIDES = 6;
-@model('TriangularGridDividerSavedModel')
-export class TriangularGridDividerSavedModel extends Model({
+@model('TriangularGridDividerPersistedSpec')
+export class TriangularGridDividerPersistedSpec extends Model({
   hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,
   }),
@@ -180,7 +180,7 @@ export class TriangularGridDividerSavedModel extends Model({
 
 @model('TriangularGridWidgetModel')
 export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  savedModel: prop(() => new TriangularGridDividerSavedModel({})),
+  persistedSpec: prop(() => new TriangularGridDividerPersistedSpec({})),
 }) {
   // eslint-disable-next-line class-methods-use-this
   get fileBasename() {
@@ -193,18 +193,18 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
       {
         name: 'Profile view',
         documentAreaProps: {
-          viewBox: pathDToViewBoxStr(this.savedModel.wallSegmentsPathD),
+          viewBox: pathDToViewBoxStr(this.persistedSpec.wallSegmentsPathD),
         },
         Component: () => (
           <g>
             <path
-              d={this.savedModel.crosshatchProfilePathD}
+              d={this.persistedSpec.crosshatchProfilePathD}
               fill="none"
               stroke="#ddd"
-              strokeWidth={this.savedModel.materialThickness.value}
+              strokeWidth={this.persistedSpec.materialThickness.value}
             />
             <path
-              d={this.savedModel.wallSegmentsPathD}
+              d={this.persistedSpec.wallSegmentsPathD}
               fill="none"
               stroke="#ddd"
               strokeWidth={1}
@@ -212,7 +212,7 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
           </g>
         ),
       },
-      ...this.savedModel.panelAssetMembers,
+      ...this.persistedSpec.panelAssetMembers,
     ]);
   }
 }

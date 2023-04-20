@@ -117,14 +117,14 @@ export const WidgetControlPanel = observer(() => {
       const fileModelType = fileData?.$modelType;
 
       // @ts-ignore
-      const storeType = getSnapshot(selectedStore.savedModel).$modelType;
+      const storeType = getSnapshot(selectedStore.persistedSpec).$modelType;
       if (fileModelType !== storeType) {
         resetFileMenuRef();
         setAlertDialogContent(`Invalid spec file: JSON data must contain top-level property $modelType with value "${
           storeType}" but instead saw "${fileModelType}"`);
       }
       applySnapshot(
-        selectedStore.savedModel,
+        selectedStore.persistedSpec,
         // @ts-ignore
         fileData,
       );
@@ -134,7 +134,7 @@ export const WidgetControlPanel = observer(() => {
   };
 
   const saveAsHandler = async () => {
-    const snapshot = getSnapshot(selectedStore.savedModel);
+    const snapshot = getSnapshot(selectedStore.persistedSpec);
     const filePath = await electronApi.saveSvgAndAssetsWithDialog(
       workspaceStore.getSelectedModelAssetsFileData(),
       snapshot,
@@ -153,7 +153,7 @@ export const WidgetControlPanel = observer(() => {
       await saveAsHandler();
       return;
     }
-    const snapshot = getSnapshot(selectedStore.savedModel);
+    const snapshot = getSnapshot(selectedStore.persistedSpec);
     await electronApi.saveSvgAndModel(
       workspaceStore.getSelectedModelAssetsFileData(), snapshot, workspaceStore.currentFilePath,
     );
@@ -244,7 +244,7 @@ export const WidgetControlPanel = observer(() => {
         </AppBar>
         <AssetsAccordion assetDefinition={selectedStore.assetDefinition} />
         <div className={classes.dielinePanelContent}>
-          {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.savedModel} />)}
+          {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.persistedSpec} />)}
         </div>
       </ControlPanelDrawer>
     </>

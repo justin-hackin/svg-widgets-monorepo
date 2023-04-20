@@ -3,7 +3,7 @@ import { FC } from 'react';
 import { AdditionalFileMenuItemsProps, AssetDefinition } from './types';
 
 export abstract class BaseWidgetClass extends Model({}) {
-  abstract savedModel: ModelProp<any, any, false, false, true>;
+  abstract persistedSpec: ModelProp<any, any, false, false, true>;
 
   abstract get fileBasename(): string;
 

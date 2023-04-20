@@ -9,6 +9,6 @@ export const AscendantEdgeTabsControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
   return (
-    <TweakableChildrenInputs parentNode={store.savedModel.ascendantEdgeTabsSpec} />
+    <TweakableChildrenInputs parentNode={store.persistedSpec.ascendantEdgeTabsSpec} />
   );
 });

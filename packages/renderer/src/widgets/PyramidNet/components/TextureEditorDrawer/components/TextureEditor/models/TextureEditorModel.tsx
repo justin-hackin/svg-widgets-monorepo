@@ -97,24 +97,24 @@ export class TextureEditorModel extends Model({
   }
 
   @computed
-  get savedModel() {
-    return this.parentPyramidNetWidgetModel.savedModel;
+  get persistedSpec() {
+    return this.parentPyramidNetWidgetModel.persistedSpec;
   }
 
   // if faceDecoration is Raw before opening texture editor, it is reset to PositionableFaceDecorationModel
   @computed
   get faceDecoration() {
-    return this.savedModel.faceDecoration as PositionableFaceDecorationModel;
+    return this.persistedSpec.faceDecoration as PositionableFaceDecorationModel;
   }
 
   @computed
   get decorationBoundary() {
-    return new BoundaryModel(this.savedModel.normalizedDecorationBoundaryPoints);
+    return new BoundaryModel(this.persistedSpec.normalizedDecorationBoundaryPoints);
   }
 
   @computed
   get shapeName() {
-    return this.savedModel.pyramid.shapeName;
+    return this.persistedSpec.pyramid.shapeName;
   }
 
   @computed
@@ -190,12 +190,12 @@ export class TextureEditorModel extends Model({
 
   @computed
   get borderToInsetRatio() {
-    return this.savedModel.borderToInsetRatio;
+    return this.persistedSpec.borderToInsetRatio;
   }
 
   @computed
   get insetToBorderOffset() {
-    return this.savedModel.insetToBorderOffset;
+    return this.persistedSpec.insetToBorderOffset;
   }
 
   @modelAction
@@ -438,7 +438,7 @@ export class TextureEditorModel extends Model({
 
   @modelAction
   setTextureFromSnapshot(textureSnapshot) {
-    this.savedModel.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
+    this.persistedSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
   }
 
   // TODO: ts type the patternInfo
@@ -463,7 +463,7 @@ export class TextureEditorModel extends Model({
       return;
     }
     if (shapeName !== this.shapeName.value) {
-      this.parentPyramidNetWidgetModel.savedModel.pyramid.shapeName.setValue(shapeName);
+      this.parentPyramidNetWidgetModel.persistedSpec.pyramid.shapeName.setValue(shapeName);
     }
     this.setTextureFromSnapshot(textureSnapshot);
   }
