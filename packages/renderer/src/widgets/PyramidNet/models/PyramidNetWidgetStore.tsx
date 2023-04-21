@@ -26,7 +26,7 @@ import { RegisteredAssetsDefinition } from '../../../WidgetWorkspace/widget-type
 
 const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
-@model('PyramidNetWidgetModel')
+@model('PolyhedralNet')
 export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   persistedSpec: prop<PyramidNetModel>(() => (new PyramidNetModel({}))),
   textureEditor: prop<TextureEditorModel>(() => (new TextureEditorModel({}))),

@@ -88,7 +88,7 @@ export class SquareGridDividerPersistedSpec extends ExtendedModel(DividerBasePer
   }
 }
 
-@model('SquareGridDividerWidgetModel')
+@model('SquareGridDivider')
 export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
   persistedSpec: prop<SquareGridDividerPersistedSpec>(() => new SquareGridDividerPersistedSpec({})),
 }) {

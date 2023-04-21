@@ -1,10 +1,10 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Avatar, Dialog, DialogTitle, Fab, List, ListItem, ListItemAvatar, ListItemText,
+  Avatar, Dialog, DialogTitle, Fab, List, ListItemAvatar, ListItemButton, ListItemText,
 } from '@mui/material';
 import BuildIcon from '@mui/icons-material/Build';
-import { startCase } from 'lodash';
+import { kebabCase, startCase } from 'lodash';
 import { styled } from '@mui/styles';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
 import { useWorkspaceMst } from './models/WorkspaceModel';
@@ -50,7 +50,6 @@ export const WidgetWorkspace = observer(() => {
   useLayoutEffect(() => {
     workspaceStore.fitToDocument();
   }, [workspaceStore?.selectedWidgetName]);
-
   if (!selectedStore) { return null; }
   const { WorkspaceView } = selectedStore.assetDefinition;
 
@@ -82,12 +81,12 @@ export const WidgetWorkspace = observer(() => {
         <DialogTitle id={WIDGET_DIALOG_TITLE_ID}>Select Widget</DialogTitle>
         <List>
           {
-            Object.keys(widgetOptions).map((widgetName) => (
-              <ListItem
+            Array.from(widgetOptions.keys()).map((widgetName) => (
+              <ListItemButton
                 key={widgetName}
                 selected={selectedWidgetName === widgetName}
                 onClick={() => {
-                  workspaceStore.setSelectedWidgetName(widgetName);
+                  workspaceStore.selectedWidgetName = widgetName;
                   setWidgetPickerOpen(false);
                 }}
               >
@@ -95,14 +94,14 @@ export const WidgetWorkspace = observer(() => {
                   <Avatar
                     alt={startCase(widgetName)}
                     className={classes.widgetAvatar}
-                    src={new URL(`../../static/images/widgets/${widgetName}.png`, import.meta.url).href}
+                    src={new URL(`../../static/images/widgets/${kebabCase(widgetName)}.png`, import.meta.url).href}
                   />
                 </ListItemAvatar>
                 <ListItemText
                   primary={startCase(widgetName)}
                   primaryTypographyProps={{ className: classes.widgetName }}
                 />
-              </ListItem>
+              </ListItemButton>
             ))
           }
         </List>

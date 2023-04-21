@@ -178,7 +178,7 @@ export class TriangularGridDividerPersistedSpec extends Model({
   }
 }
 
-@model('TriangularGridWidgetModel')
+@model('TriangleGridDivider')
 export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
   persistedSpec: prop(() => new TriangularGridDividerPersistedSpec({})),
 }) {

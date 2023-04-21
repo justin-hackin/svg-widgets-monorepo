@@ -7,14 +7,15 @@ import {
   model,
   Model,
   modelAction,
+  ModelClass,
   prop,
   registerRootStore,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash';
 import {
-  fitToViewer, // @ts-ignore
-  INITIAL_VALUE, Tool, TOOL_PAN, Value,
+// @ts-ignore
+  fitToViewer, INITIAL_VALUE, Tool, TOOL_PAN, Value,
 } from 'react-svg-pan-zoom';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
@@ -23,10 +24,8 @@ import { UNITS } from '../../common/util/units';
 import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
 import { SquareGridDividerWidgetModel } from '../../widgets/CrosshatchShelves/SquareGridDividerWidgetModel';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
-import { DiamondGridDividerWidgetModel } from
-  '../../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
-import { TriangularGridWidgetModel }
-  from '../../widgets/CrosshatchShelves/TriangularGrid';
+import { DiamondGridDividerWidgetModel } from '../../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
+import { TriangularGridWidgetModel } from '../../widgets/CrosshatchShelves/TriangularGrid';
 
 @model('WorkspacePreferencesModel')
 class WorkspacePreferencesModel extends Model({
@@ -38,23 +37,26 @@ class WorkspacePreferencesModel extends Model({
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
-const widgetOptions = {
-  'polyhedral-net': PyramidNetWidgetModel,
-  'cylinder-lightbox': CylinderLightboxWidgetModel,
-  'square-grid-divider': SquareGridDividerWidgetModel,
-  'diamond-grid-divider': DiamondGridDividerWidgetModel,
-  'triangle-grid-divider': TriangularGridWidgetModel,
-};
+const widgetList = [
+  PyramidNetWidgetModel,
+  CylinderLightboxWidgetModel,
+  SquareGridDividerWidgetModel,
+  DiamondGridDividerWidgetModel,
+  TriangularGridWidgetModel,
+];
 
-const defaultWidgetName = 'polyhedral-net';
+type BaseWidgetModelClass = ModelClass<BaseWidgetClass>;
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedWidgetName: prop<string>().withSetter(),
   selectedStore: prop<BaseWidgetClass>().withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
-  widgetOptions = widgetOptions;
+  @observable
+  widgetOptions = new Map();
+
+  @observable
+  selectedWidgetName: string = null;
 
   @observable
   savedSnapshot = undefined;
@@ -75,15 +77,16 @@ export class WorkspaceModel extends Model({
         // @ts-ignore
         document.title = this.titleBarText;
       }, { fireImmediately: true }),
-      reaction(() => [this.selectedWidgetName], () => {
+      reaction(() => [this.SelectedModel], () => {
         this.clearCurrentFileData();
         this.resetModelToDefault();
       }),
     ];
+    this.registerWidgets(widgetList);
+    this.resetModelToDefault();
 
     this.persistPreferences()
       .then(() => {
-        this.setSelectedWidgetName(defaultWidgetName);
         // TODO: get rid of this
         //  why doesn't useLayoutEffect in workspace view cover first render case?
         setTimeout(() => {
@@ -133,7 +136,7 @@ export class WorkspaceModel extends Model({
 
   @computed
   get SelectedModel() {
-    return this.widgetOptions[this.selectedWidgetName];
+    return this.widgetOptions.get(this.selectedWidgetName);
   }
 
   getSelectedModelAssetsFileData() {
@@ -181,7 +184,19 @@ export class WorkspaceModel extends Model({
     if (this.selectedStore) {
       detach(this.selectedStore);
     }
-    this.setSelectedStore(new this.SelectedModel({}));
+    if (this.SelectedModel) {
+      this.setSelectedStore(new this.SelectedModel({}));
+    }
+  }
+
+  @modelAction
+  registerWidgets(widgetList: BaseWidgetModelClass[]) {
+    for (const widgetClass of widgetList) {
+      // @ts-ignore
+      this.widgetOptions.set(widgetClass.$modelType, widgetClass);
+    }
+    // @ts-ignore
+    this.selectedWidgetName = widgetList[0].$modelType;
   }
 
   @modelAction

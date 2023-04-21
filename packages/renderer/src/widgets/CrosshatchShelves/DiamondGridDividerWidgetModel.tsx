@@ -125,7 +125,7 @@ export class DiamondGridDividerPersistedSpec extends ExtendedModel(DividerBasePe
   }
 }
 
-@model('DiamondGridDividerWidgetModel')
+@model('DiamondGridDivider')
 export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
   persistedSpec: prop(() => new DiamondGridDividerPersistedSpec({})),
 }) {

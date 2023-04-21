@@ -46,8 +46,8 @@ const applyFlap = (
     sumPoints(endPt, startFlapEdge),
   ], testTabHandleFlapRounding, true);
 };
-
-@model('PyramidNet')
+// TODO: naming consistency, delay until decision on default exports + file system import function will be used
+@model('PolyhedralNetPersistedSpec')
 export class PyramidNetModel extends Model({
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),

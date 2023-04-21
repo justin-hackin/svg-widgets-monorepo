@@ -270,7 +270,7 @@ export class CylinderLightboxModel extends Model({
   }
 }
 
-@model('CylinderLightboxWidgetModel')
+@model('CylinderLightbox')
 export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
   persistedSpec: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
 }) {
