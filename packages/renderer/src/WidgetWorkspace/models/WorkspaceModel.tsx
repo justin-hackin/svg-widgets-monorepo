@@ -70,6 +70,9 @@ export class WorkspaceModel extends Model({
   @observable
   zoomPanTool: Tool = TOOL_PAN;
 
+  @observable
+  widgetPickerOpen = false;
+
   onAttachedToRootStore() {
     const disposers = [
       // title bar changes for file status indication
@@ -83,7 +86,6 @@ export class WorkspaceModel extends Model({
       }),
     ];
     this.registerWidgets(widgetList);
-    this.resetModelToDefault();
 
     this.persistPreferences()
       .then(() => {
@@ -130,6 +132,9 @@ export class WorkspaceModel extends Model({
 
   @computed
   get titleBarText() {
+    if (!this.selectedStore) {
+      return '';
+    }
     return IS_ELECTRON_BUILD
       ? `${this.selectedWidgetNameReadable} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
   }
@@ -143,6 +148,20 @@ export class WorkspaceModel extends Model({
     return this.selectedStore.assetDefinition.getAssetsFileData(
       this.selectedStore.fileBasename,
     );
+  }
+
+  @modelAction
+  setWidgetPickerOpen(val: boolean) {
+    this.widgetPickerOpen = val;
+  }
+
+  @modelAction
+  newWidget() {
+    if (Array.from(this.widgetOptions.keys()).length > 1) {
+      this.setWidgetPickerOpen(true);
+    } else {
+      this.resetModelToDefault();
+    }
   }
 
   @modelAction
@@ -191,12 +210,20 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   registerWidgets(widgetList: BaseWidgetModelClass[]) {
+    if (!widgetList.length) {
+      // TODO: snackbar error
+      throw new Error('registerWidgets first parameter widgetList must contain at least one widget model');
+    }
     for (const widgetClass of widgetList) {
       // @ts-ignore
       this.widgetOptions.set(widgetClass.$modelType, widgetClass);
     }
-    // @ts-ignore
-    this.selectedWidgetName = widgetList[0].$modelType;
+
+    if (widgetList.length === 1) {
+      // @ts-ignore
+      this.selectedWidgetName = widgetList[0].$modelType;
+    }
+    this.newWidget();
   }
 
   @modelAction

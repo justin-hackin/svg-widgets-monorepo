@@ -1,9 +1,8 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Avatar, Dialog, DialogTitle, Fab, List, ListItemAvatar, ListItemButton, ListItemText,
+  Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText,
 } from '@mui/material';
-import BuildIcon from '@mui/icons-material/Build';
 import { kebabCase, startCase } from 'lodash';
 import { styled } from '@mui/styles';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
@@ -45,38 +44,29 @@ export const WidgetWorkspace = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { selectedStore, selectedWidgetName, widgetOptions } = workspaceStore;
 
-  const [widgetPickerOpen, setWidgetPickerOpen] = useState<boolean>(false);
-
   useLayoutEffect(() => {
     workspaceStore.fitToDocument();
   }, [workspaceStore?.selectedWidgetName]);
-  if (!selectedStore) { return null; }
-  const { WorkspaceView } = selectedStore.assetDefinition;
 
   // wrap with observer here so WidgetSVG can be rendered with ReactDOMServer for saving to string
 
   return (
     <>
       <WidgetWorkspaceStyled>
-        <ResizableZoomPan SVGBackground="url(#grid-pattern)">
-          { WorkspaceView }
-        </ResizableZoomPan>
-        <Fab
-          aria-label="open widget picker"
-          onClick={() => {
-            setWidgetPickerOpen(true);
-          }}
-          className={classes.widgetFab}
-        >
-          <BuildIcon />
-        </Fab>
-        <WidgetControlPanel />
-        <DielineViewToolbar />
+        {selectedStore && (
+          <>
+            <ResizableZoomPan SVGBackground="url(#grid-pattern)">
+              { selectedStore.assetDefinition.WorkspaceView }
+            </ResizableZoomPan>
+            <WidgetControlPanel />
+            <DielineViewToolbar />
+          </>
+        )}
       </WidgetWorkspaceStyled>
       <DialogStyled
-        open={widgetPickerOpen}
+        open={workspaceStore.widgetPickerOpen}
         aria-labelledby={WIDGET_DIALOG_TITLE_ID}
-        onClose={() => { setWidgetPickerOpen(false); }}
+        onClose={() => { workspaceStore.setWidgetPickerOpen(false); }}
       >
         <DialogTitle id={WIDGET_DIALOG_TITLE_ID}>Select Widget</DialogTitle>
         <List>
@@ -87,7 +77,7 @@ export const WidgetWorkspace = observer(() => {
                 selected={selectedWidgetName === widgetName}
                 onClick={() => {
                   workspaceStore.selectedWidgetName = widgetName;
-                  setWidgetPickerOpen(false);
+                  workspaceStore.setWidgetPickerOpen(false);
                 }}
               >
                 <ListItemAvatar>
