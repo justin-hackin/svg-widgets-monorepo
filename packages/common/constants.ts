@@ -1,5 +1,5 @@
 export enum EVENTS {
-  DIALOG_SAVE_JSON_FILE = 'dialog-save-json-file',
+  DIALOG_SAVE_TXT_FILE = 'dialog-save-txt-file',
   SAVE_TXT_FILE = 'save-txt-file',
   DIALOG_OPEN_TXT_FILE = 'dialog-open-txt-file',
   OPEN_TXT_FILE = 'open-txt-file',
@@ -19,3 +19,5 @@ export const IS_DEVELOPMENT_BUILD = import.meta.env.MODE === 'development';
 if (!IS_WEB_BUILD && !IS_ELECTRON_BUILD) {
   throw new Error(`unexpected BUILD_ENV, should be "electron" or "web" but saw: "${import.meta.env.VITE_BUILD_ENV}"`);
 }
+export const WIDGET_EXT = 'widget';
+export const WIDGET_DESC = 'widget spec file';

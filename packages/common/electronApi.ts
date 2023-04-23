@@ -4,7 +4,7 @@ import { join } from 'path';
 import {
   dialogOpenJsonRes, ParsedFilePathData, PatternInfo, TxtFileInfo,
 } from './types';
-import { EVENTS } from './constants';
+import { EVENTS, WIDGET_DESC, WIDGET_EXT } from './constants';
 
 /**
  * @see https://github.com/electron/electron/issues/21437#issuecomment-573522360
@@ -24,7 +24,7 @@ export const _electronApi = {
     message: string,
   ): Promise<dialogOpenJsonRes> => {
     const res = await ipcRenderer.invoke(
-      EVENTS.DIALOG_OPEN_TXT_FILE, { message }, 'json', 'JSON',
+      EVENTS.DIALOG_OPEN_TXT_FILE, { message }, WIDGET_EXT, WIDGET_DESC,
     );
     if (!res) { return undefined; }
     const { fileString, filePath } = res;
@@ -36,17 +36,25 @@ export const _electronApi = {
   saveSvgWithDialog: (
     svgString: string, message: string, defaultPath: string,
   ): Promise<string | undefined> => ipcRenderer
-    .invoke(EVENTS.DIALOG_SAVE_JSON_FILE, svgString, {
+    .invoke(EVENTS.DIALOG_SAVE_TXT_FILE, svgString, {
       message,
       defaultPath,
     }, SVG_EXT, SVG_EXT_NAME),
 
-  saveJsonFileWithDialog: (
+  saveJSONWithDialog: (
+    fileString: string, message: string, defaultPath: string,
+  ): Promise<string | undefined> => ipcRenderer
+    .invoke(EVENTS.DIALOG_SAVE_TXT_FILE, fileString, {
+      message,
+      defaultPath,
+    }, 'json', 'JSON'),
+
+  saveWidgetFileWithDialog: (
     fileData: object, message: string, defaultBasename: string,
   ): Promise<ParsedFilePathData | undefined> => ipcRenderer.invoke(
-    EVENTS.DIALOG_SAVE_JSON_FILE,
+    EVENTS.DIALOG_SAVE_TXT_FILE,
     formattedJSONStringify(fileData),
-    { message, defaultPath: `${defaultBasename}.json` },
+    { message, defaultPath: `${defaultBasename}.${WIDGET_EXT}` }, WIDGET_EXT, WIDGET_DESC,
   ),
 
   saveGlbWithDialog: (shapeGLTF: ArrayBuffer, message: string, defaultPath: string) => ipcRenderer.invoke(
@@ -57,7 +65,7 @@ export const _electronApi = {
     assetSVGData: TxtFileInfo[], snapshot: object, message: string,
     defaultBasename: string,
   ): Promise<string | undefined> => {
-    const res = await _electronApi.saveJsonFileWithDialog(
+    const res = await _electronApi.saveWidgetFileWithDialog(
       snapshot, message, defaultBasename,
     );
     if (!res) {

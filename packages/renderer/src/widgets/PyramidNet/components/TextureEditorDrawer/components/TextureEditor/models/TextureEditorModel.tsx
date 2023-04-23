@@ -19,7 +19,7 @@ import { tryResolvePath } from '../../../../../../../common/util/mobx-keystone';
 import {
   DEFAULT_SLIDER_STEP,
   IS_ELECTRON_BUILD,
-  IS_WEB_BUILD,
+  IS_WEB_BUILD, WIDGET_EXT,
 } from '../../../../../../../../../common/constants';
 import { reportTransformsTally } from '../../../../../../../common/util/analytics';
 import { TransformModel } from '../../../../../models/TransformModel';
@@ -425,14 +425,14 @@ export class TextureEditorModel extends Model({
     };
     const defaultBasename = `${this.shapeName.value}__${this.faceDecoration.pattern.sourceFileName}`;
     if (IS_ELECTRON_BUILD) {
-      electronApi.saveJsonFileWithDialog(
-        fileData,
+      electronApi.saveJSONWithDialog(
+        JSON.stringify(fileData),
         'Save texture arrangement',
         defaultBasename,
       );
     }
     if (IS_WEB_BUILD) {
-      fileDownload(JSON.stringify(fileData), `${defaultBasename}.json`, 'application/json');
+      fileDownload(JSON.stringify(fileData), `${defaultBasename}.${WIDGET_EXT}`, 'application/json');
     }
   }
 

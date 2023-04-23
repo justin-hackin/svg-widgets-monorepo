@@ -35,7 +35,7 @@ import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../../../..
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
 import {
   IS_ELECTRON_BUILD,
-  IS_WEB_BUILD,
+  IS_WEB_BUILD, WIDGET_EXT,
 } from '../../../../../../../../../../common/constants';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
 import { HistoryButtons } from '../../../../../HistoryButtons';
@@ -147,7 +147,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
   const ForwardRefdOpenMenuItem = forwardRef((_, ref) => (
     <FilePicker
-      extensions={['.json']}
+      extensions={[`.${WIDGET_EXT}`]}
       onFilePicked={async (file) => {
         // TODO: why doesn't file.type match downloadFile mime type 'application/json'
         if (file.type === '') {

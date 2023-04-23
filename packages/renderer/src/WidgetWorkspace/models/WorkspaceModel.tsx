@@ -11,7 +11,7 @@ import {
   modelAction,
   ModelClass, modelFlow,
   prop,
-  registerRootStore, SnapshotInOfModel,
+  registerRootStore, SnapshotInOfModel, UndoManager,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash';
@@ -91,16 +91,6 @@ export class WorkspaceModel extends Model({
 
   @observable
   alertDialogContent = null;
-
-  @modelAction
-  setAlertDialogContent(content: ReactNode) {
-    this.alertDialogContent = content;
-  }
-
-  @modelAction
-  resetAlertDialogContent() {
-    this.alertDialogContent = null;
-  }
 
   @computed
   get availableWidgetTypes() {
@@ -190,6 +180,16 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
+  setAlertDialogContent(content: ReactNode) {
+    this.alertDialogContent = content;
+  }
+
+  @modelAction
+  resetAlertDialogContent() {
+    this.alertDialogContent = null;
+  }
+
+  @modelAction
   fitToDocument() {
     this.setZoomPanValue(fitToViewer(this.zoomPanValue));
   }
@@ -234,6 +234,7 @@ export class WorkspaceModel extends Model({
       const newStore = new SelectedModel({});
       this.setSelectedStore(newStore);
     }
+    this.resetCurrentFileData();
   }
 
   @modelAction
@@ -246,17 +247,30 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
-  setSelectedStoreFromData(widgetType: string, persistedSpecSnapshot: SnapshotInOfModel<any>, filePath: string) {
-    this.setCurrentFileData(filePath, persistedSpecSnapshot);
-    this.newWidgetStore(widgetType);
+  _applySpecSnapshot(persistedSpecSnapshot: SnapshotInOfModel<any>) {
     applySnapshot(this.selectedStore.persistedSpec, persistedSpecSnapshot);
+  }
+
+  @modelAction
+  setSelectedStoreFromData(widgetType: string, persistedSpecSnapshot: SnapshotInOfModel<any>, filePath: string) {
+    this.newWidgetStore(widgetType);
+    this.setCurrentFileData(filePath, persistedSpecSnapshot);
+    // @ts-ignore
+    const history: UndoManager = this.selectedStore.persistedSpec?.history;
+    if (history) {
+      history.withoutUndo(() => {
+        this._applySpecSnapshot(persistedSpecSnapshot);
+      });
+    } else {
+      this._applySpecSnapshot(persistedSpecSnapshot);
+    }
   }
 
   @modelAction
   initializeWidgetFromSnapshot(widgetJSON: WidgetJSON, filePath: string) {
     const { modelType, persistedSpec } = widgetJSON.widget;
     if (!this.widgetOptions.has(modelType)) {
-      this.setAlertDialogContent(`Invalid spec file: JSON data must contain top-level property $modelType with value
+      this.setAlertDialogContent(`Invalid widget spec file: JSON data must contain property widget.$modelType with value
        equal to one of (${this.availableWidgetTypes.join(', ')}) but instead saw ${modelType}`);
       return;
     }
@@ -321,6 +335,12 @@ export class WorkspaceModel extends Model({
       this.setCurrentFileData(this.currentFilePath, widgetJSON.widget.persistedSpec);
     }
   });
+
+  @modelAction
+  resetCurrentFileData() {
+    this.currentFilePath = undefined;
+    this.savedSnapshot = undefined;
+  }
 
   @modelAction
   registerWidgets(widgetList: BaseWidgetModelClass[]) {
