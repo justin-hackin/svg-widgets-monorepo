@@ -21,5 +21,6 @@ export class TweakableReferenceWithOptionsModel<T extends object, M extends Refe
         this.valueRef = this.metadata.typeRef(value);
       }
     }
+    super.onAttachedToRootStore(rootStore);
   }
 }

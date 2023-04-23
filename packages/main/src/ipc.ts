@@ -51,7 +51,7 @@ export const setupIpc = (ipcMain) => {
 
   ipcMain.handle(EVENTS.SAVE_TXT_FILE, (
     e, filePath, fileString,
-  ) => fsPromises.writeFile(filePath, fileString));
+  ) => fsPromises.writeFile(filePath, fileString).then(() => ({ dirname: dirname(filePath) })));
 
   ipcMain.handle(EVENTS.DIALOG_SAVE_GLB, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,

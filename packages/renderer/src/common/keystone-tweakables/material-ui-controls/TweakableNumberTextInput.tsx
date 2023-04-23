@@ -13,6 +13,7 @@ import { NumberTextMetadata, SliderWithTextMetadata } from '../types';
 export const TweakableNumberTextInput = observer((
   { node }: { node: TweakablePrimitiveModel<number, NumberTextMetadata | SliderWithTextMetadata> },
 ) => {
+  if (!node.onAttachedComplete) { return null; }
   const labelId = uuid();
   return (
     <FormControlStyled>

@@ -6,6 +6,7 @@ import { SimpleSelect } from './SimpleSelect';
 export const TweakableReferenceSelect = observer(({
   node,
 }: { node: TweakableReferenceWithOptionsModel<any, any> }) => {
+  if (!node.onAttachedComplete) { return null; }
   const { valuePath, label, options } = node;
 
   const idToOptions = useMemo(() => options.reduce((acc, option) => {

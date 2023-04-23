@@ -52,8 +52,10 @@ export const ShapeSelect = observer(({
   node: TweakablePrimitiveWithOptionsModel<string, WithOptionsMetadata<any>>,
   className?: string, isCompactDisplay?: boolean
 }) => {
+  if (!node.onAttachedComplete) {
+    return null;
+  }
   const labelId = `${node.label}__${uuid()}`;
-
   return (
     <ShapeSelectFormControl className={`${isCompactDisplay ? classes.isCompact : ''} ${className}`}>
       { !isCompactDisplay && <InputLabel id={labelId}>{ node.label }</InputLabel>}

@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -16,9 +16,7 @@ import {
   AppBar, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@mui/material';
 
-import {
-  applySnapshot, getSnapshot, SnapshotInOfModel,
-} from 'mobx-keystone';
+import { SnapshotInOfModel } from 'mobx-keystone';
 import { styled } from '@mui/material/styles';
 import { useWorkspaceMst } from '../models/WorkspaceModel';
 import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
@@ -91,8 +89,7 @@ export const WidgetControlPanel = observer(() => {
     setDrawerIsOpen(false);
   };
 
-  const [alertDialogContent, setAlertDialogContent] = useState<ReactNode>(null);
-  const closeAlertDialog = () => setAlertDialogContent(null);
+  const closeAlertDialog = () => workspaceStore.resetAlertDialogContent();
 
   const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false);
   const handleSettingsDialogOpen = () => {
@@ -113,51 +110,19 @@ export const WidgetControlPanel = observer(() => {
     if (res !== undefined) {
       const { filePath } = res;
       const fileData = res.fileData as SnapshotInOfModel<any>;
-      const fileModelType = fileData?.$modelType;
 
-      // @ts-ignore
-      const storeType = getSnapshot(selectedStore.persistedSpec).$modelType;
-      if (fileModelType !== storeType) {
-        resetFileMenuRef();
-        setAlertDialogContent(`Invalid spec file: JSON data must contain top-level property $modelType with value "${
-          storeType}" but instead saw "${fileModelType}"`);
-      }
-      applySnapshot(
-        selectedStore.persistedSpec,
-        // @ts-ignore
-        fileData,
-      );
-      workspaceStore.setCurrentFileData(filePath, fileData);
+      workspaceStore.initializeWidgetFromSnapshot(fileData, filePath);
     }
     resetFileMenuRef();
   };
 
   const saveAsHandler = async () => {
-    const snapshot = getSnapshot(selectedStore.persistedSpec);
-    const filePath = await electronApi.saveSvgAndAssetsWithDialog(
-      workspaceStore.getSelectedModelAssetsFileData(),
-      snapshot,
-      'Save assets svg with widget settings',
-      selectedStore.fileBasename,
-    );
-
-    if (filePath) {
-      workspaceStore.setCurrentFileData(filePath, snapshot);
-    }
+    await workspaceStore.saveWidgetWithDialog();
     resetFileMenuRef();
   };
 
   const saveHandler = async () => {
-    if (!workspaceStore.currentFilePath) {
-      await saveAsHandler();
-      return;
-    }
-    const snapshot = getSnapshot(selectedStore.persistedSpec);
-    await electronApi.saveSvgAndModel(
-      workspaceStore.getSelectedModelAssetsFileData(), snapshot, workspaceStore.currentFilePath,
-    );
-    // TODO: lose redundant setting of currentFilePath
-    workspaceStore.setCurrentFileData(workspaceStore.currentFilePath, snapshot);
+    await workspaceStore.saveWidget();
     resetFileMenuRef();
   };
 
@@ -227,8 +192,8 @@ export const WidgetControlPanel = observer(() => {
             >
               <SettingsIcon />
             </IconButton>
-            <SimpleDialog isOpen={!!alertDialogContent} handleClose={closeAlertDialog} title="Error">
-              {alertDialogContent}
+            <SimpleDialog isOpen={!!workspaceStore.alertDialogContent} handleClose={closeAlertDialog} title="Error">
+              {workspaceStore.alertDialogContent}
             </SimpleDialog>
             <SimpleDialog isOpen={settingsDialogIsOpen} handleClose={handleSettingsDialogClose} title="Settings">
               <PreferencesControls />

@@ -6,7 +6,7 @@ import { SimpleRadio } from './SimpleRadio';
 
 export const TweakableRadio = observer((
   { node }: { node: TweakablePrimitiveWithOptionsModel<any, RadioMetadata<any>> },
-) => (
+) => (!node.onAttachedComplete ? null : (
   <SimpleRadio
     {...{
       onChange: (e) => {
@@ -20,4 +20,4 @@ export const TweakableRadio = observer((
       name: node.valuePath,
     }}
   />
-));
+)));

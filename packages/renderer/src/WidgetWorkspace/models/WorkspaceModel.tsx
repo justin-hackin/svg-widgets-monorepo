@@ -1,15 +1,17 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, ReactNode, useContext } from 'react';
 import { computed, observable, reaction } from 'mobx';
 import {
+  _async, _await,
+  applySnapshot,
   connectReduxDevTools,
   detach,
   getSnapshot,
   model,
   Model,
   modelAction,
-  ModelClass,
+  ModelClass, modelFlow,
   prop,
-  registerRootStore,
+  registerRootStore, SnapshotInOfModel,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash';
@@ -26,6 +28,20 @@ import { SquareGridDividerWidgetModel } from '../../widgets/CrosshatchShelves/Sq
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 import { DiamondGridDividerWidgetModel } from '../../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
 import { TriangularGridWidgetModel } from '../../widgets/CrosshatchShelves/TriangularGrid';
+import { electronApi } from '../../../../common/electron';
+
+type WidgetJSON = {
+  widget: {
+    // it's difficult to create 1-to-1 correspondence between widget model $modelType and persisted spec $modelType
+    // so instead we store the $modelType of the widget model for toggling the active widget upon file open
+    modelType: string,
+    persistedSpec: SnapshotInOfModel<any>,
+  },
+  metadata: {
+    // for future support of migrations
+    version: number,
+  }
+};
 
 @model('WorkspacePreferencesModel')
 class WorkspacePreferencesModel extends Model({
@@ -56,7 +72,7 @@ export class WorkspaceModel extends Model({
   widgetOptions = new Map();
 
   @observable
-  selectedWidgetName: string = null;
+  selectedWidgetModelType: string = null;
 
   @observable
   savedSnapshot = undefined;
@@ -73,6 +89,24 @@ export class WorkspaceModel extends Model({
   @observable
   widgetPickerOpen = false;
 
+  @observable
+  alertDialogContent = null;
+
+  @modelAction
+  setAlertDialogContent(content: ReactNode) {
+    this.alertDialogContent = content;
+  }
+
+  @modelAction
+  resetAlertDialogContent() {
+    this.alertDialogContent = null;
+  }
+
+  @computed
+  get availableWidgetTypes() {
+    return Array.from(this.widgetOptions.keys());
+  }
+
   onAttachedToRootStore() {
     const disposers = [
       // title bar changes for file status indication
@@ -80,10 +114,6 @@ export class WorkspaceModel extends Model({
         // @ts-ignore
         document.title = this.titleBarText;
       }, { fireImmediately: true }),
-      reaction(() => [this.SelectedModel], () => {
-        this.clearCurrentFileData();
-        this.resetModelToDefault();
-      }),
     ];
     this.registerWidgets(widgetList);
 
@@ -105,7 +135,7 @@ export class WorkspaceModel extends Model({
 
   @computed
   get selectedWidgetNameReadable() {
-    return startCase(this.selectedWidgetName);
+    return startCase(this.selectedWidgetModelType);
   }
 
   @computed
@@ -137,11 +167,6 @@ export class WorkspaceModel extends Model({
     }
     return IS_ELECTRON_BUILD
       ? `${this.selectedWidgetNameReadable} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
-  }
-
-  @computed
-  get SelectedModel() {
-    return this.widgetOptions.get(this.selectedWidgetName);
   }
 
   getSelectedModelAssetsFileData() {
@@ -200,13 +225,102 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetModelToDefault() {
+    const SelectedModel = this.widgetOptions.get(this.selectedWidgetModelType);
     if (this.selectedStore) {
       detach(this.selectedStore);
     }
-    if (this.SelectedModel) {
-      this.setSelectedStore(new this.SelectedModel({}));
+
+    if (SelectedModel) {
+      const newStore = new SelectedModel({});
+      this.setSelectedStore(newStore);
     }
   }
+
+  @modelAction
+  newWidgetStore(widgetType: string) {
+    if (widgetType !== this.selectedWidgetModelType) {
+      this.selectedWidgetModelType = widgetType;
+    }
+
+    this.resetModelToDefault();
+  }
+
+  @modelAction
+  setSelectedStoreFromData(widgetType: string, persistedSpecSnapshot: SnapshotInOfModel<any>, filePath: string) {
+    this.setCurrentFileData(filePath, persistedSpecSnapshot);
+    this.newWidgetStore(widgetType);
+    applySnapshot(this.selectedStore.persistedSpec, persistedSpecSnapshot);
+  }
+
+  @modelAction
+  initializeWidgetFromSnapshot(widgetJSON: WidgetJSON, filePath: string) {
+    const { modelType, persistedSpec } = widgetJSON.widget;
+    if (!this.widgetOptions.has(modelType)) {
+      this.setAlertDialogContent(`Invalid spec file: JSON data must contain top-level property $modelType with value
+       equal to one of (${this.availableWidgetTypes.join(', ')}) but instead saw ${modelType}`);
+      return;
+    }
+
+    this.setSelectedStoreFromData(modelType, persistedSpec, filePath);
+  }
+
+  // @modelAction
+  // saveWidget() {
+  //   const snapshot = getSnapshot(this.selectedStore.persistedSpec);
+  //   const filePath = await electronApi.saveSvgAndAssetsWithDialog(
+  //     this.getSelectedModelAssetsFileData(),
+  //     snapshot,
+  //     'Save assets svg with widget settings',
+  //     this.selectedStore.fileBasename,
+  //   );
+  //
+  //   if (filePath) {
+  //     this.setCurrentFileData(filePath, snapshot);
+  //   }
+  // }
+
+  @modelAction
+  getWidgetSpecJSON(): WidgetJSON {
+    const snapshot = getSnapshot(this.selectedStore.persistedSpec);
+    return {
+      widget: {
+        modelType: this.selectedWidgetModelType,
+        persistedSpec: snapshot,
+      },
+      metadata: {
+        version: 1,
+      },
+    };
+  }
+
+  @modelFlow
+  saveWidgetWithDialog = _async(function* (this: WorkspaceModel) {
+    const widgetJSON = this.getWidgetSpecJSON();
+    const filePath = yield* _await(electronApi.saveSvgAndAssetsWithDialog(
+      this.getSelectedModelAssetsFileData(),
+      widgetJSON,
+      'Save assets svg with widget settings',
+      this.selectedStore.fileBasename,
+    ));
+
+    if (filePath) {
+      this.setCurrentFileData(filePath, widgetJSON.widget.persistedSpec);
+    }
+  });
+
+  @modelFlow
+  saveWidget = _async(function* (this: WorkspaceModel) {
+    if (!this.currentFilePath) {
+      yield* _await(this.saveWidgetWithDialog());
+    } else {
+      const widgetJSON = this.getWidgetSpecJSON();
+      yield* _await(electronApi.saveSvgAndModel(
+        this.getSelectedModelAssetsFileData(), widgetJSON, this.currentFilePath,
+      ));
+
+      this.setCurrentFileData(this.currentFilePath, widgetJSON.widget.persistedSpec);
+    }
+  });
 
   @modelAction
   registerWidgets(widgetList: BaseWidgetModelClass[]) {
@@ -221,9 +335,11 @@ export class WorkspaceModel extends Model({
 
     if (widgetList.length === 1) {
       // @ts-ignore
-      this.selectedWidgetName = widgetList[0].$modelType;
+      this.selectedWidgetModelType = widgetList[0].$modelType;
+      this.resetModelToDefault();
+    } else {
+      this.newWidget();
     }
-    this.newWidget();
   }
 
   @modelAction

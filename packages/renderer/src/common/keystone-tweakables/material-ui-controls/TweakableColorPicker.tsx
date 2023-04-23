@@ -24,7 +24,7 @@ export const TweakableColorPicker = observer(({
   node,
 }: { node: TweakablePrimitiveModel<string, ColorPickerMetadata> }) => {
   const labelId = uuid();
-  if (node.value === undefined) { return null; }
+  if (!node.onAttachedComplete || node.value === undefined) { return null; }
   return (
     <ThisFormControl>
       <Typography id={labelId} gutterBottom>

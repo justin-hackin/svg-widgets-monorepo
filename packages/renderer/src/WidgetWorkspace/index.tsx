@@ -42,11 +42,11 @@ const DialogStyled = styled(Dialog)(({ theme }) => ({
 
 export const WidgetWorkspace = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const { selectedStore, selectedWidgetName, widgetOptions } = workspaceStore;
+  const { selectedStore, selectedWidgetModelType, widgetOptions } = workspaceStore;
 
   useLayoutEffect(() => {
     workspaceStore.fitToDocument();
-  }, [workspaceStore?.selectedWidgetName]);
+  }, [workspaceStore?.selectedWidgetModelType]);
 
   // wrap with observer here so WidgetSVG can be rendered with ReactDOMServer for saving to string
 
@@ -74,9 +74,9 @@ export const WidgetWorkspace = observer(() => {
             Array.from(widgetOptions.keys()).map((widgetName) => (
               <ListItemButton
                 key={widgetName}
-                selected={selectedWidgetName === widgetName}
+                selected={selectedWidgetModelType === widgetName}
                 onClick={() => {
-                  workspaceStore.selectedWidgetName = widgetName;
+                  workspaceStore.newWidgetStore(widgetName);
                   workspaceStore.setWidgetPickerOpen(false);
                 }}
               >
