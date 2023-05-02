@@ -247,7 +247,7 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
-  _applySpecSnapshot(persistedSpecSnapshot: SnapshotInOfModel<any>) {
+  applySpecSnapshot(persistedSpecSnapshot: SnapshotInOfModel<any>) {
     applySnapshot(this.selectedStore.persistedSpec, persistedSpecSnapshot);
   }
 
@@ -259,10 +259,10 @@ export class WorkspaceModel extends Model({
     const history: UndoManager = this.selectedStore.persistedSpec?.history;
     if (history) {
       history.withoutUndo(() => {
-        this._applySpecSnapshot(persistedSpecSnapshot);
+        this.applySpecSnapshot(persistedSpecSnapshot);
       });
     } else {
-      this._applySpecSnapshot(persistedSpecSnapshot);
+      this.applySpecSnapshot(persistedSpecSnapshot);
     }
   }
 

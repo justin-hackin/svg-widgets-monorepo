@@ -64,9 +64,17 @@ export const WidgetWorkspace = observer(() => {
         )}
       </WidgetWorkspaceStyled>
       <DialogStyled
+        disableEscapeKeyDown={!selectedStore}
+        disableRestoreFocus={!selectedStore}
         open={workspaceStore.widgetPickerOpen}
         aria-labelledby={WIDGET_DIALOG_TITLE_ID}
-        onClose={() => { workspaceStore.setWidgetPickerOpen(false); }}
+        onClose={(_, reason) => {
+          // if no store, ensure choice is made
+          if (reason === 'backdropClick' && !selectedStore) {
+            return;
+          }
+          workspaceStore.setWidgetPickerOpen(false);
+        }}
       >
         <DialogTitle id={WIDGET_DIALOG_TITLE_ID}>Select Widget</DialogTitle>
         <List>
