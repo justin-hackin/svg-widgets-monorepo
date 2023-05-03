@@ -50,7 +50,7 @@ export const DielinesLayer = observer(({
       femaleAscendantFlap, ascendantEdgeTabs, nonTabbedAscendantScores,
     },
     preferences: {
-      cutProps, scoreProps,
+      outerCutProps, innerCutProps, scoreProps,
       useClonesForBaseTabs: { value: useClonesForBaseTabs },
       useClonesForDecoration: { value: useClonesForDecoration },
       printRegistrationType: { value: printRegistrationType },
@@ -78,7 +78,7 @@ export const DielinesLayer = observer(({
     }
     const DECORATION_CUT_ID = 'face-decoration-cut';
     if (!useClonesForDecoration) {
-      return (<path id={DECORATION_CUT_ID} {...cutProps} d={decorationCutPath.getD()} />);
+      return (<path id={DECORATION_CUT_ID} {...innerCutProps} d={decorationCutPath.getD()} />);
     }
     const CUT_HOLES_ID = 'cut-holes-master';
     return (
@@ -91,7 +91,7 @@ export const DielinesLayer = observer(({
                 d={texturePathD}
                 transform={pathScaleMatrix.toString()}
                 {
-                ...{ ...cutProps, strokeWidth: cutProps.strokeWidth / faceLengthAdjustRatio }
+                ...{ ...innerCutProps, strokeWidth: innerCutProps.strokeWidth / faceLengthAdjustRatio }
               }
               />
               )}
@@ -116,10 +116,10 @@ export const DielinesLayer = observer(({
     return (
       <>
         <path d={ascendantEdgeTabs.male.score.getD()} {...scoreProps} />
-        <path d={ascendantEdgeTabs.male.cut.getD()} {...cutProps} />
+        <path d={ascendantEdgeTabs.male.cut.getD()} {...outerCutProps} />
         <path d={ascendantEdgeTabs.female.score.getD()} {...scoreProps} />
-        <path d={ascendantEdgeTabs.female.cut.getD()} {...cutProps} />
-        <path d={femaleAscendantFlap.getD()} {...cutProps} />
+        <path d={ascendantEdgeTabs.female.cut.getD()} {...outerCutProps} />
+        <path d={femaleAscendantFlap.getD()} {...outerCutProps} />
         <path d={nonTabbedAscendantScores.getD()} {...scoreProps} />
 
         {faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => {
@@ -128,7 +128,7 @@ export const DielinesLayer = observer(({
           return index === 0
             ? (
               <g key={key} id={BASE_TAB_ID}>
-                <path d={masterBaseTabCut.getD()} {...cutProps} />
+                <path d={masterBaseTabCut.getD()} {...outerCutProps} />
                 <path d={masterBaseTabScore.getD()} {...scoreProps} />
               </g>
             ) : (
@@ -171,7 +171,7 @@ export const DielinesLayer = observer(({
           {useClonesForBaseTabs ? (<ClonePyramidNetContent />) : (
             <>
               <path className="net-score" {...scoreProps} d={score.getD()} />
-              <path className="net-cut" {...cutProps} d={cut.getD()} />
+              <path className="net-cut" {...outerCutProps} d={cut.getD()} />
             </>
           )}
         </g>

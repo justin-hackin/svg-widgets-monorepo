@@ -18,7 +18,8 @@ export class PyramidNetPreferencesModel extends Model({
   documentHeight: numberTextProp(PIXELS_PER_CM * 27.9, { useUnits: true }),
   useClonesForBaseTabs: switchProp(false),
   useClonesForDecoration: switchProp(false),
-  cutStrokeColor: colorPickerProp('#FF3A5E'),
+  outerCutStrokeColor: colorPickerProp('#FF3A5E'),
+  innerCutStrokeColor: colorPickerProp('#ff48f6'),
   scoreStrokeColor: colorPickerProp('#BDFF48'),
   registrationStrokeColor: colorPickerProp('#005eff'),
   strokeWidth: sliderWithTextProp(1, {
@@ -48,9 +49,17 @@ export class PyramidNetPreferencesModel extends Model({
     };
   }
 
-  get cutProps() {
+  get outerCutProps() {
     return {
-      stroke: this.cutStrokeColor.value,
+      stroke: this.outerCutStrokeColor.value,
+      strokeWidth: this.strokeWidth.value,
+      fill: 'none',
+    };
+  }
+
+  get innerCutProps() {
+    return {
+      stroke: this.innerCutStrokeColor.value,
       strokeWidth: this.strokeWidth.value,
       fill: 'none',
     };

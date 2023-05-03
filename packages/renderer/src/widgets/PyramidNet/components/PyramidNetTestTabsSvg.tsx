@@ -5,7 +5,7 @@ import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 export const PyramidNetTestTabs = ({ widgetStore }: { widgetStore: PyramidNetWidgetModel }) => {
   const {
     persistedSpec: { testAscendantTab, testBaseTab },
-    preferences: { scoreProps, cutProps },
+    preferences: { scoreProps, outerCutProps },
   } = widgetStore;
   const tabs = [
     {
@@ -34,7 +34,7 @@ export const PyramidNetTestTabs = ({ widgetStore }: { widgetStore: PyramidNetWid
         acc.children.push((
           <g transform={`translate(0, ${acc.y})`} key={id} id={id}>
             <path className="score" {...scoreProps} d={paths.score.getD()} />
-            <path className="cut" {...cutProps} d={paths.cut.getD()} />
+            <path className="cut" {...outerCutProps} d={paths.cut.getD()} />
           </g>
         ));
         acc.y += ymax + Y_SPACING;
