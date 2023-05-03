@@ -29,7 +29,7 @@ export class AscendantEdgeTabsModel extends Model({
   tabControlPointsProtrusion: sliderWithTextProp(0.93, ratioSliderProps),
   tabControlPointsAngle: sliderWithTextProp(0.8, ratioSliderProps),
   tabStartGapToTabDepth: sliderWithTextProp(1, {
-    min: 0.3, max: 1, step: DEFAULT_SLIDER_STEP,
+    min: 0.3, max: 2, step: DEFAULT_SLIDER_STEP,
   }),
   holeWidthRatio: sliderProp(0.5, {
     min: 0.1, max: 0.9, step: DEFAULT_SLIDER_STEP,
