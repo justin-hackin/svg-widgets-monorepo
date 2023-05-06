@@ -35,7 +35,7 @@ type WidgetJSON = {
     // it's difficult to create 1-to-1 correspondence between widget model $modelType and persisted spec $modelType
     // so instead we store the $modelType of the widget model for toggling the active widget upon file open
     modelType: string,
-    persistedSpec: SnapshotInOfModel<any>,
+    modelSnapshot: SnapshotInOfModel<any>,
   },
   metadata: {
     // for future support of migrations
@@ -135,7 +135,7 @@ export class WorkspaceModel extends Model({
     // instead flagging history records with the associated file name upon save
     // + creating a middleware variable currentSnapshotIsSaved
     // this will also allow history to become preserved across files with titlebar accuracy
-    const currentSnapshot = getSnapshot(this.selectedStore.persistedSpec);
+    const currentSnapshot = getSnapshot(this.selectedStore);
     // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
     return JSON.stringify(this.savedSnapshot) === JSON.stringify(currentSnapshot);
   }
@@ -248,7 +248,7 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   applySpecSnapshot(persistedSpecSnapshot: SnapshotInOfModel<any>) {
-    applySnapshot(this.selectedStore.persistedSpec, persistedSpecSnapshot);
+    applySnapshot(this.selectedStore, persistedSpecSnapshot);
   }
 
   @modelAction
@@ -256,26 +256,22 @@ export class WorkspaceModel extends Model({
     this.newWidgetStore(widgetType);
     this.setCurrentFileData(filePath, persistedSpecSnapshot);
     // @ts-ignore
-    const history: UndoManager = this.selectedStore.persistedSpec?.history;
-    if (history) {
-      history.withoutUndo(() => {
-        this.applySpecSnapshot(persistedSpecSnapshot);
-      });
-    } else {
+    const { history }: UndoManager = this.selectedStore;
+    history.withoutUndo(() => {
       this.applySpecSnapshot(persistedSpecSnapshot);
-    }
+    });
   }
 
   @modelAction
   initializeWidgetFromSnapshot(widgetJSON: WidgetJSON, filePath: string) {
-    const { modelType, persistedSpec } = widgetJSON.widget;
+    const { modelType, modelSnapshot } = widgetJSON.widget;
     if (!this.widgetOptions.has(modelType)) {
       this.setAlertDialogContent(`Invalid widget spec file: JSON data must contain property widget.$modelType with value
        equal to one of (${this.availableWidgetTypes.join(', ')}) but instead saw ${modelType}`);
       return;
     }
 
-    this.setSelectedStoreFromData(modelType, persistedSpec, filePath);
+    this.setSelectedStoreFromData(modelType, modelSnapshot, filePath);
   }
 
   // @modelAction
@@ -295,11 +291,11 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   getWidgetSpecJSON(): WidgetJSON {
-    const snapshot = getSnapshot(this.selectedStore.persistedSpec);
+    const snapshot = getSnapshot(this.selectedStore);
     return {
       widget: {
         modelType: this.selectedWidgetModelType,
-        persistedSpec: snapshot,
+        modelSnapshot: snapshot,
       },
       metadata: {
         version: 1,
@@ -318,7 +314,7 @@ export class WorkspaceModel extends Model({
     ));
 
     if (filePath) {
-      this.setCurrentFileData(filePath, widgetJSON.widget.persistedSpec);
+      this.setCurrentFileData(filePath, widgetJSON.widget.modelSnapshot);
     }
   });
 
@@ -332,7 +328,7 @@ export class WorkspaceModel extends Model({
         this.getSelectedModelAssetsFileData(), widgetJSON, this.currentFilePath,
       ));
 
-      this.setCurrentFileData(this.currentFilePath, widgetJSON.widget.persistedSpec);
+      this.setCurrentFileData(this.currentFilePath, widgetJSON.widget.modelSnapshot);
     }
   });
 

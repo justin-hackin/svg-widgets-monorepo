@@ -4,14 +4,12 @@ import { CylinderLightboxWidgetModel } from '../models';
 
 export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: CylinderLightboxWidgetModel }) => {
   const {
-    persistedSpec: {
-      ringRadius: { value: ringRadius },
-      sectionPathD,
-      wallPathD,
-      innerRadius,
-      designBoundaryRadius,
-      holderTabD,
-    },
+    ringRadius: { value: ringRadius },
+    sectionPathD,
+    wallPathD,
+    innerRadius,
+    designBoundaryRadius,
+    holderTabD,
   } = widgetStore;
 
   return (

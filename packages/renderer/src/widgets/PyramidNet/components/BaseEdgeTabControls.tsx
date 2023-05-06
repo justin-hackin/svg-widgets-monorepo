@@ -10,9 +10,7 @@ import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel'
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const {
-    persistedSpec: {
-      baseEdgeTabsSpec,
-    } = {},
+    baseEdgeTabsSpec,
   } = workspaceStore.selectedStore as PyramidNetWidgetModel;
 
   return (

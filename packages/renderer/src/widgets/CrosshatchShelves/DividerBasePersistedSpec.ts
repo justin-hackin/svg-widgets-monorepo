@@ -1,9 +1,7 @@
-import { Model, model } from 'mobx-keystone';
 import { numberTextProp } from '../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../common/util/units';
 
-@model('DividerBasePersistedSpec')
-export class DividerBasePersistedSpec extends Model({
+export const dividerBaseModelProps = {
   shelfWidth: numberTextProp(96 * PIXELS_PER_INCH, {
     useUnits: true,
   }),
@@ -19,5 +17,4 @@ export class DividerBasePersistedSpec extends Model({
   materialThickness: numberTextProp(0.5 * PIXELS_PER_INCH, {
     useUnits: true,
   }),
-}) {
-}
+};

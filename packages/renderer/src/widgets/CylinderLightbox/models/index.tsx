@@ -1,8 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { computed } from 'mobx';
-import {
-  ExtendedModel, model, Model, prop,
-} from 'mobx-keystone';
+import { ExtendedModel, model } from 'mobx-keystone';
 import React from 'react';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
@@ -29,7 +27,7 @@ const rectanglePathCenteredOnOrigin = (width: number, height:number) => closedPo
 const polygonSideLength = (numSides: number, inRadius: number) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
 @model('CylinderLightbox')
-export class CylinderLightboxModel extends Model({
+export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,
   }),
@@ -64,6 +62,15 @@ export class CylinderLightboxModel extends Model({
     min: 0, max: 1, step: DEFAULT_SLIDER_STEP,
   }),
 }) {
+  // eslint-disable-next-line class-methods-use-this
+  get fileBasename() {
+    return 'cylinder_lightbox';
+  }
+
+  get ringRadiusVal() {
+    return this.ringRadius.value;
+  }
+
   @computed
   get innerRadius() {
     return this.ringRadius.value * (1 - this.ringThicknessRatio.value);
@@ -268,35 +275,19 @@ export class CylinderLightboxModel extends Model({
   get wallPathD() {
     return unifyDValues(this.wallVerticalRect.getD(), this.wallHorizontalRect.getD());
   }
-}
-
-@model('CylinderLightbox')
-export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  persistedSpec: prop<CylinderLightboxModel>(() => new CylinderLightboxModel({})),
-}) {
-  // eslint-disable-next-line class-methods-use-this
-  get fileBasename() {
-    return 'cylinder_lightbox';
-  }
-
-  get ringRadiusVal() {
-    return this.persistedSpec.ringRadius.value;
-  }
 
   @computed
   get assetDefinition() {
     const {
-      persistedSpec: {
-        ringRadius: { value: ringRadius },
-        wallsPerArc: { value: wallsPerArc },
-        arcsPerRing: { value: arcsPerRing },
-        holderTabsPerArc: { value: holderTabsPerArc },
-        sectionPathD,
-        wallPathD,
-        innerRadius,
-        designBoundaryRadius,
-        holderTabD,
-      },
+      ringRadius: { value: ringRadius },
+      wallsPerArc: { value: wallsPerArc },
+      arcsPerRing: { value: arcsPerRing },
+      holderTabsPerArc: { value: holderTabsPerArc },
+      sectionPathD,
+      wallPathD,
+      innerRadius,
+      designBoundaryRadius,
+      holderTabD,
     } = this;
     return new DisjunctAssetsDefinition([
       {

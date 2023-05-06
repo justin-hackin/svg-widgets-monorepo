@@ -1,12 +1,12 @@
-import { ExtendedModel, model, prop } from 'mobx-keystone';
+import { ExtendedModel, model } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
-import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { PathData } from '../../common/path/PathData';
 import { radioProp } from '../../common/keystone-tweakables/props';
-import { DividerBasePersistedSpec } from './DividerBasePersistedSpec';
-import { getMarginLength, centeredNotchPanel } from './util';
+import { dividerBaseModelProps } from './DividerBasePersistedSpec';
+import { centeredNotchPanel, getMarginLength } from './util';
+import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
 
 enum REMAINDER_SIZES {
   SMALL = 'small',
@@ -16,8 +16,9 @@ enum REMAINDER_SIZES {
 
 const cubbiesDecrementOptions = Object.values(REMAINDER_SIZES).map((size, index) => ({ value: index, label: size }));
 
-@model('SquareGridDividerPersistedSpec')
-export class SquareGridDividerPersistedSpec extends ExtendedModel(DividerBasePersistedSpec, {
+@model('SquareGridDivider')
+export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
+  ...dividerBaseModelProps,
   widthCubbiesDecrement: radioProp(0, {
     labelOverride: 'Left/right section size',
     options: cubbiesDecrementOptions,
@@ -31,6 +32,8 @@ export class SquareGridDividerPersistedSpec extends ExtendedModel(DividerBasePer
     isRow: true,
   }),
 }) {
+  panelSpacingRatio = 1.1;
+
   @computed
   get numCubbiesWide() {
     return Math.floor((this.shelfWidth.value - this.materialThickness.value)
@@ -86,13 +89,6 @@ export class SquareGridDividerPersistedSpec extends ExtendedModel(DividerBasePer
     }
     return path;
   }
-}
-
-@model('SquareGridDivider')
-export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  persistedSpec: prop<SquareGridDividerPersistedSpec>(() => new SquareGridDividerPersistedSpec({})),
-}) {
-  panelSpacingRatio = 1.1;
 
   // eslint-disable-next-line class-methods-use-this
   get fileBasename() {
@@ -101,58 +97,58 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
 
   @computed
   get assetDefinition() {
-    const vertTransY = this.persistedSpec.shelfHeight.value * this.panelSpacingRatio;
-    const horizTransY = (this.persistedSpec.shelfHeight.value
-      + this.persistedSpec.shelfDepth.value) * this.panelSpacingRatio;
+    const vertTransY = this.shelfHeight.value * this.panelSpacingRatio;
+    const horizTransY = (this.shelfHeight.value
+      + this.shelfDepth.value) * this.panelSpacingRatio;
 
     return new DisjunctAssetsDefinition([
       {
         name: 'Cross-section',
         documentAreaProps: {
-          width: this.persistedSpec.shelfWidth.value,
-          height: this.persistedSpec.shelfHeight.value,
+          width: this.shelfWidth.value,
+          height: this.shelfHeight.value,
         },
         Component: () => (
           <g>
             <path
-              d={this.persistedSpec.crossSectionPath.getD()}
+              d={this.crossSectionPath.getD()}
               fill="none"
               stroke="#ddd"
-              strokeWidth={this.persistedSpec.materialThickness.value}
+              strokeWidth={this.materialThickness.value}
             />
           </g>
         ),
       },
       {
         name: 'Vertical pane',
-        copies: this.persistedSpec.numCubbiesWide + 1,
+        copies: this.numCubbiesWide + 1,
         documentAreaProps: {
-          viewBox: `${0} ${vertTransY} ${this.persistedSpec.shelfHeight.value} ${this.persistedSpec.shelfDepth.value}`,
+          viewBox: `${0} ${vertTransY} ${this.shelfHeight.value} ${this.shelfDepth.value}`,
         },
         Component: () => (
           <g transform={`translate(0, ${vertTransY})`}>
             <path
-              d={this.persistedSpec.verticalPanel.getD()}
+              d={this.verticalPanel.getD()}
               fill="none"
               stroke="red"
-              strokeWidth={this.persistedSpec.strokeWidth}
+              strokeWidth={this.strokeWidth}
             />
           </g>
         ),
       },
       {
         name: 'Horizontal pane',
-        copies: this.persistedSpec.numCubbiesHigh + 1,
+        copies: this.numCubbiesHigh + 1,
         documentAreaProps: {
-          viewBox: `${0} ${horizTransY} ${this.persistedSpec.shelfWidth.value} ${this.persistedSpec.shelfDepth.value}`,
+          viewBox: `${0} ${horizTransY} ${this.shelfWidth.value} ${this.shelfDepth.value}`,
         },
         Component: () => (
           <g transform={`translate(0, ${horizTransY})`}>
             <path
-              d={this.persistedSpec.horizontalPanel.getD()}
+              d={this.horizontalPanel.getD()}
               fill="none"
               stroke="red"
-              strokeWidth={this.persistedSpec.strokeWidth}
+              strokeWidth={this.strokeWidth}
             />
           </g>
         ),

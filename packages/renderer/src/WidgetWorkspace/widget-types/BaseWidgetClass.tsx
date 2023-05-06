@@ -1,11 +1,13 @@
-import { Model, ModelProp } from 'mobx-keystone';
+import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
 import { FC } from 'react';
+import { observable } from 'mobx';
 import { AdditionalFileMenuItemsProps, AssetDefinition } from './types';
 
 export abstract class BaseWidgetClass extends Model({}) {
-  abstract persistedSpec: ModelProp<any, any, false, false, true, false, true>;
-
   abstract get fileBasename(): string;
+
+  @observable
+  history: UndoManager;
 
   // seems abstract properties can't be optional
   // see https://github.com/Microsoft/TypeScript/issues/6413#issuecomment-361869751
@@ -18,4 +20,9 @@ export abstract class BaseWidgetClass extends Model({}) {
   PanelContent?: FC;
 
   abstract get assetDefinition(): AssetDefinition;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected onAttachedToRootStore(rootStore: object): (() => void) | void {
+    this.history = undoMiddleware(this);
+  }
 }

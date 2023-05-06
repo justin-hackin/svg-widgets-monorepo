@@ -53,10 +53,8 @@ const ShapeSection = styled('div')(({ theme }) => ({
 export const PanelContent = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
-  const { persistedSpec } = store;
-  const { pyramid } = persistedSpec;
-
-  if (!persistedSpec) { return null; }
+  if (!store) { return null; }
+  const { pyramid, shapeHeight } = store;
 
   const [activeControlsIndex, setActiveControlsIndex] = React.useState(0);
 
@@ -68,11 +66,11 @@ export const PanelContent = observer(() => {
     <>
       <ShapeSection>
         <ShapeSelect
-          node={persistedSpec.pyramid.shapeName}
+          node={pyramid.shapeName}
         />
         <TweakableInput
           className={classes.shapeHeightFormControl}
-          node={persistedSpec.shapeHeight}
+          node={shapeHeight}
         />
         <TweakableInput node={pyramid.netsPerPyramid} />
       </ShapeSection>

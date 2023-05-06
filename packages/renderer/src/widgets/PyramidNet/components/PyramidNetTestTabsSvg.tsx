@@ -4,7 +4,7 @@ import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
 export const PyramidNetTestTabs = ({ widgetStore }: { widgetStore: PyramidNetWidgetModel }) => {
   const {
-    persistedSpec: { testAscendantTab, testBaseTab },
+    testAscendantTab, testBaseTab,
     preferences: { scoreProps, outerCutProps },
   } = widgetStore;
   const tabs = [

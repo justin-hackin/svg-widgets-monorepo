@@ -5,7 +5,7 @@ import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
 export const DecorationBoundarySVG = ({ store }: { store: PyramidNetWidgetModel }) => {
   const {
-    persistedSpec: { normalizedDecorationBoundaryPoints },
+    normalizedDecorationBoundaryPoints,
   } = store;
   const normalizedDecorationBoundaryPathD = closedPolygonPath(normalizedDecorationBoundaryPoints)
     .getD();

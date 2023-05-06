@@ -31,13 +31,11 @@ export const PrintLayer = observer(({
   }
   const {
     boundingBox,
-    persistedSpec: {
-      borderInsetFaceHoleTransformMatrix,
-      faceDecoration,
-      faceDecorationTransformMatricies,
-      faceLengthAdjustRatio,
-      faceBoundaryPoints,
-    },
+    borderInsetFaceHoleTransformMatrix,
+    faceDecoration,
+    faceDecorationTransformMatricies,
+    faceLengthAdjustRatio,
+    faceBoundaryPoints,
     preferences: {
       registrationPadding: { value: registrationPadding },
       printRegistrationType: { value: printRegistrationType },

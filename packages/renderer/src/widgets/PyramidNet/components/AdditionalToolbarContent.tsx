@@ -9,10 +9,10 @@ import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 export const AdditionalToolbarContent = () => {
   const workspaceStore = useWorkspaceMst();
   const pyramidNetStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
-  const { persistedSpec: { history } } = pyramidNetStore;
+  const { history } = pyramidNetStore;
   return (
     <>
-      { history && (<HistoryButtons history={history} />)}
+      <HistoryButtons history={history} />
 
       <Tooltip title="Open texture editor" arrow>
         <IconButton

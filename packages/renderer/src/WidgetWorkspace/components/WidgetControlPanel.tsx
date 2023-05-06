@@ -25,6 +25,7 @@ import { electronApi } from '../../../../common/electron';
 import { TweakableChildrenInputs } from '../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 import { AssetsAccordion } from './AssetsAccordion';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
+import { HistoryButtons } from '../../widgets/PyramidNet/components/HistoryButtons';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
@@ -74,6 +75,7 @@ export const WidgetControlPanel = observer(() => {
     AdditionalToolbarContent,
     AdditionalFileMenuItems,
     PanelContent,
+    history,
   } = selectedStore;
 
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
@@ -156,6 +158,7 @@ export const WidgetControlPanel = observer(() => {
               By default disabled elements like Button do not trigger user interactions
                thus span wrapping required by tooltip for disabled buttons
             */}
+            <HistoryButtons history={history} />
             {AdditionalToolbarContent && <AdditionalToolbarContent />}
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={newHandler}>
@@ -208,7 +211,7 @@ export const WidgetControlPanel = observer(() => {
         </AppBar>
         <AssetsAccordion assetDefinition={selectedStore.assetDefinition} />
         <div className={classes.dielinePanelContent}>
-          {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore.persistedSpec} />)}
+          {PanelContent ? (<PanelContent />) : (<TweakableChildrenInputs parentNode={selectedStore} />)}
         </div>
       </ControlPanelDrawer>
     </>

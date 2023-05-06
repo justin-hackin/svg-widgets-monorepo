@@ -51,7 +51,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
           await electronApi.saveSvgWithDialog(
             store.renderDecorationBoundaryToString(),
             DOWNLOAD_TEMPLATE_TXT,
-            `${store.persistedSpec.pyramid.shapeName}__template.svg`,
+            `${store.pyramid.shapeName}__template.svg`,
           );
         }
         resetFileMenuRef();
@@ -72,8 +72,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
             const dValue = extractCutHolesFromSvgString(fileString);
             // This file should have a .svg extension, without an extension this will be ''
             const baseFileName = filePath.split('.').slice(0, -1).join('.');
-            store.persistedSpec
-              .setFaceDecoration(new RawFaceDecorationModel({ dValue, sourceFileName: baseFileName }));
+            store.setFaceDecoration(new RawFaceDecorationModel({ dValue, sourceFileName: baseFileName }));
           }
         }
         resetFileMenuRef();
@@ -88,7 +87,7 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       {/* LOAD TEXTURE JSON */}
       <MenuItem onClick={async () => {
         const res = await electronApi.getJsonFromDialog(IMPORT_TEXTURE_TXT);
-        const currentShapeName = store.persistedSpec.pyramid.shapeName.value;
+        const currentShapeName = store.pyramid.shapeName.value;
         resetFileMenuRef();
         if (res === undefined) {
           return;
@@ -100,12 +99,12 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
           } but the chosen texture was for ${startCase(fileData.shapeName)
           } shape. Do you want to change the Polyhedron and load its default settings?`);
           if (doIt) {
-            store.persistedSpec.pyramid.shapeName.setValue(fileData.shapeName);
+            store.pyramid.shapeName.setValue(fileData.shapeName);
           } else {
             return;
           }
         }
-        store.persistedSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(fileData.textureSnapshot));
+        store.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(fileData.textureSnapshot));
       }}
       >
         <ListItemIconStyled>

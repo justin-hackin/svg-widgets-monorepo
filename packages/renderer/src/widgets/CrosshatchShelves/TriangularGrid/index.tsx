@@ -1,5 +1,5 @@
 import {
-  ExtendedModel, model, Model, prop,
+  ExtendedModel, model,
 } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
@@ -49,8 +49,9 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
   .map((index) => polarPoint(index * (1 / 3) * Math.PI, radius));
 
 const POLYGON_SIDES = 6;
-@model('TriangularGridDividerPersistedSpec')
-export class TriangularGridDividerPersistedSpec extends Model({
+
+@model('TriangleGridDivider')
+export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
   hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,
   }),
@@ -64,6 +65,7 @@ export class TriangularGridDividerPersistedSpec extends Model({
     min: 2, max: 10, step: 1,
   }),
   postProcessVertexEdges: switchProp(false),
+
 }) {
   spacingMarginRatio = 1.1;
 
@@ -176,12 +178,7 @@ export class TriangularGridDividerPersistedSpec extends Model({
           };
         }))));
   }
-}
 
-@model('TriangleGridDivider')
-export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  persistedSpec: prop(() => new TriangularGridDividerPersistedSpec({})),
-}) {
   // eslint-disable-next-line class-methods-use-this
   get fileBasename() {
     return 'TriangularGrid';
@@ -193,18 +190,18 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
       {
         name: 'Profile view',
         documentAreaProps: {
-          viewBox: pathDToViewBoxStr(this.persistedSpec.wallSegmentsPathD),
+          viewBox: pathDToViewBoxStr(this.wallSegmentsPathD),
         },
         Component: () => (
           <g>
             <path
-              d={this.persistedSpec.crosshatchProfilePathD}
+              d={this.crosshatchProfilePathD}
               fill="none"
               stroke="#ddd"
-              strokeWidth={this.persistedSpec.materialThickness.value}
+              strokeWidth={this.materialThickness.value}
             />
             <path
-              d={this.persistedSpec.wallSegmentsPathD}
+              d={this.wallSegmentsPathD}
               fill="none"
               stroke="#ddd"
               strokeWidth={1}
@@ -212,7 +209,7 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
           </g>
         ),
       },
-      ...this.persistedSpec.panelAssetMembers,
+      ...this.panelAssetMembers,
     ]);
   }
 }

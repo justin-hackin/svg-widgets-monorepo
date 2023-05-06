@@ -1,18 +1,18 @@
-import { ExtendedModel, model, prop } from 'mobx-keystone';
+import { ExtendedModel, model } from 'mobx-keystone';
 import { computed } from 'mobx';
 import React from 'react';
 import Flatten from '@flatten-js/core';
 import { round } from 'lodash';
-import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
 } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { DividerBasePersistedSpec } from './DividerBasePersistedSpec';
 import { augmentSegmentEndpoints, getPositiveSlopeSlatSegments, notchPanel } from './util';
 import { PathData } from '../../common/path/PathData';
 import { getBoundingBoxAttrs } from '../../common/util/svg';
 import { switchProp } from '../../common/keystone-tweakables/props';
+import { dividerBaseModelProps } from './DividerBasePersistedSpec';
+import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
 import Point = Flatten.Point;
 import point = Flatten.point;
 import segment = Flatten.segment;
@@ -26,8 +26,9 @@ interface SegmentInfo {
   firstIndex: number,
 }
 
-@model('DiamondGridDividerPersistedSpec')
-export class DiamondGridDividerPersistedSpec extends ExtendedModel(DividerBasePersistedSpec, {
+@model('DiamondGridDivider')
+export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
+  ...dividerBaseModelProps,
   flushPostProcess: switchProp(false),
 }) {
   panelSpacingRatio = 1.1;
@@ -123,12 +124,7 @@ export class DiamondGridDividerPersistedSpec extends ExtendedModel(DividerBasePe
       };
     });
   }
-}
 
-@model('DiamondGridDivider')
-export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
-  persistedSpec: prop(() => new DiamondGridDividerPersistedSpec({})),
-}) {
   // eslint-disable-next-line class-methods-use-this
   get fileBasename() {
     return 'DiamondShelves';
@@ -141,21 +137,21 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
         {
           name: 'Profile view',
           documentAreaProps: {
-            width: this.persistedSpec.shelfWidth.value,
-            height: this.persistedSpec.shelfHeight.value,
+            width: this.shelfWidth.value,
+            height: this.shelfHeight.value,
           },
           Component: () => (
             <g>
               <path
-                d={this.persistedSpec.crosshatchProfilePath.getD()}
+                d={this.crosshatchProfilePath.getD()}
                 fill="none"
                 stroke="#ddd"
-                strokeWidth={this.persistedSpec.materialThickness.value}
+                strokeWidth={this.materialThickness.value}
               />
             </g>
           ),
         },
-        ...this.persistedSpec.panelAssetMembers,
+        ...this.panelAssetMembers,
       ],
     );
   }

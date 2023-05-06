@@ -98,7 +98,7 @@ export class TextureEditorModel extends Model({
 
   @computed
   get persistedSpec() {
-    return this.parentPyramidNetWidgetModel.persistedSpec;
+    return this.parentPyramidNetWidgetModel;
   }
 
   // if faceDecoration is Raw before opening texture editor, it is reset to PositionableFaceDecorationModel
@@ -463,7 +463,7 @@ export class TextureEditorModel extends Model({
       return;
     }
     if (shapeName !== this.shapeName.value) {
-      this.parentPyramidNetWidgetModel.persistedSpec.pyramid.shapeName.setValue(shapeName);
+      this.parentPyramidNetWidgetModel.pyramid.shapeName.setValue(shapeName);
     }
     this.setTextureFromSnapshot(textureSnapshot);
   }
