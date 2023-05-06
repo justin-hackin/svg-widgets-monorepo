@@ -85,7 +85,7 @@
     "js-file-download": "^0.4.12",
     "lodash": "^4.17.19",
     "mobx": "^6.3.2",
-    "mobx-keystone": "^0.63.1",
+    "mobx-keystone": "1.3.0",
     "mobx-keystone-persist": "^1.2.0",
     "mobx-react": "^7.2.0",
     "nearest-power-of-two": "^1.0.0",
