@@ -3,7 +3,6 @@ import BrushIcon from '@mui/icons-material/Brush';
 import React from 'react';
 
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { HistoryButtons } from './HistoryButtons';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
 export const AdditionalToolbarContent = () => {
@@ -13,11 +12,8 @@ export const AdditionalToolbarContent = () => {
     return null;
   }
 
-  const { history } = pyramidNetStore;
   return (
     <>
-      <HistoryButtons history={history} />
-
       <Tooltip title="Open texture editor" arrow>
         <IconButton
           onClick={() => { pyramidNetStore.setTextureEditorOpen(true); }}

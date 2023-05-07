@@ -21,8 +21,7 @@ export abstract class BaseWidgetClass extends Model({}) {
 
   abstract get assetDefinition(): AssetDefinition;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected onAttachedToRootStore(rootStore: object): (() => void) | void {
+  protected onInit() {
     this.history = undoMiddleware(this);
   }
 }

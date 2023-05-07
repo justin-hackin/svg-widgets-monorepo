@@ -466,8 +466,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       : this.faceDecoration?.pattern?.sourceFileName;
   }
 
-  onAttachedToRootStore(rootStore) {
-    super.onAttachedToRootStore(rootStore);
+  onAttachedToRootStore() {
     this.persistPreferences();
     this.history.withoutUndo(() => {
       this.applyShapeBasedDefaults();
