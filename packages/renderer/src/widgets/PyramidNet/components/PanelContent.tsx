@@ -7,7 +7,6 @@ import { styled } from '@mui/styles';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { BaseEdgeTabControls } from './BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './AscendantEdgeTabsControls';
-import { ScoreControls } from './ScoreControls';
 import { ShapeSelect } from './ShapeSelect';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { TweakableInput } from '../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
@@ -23,11 +22,11 @@ const controlsTabs = [
     title: 'Ascendant Edge Tab',
     component: AscendantEdgeTabsControls,
   },
-  {
-    label: 'Score',
-    title: 'Score Pattern',
-    component: ScoreControls,
-  },
+  // {
+  //   label: 'Score',
+  //   title: 'Score Pattern',
+  //   component: ScoreControls,
+  // },
 ];
 const classes = {
   shapeHeightFormControl: 'shape-height-form-control',

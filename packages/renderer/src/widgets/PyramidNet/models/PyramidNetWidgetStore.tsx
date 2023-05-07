@@ -466,6 +466,15 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       : this.faceDecoration?.pattern?.sourceFileName;
   }
 
+  // temporarily force no dotted stroke due to issues
+  // with tweakable reference select on restoring snapshot
+  onInit() {
+    super.onInit();
+    this.history.withoutUndo(() => {
+      this.setUseDottedStroke(false);
+    });
+  }
+
   onAttachedToRootStore() {
     this.persistPreferences();
     this.history.withoutUndo(() => {
