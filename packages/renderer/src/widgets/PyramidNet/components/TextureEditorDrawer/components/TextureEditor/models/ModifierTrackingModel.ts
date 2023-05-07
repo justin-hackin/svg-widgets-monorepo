@@ -84,7 +84,7 @@ export class ModifierTrackingModel extends Model({
     this.releaseHeldKeys();
   };
 
-  onAttachedToRootStore():(() => void) {
+  onInit():(() => void) {
     window.addEventListener('keyup', this.keyupHandler.bind(this));
     window.addEventListener('keydown', this.keydownHandler.bind(this));
 
