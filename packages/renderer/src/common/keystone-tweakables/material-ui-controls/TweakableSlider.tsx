@@ -13,7 +13,6 @@ export const TweakableSlider = observer(({
 }: { node: TweakablePrimitiveModel<number, SliderMetadata>, className?: string, useUnits?: boolean }) => {
   const labelId = uuid();
 
-  // @ts-ignore
   if (node.metadata.type !== INPUT_TYPE.SLIDER) {
     throw new Error(`Slider node must have metadata.type as "slider", saw: ${node.metadata.type}`);
   }

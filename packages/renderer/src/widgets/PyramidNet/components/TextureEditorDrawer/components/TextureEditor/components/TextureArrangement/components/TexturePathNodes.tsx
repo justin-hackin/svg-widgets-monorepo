@@ -1,6 +1,5 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-// @ts-ignore
 import clsx from 'clsx';
 import { styled } from '@mui/styles';
 import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';

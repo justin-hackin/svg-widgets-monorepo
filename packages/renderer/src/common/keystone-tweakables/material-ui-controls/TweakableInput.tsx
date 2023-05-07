@@ -10,7 +10,10 @@ import { TweakableSliderOrTextInput } from './TweakableSliderOrTextInput';
 import { TweakableReferenceRadio } from './TweakableReferenceRadio';
 import { TweakableReferenceSelect } from './TweakableReferenceSelect';
 
-const TYPE_COMPONENT_MAP = {
+const TYPE_COMPONENT_MAP: Record<
+INPUT_TYPE,
+({ className: string, node: TweakableModel }) => JSX.Element
+> = {
   [INPUT_TYPE.SWITCH]: TweakableSwitch,
   [INPUT_TYPE.SLIDER]: TweakableSlider,
   [INPUT_TYPE.NUMBER_TEXT]: TweakableNumberTextInput,
@@ -27,6 +30,5 @@ export const TweakableInput = (
   { node: TweakableModel, className?: string },
 ) => {
   const Component = TYPE_COMPONENT_MAP[node.metadata.type];
-  // @ts-ignore
   return <Component className={className} node={node} />;
 };

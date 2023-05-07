@@ -50,7 +50,6 @@ export const reportTransformsTally = () => {
     for (const method of Object.values(TRANSFORM_METHODS)) {
       for (const operation of Object.values(TRANSFORM_OPERATIONS)) {
         if (transformTracking[method] && transformTracking[method][operation]) {
-          // @ts-ignore
           window.dataLayer.push(getTransformDataLayerObject(operation, method, transformTracking[method][operation]));
           transformTracking[method][operation] = 0;
         }

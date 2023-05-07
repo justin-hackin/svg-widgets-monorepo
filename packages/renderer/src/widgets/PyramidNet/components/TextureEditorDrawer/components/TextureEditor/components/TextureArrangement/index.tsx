@@ -148,7 +148,6 @@ export const TextureArrangement = observer(() => {
     <div>
       <Paper
         className={TOUR_ELEMENT_CLASSES.TEXTURE_ARRANGEMENT_AREA}
-      // @ts-ignore
         component="svg"
         square
         elevation={2}

@@ -1,7 +1,8 @@
 import React, { createContext, ReactNode, useContext } from 'react';
 import { computed, observable, reaction } from 'mobx';
 import {
-  _async, _await,
+  _async,
+  _await,
   applySnapshot,
   connectReduxDevTools,
   detach,
@@ -9,15 +10,21 @@ import {
   model,
   Model,
   modelAction,
-  ModelClass, modelFlow,
+  ModelClass,
+  modelFlow,
   prop,
-  registerRootStore, SnapshotInOfModel, UndoManager,
+  registerRootStore,
+  SnapshotInOfModel,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash';
 import {
-// @ts-ignore
-  fitToViewer, INITIAL_VALUE, Tool, TOOL_PAN, Value,
+  fitToViewer,
+  // @ts-ignore
+  INITIAL_VALUE,
+  Tool,
+  TOOL_PAN,
+  Value,
 } from 'react-svg-pan-zoom';
 import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
@@ -101,7 +108,6 @@ export class WorkspaceModel extends Model({
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
-        // @ts-ignore
         document.title = this.titleBarText;
       }, { fireImmediately: true }),
     ];
@@ -255,8 +261,7 @@ export class WorkspaceModel extends Model({
   setSelectedStoreFromData(widgetType: string, persistedSpecSnapshot: SnapshotInOfModel<any>, filePath: string) {
     this.newWidgetStore(widgetType);
     this.setCurrentFileData(filePath, persistedSpecSnapshot);
-    // @ts-ignore
-    const { history }: UndoManager = this.selectedStore;
+    const { history } = this.selectedStore;
     history.withoutUndo(() => {
       this.applySpecSnapshot(persistedSpecSnapshot);
     });
@@ -386,7 +391,6 @@ export function useWorkspaceMst() {
 }
 
 if (IS_DEVELOPMENT_BUILD) {
-  // @ts-ignore
   window.workpsaceStore = workspaceStore;
   if (IS_ELECTRON_BUILD) {
     // if this module is imported in web build,

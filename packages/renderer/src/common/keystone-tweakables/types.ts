@@ -1,6 +1,7 @@
 import { RefConstructor } from 'mobx-keystone';
 import { TweakablePrimitiveModel } from './models/TweakablePrimitiveModel';
 import { TweakableReferenceModel } from './models/TweakableReferenceModel';
+import { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
 
 export enum INPUT_TYPE {
   SWITCH = 'switch',
@@ -86,7 +87,9 @@ export type PrimitiveMetadata =
 export type ReferenceMetadata = ReferenceWithOptionsMetadata<any>;
 export type AnyMetadata = PrimitiveMetadata | ReferenceMetadata;
 export type TweakableModel =
-  TweakablePrimitiveModel<any, PrimitiveMetadata> | TweakableReferenceModel<any, ReferenceMetadata>;
+  TweakablePrimitiveModel<any, PrimitiveMetadata>
+  | TweakableReferenceModel<any, ReferenceMetadata>
+  | TweakablePrimitiveWithOptionsModel<any, WithOptionsMetadata<any>>;
 type InitialSelectionResolver<T> = (optionValues: T[], rootStore: object) => (T | undefined);
 
 export interface ReferenceResolvingOptionsMetadata<T extends object> extends BasePrimitiveMetadata {

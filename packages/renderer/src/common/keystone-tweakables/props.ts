@@ -76,8 +76,7 @@ export const numberTextProp = (
 
 export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSelectMetadata<T>, 'type'>) {
   const defaultFn = () => propertyMetadataCtx.apply(
-    // @ts-ignore
-    () => new TweakableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({}),
+    () => new TweakableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({ valueRef: undefined }),
     { type: INPUT_TYPE.REFERENCE_SELECT, ...metadata },
   );
   return prop<TweakableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>>(defaultFn);
@@ -85,8 +84,7 @@ export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSe
 
 export function referenceRadioProp<T extends object>(metadata: Omit<ReferenceRadioMetadata<T>, 'type'>) {
   return prop<TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>>(() => propertyMetadataCtx.apply(
-    // @ts-ignore
-    () => new TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({}), {
+    () => new TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({ valueRef: undefined }), {
       type: INPUT_TYPE.REFERENCE_RADIO, ...metadata,
     },
   ));

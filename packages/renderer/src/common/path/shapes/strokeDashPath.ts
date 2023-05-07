@@ -120,7 +120,6 @@ export function strokeDashPathRatios(
   }, { at: 0, lerps: [] }).lerps;
 
   const iterationsRequiredForCoverage = Math.ceil(vectorLength / strokeDashLength);
-  // @ts-ignore
   return range(iterationsRequiredForCoverage)
   // compute the start-end lerps relative to the start - end vector
     .reduce((acc, iterIndex) => {
@@ -129,15 +128,12 @@ export function strokeDashPathRatios(
       return acc.concat(startEndLerps.map((el) => el.map(lerpTransform)));
     }, [])
     // remove line segments that lie fully outside the start-end vector
-    // @ts-ignore
     .filter(([startLerp, endLerp]) => startLerp <= 1 && endLerp <= 1)
     // nudge the segments forward based on strokeDashOffsetRatio, wrapping and/or splicing where necessary
     .reduce((acc, startEndLerp) => {
-      // @ts-ignore
       const startEndLerpNew = startEndLerp.map((val) => val + strokeDashOffsetRatio * strokeDashLengthToVectorLength);
       // the whole segment is past the edges of the vector, wrap whole thing
       if (startEndLerpNew[0] >= 1) {
-        // @ts-ignore
         acc.push(startEndLerpNew.map(wrapRatio));
         return acc;
       }
@@ -145,15 +141,12 @@ export function strokeDashPathRatios(
       if (startEndLerpNew[1] > 1) {
         return acc;
       }
-      // @ts-ignore
       acc.push(startEndLerpNew);
       return acc;
     }, [])
     // visually this should not make difference but better for plotters that don't optimize
-    // @ts-ignore
     .sort(([start1], [start2]) => (start1 - start2))
     // center items so that the start and end points do not touch the cut
-    // @ts-ignore
     .map((item, index, array) => item.map((val) => val + (1 - last(array)[1]) / 2));
 }
 

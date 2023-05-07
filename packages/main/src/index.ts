@@ -40,7 +40,6 @@ app.on('ready', async () => {
     webPreferences: {
       webSecurity: false,
       nodeIntegration: true,
-      // @ts-ignore
       preload: join(__dirname, '../../preload/dist/index.cjs'),
     },
   });
@@ -63,7 +62,6 @@ app.on('ready', async () => {
     ? import.meta.env.VITE_DEV_SERVER_URL
     : new URL('../renderer/dist/index.html', `file://${__dirname}`).toString();
 
-  // @ts-ignore
   await browserWindow.loadURL(pageUrl);
 });
 

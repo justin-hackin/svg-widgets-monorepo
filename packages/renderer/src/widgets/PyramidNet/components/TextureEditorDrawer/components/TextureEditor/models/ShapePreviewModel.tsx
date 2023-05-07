@@ -39,7 +39,7 @@ import { electronApi } from '../../../../../../../../../common/electron';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
-const resolveSceneFromModelPath = (gltfLoader, path) => (new Promise((resolve, reject) => {
+const resolveSceneFromModelPath = (gltfLoader, path): Promise<Scene> => (new Promise((resolve, reject) => {
   gltfLoader.load(path, ({ scene }) => { resolve(scene); }, null, (e) => { reject(e); });
 }));
 
@@ -174,7 +174,6 @@ export class ShapePreviewModel {
 
   gltfLoader = new GLTFLoader() as GLTFLoader;
 
-  // @ts-ignore
   textureCanvas = document.createElement('canvas');
 
   scene = null;
@@ -284,8 +283,7 @@ export class ShapePreviewModel {
   async setShape(shapeName: string) {
     const modelUrl = new URL(`../../../../../../../../static/models/${shapeName}.gltf`, import.meta.url).href;
     const importScene = await resolveSceneFromModelPath(this.gltfLoader, modelUrl);
-    // @ts-ignore
-    const meshChild:Mesh = importScene.children.find((child) => (child as Mesh).isMesh);
+    const meshChild = importScene.children.find((child) => (child as Mesh).isMesh) as Mesh;
     const normalizingScale = this.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
     // move transforms into mesh so wireframe is similarly aligned
     meshChild.scale.setScalar(normalizingScale);
@@ -294,8 +292,11 @@ export class ShapePreviewModel {
       this.scene.remove(this.shapeMesh);
       this.scene.remove(this.shapeWireframe);
     }
-    // @ts-ignore
-    this.setMaterialMap(meshChild.material.map as Texture);
+    if (Array.isArray(meshChild.material)) {
+      throw new Error('Unexpected: mesh material as array and not single Material instance');
+    } else {
+      this.setMaterialMap((meshChild.material as MeshBasicMaterial).map as Texture);
+    }
     this.setShapeMesh(meshChild);
     this.scene.add(meshChild);
     const wireframe = new WireframeGeometry(this.shapeMesh.geometry);

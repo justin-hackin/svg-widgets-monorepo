@@ -142,7 +142,6 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   @computed
   get normalizedFaceEdgeLengths() {
     return this.relativeFaceEdgeLengths.map(
-      // @ts-ignore
       (val) => val * this.faceEdgeNormalizer,
     );
   }
@@ -576,7 +575,6 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   @modelAction
   renderDecorationBoundaryToString():string {
-    // @ts-ignore
     return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: this }));
   }
 

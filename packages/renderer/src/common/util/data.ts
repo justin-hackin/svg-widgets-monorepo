@@ -18,8 +18,8 @@ export interface dimensions {width: number, height: number}
 export const resolveImageDimensionsFromBase64 = (base64): Promise<dimensions> => (
   new Promise((resolve) => {
     const img = new Image();
-    // @ts-ignore
-    img.onload = ({ target: { width, height } }) => {
+    img.onload = ({ target }) => {
+      const { width, height } = target as HTMLImageElement;
       resolve({ width, height });
     };
     img.src = base64;

@@ -1,5 +1,4 @@
 import { cloneDeep, includes, last } from 'lodash';
-// @ts-ignore
 import svgpath from 'svgpath';
 import { reverse } from 'svg-path-reverse';
 import {
@@ -149,7 +148,6 @@ export const COMMAND_FACTORY = {
 const parseSVG = (d) => {
   const commandList = [];
   const absPath = svgpath(d).abs();
-  // @ts-ignore
   absPath.iterate(([code, ...params], index, x, y) => {
     if (code === 'Z') {
       commandList.push(COMMAND_FACTORY.Z());
@@ -204,7 +202,6 @@ export class PathData {
 
   private _assertLastCommandIsBezier() {
     this._assertLastCommandExists();
-    // @ts-ignore
     const lastCommand = this.commands[this.commands.length - 1];
     if (isBezierCommand(lastCommand)) {
       throw new Error(`expected last command to be a bezier (command code one of ${BEZIER_COMMAND_CODES
