@@ -23,7 +23,9 @@ import {
   WireframeGeometry,
 } from 'three';
 import fileDownload from 'js-file-download';
-import { computed, observable, reaction } from 'mobx';
+import {
+  action, computed, makeObservable, observable, reaction,
+} from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { TextureSvgUnobserved } from '../components/TextureArrangement/components/TextureSvg';
@@ -42,7 +44,11 @@ const resolveSceneFromModelPath = (gltfLoader, path) => (new Promise((resolve, r
 }));
 
 export class ShapePreviewModel {
-  constructor(private parentTextureEditor: TextureEditorModel, private rendererContainer: HTMLElement) {
+  constructor(parentTextureEditor: TextureEditorModel, private rendererContainer: HTMLElement) {
+    this.parentTextureEditor = parentTextureEditor;
+
+    makeObservable(this);
+
     this.renderer = new WebGLRenderer({
       alpha: true,
       antialias: true,
@@ -159,6 +165,9 @@ export class ShapePreviewModel {
   }
 
   @observable
+  parentTextureEditor: TextureEditorModel;
+
+  @observable
   shapeMesh = null;
 
   gltfExporter = new GLTFExporter() as GLTFExporter;
@@ -205,7 +214,7 @@ export class ShapePreviewModel {
     const {
       width = 1,
       height = 1,
-    } = this.parentTextureEditor?.shapePreviewDimensions || {};
+    } = this.parentTextureEditor.shapePreviewDimensions || {};
     return { width, height };
   }
 
@@ -239,6 +248,7 @@ export class ShapePreviewModel {
     return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.faceDecoration.pattern;
   }
 
+  @action
   alphaOnChange() {
     if (this.useAlpha) {
       this.shapeMesh.material = new MeshPhongMaterial({
@@ -270,6 +280,7 @@ export class ShapePreviewModel {
     this.shapeMesh.castShadow = this.useAlpha;
   }
 
+  @action
   async setShape(shapeName: string) {
     const modelUrl = new URL(`../../../../../../../../static/models/${shapeName}.gltf`, import.meta.url).href;
     const importScene = await resolveSceneFromModelPath(this.gltfLoader, modelUrl);
@@ -303,16 +314,19 @@ export class ShapePreviewModel {
     this.alphaOnChange();
   }
 
+  @action
   setMaterialMap(map) {
     this.shapeMaterialMap = map;
     this.shapeMaterialMap.image = this.textureCanvas;
   }
 
+  @action
   setShapeMesh(shape) { this.shapeMesh = shape; }
 
+  @action
   setShapeWireframe(wireframe) { this.shapeWireframe = wireframe; }
 
-  async applyTextureToMesh(this) {
+  async applyTextureToMesh() {
     const {
       shapeMesh,
       parentTextureEditor: { faceDecoration = undefined, faceBoundary: { boundingBoxAttrs = undefined } = {} } = {},
@@ -333,8 +347,8 @@ export class ShapePreviewModel {
     } = boundingBoxAttrs;
     const scaleWidth = npot(vbWidth * this.TEXTURE_BITMAP_SCALE);
     const scaleHeight = npot(vbHeight * this.TEXTURE_BITMAP_SCALE);
-    this.textureCanvas.setAttribute('width', vbWidth);
-    this.textureCanvas.setAttribute('height', vbHeight);
+    this.textureCanvas.setAttribute('width', `${vbWidth}`);
+    this.textureCanvas.setAttribute('height', `${vbHeight}`);
     const ctx = this.textureCanvas.getContext('2d');
     const v = await Canvg.from(ctx, svgStr, {
       ignoreAnimation: true,
