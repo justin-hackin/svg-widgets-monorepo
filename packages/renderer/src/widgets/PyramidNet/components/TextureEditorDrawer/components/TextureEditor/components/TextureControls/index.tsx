@@ -10,7 +10,8 @@ import {
   MenuItem,
   Switch,
   TextField,
-  Toolbar, Tooltip,
+  Toolbar,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { observer } from 'mobx-react';
@@ -30,13 +31,9 @@ import clsx from 'clsx';
 
 import { styled } from '@mui/styles';
 import { SnapMenu } from './components/SnapMenu';
-import { TextureEditorModel } from '../../models/TextureEditorModel';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../../../../../common/util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
-import {
-  IS_ELECTRON_BUILD,
-  IS_WEB_BUILD, WIDGET_EXT,
-} from '../../../../../../../../../../common/constants';
+import { IS_ELECTRON_BUILD, IS_WEB_BUILD, WIDGET_EXT } from '../../../../../../../../../../common/constants';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
 import { HistoryButtons } from '../../../../../HistoryButtons';
 import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
@@ -135,11 +132,11 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const { textureEditor, preferences, history } = widgetModel;
   const {
     faceDecoration,
-    showNodes, autoRotatePreview,
+    showNodes,
     shapePreview,
     shapeName,
-  //  TODO: why does code loose type info when destructuring this
-  } = textureEditor as TextureEditorModel;
+    autoRotatePreview,
+  } = textureEditor;
 
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
@@ -345,7 +342,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
                   label="Node selection"
                 />
                 <TweakableInput
-                  node={widgetModel.textureEditor.nodeScaleMux}
+                  node={widgetModel.textureEditor.viewerModel.nodeScaleMux}
                   className={classes.nodeScaleMuxSlider}
                 />
               </span>

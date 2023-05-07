@@ -26,12 +26,16 @@ export const TextureArrangement = observer(() => {
     faceDecoration,
     placementAreaDimensions,
     decorationBoundary,
-    viewScalePercentStr, viewScaleCenterPercentStr,
     minImageScale, maxImageScale,
+    viewerModel,
+  } = textureEditor;
+  const {
+    viewScalePercentStr,
+    viewScaleCenterPercentStr,
     viewScaleDiff,
     modifierTracking: { dragMode = undefined } = {},
-  } = textureEditor;
-  if (faceDecoration instanceof RawFaceDecorationModel) { return null; }
+  } = viewerModel;
+
   // WARNING: Don't be tempted to use the setters on transformDiff, need withoutUndo as in texture.set*Diff methods
   const { transformDiff } = faceDecoration || {};
   // Init
@@ -40,14 +44,13 @@ export const TextureArrangement = observer(() => {
 
     if (dragMode === DRAG_MODES.SCALE_VIEW) {
       if (down) {
-        textureEditor.setViewScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
+        textureEditor.viewerModel.setViewScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
       } else {
-        textureEditor.reconcileViewScaleDiff();
+        textureEditor.viewerModel.reconcileViewScaleDiff();
         incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.SCALE_VIEW);
       }
     }
 
-    if (!faceDecoration) { return; }
     if (
       dragMode === DRAG_MODES.TRANSLATE
       || dragMode === DRAG_MODES.TRANSLATE_HORIZONTAL
@@ -107,7 +110,7 @@ export const TextureArrangement = observer(() => {
       const percentHeightDelta = (y / placementAreaDimensions.height);
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
         const newViewScaleMux = (percentHeightDelta + 1) * viewScaleDiff;
-        textureEditor.setViewScaleDiff(newViewScaleMux);
+        textureEditor.viewerModel.setViewScaleDiff(newViewScaleMux);
         return;
       }
       if (!faceDecoration) { return; }
@@ -122,7 +125,7 @@ export const TextureArrangement = observer(() => {
     onWheelEnd: () => {
       if (!placementAreaDimensions || !decorationBoundary) { return; }
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
-        textureEditor.reconcileViewScaleDiff();
+        textureEditor.viewerModel.reconcileViewScaleDiff();
         incrementTransformTracking(TRANSFORM_METHODS.SCROLL, TRANSFORM_OPERATIONS.SCALE_VIEW);
       }
       if (!faceDecoration) { return; }
@@ -135,7 +138,11 @@ export const TextureArrangement = observer(() => {
       }
     },
   });
-  if (!placementAreaDimensions || !decorationBoundary) { return null; }
+
+  if (!faceDecoration || faceDecoration instanceof RawFaceDecorationModel
+    || !placementAreaDimensions || !decorationBoundary) {
+    return null;
+  }
 
   return (
     <div>

@@ -9,6 +9,10 @@ import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 export const AdditionalToolbarContent = () => {
   const workspaceStore = useWorkspaceMst();
   const pyramidNetStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  if (!pyramidNetStore) {
+    return null;
+  }
+
   const { history } = pyramidNetStore;
   return (
     <>

@@ -26,10 +26,6 @@ import fileDownload from 'js-file-download';
 import { computed, observable, reaction } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
-
-import {
-  _async, _await, createContext, findParent, Model, model, modelAction, modelFlow,
-} from 'mobx-keystone';
 import { TextureSvgUnobserved } from '../components/TextureArrangement/components/TextureSvg';
 import { TextureEditorModel } from './TextureEditorModel';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
@@ -45,54 +41,8 @@ const resolveSceneFromModelPath = (gltfLoader, path) => (new Promise((resolve, r
   gltfLoader.load(path, ({ scene }) => { resolve(scene); }, null, (e) => { reject(e); });
 }));
 
-export const rendererContainerContext = createContext<HTMLElement>();
-
-@model('ShapePreviewModel')
-export class ShapePreviewModel extends Model({
-}) {
-  @observable
-  shapeMesh = null;
-
-  gltfExporter = new GLTFExporter() as GLTFExporter;
-
-  gltfLoader = new GLTFLoader() as GLTFLoader;
-
-  // @ts-ignore
-  textureCanvas = document.createElement('canvas');
-
-  scene = null;
-
-  lightColor = 0x404040;
-
-  internalLight = null;
-
-  ambientLight = null;
-
-  castSphere = null;
-
-  renderer = null;
-
-  shapeWireframe = null;
-
-  shapeMaterialMap = null;
-
-  camera = null;
-
-  controls = null;
-
-  disposers = null;
-
-  animationFrame = null;
-
-  // TODO = make this value adjustable with alpha texture on (changes result in loss of shadows;
-  IDEAL_RADIUS = 6;
-
-  TEXTURE_BITMAP_SCALE = 0.5;
-
-  MARGIN = 1;
-
-  protected onAttachedToRootStore(): (() => void) | void {
-    const rendererContainer = rendererContainerContext.get(this);
+export class ShapePreviewModel {
+  constructor(private parentTextureEditor: TextureEditorModel, private rendererContainer: HTMLElement) {
     this.renderer = new WebGLRenderer({
       alpha: true,
       antialias: true,
@@ -141,6 +91,7 @@ export class ShapePreviewModel extends Model({
       this.alphaOnChange();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const disposers = [
       // update renderer dimensions
       reaction(() => [this.canvasDimensions, this.renderer], () => {
@@ -198,14 +149,55 @@ export class ShapePreviewModel extends Model({
       return animate;
     })(this.renderer, this.controls, this.camera, this.scene));
 
-    // TODO: Can instantiation be deferred until canvas available?
-    return () => {
-      cancelAnimationFrame(this.animationFrame);
-      for (const disposer of disposers) {
-        disposer();
-      }
-    };
+    // // TODO: Can instantiation be deferred until canvas available?
+    // return () => {
+    //   cancelAnimationFrame(this.animationFrame);
+    //   for (const disposer of disposers) {
+    //     disposer();
+    //   }
+    // };
   }
+
+  @observable
+  shapeMesh = null;
+
+  gltfExporter = new GLTFExporter() as GLTFExporter;
+
+  gltfLoader = new GLTFLoader() as GLTFLoader;
+
+  // @ts-ignore
+  textureCanvas = document.createElement('canvas');
+
+  scene = null;
+
+  lightColor = 0x404040;
+
+  internalLight = null;
+
+  ambientLight = null;
+
+  castSphere = null;
+
+  renderer = null;
+
+  shapeWireframe = null;
+
+  shapeMaterialMap = null;
+
+  camera = null;
+
+  controls = null;
+
+  disposers = null;
+
+  animationFrame = null;
+
+  // TODO = make this value adjustable with alpha texture on (changes result in loss of shadows;
+  IDEAL_RADIUS = 6;
+
+  TEXTURE_BITMAP_SCALE = 0.5;
+
+  MARGIN = 1;
 
   @computed
   get canvasDimensions() {
@@ -215,11 +207,6 @@ export class ShapePreviewModel extends Model({
       height = 1,
     } = this.parentTextureEditor?.shapePreviewDimensions || {};
     return { width, height };
-  }
-
-  @computed
-  get parentTextureEditor() {
-    return findParent<TextureEditorModel>(this, (parent) => parent instanceof TextureEditorModel);
   }
 
   @computed
@@ -252,7 +239,6 @@ export class ShapePreviewModel extends Model({
     return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.faceDecoration.pattern;
   }
 
-  @modelAction
   alphaOnChange() {
     if (this.useAlpha) {
       this.shapeMesh.material = new MeshPhongMaterial({
@@ -284,10 +270,9 @@ export class ShapePreviewModel extends Model({
     this.shapeMesh.castShadow = this.useAlpha;
   }
 
-  @modelFlow
-  setShape = _async(function* (this, shapeName: string) {
+  async setShape(shapeName: string) {
     const modelUrl = new URL(`../../../../../../../../static/models/${shapeName}.gltf`, import.meta.url).href;
-    const importScene = yield* _await(resolveSceneFromModelPath(this.gltfLoader, modelUrl));
+    const importScene = await resolveSceneFromModelPath(this.gltfLoader, modelUrl);
     // @ts-ignore
     const meshChild:Mesh = importScene.children.find((child) => (child as Mesh).isMesh);
     const normalizingScale = this.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
@@ -316,22 +301,18 @@ export class ShapePreviewModel extends Model({
     this.scene.add(shapeWireframe);
     this.setShapeWireframe(shapeWireframe);
     this.alphaOnChange();
-  });
+  }
 
-  @modelAction
   setMaterialMap(map) {
     this.shapeMaterialMap = map;
     this.shapeMaterialMap.image = this.textureCanvas;
   }
 
-  @modelAction
   setShapeMesh(shape) { this.shapeMesh = shape; }
 
-  @modelAction
   setShapeWireframe(wireframe) { this.shapeWireframe = wireframe; }
 
-  @modelFlow
-  applyTextureToMesh = _async(function* (this) {
+  async applyTextureToMesh(this) {
     const {
       shapeMesh,
       parentTextureEditor: { faceDecoration = undefined, faceBoundary: { boundingBoxAttrs = undefined } = {} } = {},
@@ -355,15 +336,15 @@ export class ShapePreviewModel extends Model({
     this.textureCanvas.setAttribute('width', vbWidth);
     this.textureCanvas.setAttribute('height', vbHeight);
     const ctx = this.textureCanvas.getContext('2d');
-    const v = yield* _await(Canvg.from(ctx, svgStr, {
+    const v = await Canvg.from(ctx, svgStr, {
       ignoreAnimation: true,
       ignoreMouse: true,
       enableRedraw: false,
-    }));
+    });
     v.resize(scaleWidth, scaleHeight, 'none');
-    yield* _await(v.render());
+    await v.render();
     this.shapeMesh.material.map.needsUpdate = true;
-  });
+  }
 
   async downloadShapeGLTF() {
     const defaultPath = `${this.parentTextureEditor.fileBasename}.glb`;

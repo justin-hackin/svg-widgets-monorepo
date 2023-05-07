@@ -3,7 +3,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import {
-  ExtendedModel, getParent, model, modelAction, prop,
+  ExtendedModel, model, modelAction, prop,
 } from 'mobx-keystone';
 import { computed, observable, reaction } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
@@ -55,8 +55,10 @@ const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 export const FACE_FIRST_EDGE_NORMALIZED_SIZE = 2000;
 
 const applyFlap = (
-  path: PathData, flapDirectionIsUp: boolean,
-  handleFlapDepth: number, testTabHandleFlapRounding: number,
+  path: PathData,
+  flapDirectionIsUp: boolean,
+  handleFlapDepth: number,
+  testTabHandleFlapRounding: number,
 ) => {
   const startPt = path.lastPosition;
   const endPt = path.currentSegmentStart;
@@ -83,16 +85,15 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
 }) {
   @observable
-  textureEditorOpen = false;
+    textureEditorOpen = false;
 
   @observable
-  dashPatterns = dashPatternsDefaultFn();
+    dashPatterns = dashPatternsDefaultFn();
 
-  @observable
   preferences = new PyramidNetPreferencesModel({});
 
   @observable
-  textureEditor = new TextureEditorModel({});
+  textureEditor = new TextureEditorModel(this);
 
   testTabHandleFlapDepth = 2;
 
@@ -209,7 +210,9 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     const { faceBoundaryPoints, faceInteriorAngles, actualFaceEdgeLengths } = this;
     return range(facesPerNet + 1).map(
       (index) => hingedPlot(
-        faceBoundaryPoints[1], faceBoundaryPoints[0], Math.PI * 2 - index * faceInteriorAngles[2],
+        faceBoundaryPoints[1],
+        faceBoundaryPoints[0],
+        Math.PI * 2 - index * faceInteriorAngles[2],
         index % 2 ? actualFaceEdgeLengths[2] : actualFaceEdgeLengths[0],
       ),
     );
@@ -223,8 +226,11 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   @computed
   get masterBaseTab() {
     return baseEdgeConnectionTab(
-      this.faceBoundaryPoints[1], this.faceBoundaryPoints[2],
-      this.baseTabDepth, this.baseEdgeTabsSpec, this.baseScoreDashSpec,
+      this.faceBoundaryPoints[1],
+      this.faceBoundaryPoints[2],
+      this.baseTabDepth,
+      this.baseEdgeTabsSpec,
+      this.baseScoreDashSpec,
     );
   }
 
@@ -242,12 +248,19 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   get testBaseTab() {
     const endPt = { x: this.actualFaceEdgeLengths[1], y: 0 };
     const { boundaryCut, innerCut, score } = baseEdgeConnectionTab(
-      this.faceBoundaryPoints[0], endPt,
-      this.baseTabDepth, this.baseEdgeTabsSpec, this.baseScoreDashSpec,
+      this.faceBoundaryPoints[0],
+      endPt,
+      this.baseTabDepth,
+      this.baseEdgeTabsSpec,
+      this.baseScoreDashSpec,
     );
     const cut = (new PathData()).concatPath(innerCut).concatPath(boundaryCut);
-    applyFlap(cut, false,
-      this.testTabHandleFlapDepth * this.baseTabDepth, this.testTabHandleFlapRounding);
+    applyFlap(
+      cut,
+      false,
+      this.testTabHandleFlapDepth * this.baseTabDepth,
+      this.testTabHandleFlapRounding,
+    );
     return { cut, score };
   }
 
@@ -263,18 +276,29 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     const endPt = { x: this.actualFaceEdgeLengths[0], y: 0 };
 
     const { male, female } = ascendantEdgeConnectionTabs(
-      startPt, endPt,
-      this.ascendantEdgeTabsSpec, this.interFaceScoreDashSpec,
-      this.tabIntervalRatios, this.tabGapIntervalRatios,
+      startPt,
+      endPt,
+      this.ascendantEdgeTabsSpec,
+      this.interFaceScoreDashSpec,
+      this.tabIntervalRatios,
+      this.tabGapIntervalRatios,
       this.ascendantEdgeTabDepth,
     );
     female.cut
       .concatPath(this.testTabFemaleAscendantFlap);
 
-    applyFlap(male.cut, false,
-      this.testTabHandleFlapDepth * this.baseTabDepth, this.testTabHandleFlapRounding);
-    applyFlap(female.cut, true,
-      this.testTabHandleFlapDepth * this.baseTabDepth, this.testTabHandleFlapRounding);
+    applyFlap(
+      male.cut,
+      false,
+      this.testTabHandleFlapDepth * this.baseTabDepth,
+      this.testTabHandleFlapRounding,
+    );
+    applyFlap(
+      female.cut,
+      true,
+      this.testTabHandleFlapDepth * this.baseTabDepth,
+      this.testTabHandleFlapRounding,
+    );
     return { male, female };
   }
 
@@ -288,12 +312,8 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     const FLAP_BASE_ANGLE = degToRad(60);
 
     const flapApexAngle = Math.min(remainderGapAngle - FLAP_APEX_IMPINGE_MARGIN, this.faceInteriorAngles[2]);
-    const outerPt1 = hingedPlotByProjectionDistance(
-      end, start, flapApexAngle, -this.ascendantEdgeTabDepth,
-    );
-    const outerPt2 = hingedPlotByProjectionDistance(
-      start, end, -FLAP_BASE_ANGLE, this.ascendantEdgeTabDepth,
-    );
+    const outerPt1 = hingedPlotByProjectionDistance(end, start, flapApexAngle, -this.ascendantEdgeTabDepth);
+    const outerPt2 = hingedPlotByProjectionDistance(start, end, -FLAP_BASE_ANGLE, this.ascendantEdgeTabDepth);
 
     return roundedEdgePath(
       [start, outerPt1, outerPt2, end],
@@ -323,8 +343,12 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   @computed
   get ascendantEdgeTabs() {
     const ascendantTabs = ascendantEdgeConnectionTabs(
-      this.faceBoundaryPoints[1], this.faceBoundaryPoints[0],
-      this.ascendantEdgeTabsSpec, this.interFaceScoreDashSpec, this.tabIntervalRatios, this.tabGapIntervalRatios,
+      this.faceBoundaryPoints[1],
+      this.faceBoundaryPoints[0],
+      this.ascendantEdgeTabsSpec,
+      this.interFaceScoreDashSpec,
+      this.tabIntervalRatios,
+      this.tabGapIntervalRatios,
       this.ascendantEdgeTabDepth,
     );
     const rotationMatrix = `rotate(${radToDeg(-this.pyramid.facesPerNet * this.faceInteriorAngles[2])})`;
@@ -346,9 +370,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     // base edge tabs
     faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
       const edgePt2 = faceTabFenceposts[index + 1];
-      const baseEdgeTab = baseEdgeConnectionTab(
-        edgePt1, edgePt2, baseTabDepth, baseEdgeTabsSpec, baseScoreDashSpec,
-      );
+      const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, baseTabDepth, baseEdgeTabsSpec, baseScoreDashSpec);
       boundaryCut.weldPath(baseEdgeTab.boundaryCut);
       innerCut.concatPath(baseEdgeTab.innerCut);
       score.concatPath(baseEdgeTab.score);
@@ -456,7 +478,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
         // all geometries have 1 as option, but different shapes have different divisors > 1
         this.pyramid.netsPerPyramid.setValue(1);
         this.applyShapeBasedDefaults();
-        getParent(this).textureEditor.refitTextureToFace();
+        this.textureEditor.refitTextureToFace();
       }),
     ];
 

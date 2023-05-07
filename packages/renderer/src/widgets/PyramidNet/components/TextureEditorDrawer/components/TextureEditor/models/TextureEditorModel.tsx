@@ -1,7 +1,7 @@
 import { inRange } from 'lodash';
 import fileDownload from 'js-file-download';
 import {
-  findParent, fromSnapshot, getSnapshot, Model, model, modelAction, prop,
+  fromSnapshot, getSnapshot, Model, model, modelAction, prop,
 } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
 import { BoundaryModel } from './BoundaryModel';
@@ -13,15 +13,15 @@ import {
   sumPoints,
   transformPoint,
 } from '../../../../../../../common/util/geom';
-import { rendererContainerContext, ShapePreviewModel } from './ShapePreviewModel';
+import { ShapePreviewModel } from './ShapePreviewModel';
 import { sliderProp } from '../../../../../../../common/keystone-tweakables/props';
 import { tryResolvePath } from '../../../../../../../common/util/mobx-keystone';
 import {
   DEFAULT_SLIDER_STEP,
   IS_ELECTRON_BUILD,
-  IS_WEB_BUILD, WIDGET_EXT,
+  IS_WEB_BUILD,
+  WIDGET_EXT,
 } from '../../../../../../../../../common/constants';
-import { reportTransformsTally } from '../../../../../../../common/util/analytics';
 import { TransformModel } from '../../../../../models/TransformModel';
 import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
@@ -56,15 +56,57 @@ const getFitScale = (bounds, image) => {
   };
 };
 
-@model('TextureEditorModel')
-export class TextureEditorModel extends Model({
+const MIN_VIEW_SCALE = 0.3;
+
+const MAX_VIEW_SCALE = 3;
+
+@model('TextureEditorViewerModel')
+export class TextureEditorViewerModel extends Model({
   viewScale: prop<number>(DEFAULT_VIEW_SCALE),
-  shapePreview: prop<ShapePreviewModel | undefined>(),
   modifierTracking: prop<ModifierTrackingModel>(() => new ModifierTrackingModel({})),
   nodeScaleMux: sliderProp(1, {
     labelOverride: 'Node size', min: 0.1, max: 10, step: DEFAULT_SLIDER_STEP,
   }),
 }) {
+  @observable
+  viewScaleDiff = 1;
+
+  @computed
+  get viewScaleDragged() {
+    return this.viewScale && (this.viewScale * this.viewScaleDiff);
+  }
+
+  @computed
+  get viewScaleCenterPercentStr() {
+    return this.viewScaleDragged && `${((1 - this.viewScaleDragged) * 100) / 2}%`;
+  }
+
+  @computed
+  get viewScalePercentStr() {
+    return this.viewScaleDragged && `${this.viewScaleDragged * 100}%`;
+  }
+
+  @modelAction
+  setViewScaleDiff(mux) {
+    if (inRange(mux * this.viewScale, MIN_VIEW_SCALE, MAX_VIEW_SCALE)) {
+      this.viewScaleDiff = mux;
+    }
+  }
+
+  @modelAction
+  reconcileViewScaleDiff() {
+    this.viewScale = this.viewScaleDragged;
+    this.viewScaleDiff = 1;
+  }
+}
+
+export class TextureEditorModel {
+  constructor(private parentPyramidNetWidgetModel: PyramidNetWidgetModel) {
+  }
+
+  @observable
+  viewerModel = new TextureEditorViewerModel({});
+
   @observable
   shapePreviewIsFullScreen = false;
 
@@ -72,49 +114,33 @@ export class TextureEditorModel extends Model({
   placementAreaDimensions = null;
 
   @observable
-  viewScaleDiff = 1;
-
-  @observable
   autoRotatePreview = false;
 
   @observable
-  showNodes = false;
+    showNodes = false;
 
   @observable
-  selectedTextureNodeIndex = null;
+    selectedTextureNodeIndex = null;
 
   @observable
-  MIN_VIEW_SCALE = 0.3;
-
-  @observable
-  MAX_VIEW_SCALE = 3;
+  shapePreview:ShapePreviewModel;
 
   SEND_ANALYTICS_INTERVAL_MS = 10000;
-
-  @computed
-  get parentPyramidNetWidgetModel(): PyramidNetWidgetModel {
-    return findParent(this, (parentNode) => parentNode instanceof PyramidNetWidgetModel);
-  }
-
-  @computed
-  get persistedSpec() {
-    return this.parentPyramidNetWidgetModel;
-  }
 
   // if faceDecoration is Raw before opening texture editor, it is reset to PositionableFaceDecorationModel
   @computed
   get faceDecoration() {
-    return this.persistedSpec.faceDecoration as PositionableFaceDecorationModel;
+    return this.parentPyramidNetWidgetModel.faceDecoration as PositionableFaceDecorationModel;
   }
 
   @computed
   get decorationBoundary() {
-    return new BoundaryModel(this.persistedSpec.normalizedDecorationBoundaryPoints);
+    return new BoundaryModel(this.parentPyramidNetWidgetModel.normalizedDecorationBoundaryPoints);
   }
 
   @computed
   get shapeName() {
-    return this.persistedSpec.pyramid.shapeName;
+    return this.parentPyramidNetWidgetModel.pyramid.shapeName;
   }
 
   @computed
@@ -152,21 +178,6 @@ export class TextureEditorModel extends Model({
   }
 
   @computed
-  get viewScaleDragged() {
-    return this.viewScale && (this.viewScale * this.viewScaleDiff);
-  }
-
-  @computed
-  get viewScaleCenterPercentStr() {
-    return this.viewScaleDragged && `${((1 - this.viewScaleDragged) * 100) / 2}%`;
-  }
-
-  @computed
-  get viewScalePercentStr() {
-    return this.viewScaleDragged && `${this.viewScaleDragged * 100}%`;
-  }
-
-  @computed
   get selectedTextureNode() {
     return (this.selectedTextureNodeIndex !== null && this.faceDecoration)
       && this.faceDecoration.destinationPoints[this.selectedTextureNodeIndex];
@@ -190,49 +201,27 @@ export class TextureEditorModel extends Model({
 
   @computed
   get borderToInsetRatio() {
-    return this.persistedSpec.borderToInsetRatio;
+    return this.parentPyramidNetWidgetModel.borderToInsetRatio;
   }
 
   @computed
   get insetToBorderOffset() {
-    return this.persistedSpec.insetToBorderOffset;
+    return this.parentPyramidNetWidgetModel.insetToBorderOffset;
   }
 
-  @modelAction
   setPlacementAreaDimensions(placementAreaDimensions) {
     this.placementAreaDimensions = placementAreaDimensions;
   }
 
-  @modelAction
-  setViewScaleDiff(mux) {
-    if (inRange(mux * this.viewScale, this.MIN_VIEW_SCALE, this.MAX_VIEW_SCALE)) {
-      this.viewScaleDiff = mux;
-    }
-  }
-
-  @modelAction
-  reconcileViewScaleDiff() {
-    this.viewScale = this.viewScaleDragged;
-    this.viewScaleDiff = 1;
-  }
-
-  @modelAction
   setSelectedTextureNodeIndex(index) {
     this.selectedTextureNodeIndex = index;
   }
 
-  @modelAction
   setShowNodes(showNodes) {
     this.showNodes = showNodes;
     if (!this.showNodes) { this.selectedTextureNodeIndex = undefined; }
   }
 
-  @modelAction
-  setAutoRotatePreview(shouldRotate) {
-    this.autoRotatePreview = shouldRotate;
-  }
-
-  @modelAction
   fitTextureToFace() {
     const { boundingBoxAttrs } = this.decorationBoundary;
     const { dimensions: textureDimensions } = this.faceDecoration;
@@ -249,7 +238,6 @@ export class TextureEditorModel extends Model({
     });
   }
 
-  @modelAction
   refitTextureToFace() {
     if (this.faceDecoration?.pattern) {
       this.fitTextureToFace();
@@ -257,19 +245,16 @@ export class TextureEditorModel extends Model({
     }
   }
 
-  @modelAction
   resetNodesEditor() {
     this.showNodes = false;
     this.selectedTextureNodeIndex = null;
   }
 
-  @modelAction
   clearTexturePattern() {
     this.faceDecoration.setPattern(undefined);
     this.faceDecoration.setTransform(new TransformModel({}));
   }
 
-  @modelAction
   setTextureFromPattern(pattern) {
     this.resetNodesEditor();
     this.faceDecoration.setPattern(pattern);
@@ -277,21 +262,18 @@ export class TextureEditorModel extends Model({
     this.repositionOriginOverFaceCenter();
   }
 
-  @modelAction
   setTexturePath(pathD, sourceFileName) {
     this.setTextureFromPattern(new PathFaceDecorationPatternModel({
       pathD, sourceFileName, isPositive: DEFAULT_IS_POSITIVE,
     }));
   }
 
-  @modelAction
   setTextureImage(imageData, dimensions, sourceFileName) {
     this.setTextureFromPattern(new ImageFaceDecorationPatternModel({
       imageData, dimensions, sourceFileName,
     }));
   }
 
-  @modelAction
   setShapePreviewIsFullScreen(isFullScreen) {
     this.shapePreviewIsFullScreen = isFullScreen;
   }
@@ -305,12 +287,10 @@ export class TextureEditorModel extends Model({
   // TODO: add limits for view scale and
   // these seem like the domain of the texture model but setters for
   // textureScaleDiff (and more to follow) need boundary
-  @modelAction
   absoluteMovementToSvg(absCoords) {
-    return scalePoint(absCoords, 1 / (this.viewScaleDragged * this.faceFittingScale.scale));
+    return scalePoint(absCoords, 1 / (this.viewerModel.viewScaleDragged * this.faceFittingScale.scale));
   }
 
-  @modelAction
   translateAbsoluteCoordsToRelative(absCoords) {
     return transformPoint(
       ((new DOMMatrixReadOnly())
@@ -321,7 +301,6 @@ export class TextureEditorModel extends Model({
     );
   }
 
-  @modelAction
   repositionTextureWithOriginOverPoint(point) {
     if (!this.faceDecoration || !this.decorationBoundary) {
       return;
@@ -336,39 +315,31 @@ export class TextureEditorModel extends Model({
     );
   }
 
-  @modelAction
   repositionTextureWithOriginOverCorner(vertexIndex) {
     this.repositionTextureWithOriginOverPoint(this.decorationBoundary.vertices[vertexIndex]);
   }
 
-  @modelAction
   repositionTextureWithOriginOverFaceCenter() {
     this.repositionTextureWithOriginOverPoint(this.decorationBoundary.centerPoint);
   }
 
-  @modelAction
   repositionSelectedNodeOverPoint(point) {
     if (!this.faceDecoration || !this.decorationBoundary) {
       return;
     }
-    const svgTextureNode = transformPoint(
-      this.faceDecoration.transformMatrixDragged, this.selectedTextureNode,
-    );
+    const svgTextureNode = transformPoint(this.faceDecoration.transformMatrixDragged, this.selectedTextureNode);
     const diff = sumPoints(svgTextureNode, scalePoint(point, -1));
     this.faceDecoration.transform.translate = sumPoints(scalePoint(diff, -1), this.faceDecoration.transform.translate);
   }
 
-  @modelAction
   repositionSelectedNodeOverCorner(vertexIndex) {
     this.repositionSelectedNodeOverPoint(this.decorationBoundary.vertices[vertexIndex]);
   }
 
-  @modelAction
   repositionSelectedNodeOverFaceCenter() {
     this.repositionSelectedNodeOverPoint(this.decorationBoundary.centerPoint);
   }
 
-  @modelAction
   repositionOriginOverPoint(point: RawPoint) {
     if (!this.faceDecoration || !this.decorationBoundary) {
       return;
@@ -378,10 +349,10 @@ export class TextureEditorModel extends Model({
     );
   }
 
-  @modelAction
   repositionOriginOverRelativePoint(pointRelativeToTexture: RawPoint) {
     const delta = scalePoint(
-      sumPoints(scalePoint(pointRelativeToTexture, -1), this.faceDecoration.transform.transformOrigin), -1,
+      sumPoints(scalePoint(pointRelativeToTexture, -1),
+        this.faceDecoration.transform.transformOrigin), -1,
     );
     const {
       transformOrigin, translate, scale, rotate,
@@ -389,23 +360,25 @@ export class TextureEditorModel extends Model({
     const newTransformOrigin = sumPoints(delta, transformOrigin);
     this.faceDecoration.transform.translate = sumPoints(
       translate,
-      scalePoint(calculateTransformOriginChangeOffset(transformOrigin, newTransformOrigin,
-        scale, rotate, translate), -1),
+      scalePoint(calculateTransformOriginChangeOffset(
+        transformOrigin,
+        newTransformOrigin,
+        scale,
+        rotate,
+        translate,
+      ), -1),
     );
     this.faceDecoration.transform.transformOrigin = newTransformOrigin;
   }
 
-  @modelAction
   repositionOriginOverCorner(vertexIndex) {
     this.repositionOriginOverPoint(this.decorationBoundary.vertices[vertexIndex]);
   }
 
-  @modelAction
   repositionOriginOverFaceCenter() {
     this.repositionOriginOverPoint(this.decorationBoundary.centerPoint);
   }
 
-  @modelAction
   repositionOriginOverTextureCenter() {
     if (this.faceDecoration) {
       const { width, height } = this.faceDecoration.dimensions;
@@ -416,7 +389,6 @@ export class TextureEditorModel extends Model({
   // TODO: although it may be ok to directly edit the dieline texture in the texture editor,
   //  consider using drafts with own history or scope history to on opened state of texture
 
-  @modelAction
   saveTextureArrangement() {
     if (!this.faceDecoration) { return; }
     const fileData = {
@@ -436,13 +408,11 @@ export class TextureEditorModel extends Model({
     }
   }
 
-  @modelAction
   setTextureFromSnapshot(textureSnapshot) {
-    this.persistedSpec.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
+    this.parentPyramidNetWidgetModel.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
   }
 
   // TODO: ts type the patternInfo
-  @modelAction
   assignTextureFromPatternInfo(patternInfo: PatternInfo) {
     if (patternInfo) {
       if (patternInfo.isPath === true) {
@@ -456,7 +426,6 @@ export class TextureEditorModel extends Model({
     }
   }
 
-  @modelAction
   setTextureArrangementFromFileData(fileData) {
     const { shapeName, textureSnapshot } = fileData;
     if (!textureSnapshot) {
@@ -468,7 +437,10 @@ export class TextureEditorModel extends Model({
     this.setTextureFromSnapshot(textureSnapshot);
   }
 
-  @modelAction
+  setAutoRotatePreview(shouldRotate) {
+    this.autoRotatePreview = shouldRotate;
+  }
+
   async openTextureArrangement() {
     const res = await electronApi.getJsonFromDialog('Import texture arrangement');
     if (res === undefined) { return; }
@@ -477,17 +449,7 @@ export class TextureEditorModel extends Model({
     this.setTextureArrangementFromFileData(fileData);
   }
 
-  @modelAction
   createShapePreview(rendererContainer: HTMLElement) {
-    this.shapePreview = rendererContainerContext.apply(() => new ShapePreviewModel({}), rendererContainer);
-  }
-
-  onAttachedToRootStore() {
-    const sendAnalyticsBuffersInterval = setInterval(reportTransformsTally, this.SEND_ANALYTICS_INTERVAL_MS);
-
-    return () => {
-      reportTransformsTally();
-      clearInterval(sendAnalyticsBuffersInterval);
-    };
+    this.shapePreview = new ShapePreviewModel(this, rendererContainer);
   }
 }

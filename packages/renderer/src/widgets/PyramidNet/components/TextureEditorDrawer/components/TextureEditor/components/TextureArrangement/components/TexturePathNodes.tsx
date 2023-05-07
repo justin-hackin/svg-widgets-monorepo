@@ -28,9 +28,9 @@ export const TexturePathNodes = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { textureEditor } = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const {
-    faceDecoration, selectedTextureNodeIndex, showNodes, imageCoverScale,
-    nodeScaleMux: { value: nodeScaleMux },
+    faceDecoration, selectedTextureNodeIndex, showNodes, imageCoverScale, viewerModel,
   } = textureEditor;
+  const { nodeScaleMux: { value: nodeScaleMux } } = viewerModel;
 
   if (
     !showNodes || faceDecoration instanceof RawFaceDecorationModel

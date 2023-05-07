@@ -46,12 +46,10 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   const mainAreaRef = useRef<HTMLDivElement>();
 
   const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
-  const { history } = pyramidNetPluginStore;
-  const { preferences } = pyramidNetPluginStore;
+  const { preferences, textureEditor, history } = pyramidNetPluginStore;
   const { needsTour } = preferences;
-  // ==================================================================================================================
-  const { textureEditor } = pyramidNetPluginStore;
   const { faceDecoration } = textureEditor;
+  // ==================================================================================================================
   useTheme();
   // Init
   useEffect(() => {
