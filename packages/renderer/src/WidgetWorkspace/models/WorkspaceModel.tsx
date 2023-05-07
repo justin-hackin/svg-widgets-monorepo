@@ -65,7 +65,7 @@ type BaseWidgetModelClass = ModelClass<BaseWidgetClass>;
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedStore: prop<BaseWidgetClass>().withSetter(),
+  selectedStore: prop<BaseWidgetClass>(undefined).withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
   @observable

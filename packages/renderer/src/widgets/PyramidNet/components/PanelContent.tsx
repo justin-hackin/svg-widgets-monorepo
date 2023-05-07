@@ -72,6 +72,7 @@ export const PanelContent = observer(() => {
           className={classes.shapeHeightFormControl}
           node={shapeHeight}
         />
+        {/* @ts-ignore */}
         <TweakableInput node={pyramid.netsPerPyramid} />
       </ShapeSection>
       <Divider />
