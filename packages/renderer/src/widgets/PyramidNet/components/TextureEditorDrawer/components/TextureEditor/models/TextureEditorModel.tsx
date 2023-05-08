@@ -71,7 +71,7 @@ export class TextureEditorViewerModel extends Model({
   }),
 }) {
   @observable
-  viewScaleDiff = 1;
+    viewScaleDiff = 1;
 
   @computed
   get viewScaleDragged() {
@@ -109,19 +109,19 @@ export class TextureEditorModel {
   }
 
   @observable
-  parentPyramidNetWidgetModel: PyramidNetWidgetModel;
+    parentPyramidNetWidgetModel: PyramidNetWidgetModel;
 
   @observable
-  viewerModel = new TextureEditorViewerModel({});
+    viewerModel = new TextureEditorViewerModel({});
 
   @observable
-  shapePreviewIsFullScreen = false;
+    shapePreviewIsFullScreen = false;
 
   @observable
-  placementAreaDimensions = null;
+    placementAreaDimensions = null;
 
   @observable
-  autoRotatePreview = false;
+    autoRotatePreview = false;
 
   @observable
     showNodes = false;
@@ -130,7 +130,7 @@ export class TextureEditorModel {
     selectedTextureNodeIndex = null;
 
   @observable
-  shapePreview:ShapePreviewModel;
+    shapePreview:ShapePreviewModel;
 
   SEND_ANALYTICS_INTERVAL_MS = 10000;
 
@@ -216,6 +216,7 @@ export class TextureEditorModel {
     return this.parentPyramidNetWidgetModel.insetToBorderOffset;
   }
 
+  @action
   setPlacementAreaDimensions(placementAreaDimensions) {
     this.placementAreaDimensions = placementAreaDimensions;
   }
@@ -327,7 +328,8 @@ export class TextureEditorModel {
       return;
     }
     const originAbsolute = transformPoint(
-      this.faceDecoration.transformMatrixDragged, this.faceDecoration.transform.transformOrigin,
+      this.faceDecoration.transformMatrixDragged,
+      this.faceDecoration.transform.transformOrigin,
     );
     this.faceDecoration.transform.translate = sumPoints(
       this.faceDecoration.transform.translate,
@@ -378,10 +380,10 @@ export class TextureEditorModel {
 
   @action
   repositionOriginOverRelativePoint(pointRelativeToTexture: RawPoint) {
-    const delta = scalePoint(
-      sumPoints(scalePoint(pointRelativeToTexture, -1),
-        this.faceDecoration.transform.transformOrigin), -1,
-    );
+    const delta = scalePoint(sumPoints(
+      scalePoint(pointRelativeToTexture, -1),
+      this.faceDecoration.transform.transformOrigin,
+    ), -1);
     const {
       transformOrigin, translate, scale, rotate,
     } = this.faceDecoration.transform;
