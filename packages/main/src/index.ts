@@ -4,6 +4,8 @@ import {
   app, BrowserWindow, ipcMain, nativeImage, nativeTheme, screen,
 } from 'electron';
 import debug from 'electron-debug';
+import { installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electron-extension-installer';
+
 import { EVENTS } from '../../common/constants';
 import { setupIpc } from './ipc';
 import icon from '../../../buildResources/icons/png/512x512.png';
@@ -13,19 +15,19 @@ const nativeImageIcon = nativeImage.createFromDataURL(icon);
 // for debugging prod build, temporarily add isEnabled: true
 debug({ showDevTools: false, isEnabled: true });
 
-if (import.meta.env.MODE === 'development') {
-  app.whenReady()
-    .then(() => import('electron-devtools-installer'))
-    .then(async ({ default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS }) => {
-      await installExtension(REACT_DEVELOPER_TOOLS);
-      await installExtension(REDUX_DEVTOOLS);
-    })
-    .catch((e) => console.error('Failed install extension:', e));
-}
-
 app.on('ready', async () => {
   // Install "Vue.js devtools"
-
+  if (import.meta.env.MODE === 'development') {
+    try {
+      await installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS], {
+        loadExtensionOptions: {
+          allowFileAccess: true,
+        },
+      });
+    } catch (e) {
+      console.error('Failed install extension:', e);
+    }
+  }
   setupIpc(ipcMain);
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
