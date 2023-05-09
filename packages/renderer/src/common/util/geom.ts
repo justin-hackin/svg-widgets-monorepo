@@ -94,8 +94,11 @@ export const matrixWithTransformOrigin = (origin: RawPoint, matrix) => {
 };
 
 export const calculateTransformOriginChangeOffset = (
-  oldTransformOrigin, newTransformOrigin,
-  scale, rotation, translation,
+  oldTransformOrigin,
+  newTransformOrigin,
+  scale,
+  rotation,
+  translation,
 ) => {
   const uncenteredMatrix = (new DOMMatrixReadOnly()).scale(scale, scale).rotate(rotation);
   const newMatrix = matrixWithTransformOrigin(newTransformOrigin, uncenteredMatrix);
@@ -132,16 +135,18 @@ export const polygonPointsGivenAnglesAndSides = (angles, sides): RawPoint[] => {
 export function hingedPlotLerp(p1:PointLike, p2:PointLike, theta, lengthRatio) {
   const difference = subtractPoints(p1, p2);
 
-  return sumPoints(p2,
-    pointFromPolar(angleRelativeToOrigin(difference) + theta,
-      distanceFromOrigin(difference) * lengthRatio));
+  return sumPoints(
+    p2,
+    pointFromPolar(
+      angleRelativeToOrigin(difference) + theta,
+      distanceFromOrigin(difference) * lengthRatio,
+    ),
+  );
 }
 
 export function lineLerp(start, end, lerp) {
   const difference = subtractPoints(end, start);
-  return sumPoints(
-    start, pointFromPolar(angleRelativeToOrigin(difference), distanceFromOrigin(difference) * lerp),
-  );
+  return sumPoints(start, pointFromPolar(angleRelativeToOrigin(difference), distanceFromOrigin(difference) * lerp));
 }
 
 export function parallelLineAtDistance(pt1, pt2, distance) {

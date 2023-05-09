@@ -41,9 +41,7 @@ const segmentsToLinePath = (segments: Segment[]): PathData => segments.reduce(
   new PathData(),
 );
 
-export const polarPoint = (theta: number, length: number) => point(
-  Math.cos(theta) * length, Math.sin(theta) * length,
-);
+export const polarPoint = (theta: number, length: number) => point(Math.cos(theta) * length, Math.sin(theta) * length);
 
 const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
   .map((index) => polarPoint(index * (1 / 3) * Math.PI, radius));
@@ -86,9 +84,8 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   @computed
   get wallSegments() {
-    return range(0, POLYGON_SIDES).map((i) => segment(
-      this.wallVertices[i], this.wallVertices[(i + 1) % POLYGON_SIDES],
-    ));
+    return range(0, POLYGON_SIDES)
+      .map((i) => segment(this.wallVertices[i], this.wallVertices[(i + 1) % POLYGON_SIDES]));
   }
 
   @computed
@@ -162,8 +159,13 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
         .slice(0, this.subdivisionsFencepostsMiddleEnd)
         .map((segment, index) => {
           // first item will have double the copies because it it same as last
-          const panelPathD = triNotchPanel(segment.length, this.hexagonDepth.value,
-            this.panelIntersectionDistances[index], this.materialThickness.value, notchLevel).getD();
+          const panelPathD = triNotchPanel(
+            segment.length,
+            this.hexagonDepth.value,
+            this.panelIntersectionDistances[index],
+            this.materialThickness.value,
+            notchLevel,
+          ).getD();
           const transX = (notchLevel - 0.5) * this.hexagonHeight * this.spacingMarginRatio;
           const transY = (index * this.hexagonDepth.value + (this.hexagonHeight / 2)) * this.spacingMarginRatio;
           return {

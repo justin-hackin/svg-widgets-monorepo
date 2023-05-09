@@ -12,7 +12,7 @@ export class TweakableReferenceModel<T extends object, M extends ReferenceMetada
 )<T> {
   // helps prevent controls from being rendered before onAttachedToRootStore has a chance to set up metadata getters
   @observable
-  onAttachedComplete = false;
+    onAttachedComplete = false;
 
   @computed
   get metadata(): M {

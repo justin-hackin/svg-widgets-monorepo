@@ -2,7 +2,7 @@ import React from 'react';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
-export const PyramidNetTestTabs = ({ widgetStore }: { widgetStore: PyramidNetWidgetModel }) => {
+export function PyramidNetTestTabs({ widgetStore }: { widgetStore: PyramidNetWidgetModel }) {
   const {
     testAscendantTab, testBaseTab,
     preferences: { scoreProps, outerCutProps },
@@ -24,22 +24,18 @@ export const PyramidNetTestTabs = ({ widgetStore }: { widgetStore: PyramidNetWid
     },
   ];
   const Y_SPACING = 0;
-  return (
-    <>
-      {tabs.reduce((acc, { id, paths }) => {
-        // TODO: the boundingViewBoxAttrs doesn't calculate path region property (seems to include control points),
-        // thus items are improperly spaced
-        const { ymin, ymax } = getBoundingBoxAttrs(paths.cut.getD());
-        acc.y += -1 * ymin;
-        acc.children.push((
-          <g transform={`translate(0, ${acc.y})`} key={id} id={id}>
-            <path className="score" {...scoreProps} d={paths.score.getD()} />
-            <path className="cut" {...outerCutProps} d={paths.cut.getD()} />
-          </g>
-        ));
-        acc.y += ymax + Y_SPACING;
-        return acc;
-      }, { children: [], y: 0 }).children}
-    </>
-  );
-};
+  return tabs.reduce((acc, { id, paths }) => {
+    // TODO: the boundingViewBoxAttrs doesn't calculate path region property (seems to include control points),
+    // thus items are improperly spaced
+    const { ymin, ymax } = getBoundingBoxAttrs(paths.cut.getD());
+    acc.y += -1 * ymin;
+    acc.children.push((
+      <g transform={`translate(0, ${acc.y})`} key={id} id={id}>
+        <path className="score" {...scoreProps} d={paths.score.getD()} />
+        <path className="cut" {...outerCutProps} d={paths.cut.getD()} />
+      </g>
+    ));
+    acc.y += ymax + Y_SPACING;
+    return acc;
+  }, { children: [], y: 0 }).children;
+}

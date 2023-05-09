@@ -36,18 +36,22 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
   @computed
   get positiveCrosshatchSegments() {
     return getPositiveSlopeSlatSegments(
-      this.shelfWidth.value, this.shelfHeight.value,
-      this.cubbyWidth.value, this.materialThickness.value,
+      this.shelfWidth.value,
+      this.shelfHeight.value,
+      this.cubbyWidth.value,
+      this.materialThickness.value,
     ).map((seg) => augmentSegmentEndpoints(seg, this.matThicknessAdjust));
   }
 
   @computed
   get crosshatchProfilePath() {
-    return this.positiveCrosshatchSegments.reduce((path, segment) => path
-      .move(segment.ps).line(segment.pe)
-      .move(reflectByWidth(segment.ps, this.shelfWidth.value))
-      .line(reflectByWidth(segment.pe, this.shelfWidth.value)),
-    new PathData());
+    return this.positiveCrosshatchSegments.reduce(
+      (path, segment) => path
+        .move(segment.ps).line(segment.pe)
+        .move(reflectByWidth(segment.ps, this.shelfWidth.value))
+        .line(reflectByWidth(segment.pe, this.shelfWidth.value)),
+      new PathData(),
+    );
   }
 
   @computed
@@ -105,9 +109,12 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
     return this.uniqueSegmentsInfo.map(({ length, copies, firstIndex }, index) => {
       const start = this.getFirstPanelNotchCenter(firstIndex);
       const path = notchPanel(
-        start, length, this.shelfDepth.value,
+        start,
+        length,
+        this.shelfDepth.value,
         this.getNumIntersectionsForPanel(firstIndex),
-        this.cubbyWidth.value, this.materialThickness.value,
+        this.cubbyWidth.value,
+        this.materialThickness.value,
       );
       const d = path.getD();
       const transY = (this.shelfHeight.value + (index * this.shelfDepth.value)) * this.panelSpacingRatio;

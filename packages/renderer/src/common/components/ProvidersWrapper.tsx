@@ -23,10 +23,12 @@ const StylesWrapper = observer(({ children }) => {
   );
 });
 
-export const ProvidersWrapper = ({ children }) => (
-  <WorkspaceStoreProvider>
-    <StylesWrapper>
-      {children}
-    </StylesWrapper>
-  </WorkspaceStoreProvider>
-);
+export function ProvidersWrapper({ children }) {
+  return (
+    <WorkspaceStoreProvider>
+      <StylesWrapper>
+        {children}
+      </StylesWrapper>
+    </WorkspaceStoreProvider>
+  );
+}

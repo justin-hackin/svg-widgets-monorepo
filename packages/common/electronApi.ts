@@ -16,16 +16,17 @@ const formattedJSONStringify = (obj) => JSON.stringify(obj, null, 2);
 
 const saveSvgAssets = (assetSVGData: TxtFileInfo[], dirname: string) => Promise.all(assetSVGData
   .map(({ filePath, fileString }) => ipcRenderer.invoke(
-    EVENTS.SAVE_TXT_FILE, join(dirname, filePath), fileString,
+    EVENTS.SAVE_TXT_FILE,
+    join(dirname, filePath),
+    fileString,
   )));
 
+// eslint-disable-next-line no-underscore-dangle
 export const _electronApi = {
   getJsonFromDialog: async (
     message: string,
   ): Promise<dialogOpenJsonRes> => {
-    const res = await ipcRenderer.invoke(
-      EVENTS.DIALOG_OPEN_TXT_FILE, { message }, WIDGET_EXT, WIDGET_DESC,
-    );
+    const res = await ipcRenderer.invoke(EVENTS.DIALOG_OPEN_TXT_FILE, { message }, WIDGET_EXT, WIDGET_DESC);
     if (!res) { return undefined; }
     const { fileString, filePath } = res;
     return { fileData: JSON.parse(fileString), filePath };
@@ -33,41 +34,45 @@ export const _electronApi = {
 
   getPatternInfoFromDialog: (): Promise<PatternInfo> => ipcRenderer.invoke(EVENTS.DIALOG_ACQUIRE_PATTERN_INFO),
 
-  saveSvgWithDialog: (
-    svgString: string, message: string, defaultPath: string,
-  ): Promise<string | undefined> => ipcRenderer
+  saveSvgWithDialog: (svgString: string, message: string, defaultPath: string):
+  Promise<string | undefined> => ipcRenderer
     .invoke(EVENTS.DIALOG_SAVE_TXT_FILE, svgString, {
       message,
       defaultPath,
     }, SVG_EXT, SVG_EXT_NAME),
 
-  saveJSONWithDialog: (
-    fileString: string, message: string, defaultPath: string,
-  ): Promise<string | undefined> => ipcRenderer
+  saveJSONWithDialog: (fileString: string, message: string, defaultPath: string):
+  Promise<string | undefined> => ipcRenderer
     .invoke(EVENTS.DIALOG_SAVE_TXT_FILE, fileString, {
       message,
       defaultPath,
     }, 'json', 'JSON'),
 
   saveWidgetFileWithDialog: (
-    fileData: object, message: string, defaultBasename: string,
+    fileData: object,
+    message: string,
+    defaultBasename: string,
   ): Promise<ParsedFilePathData | undefined> => ipcRenderer.invoke(
     EVENTS.DIALOG_SAVE_TXT_FILE,
     formattedJSONStringify(fileData),
-    { message, defaultPath: `${defaultBasename}.${WIDGET_EXT}` }, WIDGET_EXT, WIDGET_DESC,
+    { message, defaultPath: `${defaultBasename}.${WIDGET_EXT}` },
+    WIDGET_EXT,
+    WIDGET_DESC,
   ),
 
   saveGlbWithDialog: (shapeGLTF: ArrayBuffer, message: string, defaultPath: string) => ipcRenderer.invoke(
-    EVENTS.DIALOG_SAVE_GLB, shapeGLTF, { message, defaultPath },
+    EVENTS.DIALOG_SAVE_GLB,
+    shapeGLTF,
+    { message, defaultPath },
   ),
 
   saveSvgAndAssetsWithDialog: async (
-    assetSVGData: TxtFileInfo[], snapshot: object, message: string,
+    assetSVGData: TxtFileInfo[],
+    snapshot: object,
+    message: string,
     defaultBasename: string,
   ): Promise<string | undefined> => {
-    const res = await _electronApi.saveWidgetFileWithDialog(
-      snapshot, message, defaultBasename,
-    );
+    const res = await _electronApi.saveWidgetFileWithDialog(snapshot, message, defaultBasename);
     if (!res) {
       return undefined;
     }
@@ -76,15 +81,16 @@ export const _electronApi = {
     return path;
   },
 
-  saveSvgAndModel: async (
-    assetSVGData: TxtFileInfo[], snapshot: object, path: string,
-  ): Promise<void> => {
+  saveSvgAndModel: async (assetSVGData: TxtFileInfo[], snapshot: object, path: string): Promise<void> => {
     const { dirname } = await ipcRenderer.invoke(EVENTS.SAVE_TXT_FILE, path, JSON.stringify(snapshot));
     await saveSvgAssets(assetSVGData, dirname);
   },
 
   openSvgWithDialog: (message: string): Promise<TxtFileInfo | undefined> => ipcRenderer.invoke(
-    EVENTS.DIALOG_OPEN_TXT_FILE, { message }, SVG_EXT, SVG_EXT_NAME,
+    EVENTS.DIALOG_OPEN_TXT_FILE,
+    { message },
+    SVG_EXT,
+    SVG_EXT_NAME,
   ),
 
   addDragModeResetHandler: (handler) => {

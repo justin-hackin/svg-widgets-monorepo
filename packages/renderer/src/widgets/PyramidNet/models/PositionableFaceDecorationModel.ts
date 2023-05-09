@@ -29,7 +29,7 @@ export class PositionableFaceDecorationModel extends Model({
   transform: prop<TransformModel>(() => (new TransformModel({}))).withSetter(),
 }) {
   @observable
-  transformDiff = new TransformModel({});
+    transformDiff = new TransformModel({});
 
   @computed
   get dimensions() {
@@ -69,7 +69,9 @@ export class PositionableFaceDecorationModel extends Model({
   get transformMatrixDragged() {
     return getTextureTransformMatrix(
       this.transform.transformOrigin,
-      this.scaleDragged, this.rotateDragged, this.translateDragged,
+      this.scaleDragged,
+      this.rotateDragged,
+      this.translateDragged,
     );
   }
 
@@ -143,8 +145,11 @@ export class PositionableFaceDecorationModel extends Model({
   @modelAction
   reconcileTransformOriginDiff() {
     const relativeDifference = calculateTransformOriginChangeOffset(
-      this.transform.transformOrigin, this.transformOriginDragged,
-      this.scaleDragged, this.rotateDragged, this.translateDragged,
+      this.transform.transformOrigin,
+      this.transformOriginDragged,
+      this.scaleDragged,
+      this.rotateDragged,
+      this.translateDragged,
     );
     this.transform.transformOrigin = this.transformOriginDragged;
     this.transform.translate = sumPoints(this.transform.translate, scalePoint(relativeDifference, -1));

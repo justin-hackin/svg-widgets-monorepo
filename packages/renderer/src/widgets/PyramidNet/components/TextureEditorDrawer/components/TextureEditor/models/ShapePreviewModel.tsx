@@ -83,7 +83,10 @@ export class ShapePreviewModel {
     this.internalLight.shadow.bias = -0.005;
 
     this.camera = new PerspectiveCamera(
-      60, this.canvasDimensions.width / this.canvasDimensions.height, 0.1, this.cameraFar,
+      60,
+      this.canvasDimensions.width / this.canvasDimensions.height,
+      0.1,
+      this.cameraFar,
     );
     this.camera.position.set(0, 0, this.cameraRadius);
 
@@ -165,10 +168,10 @@ export class ShapePreviewModel {
   }
 
   @observable
-  parentTextureEditor: TextureEditorModel;
+    parentTextureEditor: TextureEditorModel;
 
   @observable
-  shapeMesh = null;
+    shapeMesh = null;
 
   gltfExporter = new GLTFExporter() as GLTFExporter;
 

@@ -83,8 +83,11 @@ export class BaseEdgeTabsModel extends Model({
 }
 
 export function baseEdgeConnectionTab(
-  start: RawPoint, end: RawPoint,
-  tabDepth, tabSpec: BaseEdgeTabsModel, scoreDashSpec: DashPatternModel,
+  start: RawPoint,
+  end: RawPoint,
+  tabDepth,
+  tabSpec: BaseEdgeTabsModel,
+  scoreDashSpec: DashPatternModel,
 ): BaseEdgeConnectionTab {
   const {
     bendGuideValley,
@@ -128,7 +131,10 @@ export function baseEdgeConnectionTab(
 
   const holeTheta = -holeTaper + Math.PI / 2;
   const holeEdges = symmetricHingePlotByProjectionDistance(
-    holeBasesClearance[0], holeBasesClearance[1], holeTheta, tabDepth * holeDepthToTabDepth,
+    holeBasesClearance[0],
+    holeBasesClearance[1],
+    holeTheta,
+    tabDepth * holeDepthToTabDepth,
   );
 
   const finBases = [
@@ -145,8 +151,11 @@ export function baseEdgeConnectionTab(
   const finTraversal = distanceBetweenPoints(finBases[0], finBases[1]);
   // for plotting points only, need rounding clamp based on all roundings
   const { tabMidpoints, tabApexes } = arrowTabPlots(
-    finBasesClearance[0], finBasesClearance[1], 0.5,
-    finDepth / finTraversal, holeTheta,
+    finBasesClearance[0],
+    finBasesClearance[1],
+    0.5,
+    finDepth / finTraversal,
+    holeTheta,
   );
 
   innerCut
@@ -181,7 +190,8 @@ export function baseEdgeConnectionTab(
     .curvedLineSegments([finBases[0], finBasesClearance[0], tabMidpoints[0]], 0.5);
   boundaryCut.commands.pop();
   boundaryCut.curvedLineSegments(
-    [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]], roundingDistanceRatio,
+    [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]],
+    roundingDistanceRatio,
   );
   boundaryCut.commands.pop();
   boundaryCut.curvedLineSegments([finBasesClearance[1], finBases[1], end], 0.5);

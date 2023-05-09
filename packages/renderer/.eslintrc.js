@@ -1,13 +1,11 @@
 module.exports = {
-  'env': {
-    'browser': true,
-    'node': false,
+  env: {
+    browser: true,
   },
   globals: {
-    'electron': true,
-    'dataLayer': true,
+    electron: true,
   },
-  'rules': {
+  rules: {
     'import/prefer-default-export': 0,
     'import/no-extraneous-dependencies': 1,
     'max-len': ['error', { code: 120 }],

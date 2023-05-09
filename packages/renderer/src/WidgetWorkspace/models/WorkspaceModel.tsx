@@ -76,28 +76,28 @@ export class WorkspaceModel extends Model({
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
   @observable
-  widgetOptions = new Map();
+    widgetOptions = new Map();
 
   @observable
-  selectedWidgetModelType: string = null;
+    selectedWidgetModelType: string = null;
 
   @observable
-  savedSnapshot = undefined;
+    savedSnapshot = undefined;
 
   @observable
-  currentFilePath = undefined;
+    currentFilePath = undefined;
 
   @observable
-  zoomPanValue: Value = INITIAL_VALUE;
+    zoomPanValue: Value = INITIAL_VALUE;
 
   @observable
-  zoomPanTool: Tool = TOOL_PAN;
+    zoomPanTool: Tool = TOOL_PAN;
 
   @observable
-  widgetPickerOpen = false;
+    widgetPickerOpen = false;
 
   @observable
-  alertDialogContent = null;
+    alertDialogContent = null;
 
   @computed
   get availableWidgetTypes() {
@@ -309,33 +309,33 @@ export class WorkspaceModel extends Model({
   }
 
   @modelFlow
-  saveWidgetWithDialog = _async(function* (this: WorkspaceModel) {
-    const widgetJSON = this.getWidgetSpecJSON();
-    const filePath = yield* _await(electronApi.saveSvgAndAssetsWithDialog(
-      this.getSelectedModelAssetsFileData(),
-      widgetJSON,
-      'Save assets svg with widget settings',
-      this.selectedStore.fileBasename,
-    ));
-
-    if (filePath) {
-      this.setCurrentFileData(filePath, widgetJSON.widget.modelSnapshot);
-    }
-  });
-
-  @modelFlow
-  saveWidget = _async(function* (this: WorkspaceModel) {
-    if (!this.currentFilePath) {
-      yield* _await(this.saveWidgetWithDialog());
-    } else {
+    saveWidgetWithDialog = _async(function* (this: WorkspaceModel) {
       const widgetJSON = this.getWidgetSpecJSON();
-      yield* _await(electronApi.saveSvgAndModel(
-        this.getSelectedModelAssetsFileData(), widgetJSON, this.currentFilePath,
+      const filePath = yield* _await(electronApi.saveSvgAndAssetsWithDialog(
+        this.getSelectedModelAssetsFileData(),
+        widgetJSON,
+        'Save assets svg with widget settings',
+        this.selectedStore.fileBasename,
       ));
 
-      this.setCurrentFileData(this.currentFilePath, widgetJSON.widget.modelSnapshot);
-    }
-  });
+      if (filePath) {
+        this.setCurrentFileData(filePath, widgetJSON.widget.modelSnapshot);
+      }
+    });
+
+  @modelFlow
+    saveWidget = _async(function* (this: WorkspaceModel) {
+      if (!this.currentFilePath) {
+        yield* _await(this.saveWidgetWithDialog());
+      } else {
+        const widgetJSON = this.getWidgetSpecJSON();
+        yield* _await(
+          electronApi.saveSvgAndModel(this.getSelectedModelAssetsFileData(), widgetJSON, this.currentFilePath),
+        );
+
+        this.setCurrentFileData(this.currentFilePath, widgetJSON.widget.modelSnapshot);
+      }
+    });
 
   @modelAction
   resetCurrentFileData() {
@@ -382,9 +382,9 @@ const WorkspaceStoreContext = createContext<WorkspaceModel>(workspaceStore);
 
 export const { Provider: WorkspaceProvider } = WorkspaceStoreContext;
 
-export const WorkspaceStoreProvider = ({ children }) => (
-  <WorkspaceProvider value={workspaceStore}>{children}</WorkspaceProvider>
-);
+export function WorkspaceStoreProvider({ children }) {
+  return <WorkspaceProvider value={workspaceStore}>{children}</WorkspaceProvider>;
+}
 
 export function useWorkspaceMst() {
   return useContext(WorkspaceStoreContext);

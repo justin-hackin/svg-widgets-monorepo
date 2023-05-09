@@ -33,7 +33,7 @@ interface ModeDef {
 export class ModifierTrackingModel extends Model({
 }) {
   @observable
-  keysHeld = {} as Record<string, boolean>;
+    keysHeld = {} as Record<string, boolean>;
 
   modeDefs = [
     { mode: DRAG_MODES.TRANSLATE_HORIZONTAL, keysHeld: ['Alt', 'Control'] },
@@ -80,9 +80,9 @@ export class ModifierTrackingModel extends Model({
   }
 
   @modelAction
-  resetHandler = () => {
-    this.releaseHeldKeys();
-  };
+    resetHandler = () => {
+      this.releaseHeldKeys();
+    };
 
   onInit():(() => void) {
     window.addEventListener('keyup', this.keyupHandler.bind(this));

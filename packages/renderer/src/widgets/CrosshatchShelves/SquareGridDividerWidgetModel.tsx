@@ -49,16 +49,22 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
   @computed
   get horizontalPanel() {
     return centeredNotchPanel(
-      this.shelfWidth.value, this.shelfDepth.value,
-      this.numCubbiesWide + 1, this.cubbyWidth.value, this.materialThickness.value,
+      this.shelfWidth.value,
+      this.shelfDepth.value,
+      this.numCubbiesWide + 1,
+      this.cubbyWidth.value,
+      this.materialThickness.value,
     );
   }
 
   @computed
   get verticalPanel() {
     return centeredNotchPanel(
-      this.shelfHeight.value, this.shelfDepth.value,
-      this.numCubbiesHigh + 1, this.cubbyWidth.value, this.materialThickness.value,
+      this.shelfHeight.value,
+      this.shelfDepth.value,
+      this.numCubbiesHigh + 1,
+      this.cubbyWidth.value,
+      this.materialThickness.value,
     );
   }
 
@@ -71,7 +77,10 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
   get crossSectionPath() {
     const path = new PathData();
     const widthMargins = getMarginLength(
-      this.shelfWidth.value, this.numCubbiesWide + 1, this.cubbyWidth.value, this.materialThickness.value,
+      this.shelfWidth.value,
+      this.numCubbiesWide + 1,
+      this.cubbyWidth.value,
+      this.materialThickness.value,
     );
     for (let i = 0; i <= this.numCubbiesWide; i += 1) {
       const x = widthMargins + (this.materialThickness.value / 2)
@@ -80,7 +89,10 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
     }
 
     const heightMargins = getMarginLength(
-      this.shelfHeight.value, this.numCubbiesHigh + 1, this.cubbyWidth.value, this.materialThickness.value,
+      this.shelfHeight.value,
+      this.numCubbiesHigh + 1,
+      this.cubbyWidth.value,
+      this.materialThickness.value,
     );
     for (let i = 0; i <= this.numCubbiesHigh; i += 1) {
       const y = heightMargins + (this.materialThickness.value / 2)

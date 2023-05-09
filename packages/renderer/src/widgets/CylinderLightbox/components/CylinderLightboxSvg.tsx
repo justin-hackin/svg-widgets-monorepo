@@ -2,7 +2,7 @@ import React from 'react';
 
 import { CylinderLightboxWidgetModel } from '../models';
 
-export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: CylinderLightboxWidgetModel }) => {
+export function CylinderLightboxSvg({ widgetStore }: { widgetStore: CylinderLightboxWidgetModel }) {
   const {
     ringRadius: { value: ringRadius },
     sectionPathD,
@@ -22,4 +22,4 @@ export const CylinderLightboxSvg = ({ widgetStore }: { widgetStore: CylinderLigh
       <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
     </g>
   );
-};
+}

@@ -5,7 +5,8 @@ module.exports = {
   globals: {
     globalThis: true,
   },
-  'parserOptions': {
-    'project': '../tsconfig.json',
-  }
+
+  parserOptions: {
+    project: './../tsconfig.json',
+  },
 };

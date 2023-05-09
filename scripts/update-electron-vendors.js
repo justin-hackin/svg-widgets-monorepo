@@ -32,11 +32,13 @@ function updateVendors() {
   const packageJSONPath = path.resolve(process.cwd(), 'package.json');
 
   return Promise.all([
-    writeFile('./electron-vendors.config.json',
+    writeFile(
+      './electron-vendors.config.json',
       formattedJSON({
         chrome: chromeMajorVersion,
         node: nodeMajorVersion,
-      })),
+      }),
+    ),
 
     readFile(packageJSONPath).then(JSON.parse).then((packageJSON) => {
       if (!packageJSON || !Array.isArray(packageJSON.browserslist)) {

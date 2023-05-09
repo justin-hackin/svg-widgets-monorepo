@@ -207,7 +207,8 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   @computed
   get wallHorizontalRect() {
     return rectanglePathCenteredOnOrigin(
-      this.innerWallPolygonSideLength, this.cylinderHeight.value - 2 * this.materialThickness.value,
+      this.innerWallPolygonSideLength,
+      this.cylinderHeight.value - 2 * this.materialThickness.value,
     );
   }
 
@@ -261,8 +262,11 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
       .line({ x: secondFootStart, y: -this.materialThickness.value }) // crotch end
       .line({ x: secondFootStart, y: 0 }) // second foot start
       .line({ x: secondFootEnd, y: 0 }) // second foot end
-      .curvedLineSegments([{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
-        0.5, true)
+      .curvedLineSegments(
+        [{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
+        0.5,
+        true,
+      )
       .getD();
   }
 

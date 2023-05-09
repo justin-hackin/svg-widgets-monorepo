@@ -7,10 +7,8 @@ const INPUT_TYPES_VALUES = Object.values(INPUT_TYPE);
 
 type childrenFilter = (child: object)=>boolean;
 
-export const TweakableChildrenInputs = (
-  { parentNode, childrenFilter }:
-  { parentNode: object, childrenFilter?: childrenFilter },
-) => {
+export function TweakableChildrenInputs({ parentNode, childrenFilter }:
+{ parentNode: object, childrenFilter?: childrenFilter }) {
   if (!parentNode) { return null; }
   const children = findChildren(parentNode, (child) => (
     INPUT_TYPES_VALUES.includes((child as TweakableModel)?.metadata?.type)
@@ -22,4 +20,4 @@ export const TweakableChildrenInputs = (
       )}
     </>
   );
-};
+}

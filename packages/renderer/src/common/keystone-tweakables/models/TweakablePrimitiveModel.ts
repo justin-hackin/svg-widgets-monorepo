@@ -13,7 +13,7 @@ export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Mod
 }))<T> {
   // helps prevent controls from being rendered before onAttachedToRootStore has a chance to set up metadata getters
   @observable
-  onAttachedComplete = false;
+    onAttachedComplete = false;
 
   private defaultValue: T | undefined;
 

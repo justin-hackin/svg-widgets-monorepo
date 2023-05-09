@@ -21,7 +21,9 @@ export interface BaseAssetDefinition {
 }
 
 export const filePathConstructor = (
-  fileBaseName: string, assetName: string | undefined, copies: number | undefined,
+  fileBaseName: string,
+  assetName: string | undefined,
+  copies: number | undefined,
 ) => `${fileBaseName}${assetName ? `__${assetName}` : ''}${copies ? `__X${copies}` : ''}.svg`;
 
 export type AssetDefinition = DisjunctAssetsDefinition | RegisteredAssetsDefinition | SolitaryAssetDefinition;

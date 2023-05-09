@@ -21,11 +21,13 @@ const namedviewAttributes = {
   'current-layer': 'dielines',
 };
 
-export const SVGWrapper = ({ children, ...rest }) => (
-  <svg {...rest} {...svgNamespaceAttributes}>
-    <DocumentMetadata />
-    <LicenseGroup viewBox={rest.viewBox} />
-    <SodipodiNamedview {...namedviewAttributes} />
-    {children}
-  </svg>
-);
+export function SVGWrapper({ children, ...rest }) {
+  return (
+    <svg {...rest} {...svgNamespaceAttributes}>
+      <DocumentMetadata />
+      <LicenseGroup viewBox={rest.viewBox} />
+      <SodipodiNamedview {...namedviewAttributes} />
+      {children}
+    </svg>
+  );
+}

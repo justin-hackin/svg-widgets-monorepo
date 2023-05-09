@@ -47,7 +47,8 @@ export const subtractRangeSet = (baseSet, subtractSet) => {
         const intersectIndex = (startPos - 1) / 2;
         const intersectedRange = returnValue[intersectIndex];
         returnValue.splice(
-          intersectIndex, 1,
+          intersectIndex,
+          1,
           [intersectedRange[0], subtractRange[0]],
           [subtractRange[1], intersectedRange[1]],
         );

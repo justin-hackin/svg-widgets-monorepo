@@ -64,19 +64,21 @@ const NumberFormatDecimalDegrees = forwardRef(({ onChange, ...other }, ref) => (
   />
 ));
 
-const UploadButton = ({ onClick = undefined }) => (
-  <Tooltip title="Upload raster/vector graphics...">
-    <IconButton
-      className={TOUR_ELEMENT_CLASSES.UPLOAD_IMAGE}
-      onClick={onClick}
-      aria-label="send texture"
-      component="span"
-      size="large"
-    >
-      <PublishIcon fontSize="large" />
-    </IconButton>
-  </Tooltip>
-);
+function UploadButton({ onClick = undefined }) {
+  return (
+    <Tooltip title="Upload raster/vector graphics...">
+      <IconButton
+        className={TOUR_ELEMENT_CLASSES.UPLOAD_IMAGE}
+        onClick={onClick}
+        aria-label="send texture"
+        component="span"
+        size="large"
+      >
+        <PublishIcon fontSize="large" />
+      </IconButton>
+    </Tooltip>
+  );
+}
 
 const classes = {
   toolbar: 'texture-editor__toolbar',
@@ -161,14 +163,13 @@ export const TextureControls = observer(({ hasCloseButton }) => {
 
   // TODO: add whitespace, improve button definition and input alignment
   return (
-    <>
-      <TextureEditorAppBar position="relative">
-        <Toolbar
-          className={clsx(classes.toolbar, faceDecoration && classes.toolbarWithTexture)}
-          variant="dense"
-        >
-          {/* web app uses texture editor as standalone component without drawer */}
-          {hasCloseButton && (
+    <TextureEditorAppBar position="relative">
+      <Toolbar
+        className={clsx(classes.toolbar, faceDecoration && classes.toolbarWithTexture)}
+        variant="dense"
+      >
+        {/* web app uses texture editor as standalone component without drawer */}
+        {hasCloseButton && (
           <>
             <IconButton
               onClick={() => {
@@ -182,32 +183,32 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             </IconButton>
             <Divider />
           </>
-          )}
-          <Tooltip title="File...">
-            <IconButton
-              className={TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU}
-              onClick={(e) => {
-                setFileMenuRef(e.currentTarget);
+        )}
+        <Tooltip title="File...">
+          <IconButton
+            className={TOUR_ELEMENT_CLASSES.TEXTURE_EDITOR_FILE_MENU}
+            onClick={(e) => {
+              setFileMenuRef(e.currentTarget);
+            }}
+          >
+            <FolderIcon />
+          </IconButton>
+        </Tooltip>
+        <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
+          {(() => {
+            if (IS_WEB_BUILD) {
+              return (<ForwardRefdOpenMenuItem />);
+            }
+            return (
+              <OpenTextureArrangementMenuItem onClick={() => {
+                textureEditor.openTextureArrangement();
+                resetFileMenuRef();
               }}
-            >
-              <FolderIcon />
-            </IconButton>
-          </Tooltip>
-          <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
-            {(() => {
-              if (IS_WEB_BUILD) {
-                return (<ForwardRefdOpenMenuItem />);
-              }
-              return (
-                <OpenTextureArrangementMenuItem onClick={() => {
-                  textureEditor.openTextureArrangement();
-                  resetFileMenuRef();
-                }}
-                />
-              );
-            })()}
-            {/* Menu component emits error when child is React.Fragment */}
-            { faceDecoration
+              />
+            );
+          })()}
+          {/* Menu component emits error when child is React.Fragment */}
+          { faceDecoration
           && [
             (
               <MenuItem
@@ -234,77 +235,77 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               </MenuItem>
             ),
           ]}
-          </Menu>
+        </Menu>
 
-          {(() => {
-            if (IS_ELECTRON_BUILD) {
-              return (
-                <UploadButton onClick={async () => {
-                  const patternInfo = await electronApi.getPatternInfoFromDialog();
-                  textureEditor.assignTextureFromPatternInfo(patternInfo);
-                }}
-                />
-              );
-            }
-            if (IS_WEB_BUILD) {
-              return (
-                <FilePicker
-                  extensions={['.jpg', '.jpeg', '.png', '.svg']}
-                  onFilePicked={async (file) => {
-                    if (file) {
-                      if (file.type === 'image/svg+xml') {
-                        const svgString = await file.text();
-                        textureEditor.assignTextureFromPatternInfo({
-                          isPath: true,
-                          svgString,
-                          sourceFileName: file.name,
-                        });
-                      } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
-                        //  file is either png or jpg
-                        const imageData = await toBase64(file);
-                        const dimensions = await resolveImageDimensionsFromBase64(imageData);
-                        textureEditor.assignTextureFromPatternInfo({
-                          isPath: false,
-                          pattern: {
-                            imageData,
-                            dimensions,
-                            sourceFileName: file.name,
-                          },
-                        });
-                      }
-                      // TODO: user can still pick non-image, emit snackbar error in this case
-                    }
-                  }}
-                >
-                  <UploadButton />
-                </FilePicker>
-              );
-            }
-            throw new Error('unexpected build environment');
-          })()}
-          <ShapeSelect
-            className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
-            isCompactDisplay
-            node={shapeName}
-          />
-          <FormControlLabel
-            className={TOUR_ELEMENT_CLASSES.ROTATE_3D}
-            labelPlacement="top"
-            control={(
-              <Switch
-                checked={autoRotatePreview}
-                onChange={(e) => {
-                  textureEditor.setAutoRotatePreview(e.target.checked);
-                }}
-                color="secondary"
+        {(() => {
+          if (IS_ELECTRON_BUILD) {
+            return (
+              <UploadButton onClick={async () => {
+                const patternInfo = await electronApi.getPatternInfoFromDialog();
+                textureEditor.assignTextureFromPatternInfo(patternInfo);
+              }}
               />
+            );
+          }
+          if (IS_WEB_BUILD) {
+            return (
+              <FilePicker
+                extensions={['.jpg', '.jpeg', '.png', '.svg']}
+                onFilePicked={async (file) => {
+                  if (file) {
+                    if (file.type === 'image/svg+xml') {
+                      const svgString = await file.text();
+                      textureEditor.assignTextureFromPatternInfo({
+                        isPath: true,
+                        svgString,
+                        sourceFileName: file.name,
+                      });
+                    } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
+                      //  file is either png or jpg
+                      const imageData = await toBase64(file);
+                      const dimensions = await resolveImageDimensionsFromBase64(imageData);
+                      textureEditor.assignTextureFromPatternInfo({
+                        isPath: false,
+                        pattern: {
+                          imageData,
+                          dimensions,
+                          sourceFileName: file.name,
+                        },
+                      });
+                    }
+                    // TODO: user can still pick non-image, emit snackbar error in this case
+                  }
+                }}
+              >
+                <UploadButton />
+              </FilePicker>
+            );
+          }
+          throw new Error('unexpected build environment');
+        })()}
+        <ShapeSelect
+          className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
+          isCompactDisplay
+          node={shapeName}
+        />
+        <FormControlLabel
+          className={TOUR_ELEMENT_CLASSES.ROTATE_3D}
+          labelPlacement="top"
+          control={(
+            <Switch
+              checked={autoRotatePreview}
+              onChange={(e) => {
+                textureEditor.setAutoRotatePreview(e.target.checked);
+              }}
+              color="secondary"
+            />
         )}
-            label="Rotate 3D"
-          />
+          label="Rotate 3D"
+        />
 
-          {history && (<HistoryButtons history={history} />)}
+        {history && (<HistoryButtons history={history} />)}
 
-          {faceDecoration?.pattern && faceDecoration.pattern instanceof ImageFaceDecorationPatternModel && (
+        {faceDecoration?.pattern && faceDecoration.pattern instanceof ImageFaceDecorationPatternModel && (
           <FormControlLabel
             className={TOUR_ELEMENT_CLASSES.IS_BORDERED}
             labelPlacement="top"
@@ -321,8 +322,8 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           />
         )}
 
-          <SnapMenu />
-          {faceDecoration instanceof PositionableFaceDecorationModel && (
+        <SnapMenu />
+        {faceDecoration instanceof PositionableFaceDecorationModel && (
           <>
             {/* menu content at bottom section */}
             {faceDecoration.pattern instanceof PathFaceDecorationPatternModel && (
@@ -404,8 +405,8 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             />
             {/* TODO: use draft? */}
           </>
-          )}
-          { IS_WEB_BUILD && (
+        )}
+        { IS_WEB_BUILD && (
           <IconButton
             onClick={() => {
               preferences.setNeedsTour(true);
@@ -416,9 +417,8 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           >
             <HelpIcon fontSize="large" />
           </IconButton>
-          )}
-        </Toolbar>
-      </TextureEditorAppBar>
-    </>
+        )}
+      </Toolbar>
+    </TextureEditorAppBar>
   );
 });

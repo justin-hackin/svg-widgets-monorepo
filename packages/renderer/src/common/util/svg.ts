@@ -18,7 +18,7 @@ export const extractViewBoxFromSvg = (svgString:string) => {
   return doc.querySelector('svg').getAttribute('viewBox');
 };
 
-export const namespacedElementFactory = (elName) => (p: any) => {
+export const namespacedElementFactory = (elName) => function (p: any) {
   const { children, ...props } = p;
   return React.createElement(elName, props, children);
 };

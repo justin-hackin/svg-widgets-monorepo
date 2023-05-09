@@ -25,10 +25,8 @@ INPUT_TYPE,
   [INPUT_TYPE.REFERENCE_SELECT]: TweakableReferenceSelect,
 };
 
-export const TweakableInput = (
-  { node, className }:
-  { node: TweakableModel, className?: string },
-) => {
+export function TweakableInput({ node, className }:
+{ node: TweakableModel, className?: string }) {
   const Component = TYPE_COMPONENT_MAP[node.metadata.type];
   return <Component className={className} node={node} />;
-};
+}

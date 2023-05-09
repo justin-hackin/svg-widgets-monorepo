@@ -5,7 +5,7 @@ import React from 'react';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
-export const AdditionalToolbarContent = () => {
+export function AdditionalToolbarContent() {
   const workspaceStore = useWorkspaceMst();
   const pyramidNetStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
   if (!pyramidNetStore) {
@@ -13,14 +13,12 @@ export const AdditionalToolbarContent = () => {
   }
 
   return (
-    <>
-      <Tooltip title="Open texture editor" arrow>
-        <IconButton
-          onClick={() => { pyramidNetStore.setTextureEditorOpen(true); }}
-        >
-          <BrushIcon />
-        </IconButton>
-      </Tooltip>
-    </>
+    <Tooltip title="Open texture editor" arrow>
+      <IconButton
+        onClick={() => { pyramidNetStore.setTextureEditorOpen(true); }}
+      >
+        <BrushIcon />
+      </IconButton>
+    </Tooltip>
   );
-};
+}

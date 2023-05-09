@@ -15,16 +15,18 @@ import { PathFaceDecorationPatternModel } from '../models/PathFaceDecorationPatt
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
 
-const DielineGroup = ({ children }) => (
-  <g {...{
-    id: 'dielines',
-    'inkscape:groupmode': 'layer',
-    'inkscape:label': 'Dielines',
-  }}
-  >
-    {children}
-  </g>
-);
+function DielineGroup({ children }) {
+  return (
+    <g {...{
+      id: 'dielines',
+      'inkscape:groupmode': 'layer',
+      'inkscape:label': 'Dielines',
+    }}
+    >
+      {children}
+    </g>
+  );
+}
 
 export const DielinesLayer = observer(({
   widgetStore,
@@ -70,7 +72,7 @@ export const DielinesLayer = observer(({
   ) ? boundingBox : dielineRegistrationBB;
   const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(fittingBB), -1));
 
-  const DecorationContent = () => {
+  function DecorationContent() {
     if (!texturePathD) {
       return null;
     }
@@ -105,9 +107,9 @@ export const DielinesLayer = observer(({
           )))}
       </g>
     );
-  };
+  }
 
-  const ClonePyramidNetContent = () => {
+  function ClonePyramidNetContent() {
     const BASE_TAB_ID = 'base-tab';
     const faceMasterBaseMidpoint = lineLerp(faceBoundaryPoints[1], faceBoundaryPoints[2], 0.5);
 
@@ -143,14 +145,13 @@ export const DielinesLayer = observer(({
         })}
       </>
     );
-  };
+  }
 
   return (
-    <>
-      <DielineGroup>
-        <g transform={fitToCanvasTranslationStr}>
-          {/* TODO: consider using something like <Switch>/<ElseIf>, hard to read */}
-          {
+    <DielineGroup>
+      <g transform={fitToCanvasTranslationStr}>
+        {/* TODO: consider using something like <Switch>/<ElseIf>, hard to read */}
+        {
             faceDecoration instanceof PositionableFaceDecorationModel
             && faceDecoration?.pattern instanceof ImageFaceDecorationPatternModel
           && (printRegistrationType === PRINT_REGISTRATION_TYPES.GRAPHTEC_OPTICAL ? (
@@ -165,15 +166,14 @@ export const DielinesLayer = observer(({
             />
           ))
           }
-          <DecorationContent />
-          {useClonesForBaseTabs ? (<ClonePyramidNetContent />) : (
-            <>
-              <path className="net-score" {...scoreProps} d={score.getD()} />
-              <path className="net-cut" {...outerCutProps} d={cut.getD()} />
-            </>
-          )}
-        </g>
-      </DielineGroup>
-    </>
+        <DecorationContent />
+        {useClonesForBaseTabs ? (<ClonePyramidNetContent />) : (
+          <>
+            <path className="net-score" {...scoreProps} d={score.getD()} />
+            <path className="net-cut" {...outerCutProps} d={cut.getD()} />
+          </>
+        )}
+      </g>
+    </DielineGroup>
   );
 });

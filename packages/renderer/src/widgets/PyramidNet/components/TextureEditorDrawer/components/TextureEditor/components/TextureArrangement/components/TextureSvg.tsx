@@ -17,7 +17,7 @@ const HOLES_COLOR = '#000';
 const WHITE = '#fff';
 const MUTED_WHITE = '#aaa';
 
-export const TextureSvgUnobserved = ({
+export function TextureSvgUnobserved({
   viewBox = undefined,
   textureTransformationUseDrag = undefined,
   transformOriginUseDrag = undefined,
@@ -27,7 +27,7 @@ export const TextureSvgUnobserved = ({
   transformOriginUseDrag?: (...args: any[]) => HookReturnType<UseDragConfig>,
   viewBox?: string,
   store?: TextureEditorModel,
-}) => {
+}) {
   // must avoid calling useMst (hooks) when using server-side rendering (results in errors about useLayoutEffect)
   const {
     decorationBoundary: { pathD: decorationBoundaryPathD = '' } = {},
@@ -215,5 +215,5 @@ export const TextureSvgUnobserved = ({
       />
     </svg>
   );
-};
+}
 export const TextureSvg = observer(TextureSvgUnobserved);

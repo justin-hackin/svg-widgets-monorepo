@@ -3,7 +3,7 @@
 import React from 'react';
 import { viewBoxStrToBoundingBoxAttrs } from '../../common/util/svg';
 
-export const LicenseGroup = ({ viewBox }: { viewBox: string | undefined }) => {
+export function LicenseGroup({ viewBox }: { viewBox: string | undefined }) {
   let transformVal;
   if (viewBox) {
     const { xmin, ymin } = viewBoxStrToBoundingBoxAttrs(viewBox);
@@ -42,4 +42,4 @@ export const LicenseGroup = ({ viewBox }: { viewBox: string | undefined }) => {
       />
     </g>
   );
-};
+}

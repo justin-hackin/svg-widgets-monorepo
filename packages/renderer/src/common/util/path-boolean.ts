@@ -41,7 +41,10 @@ export function unifyDValues(d1, d2) {
 }
 
 export const getBoundedTexturePathD = (
-  decorationBoundaryPathD, texturePathD, textureTransformMatrixStr, isPositive,
+  decorationBoundaryPathD,
+  texturePathD,
+  textureTransformMatrixStr,
+  isPositive,
 ) => {
   const texturePathTransformedD = svgpath(texturePathD).transform(textureTransformMatrixStr).toString();
 

@@ -39,7 +39,7 @@ const ListItemIconStyled = styled(ListItemIcon)(({ theme }) => ({
   minWidth: theme.spacing(4),
 }));
 
-export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
+export function AdditionalFileMenuItems({ resetFileMenuRef }) {
   const workspaceStore = useWorkspaceMst();
   const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
 
@@ -130,4 +130,4 @@ export const AdditionalFileMenuItems = ({ resetFileMenuRef }) => {
       </MenuItem>
     </>
   );
-};
+}

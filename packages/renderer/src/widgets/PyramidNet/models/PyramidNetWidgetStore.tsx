@@ -93,7 +93,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   preferences = new PyramidNetPreferencesModel({});
 
   @observable
-  textureEditor = new TextureEditorModel(this);
+    textureEditor = new TextureEditorModel(this);
 
   testTabHandleFlapDepth = 2;
 

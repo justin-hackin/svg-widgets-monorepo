@@ -6,8 +6,11 @@ import {
 } from '../../util/geom';
 
 export const arrowTabPlots = (
-  tabBaseStart, tabBaseEnd,
-  midpointDepthToTabDepth, tabDepthToBaseLength, tabWideningAngle,
+  tabBaseStart,
+  tabBaseEnd,
+  midpointDepthToTabDepth,
+  tabDepthToBaseLength,
+  tabWideningAngle,
 ) => {
   const vector = subtractPoints(tabBaseEnd, tabBaseStart);
   const tabDepth = tabDepthToBaseLength * distanceFromOrigin(vector);
@@ -15,12 +18,8 @@ export const arrowTabPlots = (
   const midpointDepth = tabDepth * midpointDepthToTabDepth;
 
   const tabMidpoints = [
-    hingedPlotByProjectionDistance(
-      tabBaseEnd, tabBaseStart, tabWideningAngle, -midpointDepth,
-    ),
-    hingedPlotByProjectionDistance(
-      tabBaseStart, tabBaseEnd, tabWideningAngle, midpointDepth,
-    ),
+    hingedPlotByProjectionDistance(tabBaseEnd, tabBaseStart, tabWideningAngle, -midpointDepth),
+    hingedPlotByProjectionDistance(tabBaseStart, tabBaseEnd, tabWideningAngle, midpointDepth),
   ];
 
   return {

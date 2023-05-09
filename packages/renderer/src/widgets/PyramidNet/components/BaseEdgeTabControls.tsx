@@ -30,9 +30,7 @@ export const BaseEdgeTabControls = observer(() => {
         }}
       />
       {baseEdgeTabsSpec.bendGuideValley instanceof BendGuideValleyModel && (
-        <>
-          <TweakableChildrenInputs parentNode={baseEdgeTabsSpec.bendGuideValley} />
-        </>
+        <TweakableChildrenInputs parentNode={baseEdgeTabsSpec.bendGuideValley} />
       )}
     </>
   );

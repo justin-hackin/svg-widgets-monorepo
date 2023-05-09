@@ -28,7 +28,7 @@ interface CubicBezierCommand extends DestinationCommand {
   ctrl2: RawPoint
 }
 
-interface SymmetricCubicBezierCommand extends DestinationCommand{
+interface SymmetricCubicBezierCommand extends DestinationCommand {
   code: CommandCodes.S
   ctrl2: RawPoint
 }
@@ -130,7 +130,12 @@ export const COMMAND_FACTORY = {
     to: castCoordToRawPoint(to),
   }),
   A: (
-    radiusX: number, radiusY: number, xAxisRotation: number, largeArcFlag: boolean, sweepFlag: boolean, to:Coord,
+    radiusX: number,
+    radiusY: number,
+    xAxisRotation: number,
+    largeArcFlag: boolean,
+    sweepFlag: boolean,
+    to:Coord,
   ):ArcCommand => ({
     code: CommandCodes.A,
     rx: radiusX,
@@ -171,9 +176,9 @@ const parseSVG = (d) => {
         [params[2], params[3]],
       ));
     } else if (code === 'A') {
-      commandList.push(COMMAND_FACTORY.A(
-        params[0], params[1], params[2], !!params[3], !!params[4], [params[5], params[6]],
-      ));
+      commandList.push(
+        COMMAND_FACTORY.A(params[0], params[1], params[2], !!params[3], !!params[4], [params[5], params[6]]),
+      );
     }
   });
   return commandList;
@@ -187,7 +192,6 @@ export class PathData {
   constructor(d?: string) {
     // TODO: check instance type
     this.commands = d ? parseSVG(d) : [];
-    return this;
   }
 
   private get _lastCommandExists() {
@@ -251,7 +255,12 @@ export class PathData {
   }
 
   ellipticalArc(
-    radiusX:number, radiusY:number, xAxisRotation:number, largeArcFlag:boolean, sweepFlag:boolean, to: Coord,
+    radiusX:number,
+    radiusY:number,
+    xAxisRotation:number,
+    largeArcFlag:boolean,
+    sweepFlag:boolean,
+    to: Coord,
   ):PathData {
     this._assertLastCommandExists();
     this.commands.push(COMMAND_FACTORY.A(radiusX, radiusY, xAxisRotation, largeArcFlag, sweepFlag, to));

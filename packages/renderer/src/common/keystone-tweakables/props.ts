@@ -20,58 +20,51 @@ import {
 } from './types';
 
 export function controllablePrimitiveProp<T, M extends PrimitiveMetadata>(value: T, metadata: M) {
-  return prop<TweakablePrimitiveModel<T, M>>(() => propertyMetadataCtx.apply(
-    () => new TweakablePrimitiveModel<T, M>({
-      value,
-    }), metadata,
-  ));
+  return prop<TweakablePrimitiveModel<T, M>>(() => propertyMetadataCtx.apply(() => new TweakablePrimitiveModel<T, M>({
+    value,
+  }), metadata));
 }
 
 export const sliderProp = (
-  value: number, metadata: Omit<SliderMetadata, 'type'>,
-) => controllablePrimitiveProp<number, SliderMetadata>(
-  value, { type: INPUT_TYPE.SLIDER, ...metadata },
-);
+  value: number,
+  metadata: Omit<SliderMetadata, 'type'>,
+) => controllablePrimitiveProp<number, SliderMetadata>(value, { type: INPUT_TYPE.SLIDER, ...metadata });
+
 export const sliderWithTextProp = (
-  value: number, metadata: Omit<SliderWithTextMetadata, 'type'>,
+  value: number,
+  metadata: Omit<SliderWithTextMetadata, 'type'>,
 ) => controllablePrimitiveProp<number, SliderWithTextMetadata>(
-  value, { type: INPUT_TYPE.SLIDER_WITH_TEXT, ...metadata },
+  value,
+  { type: INPUT_TYPE.SLIDER_WITH_TEXT, ...metadata },
 );
 export const colorPickerProp = (value: string) => controllablePrimitiveProp<string, ColorPickerMetadata>(
-  value, { type: INPUT_TYPE.COLOR_PICKER },
+  value,
+  { type: INPUT_TYPE.COLOR_PICKER },
 );
 
-function controllablePrimitiveWithOptionsProp<T, M extends WithOptionsMetadata<T>>(
-  value: T, metadata: M,
-) {
-  return prop<TweakablePrimitiveWithOptionsModel<T, M>>(() => propertyMetadataCtx.apply(
-    () => new TweakablePrimitiveWithOptionsModel<T, M>({
+function controllablePrimitiveWithOptionsProp<T, M extends WithOptionsMetadata<T>>(value: T, metadata: M) {
+  return prop<TweakablePrimitiveWithOptionsModel<T, M>>(
+    () => propertyMetadataCtx.apply(() => new TweakablePrimitiveWithOptionsModel<T, M>({
       value,
-    }), metadata,
-  ));
-}
-
-export function radioProp<T>(
-  value: T, metadata: Omit<RadioMetadata<T>, 'type'>,
-) {
-  return controllablePrimitiveWithOptionsProp<T, RadioMetadata<T>>(
-    value, { type: INPUT_TYPE.RADIO, ...metadata },
+    }), metadata),
   );
 }
 
-export function selectProp<T>(
-  value: T, metadata: Omit<SelectMetadata<T>, 'type'>,
-) {
-  return controllablePrimitiveWithOptionsProp<T, SelectMetadata<T>>(
-    value, { type: INPUT_TYPE.SELECT, ...metadata },
-  );
+export function radioProp<T>(value: T, metadata: Omit<RadioMetadata<T>, 'type'>) {
+  return controllablePrimitiveWithOptionsProp<T, RadioMetadata<T>>(value, { type: INPUT_TYPE.RADIO, ...metadata });
+}
+
+export function selectProp<T>(value: T, metadata: Omit<SelectMetadata<T>, 'type'>) {
+  return controllablePrimitiveWithOptionsProp<T, SelectMetadata<T>>(value, { type: INPUT_TYPE.SELECT, ...metadata });
 }
 
 // TODO: consider default label override + context for units on label
 export const numberTextProp = (
-  value: number, metadata?: Omit<NumberTextMetadata, 'type'>,
+  value: number,
+  metadata?: Omit<NumberTextMetadata, 'type'>,
 ) => controllablePrimitiveProp<number, NumberTextMetadata>(
-  value, { type: INPUT_TYPE.NUMBER_TEXT, ...metadata },
+  value,
+  { type: INPUT_TYPE.NUMBER_TEXT, ...metadata },
 );
 
 export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSelectMetadata<T>, 'type'>) {
@@ -83,13 +76,17 @@ export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSe
 }
 
 export function referenceRadioProp<T extends object>(metadata: Omit<ReferenceRadioMetadata<T>, 'type'>) {
-  return prop<TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>>(() => propertyMetadataCtx.apply(
-    () => new TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({ valueRef: undefined }), {
-      type: INPUT_TYPE.REFERENCE_RADIO, ...metadata,
-    },
-  ));
+  return prop<TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>>(
+    () => propertyMetadataCtx.apply(
+      () => new TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({ valueRef: undefined }),
+      {
+        type: INPUT_TYPE.REFERENCE_RADIO, ...metadata,
+      },
+    ),
+  );
 }
 
 export const switchProp = (value: boolean) => controllablePrimitiveProp<boolean, SwitchMetadata>(
-  value, { type: INPUT_TYPE.SWITCH },
+  value,
+  { type: INPUT_TYPE.SWITCH },
 );

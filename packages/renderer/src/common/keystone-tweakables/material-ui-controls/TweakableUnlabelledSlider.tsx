@@ -7,15 +7,17 @@ import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel'
 import { getNearestHistoryFromAncestorNode } from '../../util/mobx-keystone';
 import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../../util/units';
 
-const ValueLabelComponent = ({
+function ValueLabelComponent({
   children,
   open,
   value,
-}) => (
-  <Tooltip open={open} enterTouchDelay={0} placement="top" title={value} arrow>
-    {children}
-  </Tooltip>
-);
+}) {
+  return (
+    <Tooltip open={open} enterTouchDelay={0} placement="top" title={value} arrow>
+      {children}
+    </Tooltip>
+  );
+}
 export const TweakableUnlabelledSlider = observer(({
   node,
   className,

@@ -17,8 +17,11 @@ export const calculateAngledNotchWidth = (angleOfIncidence: number, materialThic
 };
 
 export const triNotchPanel = (
-  panelLength: number, panelDepth: number,
-  notchCenterDistances: number[], materialThickness: number, triNotchLevel: TRI_NOTCH_LEVEL,
+  panelLength: number,
+  panelDepth: number,
+  notchCenterDistances: number[],
+  materialThickness: number,
+  triNotchLevel: TRI_NOTCH_LEVEL,
 ): PathData => {
   const notchThickness = calculateAngledNotchWidth((4 / 3) * Math.PI, materialThickness);
   const path = new PathData();

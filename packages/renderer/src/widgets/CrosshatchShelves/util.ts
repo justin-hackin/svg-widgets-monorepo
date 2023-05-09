@@ -10,15 +10,22 @@ const {
 } = Flatten;
 
 export const getMarginLength = (
-  panelLength: number, numNotches: number, notchSpacing: number, notchThickness: number,
+  panelLength: number,
+  numNotches: number,
+  notchSpacing: number,
+  notchThickness: number,
 ) => {
   const notchesCoverage = (numNotches - 1) * notchSpacing + numNotches * notchThickness;
   return (panelLength - notchesCoverage) / 2;
 };
 
 export const notchPanel = (
-  firstNotchCenter: number, panelLength: number, panelDepth: number,
-  numNotches: number, notchSpacing: number, notchThickness: number,
+  firstNotchCenter: number,
+  panelLength: number,
+  panelDepth: number,
+  numNotches: number,
+  notchSpacing: number,
+  notchThickness: number,
 ): PathData => {
   const path = new PathData();
   const notchDepth = panelDepth / 2;
@@ -39,8 +46,11 @@ export const notchPanel = (
 };
 
 export const centeredNotchPanel = (
-  panelLength: number, panelDepth: number,
-  numNotches: number, notchSpacing: number, notchThickness: number,
+  panelLength: number,
+  panelDepth: number,
+  numNotches: number,
+  notchSpacing: number,
+  notchThickness: number,
 ) => {
   const firstNotchCenter = getMarginLength(panelLength, numNotches, notchSpacing, notchThickness) + notchThickness / 2;
   return notchPanel(firstNotchCenter, panelLength, panelDepth, numNotches, notchSpacing, notchThickness);
@@ -74,12 +84,15 @@ const projectPointOntoLine = (l: Line, pt: Point):Point => {
   return start;
 };
 
-export const getNumNotches = (
-  panelWidth: number, notchThickness: number, cubbyWidth: number,
-) => Math.ceil((panelWidth - notchThickness) / (cubbyWidth + notchThickness));
+export const getNumNotches = (panelWidth: number, notchThickness: number, cubbyWidth: number) => Math.ceil(
+  (panelWidth - notchThickness) / (cubbyWidth + notchThickness),
+);
 
 export const getPositiveSlopeSlatSegments = (
-  width: number, height: number, cubbyWidth: number, matThickness: number,
+  width: number,
+  height: number,
+  cubbyWidth: number,
+  matThickness: number,
 ): Segment[] => {
   const backboneLine = line(point(0, 0), point(1, 1));
   const slatBackboneEnd = projectPointOntoLine(backboneLine, point(width, height));

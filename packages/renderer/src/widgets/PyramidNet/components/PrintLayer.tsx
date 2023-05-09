@@ -10,16 +10,18 @@ import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 
-const PrintGroup = ({ children }) => (
-  <g {...{
-    id: 'print',
-    'inkscape:groupmode': 'layer',
-    'inkscape:label': 'Print',
-  }}
-  >
-    {children}
-  </g>
-);
+function PrintGroup({ children }) {
+  return (
+    <g {...{
+      id: 'print',
+      'inkscape:groupmode': 'layer',
+      'inkscape:label': 'Print',
+    }}
+    >
+      {children}
+    </g>
+  );
+}
 export const PrintLayer = observer(({
   widgetStore,
 }: {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from '@mui/styles';
 
-export const GridPattern = ({ patternId }) => {
+export function GridPattern({ patternId }) {
   const theme = useTheme();
   const lineColor = theme.palette.mode === 'dark'
     ? theme.palette.common.white : theme.palette.common.black;
@@ -18,4 +18,4 @@ export const GridPattern = ({ patternId }) => {
       </pattern>
     </defs>
   );
-};
+}

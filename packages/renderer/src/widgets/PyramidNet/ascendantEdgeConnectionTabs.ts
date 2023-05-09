@@ -38,9 +38,13 @@ export class AscendantEdgeTabsModel extends Model({
 }) {}
 
 export const ascendantEdgeConnectionTabs = (
-  start: RawPoint, end: RawPoint,
-  tabSpec: AscendantEdgeTabsModel, scoreDashSpec: DashPatternModel,
-  tabIntervalRatios, tabGapIntervalRatios, tabDepth: number,
+  start: RawPoint,
+  end: RawPoint,
+  tabSpec: AscendantEdgeTabsModel,
+  scoreDashSpec: DashPatternModel,
+  tabIntervalRatios,
+  tabGapIntervalRatios,
+  tabDepth: number,
 ): AscendantEdgeConnectionPaths => {
   const {
     holeFlapTaperAngle,
@@ -70,10 +74,16 @@ export const ascendantEdgeConnectionTabs = (
   range(0, tabsCount).forEach((tabNum) => {
     const [tabBaseStart, tabBaseEnd] = getTabBaseInterval(tabNum);
     const [holeEdgeStart, holeEdgeEnd] = symmetricHingePlotByProjectionDistance(
-      tabBaseStart, tabBaseEnd, -Math.PI / 2 + holeFlapTaperAngle, holeReachToTabDepth * -tabDepth,
+      tabBaseStart,
+      tabBaseEnd,
+      -Math.PI / 2 + holeFlapTaperAngle,
+      holeReachToTabDepth * -tabDepth,
     );
     const [tabEdgeStartUnindented, tabEdgeEndUnindented] = symmetricHingePlotByProjectionDistance(
-      tabBaseStart, tabBaseEnd, Math.PI / 2, tabDepth,
+      tabBaseStart,
+      tabBaseEnd,
+      Math.PI / 2,
+      tabDepth,
     );
     const controlPointDistance = tabDepth * tabControlPointsProtrusion;
     const edgeInsetDistance = tabEdgeEndpointsIndentation * tabDepth;
@@ -81,10 +91,16 @@ export const ascendantEdgeConnectionTabs = (
     const tabEdgeStart = hingedPlot(tabEdgeEndUnindented, tabEdgeStartUnindented, 0, edgeInsetDistance);
     const tabEdgeEnd = hingedPlot(tabEdgeStartUnindented, tabEdgeEndUnindented, 0, edgeInsetDistance);
     const baseControlPointStart = hingedPlot(
-      tabBaseEnd, tabBaseStart, Math.PI - baseControlAngleMux, controlPointDistance,
+      tabBaseEnd,
+      tabBaseStart,
+      Math.PI - baseControlAngleMux,
+      controlPointDistance,
     );
     const baseControlPointEnd = hingedPlot(
-      tabBaseStart, tabBaseEnd, Math.PI + baseControlAngleMux, controlPointDistance,
+      tabBaseStart,
+      tabBaseEnd,
+      Math.PI + baseControlAngleMux,
+      controlPointDistance,
     );
     const edgeControlPointStart = hingedPlot(tabEdgeEnd, tabEdgeStart, Math.PI, controlPointDistance);
     const edgeControlPointEnd = hingedPlot(tabEdgeStart, tabEdgeEnd, Math.PI, controlPointDistance);

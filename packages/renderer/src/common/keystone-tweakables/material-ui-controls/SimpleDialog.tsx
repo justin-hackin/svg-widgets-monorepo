@@ -25,23 +25,25 @@ const DialogStyled = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-export const SimpleDialog = ({
+export function SimpleDialog({
   isOpen, handleClose, title, children,
-}) => (
-  <DialogStyled aria-labelledby="simple-dialog-title" open={isOpen}>
-    <DialogTitle id="simple-dialog-title">
-      <Typography>{title}</Typography>
-      <IconButton
-        className={classes.closeIconButton}
-        aria-label="close"
-        onClick={handleClose}
-        size="large"
-      >
-        <CloseIcon />
-      </IconButton>
-    </DialogTitle>
-    <div className={classes.dialogContent}>
-      { children }
-    </div>
-  </DialogStyled>
-);
+}) {
+  return (
+    <DialogStyled aria-labelledby="simple-dialog-title" open={isOpen}>
+      <DialogTitle id="simple-dialog-title">
+        <Typography>{title}</Typography>
+        <IconButton
+          className={classes.closeIconButton}
+          aria-label="close"
+          onClick={handleClose}
+          size="large"
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <div className={classes.dialogContent}>
+        { children }
+      </div>
+    </DialogStyled>
+  );
+}

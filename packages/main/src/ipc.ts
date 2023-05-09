@@ -29,10 +29,9 @@ const glbFilters = [{ name: 'GLB 3D model', extensions: ['glb'] }];
 // TODO: type safety between invoke and handle parameters
 
 export const setupIpc = (ipcMain) => {
-  ipcMain.handle(EVENTS.DIALOG_SAVE_TXT_FILE,
-    async (
-      e, fileStr, dialogOptions, fileExt, extDesc,
-    ): Promise<ParsedFilePathData | undefined> => {
+  ipcMain.handle(
+    EVENTS.DIALOG_SAVE_TXT_FILE,
+    async (e, fileStr, dialogOptions, fileExt, extDesc): Promise<ParsedFilePathData | undefined> => {
       const { canceled, filePath } = await dialog.showSaveDialog({
         ...dialogOptions,
         filters: [{ name: extDesc, extensions: [fileExt] }],
@@ -47,11 +46,14 @@ export const setupIpc = (ipcMain) => {
         basename: basename(resolvedFilePath, ext),
         dirname: dirname(resolvedFilePath),
       };
-    });
+    },
+  );
 
-  ipcMain.handle(EVENTS.SAVE_TXT_FILE, (
-    e, filePath, fileString,
-  ) => fsPromises.writeFile(filePath, fileString).then(() => ({ dirname: dirname(filePath) })));
+  ipcMain.handle(
+    EVENTS.SAVE_TXT_FILE,
+    (e, filePath, fileString) => fsPromises.writeFile(filePath, fileString)
+      .then(() => ({ dirname: dirname(filePath) })),
+  );
 
   ipcMain.handle(EVENTS.DIALOG_SAVE_GLB, (e, glbArrayBuffer, dialogOptions) => dialog.showSaveDialog({
     ...dialogOptions,
@@ -70,7 +72,10 @@ export const setupIpc = (ipcMain) => {
   };
 
   ipcMain.handle(EVENTS.DIALOG_OPEN_TXT_FILE, async (
-    e, dialogOptions, extension, extensionName,
+    e,
+    dialogOptions,
+    extension,
+    extensionName,
   ): Promise<TxtFileInfo | undefined> => {
     const res = await resolveStringDataFromDialog({
       ...dialogOptions,
