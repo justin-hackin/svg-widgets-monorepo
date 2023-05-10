@@ -13,10 +13,10 @@ import {
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
 import { DRAG_MODES } from '../../models/ModifierTrackingModel';
 import { boundingBoxAttrsToViewBoxStr } from '../../../../../../../../common/util/svg';
-import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
 import { TextureSvg } from './components/TextureSvg';
 import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
+import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/rootStore';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();

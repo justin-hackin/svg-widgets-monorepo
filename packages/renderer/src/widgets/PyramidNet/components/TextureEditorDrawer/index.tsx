@@ -4,8 +4,8 @@ import { observer } from 'mobx-react';
 import { Drawer } from '@mui/material';
 import { styled } from '@mui/styles';
 import { PyramidNetWidgetModel } from '../../models/PyramidNetWidgetStore';
-import { useWorkspaceMst } from '../../../../WidgetWorkspace/models/WorkspaceModel';
 import { TextureEditor } from './components/TextureEditor';
+import { useWorkspaceMst } from '../../../../WidgetWorkspace/rootStore';
 
 // TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 const DrawerStyled = styled(Drawer)({

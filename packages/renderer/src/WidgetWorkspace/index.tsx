@@ -6,10 +6,11 @@ import {
 import { kebabCase, startCase } from 'lodash';
 import { styled } from '@mui/styles';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
-import { useWorkspaceMst } from './models/WorkspaceModel';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
 import { FullPageDiv } from '../common/style/style';
 import { DielineViewToolbar } from './components/DielineViewToolbar';
+import { useWorkspaceMst } from './rootStore';
+import { widgetOptions } from './models/WorkspaceModel';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
 const CLASS_BASE = 'workspace';
@@ -42,7 +43,7 @@ const DialogStyled = styled(Dialog)(({ theme }) => ({
 
 export const WidgetWorkspace = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const { selectedStore, selectedWidgetModelType, widgetOptions } = workspaceStore;
+  const { selectedStore, selectedWidgetModelType } = workspaceStore;
 
   useLayoutEffect(() => {
     workspaceStore.fitToDocument();

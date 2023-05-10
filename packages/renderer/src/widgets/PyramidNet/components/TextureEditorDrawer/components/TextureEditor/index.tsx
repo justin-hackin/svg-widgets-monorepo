@@ -18,8 +18,8 @@ import { RawFaceDecorationModel } from '../../../../models/RawFaceDecorationMode
 import { IS_WEB_BUILD } from '../../../../../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
-import { useWorkspaceMst } from '../../../../../../WidgetWorkspace/models/WorkspaceModel';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
+import { useWorkspaceMst } from '../../../../../../WidgetWorkspace/rootStore';
 
 const classes = { mainArea: 'main-area' };
 const TextureEditorRoot = styled(FullPageDiv)(({ theme }) => ({

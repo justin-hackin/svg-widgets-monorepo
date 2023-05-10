@@ -9,7 +9,6 @@ import { startCase } from 'lodash';
 import { fromSnapshot, SnapshotOutOf } from 'mobx-keystone';
 import ReactDOMServer from 'react-dom/server';
 import { styled } from '@mui/styles';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { IS_ELECTRON_BUILD } from '../../../../../common/constants';
@@ -18,6 +17,7 @@ import { RawFaceDecorationModel } from '../models/RawFaceDecorationModel';
 import { electronApi } from '../../../../../common/electron';
 import { SVGWrapper } from '../../../WidgetWorkspace/components/SVGWrapper';
 import { PyramidNetTestTabs } from './PyramidNetTestTabsSvg';
+import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 export const renderTestTabsToString = (widgetStore): string => ReactDOMServer.renderToString(
   <SVGWrapper>

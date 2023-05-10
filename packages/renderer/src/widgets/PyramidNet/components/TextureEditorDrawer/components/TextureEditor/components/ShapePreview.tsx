@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../common/util/tour';
 import { IS_ELECTRON_BUILD } from '../../../../../../../../../common/constants';
-import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/models/WorkspaceModel';
+import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/rootStore';
 
 const classes = {
   enterFullScreenButton: 'shape-preview__enter-full-screen-button',

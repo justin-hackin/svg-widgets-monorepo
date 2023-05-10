@@ -4,14 +4,14 @@ import { IconButton, Typography } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import { observer } from 'mobx-react';
-
 import { styled } from '@mui/styles';
+
 import { FormControlStyled } from '../../style/style';
 import { TweakableUnlabelledNumberTextInput } from './TweakableUnlabelledNumberTextInput';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { SliderWithTextMetadata } from '../types';
 import { TweakableUnlabelledSlider } from './TweakableUnlabelledSlider';
+import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 const classes = {
   inputContainer: 'input-container',

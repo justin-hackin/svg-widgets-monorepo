@@ -1,10 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
-import { useWorkspaceMst, WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { TweakableChildrenInputs }
   from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 export const PreferencesControls = observer(() => {
   const workspaceStore: WorkspaceModel = useWorkspaceMst();

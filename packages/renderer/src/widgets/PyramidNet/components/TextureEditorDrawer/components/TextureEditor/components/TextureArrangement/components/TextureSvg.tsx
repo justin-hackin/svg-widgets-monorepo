@@ -9,8 +9,8 @@ import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWid
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
 import { TextureEditorModel } from '../../../models/TextureEditorModel';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
-import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
 import { PathFaceDecorationPatternModel } from '../../../../../../../models/PathFaceDecorationPatternModel';
+import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';

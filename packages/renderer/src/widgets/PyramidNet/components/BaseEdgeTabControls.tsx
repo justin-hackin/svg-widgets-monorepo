@@ -5,7 +5,7 @@ import { BendGuideValleyModel } from '../baseEdgeConnectionTab';
 import { TweakableChildrenInputs }
   from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 import { SimpleSwitch } from '../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 export const BaseEdgeTabControls = observer(() => {
   const workspaceStore = useWorkspaceMst();

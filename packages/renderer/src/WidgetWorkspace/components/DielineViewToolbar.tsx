@@ -13,7 +13,8 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { styled } from '@mui/styles';
 import { observer } from 'mobx-react';
-import { useWorkspaceMst, WorkspaceModel } from '../models/WorkspaceModel';
+import { WorkspaceModel } from '../models/WorkspaceModel';
+import { useWorkspaceMst } from '../rootStore';
 
 const TOOL_ICON_MAP = {
   [TOOL_NONE]: MouseIcon,

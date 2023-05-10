@@ -1,4 +1,4 @@
-import { ExtendedModel, model } from 'mobx-keystone';
+import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
@@ -7,6 +7,7 @@ import { radioProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
 import { centeredNotchPanel, getMarginLength } from './util';
 import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
+import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 
 enum REMAINDER_SIZES {
   SMALL = 'small',
@@ -16,7 +17,7 @@ enum REMAINDER_SIZES {
 
 const cubbiesDecrementOptions = Object.values(REMAINDER_SIZES).map((size, index) => ({ value: index, label: size }));
 
-@model('SquareGridDivider')
+@widgetModel('SquareGridDivider')
 export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
   ...dividerBaseModelProps,
   widthCubbiesDecrement: radioProp(0, {

@@ -18,7 +18,6 @@ import {
 
 import { SnapshotInOfModel } from 'mobx-keystone';
 import { styled } from '@mui/material/styles';
-import { useWorkspaceMst } from '../models/WorkspaceModel';
 import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
 import { electronApi } from '../../../../common/electron';
@@ -26,6 +25,7 @@ import { TweakableChildrenInputs } from '../../common/keystone-tweakables/materi
 import { AssetsAccordion } from './AssetsAccordion';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 import { HistoryButtons } from '../../widgets/PyramidNet/components/HistoryButtons';
+import { useWorkspaceMst } from '../rootStore';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';

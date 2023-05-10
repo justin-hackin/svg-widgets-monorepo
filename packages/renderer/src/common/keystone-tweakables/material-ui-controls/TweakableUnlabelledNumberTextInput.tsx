@@ -3,10 +3,10 @@ import React, { createRef, useEffect } from 'react';
 import parseFraction from 'parse-fraction';
 import { observer } from 'mobx-react';
 
-import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { PIXELS_PER_UNIT, pxToUnitView } from '../../util/units';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { NumberTextMetadata, SliderWithTextMetadata } from '../types';
+import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 export const TweakableUnlabelledNumberTextInput = observer(({
   node, labelId,

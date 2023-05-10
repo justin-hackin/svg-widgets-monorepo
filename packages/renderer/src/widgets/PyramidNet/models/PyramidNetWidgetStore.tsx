@@ -2,9 +2,7 @@
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
-import {
-  ExtendedModel, model, modelAction, prop,
-} from 'mobx-keystone';
+import { ExtendedModel, modelAction, prop } from 'mobx-keystone';
 import { computed, observable, reaction } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash';
@@ -49,6 +47,7 @@ import {
 import { closedPolygonPath, roundedEdgePath } from '../../../common/path/shapes/generic';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
+import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 
 const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
@@ -69,7 +68,7 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-@model('PolyhedralNet')
+@widgetModel('PolyhedralNet')
 export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),

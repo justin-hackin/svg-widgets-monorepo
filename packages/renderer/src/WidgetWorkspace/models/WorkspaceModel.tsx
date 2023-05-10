@@ -1,10 +1,9 @@
-import React, { createContext, ReactNode, useContext } from 'react';
+import { ReactNode } from 'react';
 import { computed, observable, reaction } from 'mobx';
 import {
   _async,
   _await,
   applySnapshot,
-  connectReduxDevTools,
   detach,
   getSnapshot,
   model,
@@ -13,7 +12,6 @@ import {
   ModelClass,
   modelFlow,
   prop,
-  registerRootStore,
   SnapshotInOfModel,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
@@ -26,15 +24,10 @@ import {
   TOOL_PAN,
   Value,
 } from 'react-svg-pan-zoom';
-import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../../common/constants';
-import { PyramidNetWidgetModel } from '../../widgets/PyramidNet/models/PyramidNetWidgetStore';
+import { IS_ELECTRON_BUILD } from '../../../../common/constants';
 import { radioProp, switchProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
-import { CylinderLightboxWidgetModel } from '../../widgets/CylinderLightbox/models';
-import { SquareGridDividerWidgetModel } from '../../widgets/CrosshatchShelves/SquareGridDividerWidgetModel';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
-import { DiamondGridDividerWidgetModel } from '../../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
-import { TriangularGridWidgetModel } from '../../widgets/CrosshatchShelves/TriangularGrid';
 import { electronApi } from '../../../../common/electron';
 
 type WidgetJSON = {
@@ -60,24 +53,23 @@ class WorkspacePreferencesModel extends Model({
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
-const widgetList = [
-  PyramidNetWidgetModel,
-  CylinderLightboxWidgetModel,
-  SquareGridDividerWidgetModel,
-  DiamondGridDividerWidgetModel,
-  TriangularGridWidgetModel,
-];
 
-type BaseWidgetModelClass = ModelClass<BaseWidgetClass>;
+export const widgetOptions = new Map();
+observable(widgetOptions);
+
+export function widgetModel(modelName: string) {
+  return function (constructor: ModelClass<any>) {
+    const decoratedClass = model(modelName)(constructor);
+    widgetOptions.set(modelName, decoratedClass);
+    return decoratedClass;
+  };
+}
 
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
   selectedStore: prop<BaseWidgetClass>(undefined).withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))),
 }) {
-  @observable
-    widgetOptions = new Map();
-
   @observable
     selectedWidgetModelType: string = null;
 
@@ -99,19 +91,32 @@ export class WorkspaceModel extends Model({
   @observable
     alertDialogContent = null;
 
+  // eslint-disable-next-line class-methods-use-this
   @computed
   get availableWidgetTypes() {
-    return Array.from(this.widgetOptions.keys());
+    return Array.from(widgetOptions.keys());
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  get widgetOptions() {
+    return widgetOptions;
   }
 
   onAttachedToRootStore() {
+    if (this.availableWidgetTypes.length === 1) {
+      // @ts-ignore
+      this.selectedWidgetModelType = widgetList[0].$modelType;
+      this.resetModelToDefault();
+    } else {
+      this.newWidget();
+    }
+
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
         document.title = this.titleBarText;
       }, { fireImmediately: true }),
     ];
-    this.registerWidgets(widgetList);
 
     this.persistPreferences()
       .then(() => {
@@ -178,7 +183,7 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   newWidget() {
-    if (Array.from(this.widgetOptions.keys()).length > 1) {
+    if (this.availableWidgetTypes.length > 1) {
       this.setWidgetPickerOpen(true);
     } else {
       this.resetModelToDefault();
@@ -231,7 +236,7 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetModelToDefault() {
-    const SelectedModel = this.widgetOptions.get(this.selectedWidgetModelType);
+    const SelectedModel = widgetOptions.get(this.selectedWidgetModelType);
     if (this.selectedStore) {
       detach(this.selectedStore);
     }
@@ -270,7 +275,7 @@ export class WorkspaceModel extends Model({
   @modelAction
   initializeWidgetFromSnapshot(widgetJSON: WidgetJSON, filePath: string) {
     const { modelType, modelSnapshot } = widgetJSON.widget;
-    if (!this.widgetOptions.has(modelType)) {
+    if (!widgetOptions.has(modelType)) {
       this.setAlertDialogContent(`Invalid widget spec file: JSON data must contain property widget.$modelType with value
        equal to one of (${this.availableWidgetTypes.join(', ')}) but instead saw ${modelType}`);
       return;
@@ -344,26 +349,6 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
-  registerWidgets(widgetList: BaseWidgetModelClass[]) {
-    if (!widgetList.length) {
-      // TODO: snackbar error
-      throw new Error('registerWidgets first parameter widgetList must contain at least one widget model');
-    }
-    for (const widgetClass of widgetList) {
-      // @ts-ignore
-      this.widgetOptions.set(widgetClass.$modelType, widgetClass);
-    }
-
-    if (widgetList.length === 1) {
-      // @ts-ignore
-      this.selectedWidgetModelType = widgetList[0].$modelType;
-      this.resetModelToDefault();
-    } else {
-      this.newWidget();
-    }
-  }
-
-  @modelAction
   setCurrentFileData(filePath: string, snapshot: object) {
     this.currentFilePath = filePath;
     this.savedSnapshot = snapshot;
@@ -373,36 +358,5 @@ export class WorkspaceModel extends Model({
   clearCurrentFileData() {
     this.currentFilePath = undefined;
     this.savedSnapshot = undefined;
-  }
-}
-
-export const workspaceStore = new WorkspaceModel({});
-registerRootStore(workspaceStore);
-const WorkspaceStoreContext = createContext<WorkspaceModel>(workspaceStore);
-
-export const { Provider: WorkspaceProvider } = WorkspaceStoreContext;
-
-export function WorkspaceStoreProvider({ children }) {
-  return <WorkspaceProvider value={workspaceStore}>{children}</WorkspaceProvider>;
-}
-
-export function useWorkspaceMst() {
-  return useContext(WorkspaceStoreContext);
-}
-
-if (IS_DEVELOPMENT_BUILD) {
-  window.workpsaceStore = workspaceStore;
-  if (IS_ELECTRON_BUILD) {
-    // if this module is imported in web build,
-    // `import "querystring"` appears in index bundle, breaks app
-    // eslint-disable-next-line import/no-extraneous-dependencies
-    import('remotedev').then(({ default: remotedev }) => {
-      // create a connection to the monitor (for example with connectViaExtension)
-      const connection = remotedev.connectViaExtension({
-        name: 'Polyhedral Net Studio',
-      });
-
-      connectReduxDevTools(remotedev, connection, workspaceStore);
-    });
   }
 }

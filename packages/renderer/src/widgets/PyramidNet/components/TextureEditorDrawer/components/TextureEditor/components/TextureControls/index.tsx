@@ -40,10 +40,10 @@ import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidget
 import { ImageFaceDecorationPatternModel } from '../../../../../../models/ImageFaceDecorationPatternModel';
 import { TweakableInput } from '../../../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 import { ShapeSelect } from '../../../../../ShapeSelect';
-import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
 import { PathFaceDecorationPatternModel } from '../../../../../../models/PathFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../../models/PositionableFaceDecorationModel';
 import { electronApi } from '../../../../../../../../../../common/electron';
+import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/rootStore';
 
 // @ts-ignore
 const NumberFormatDecimalDegrees = forwardRef(({ onChange, ...other }, ref) => (

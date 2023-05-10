@@ -2,8 +2,8 @@ import { IconButton, Tooltip } from '@mui/material';
 import BrushIcon from '@mui/icons-material/Brush';
 import React from 'react';
 
-import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 export function AdditionalToolbarContent() {
   const workspaceStore = useWorkspaceMst();

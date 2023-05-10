@@ -1,6 +1,4 @@
-import {
-  ExtendedModel, model,
-} from 'mobx-keystone';
+import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
 import { flatten, range } from 'lodash';
@@ -16,10 +14,11 @@ import { PathData } from '../../../common/path/PathData';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { TRI_NOTCH_LEVEL, triNotchPanel } from './util';
+import { augmentSegmentEndpoints } from '../util';
+import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import point = Flatten.point;
 import segment = Flatten.segment;
 import Segment = Flatten.Segment;
-import { augmentSegmentEndpoints } from '../util';
 
 const triNotchLevelToLabel = (level: TRI_NOTCH_LEVEL) => {
   switch (level) {
@@ -48,7 +47,7 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
 
 const POLYGON_SIDES = 6;
 
-@model('TriangleGridDivider')
+@widgetModel('TriangleGridDivider')
 export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
   hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,

@@ -4,9 +4,9 @@ import clsx from 'clsx';
 import { styled } from '@mui/styles';
 import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
-import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/models/WorkspaceModel';
 import { PathData } from '../../../../../../../../../common/path/PathData';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
+import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
 const classes = {
   textureNode: 'texture-node',

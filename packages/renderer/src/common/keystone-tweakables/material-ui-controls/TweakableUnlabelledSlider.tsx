@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { INPUT_TYPE, SliderMetadata, SliderWithTextMetadata } from '../types';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { getNearestHistoryFromAncestorNode } from '../../util/mobx-keystone';
 import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../../util/units';
+import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 function ValueLabelComponent({
   children,
