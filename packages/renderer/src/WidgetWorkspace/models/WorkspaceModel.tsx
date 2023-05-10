@@ -58,7 +58,7 @@ export const widgetOptions = new Map();
 observable(widgetOptions);
 
 export function widgetModel(modelName: string) {
-  return function (constructor: ModelClass<any>) {
+  return function <C extends ModelClass<BaseWidgetClass>>(constructor: C): C {
     const decoratedClass = model(modelName)(constructor);
     widgetOptions.set(modelName, decoratedClass);
     return decoratedClass;
