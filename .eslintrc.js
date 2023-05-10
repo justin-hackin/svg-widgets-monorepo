@@ -1,19 +1,26 @@
+const commonRules = {
+  'max-len': ['error', { code: 120 }],
+  'no-param-reassign': 0,
+  'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
+  'no-underscore-dangle': 0,
+  'func-names': 0,
+  'import/no-extraneous-dependencies': 0,
+};
+
 module.exports = {
-  env: {
-    browser: false,
-    node: true,
-  },
-  // javascript files config
-  extends: ['airbnb-base'],
-  rules: {
-    'max-len': ['error', { code: 120 }],
-    'no-param-reassign': 0,
-    'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
-    'no-underscore-dangle': 0,
-    'func-names': 0,
-    'import/no-extraneous-dependencies': 0,
-  },
   overrides: [
+    {
+      files: ['**/*.js'],
+      env: {
+        browser: false,
+        node: true,
+      },
+      // javascript files config
+      extends: ['airbnb-base'],
+      rules: {
+        ...commonRules,
+      },
+    },
     // typescript/react config
     {
       extends: ['airbnb', 'airbnb-typescript'],
@@ -28,13 +35,7 @@ module.exports = {
         project: '**/tsconfig.json',
       },
       rules: {
-        'max-classes-per-file': 0,
-        'max-len': ['error', { code: 120 }],
-        'no-continue': 0,
-        'no-param-reassign': 0,
-        'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
-        'no-underscore-dangle': 0,
-        'func-names': 0,
+        ...commonRules,
         '@typescript-eslint/naming-convention': 0,
         '@typescript-eslint/no-shadow': 0,
 
