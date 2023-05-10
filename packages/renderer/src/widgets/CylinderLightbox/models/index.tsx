@@ -1,6 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
 import { computed } from 'mobx';
-import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
@@ -12,9 +11,8 @@ import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakab
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../../common/path/PathData';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
-import { BaseWidgetClass } from '../../../WidgetWorkspace/widget-types/BaseWidgetClass';
 import { DisjunctAssetsDefinition } from '../../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -28,7 +26,7 @@ const rectanglePathCenteredOnOrigin = (width: number, height:number) => closedPo
 const polygonSideLength = (numSides: number, inRadius: number) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
 @widgetModel('CylinderLightbox')
-export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class CylinderLightboxWidgetModel extends WidgetExtendedModel({
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,
   }),

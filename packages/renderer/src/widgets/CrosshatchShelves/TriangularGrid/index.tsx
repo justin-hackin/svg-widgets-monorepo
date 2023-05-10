@@ -1,11 +1,9 @@
-import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
 import { flatten, range } from 'lodash';
 import Flatten from '@flatten-js/core';
 import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../../common/util/units';
-import { BaseWidgetClass } from '../../../WidgetWorkspace/widget-types/BaseWidgetClass';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
@@ -15,7 +13,7 @@ import { pathDToViewBoxStr } from '../../../common/util/svg';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { TRI_NOTCH_LEVEL, triNotchPanel } from './util';
 import { augmentSegmentEndpoints } from '../util';
-import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import point = Flatten.point;
 import segment = Flatten.segment;
 import Segment = Flatten.Segment;
@@ -48,7 +46,7 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
 const POLYGON_SIDES = 6;
 
 @widgetModel('TriangleGridDivider')
-export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class TriangularGridWidgetModel extends WidgetExtendedModel({
   hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,
   }),

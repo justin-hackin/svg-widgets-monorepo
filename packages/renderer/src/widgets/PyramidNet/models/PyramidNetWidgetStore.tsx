@@ -2,7 +2,7 @@
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
-import { ExtendedModel, modelAction, prop } from 'mobx-keystone';
+import { modelAction, prop } from 'mobx-keystone';
 import { computed, observable, reaction } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash';
@@ -20,7 +20,6 @@ import { AdditionalFileMenuItems } from '../components/AdditionalFileMenuItems';
 import { PanelContent } from '../components/PanelContent';
 import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
 import { AdditionalToolbarContent } from '../components/AdditionalToolbarContent';
-import { BaseWidgetClass } from '../../../WidgetWorkspace/widget-types/BaseWidgetClass';
 import { RegisteredAssetsDefinition } from '../../../WidgetWorkspace/widget-types/RegisteredAssetsDefinition';
 import { PyramidModel } from './PyramidModel';
 import {
@@ -47,7 +46,7 @@ import {
 import { closedPolygonPath, roundedEdgePath } from '../../../common/path/shapes/generic';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
-import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 
 const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
@@ -69,7 +68,7 @@ const applyFlap = (
 };
 
 @widgetModel('PolyhedralNet')
-export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class PyramidNetWidgetModel extends WidgetExtendedModel({
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),
   baseEdgeTabsSpec: prop<BaseEdgeTabsModel>(() => (new BaseEdgeTabsModel({}))),

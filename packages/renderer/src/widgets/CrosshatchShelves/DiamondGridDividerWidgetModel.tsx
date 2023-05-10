@@ -1,4 +1,3 @@
-import { ExtendedModel } from 'mobx-keystone';
 import { computed } from 'mobx';
 import React from 'react';
 import Flatten from '@flatten-js/core';
@@ -12,8 +11,7 @@ import { PathData } from '../../common/path/PathData';
 import { getBoundingBoxAttrs } from '../../common/util/svg';
 import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
-import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
-import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
+import { WidgetExtendedModel, widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import Point = Flatten.Point;
 import point = Flatten.point;
 import segment = Flatten.segment;
@@ -28,7 +26,7 @@ interface SegmentInfo {
 }
 
 @widgetModel('DiamondGridDivider')
-export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class DiamondGridDividerWidgetModel extends WidgetExtendedModel({
   ...dividerBaseModelProps,
   flushPostProcess: switchProp(false),
 }) {

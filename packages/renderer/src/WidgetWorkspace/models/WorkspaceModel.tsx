@@ -4,13 +4,13 @@ import {
   _async,
   _await,
   applySnapshot,
-  detach,
+  detach, ExtendedModel,
   getSnapshot,
   model,
   Model,
   modelAction,
   ModelClass,
-  modelFlow,
+  modelFlow, ModelProps,
   prop,
   SnapshotInOfModel,
 } from 'mobx-keystone';
@@ -63,6 +63,10 @@ export function widgetModel(modelName: string) {
     widgetOptions.set(modelName, decoratedClass);
     return decoratedClass;
   };
+}
+
+export function WidgetExtendedModel(modelProps: ModelProps) {
+  return ExtendedModel(BaseWidgetClass, modelProps);
 }
 
 @model('WorkspaceModel')
