@@ -27,6 +27,7 @@ import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 import { HistoryButtons } from '../../widgets/PyramidNet/components/HistoryButtons';
 import { useWorkspaceMst } from '../rootStore';
 import { AdditionalFileMenuItems } from './AdditionalFileMenuItems';
+import { AdditionalToolbarContent } from '../../widgets/PyramidNet/components/AdditionalToolbarContent';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
@@ -73,7 +74,7 @@ export const WidgetControlPanel = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { selectedStore }: { selectedStore: BaseWidgetClass } = workspaceStore;
   const {
-    AdditionalToolbarContent,
+    additionalToolbarContent,
     additionalFileMenuItems,
     PanelContent,
     history,
@@ -160,7 +161,8 @@ export const WidgetControlPanel = observer(() => {
                thus span wrapping required by tooltip for disabled buttons
             */}
             <HistoryButtons history={history} />
-            {AdditionalToolbarContent && <AdditionalToolbarContent />}
+            {additionalToolbarContent
+              && <AdditionalToolbarContent additionalToolbarContent={additionalToolbarContent} />}
             <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
               <MenuItem onClick={newHandler}>
                 <ListItemIcon className={classes.listItemIcon}>

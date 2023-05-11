@@ -6,6 +6,7 @@ import { modelAction, prop } from 'mobx-keystone';
 import { computed, observable, reaction } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash';
+import BrushIcon from '@mui/icons-material/Brush';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
@@ -18,7 +19,6 @@ import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
 import { PanelContent } from '../components/PanelContent';
 import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
-import { AdditionalToolbarContent } from '../components/AdditionalToolbarContent';
 import { RegisteredAssetsDefinition } from '../../../WidgetWorkspace/widget-types/RegisteredAssetsDefinition';
 import { PyramidModel } from './PyramidModel';
 import {
@@ -606,7 +606,11 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
 
   PanelContent = PanelContent;
 
-  AdditionalToolbarContent = AdditionalToolbarContent;
+  additionalToolbarContent = [{
+    tooltipText: 'Open texture editor',
+    ButtonIcon: BrushIcon,
+    action: () => { this.setTextureEditorOpen(true); },
+  }];
 
   additionalFileMenuItems = additionalFileMenuItemsFactory(this);
 

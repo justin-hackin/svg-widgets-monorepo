@@ -1,24 +1,25 @@
-import { IconButton, Tooltip } from '@mui/material';
-import BrushIcon from '@mui/icons-material/Brush';
-import React from 'react';
+import { IconButton, SvgIcon, Tooltip } from '@mui/material';
+import React, { MouseEventHandler } from 'react';
 
-import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
+export interface AdditionalToolbarItem {
+  ButtonIcon: typeof SvgIcon,
+  tooltipText: string,
+  action: MouseEventHandler,
+}
 
-export function AdditionalToolbarContent() {
-  const workspaceStore = useWorkspaceMst();
-  const pyramidNetStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
-  if (!pyramidNetStore) {
-    return null;
-  }
-
+export function AdditionalToolbarContent({ additionalToolbarContent }:
+{ additionalToolbarContent: AdditionalToolbarItem[] }) {
   return (
-    <Tooltip title="Open texture editor" arrow>
-      <IconButton
-        onClick={() => { pyramidNetStore.setTextureEditorOpen(true); }}
-      >
-        <BrushIcon />
-      </IconButton>
-    </Tooltip>
+    <>
+      {additionalToolbarContent.map(({ tooltipText, action, ButtonIcon }) => (
+        <Tooltip title={tooltipText} arrow>
+          <IconButton
+            onClick={action}
+          >
+            <ButtonIcon />
+          </IconButton>
+        </Tooltip>
+      ))}
+    </>
   );
 }
