@@ -4,7 +4,6 @@ const commonRules = {
   'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
   'no-underscore-dangle': 0,
   'func-names': 0,
-  'import/no-extraneous-dependencies': 0,
 };
 
 module.exports = {
@@ -37,20 +36,7 @@ module.exports = {
       rules: {
         ...commonRules,
         '@typescript-eslint/naming-convention': 0,
-        '@typescript-eslint/no-shadow': 0,
-
-        'import/extensions': 0,
-        // TODO: remove dep cycles
-        'import/no-cycle': 0,
-        'import/no-extraneous-dependencies': 0,
         'import/prefer-default-export': 0,
-        // TODO: remove below, enforce rule
-
-        'react/jsx-props-no-spreading': 0,
-        'react/no-array-index': 0,
-        'react/no-array-index-key': 0,
-        'react/prop-types': 0,
-        'react/require-default-props': 0,
       },
     }],
 };
