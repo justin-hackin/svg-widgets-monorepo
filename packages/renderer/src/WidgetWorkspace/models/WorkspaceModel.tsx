@@ -151,7 +151,7 @@ export class WorkspaceModel extends Model({
     // + creating a middleware variable currentSnapshotIsSaved
     // this will also allow history to become preserved across files with titlebar accuracy
     const currentSnapshot = getSnapshot(this.selectedStore);
-    // TODO: why does lodash isEqual fail to accurately compare these and why no comparator with mst?
+    // why does lodash isEqual fail to accurately compare these and why no comparator with mst?
     return JSON.stringify(this.savedSnapshot) === JSON.stringify(currentSnapshot);
   }
 

@@ -148,7 +148,6 @@ export class ShapePreviewModel {
       }),
     ];
 
-    // TODO: is IIFE needed here
     this.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
       const animate = () => {
         controls.update();
@@ -157,14 +156,6 @@ export class ShapePreviewModel {
       };
       return animate;
     })(this.renderer, this.controls, this.camera, this.scene));
-
-    // // TODO: Can instantiation be deferred until canvas available?
-    // return () => {
-    //   cancelAnimationFrame(this.animationFrame);
-    //   for (const disposer of disposers) {
-    //     disposer();
-    //   }
-    // };
   }
 
   @observable
@@ -203,7 +194,7 @@ export class ShapePreviewModel {
 
   animationFrame = null;
 
-  // TODO = make this value adjustable with alpha texture on (changes result in loss of shadows;
+  // TODO: experiment with this value being adjustable (changes result in loss of shadows)
   IDEAL_RADIUS = 6;
 
   TEXTURE_BITMAP_SCALE = 0.5;

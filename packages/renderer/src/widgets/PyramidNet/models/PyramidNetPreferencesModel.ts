@@ -30,7 +30,6 @@ export class PyramidNetPreferencesModel extends Model({
   }),
   needsTour: prop(true)
     .withSetter(),
-  // TODO: how to do enum property in keystone
   printRegistrationType: radioProp<PRINT_REGISTRATION_TYPES>(PRINT_REGISTRATION_TYPES.LASER_CUTTER, {
     options: Object.values(PRINT_REGISTRATION_TYPES)
       .map((type) => ({

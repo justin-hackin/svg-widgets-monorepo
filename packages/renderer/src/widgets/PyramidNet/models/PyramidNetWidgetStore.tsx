@@ -596,7 +596,6 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       });
   }
 
-  // TODO: make DRY with WorkspacePreferences
   @modelAction
   resetPreferences() {
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);

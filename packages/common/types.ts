@@ -5,8 +5,8 @@ interface PathPatternInfo {
 }
 
 interface ImagePatternInfo {
+  // TODO: consider this could be inferred from pattern
   isPath: false,
-  // TODO: this could be flattened now that it's not being used as a snapshotIn (post-MST)
   pattern: {
     imageData: string,
     dimensions: {

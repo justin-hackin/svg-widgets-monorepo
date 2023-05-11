@@ -63,7 +63,6 @@ export const DielinesLayer = observer(({
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
   // graphtec type frames with rectangle but laser type has registration L marks facing outward
-  // TODO: consider making DRY with PrintLayer
   const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
     ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
   const fittingBB = (
@@ -150,7 +149,6 @@ export const DielinesLayer = observer(({
   return (
     <DielineGroup>
       <g transform={fitToCanvasTranslationStr}>
-        {/* TODO: consider using something like <Switch>/<ElseIf>, hard to read */}
         {
             faceDecoration instanceof PositionableFaceDecorationModel
             && faceDecoration?.pattern instanceof ImageFaceDecorationPatternModel

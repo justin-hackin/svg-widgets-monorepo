@@ -35,7 +35,6 @@ const STROKE_DASH_PATH_PATTERN_MODEL_TYPE = 'StrokeDashPathPatternModel';
 
 @model(STROKE_DASH_PATH_PATTERN_MODEL_TYPE)
 export class StrokeDashPathPatternModel extends Model({
-  // TODO: even number length typing?
   relativeStrokeDasharray: prop<number[]>(),
 }) {
   @computed
@@ -46,13 +45,17 @@ export class StrokeDashPathPatternModel extends Model({
   getRefId() {
     return this.label;
   }
+
+  onInit() {
+    if (this.relativeStrokeDasharray.length % 2 !== 0) {
+      throw new Error('relativeStrokeDasharray was not divisible by 2');
+    }
+  }
 }
 
 const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
   onResolvedValueChange(ref, newInst, oldInst) {
     if (oldInst && !newInst) {
-      // if the todo value we were referencing disappeared then remove the reference
-      // from its parent
       detach(ref);
     }
   },
@@ -76,7 +79,6 @@ export class DashPatternModel extends Model({
       return node.ownPropertyName;
     },
     typeRef: patternRef,
-    // TODO: make root store type generic
     options: (rootStore) => () => ((rootStore as WorkspaceModel).selectedStore as PyramidNetWidgetModel).dashPatterns
       .map((pattern) => ({
         value: pattern,

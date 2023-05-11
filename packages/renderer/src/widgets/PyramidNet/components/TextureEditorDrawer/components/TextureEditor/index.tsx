@@ -78,8 +78,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
   if (!pyramidNetPluginStore?.textureEditor || faceDecoration instanceof RawFaceDecorationModel) {
     return null;
   }
-  // TODO: drag and drop functionality, removed in fd71f4aba9dd4a698e5a2667595cff82c8fb5cf5
-  // see commit message for rationale
+  // TODO: drag and drop functionality (post-electron)
 
   const joyrideCallback = ({
     type, step, index, action,

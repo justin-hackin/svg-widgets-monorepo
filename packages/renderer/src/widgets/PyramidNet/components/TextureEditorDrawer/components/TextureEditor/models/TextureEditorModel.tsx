@@ -33,7 +33,6 @@ import { PathFaceDecorationPatternModel } from '../../../../../models/PathFaceDe
 import { PatternInfo } from '../../../../../../../../../common/types';
 import { electronApi } from '../../../../../../../../../common/electron';
 
-// TODO: put in preferences
 const DEFAULT_IS_POSITIVE = true;
 const DEFAULT_VIEW_SCALE = 0.7;
 
@@ -296,16 +295,12 @@ export class TextureEditorModel {
     this.shapePreviewIsFullScreen = isFullScreen;
   }
 
-  // TODO: duplicated in PyramidNetMakerStore, consider a common model prototype across BrowserWindows
   @computed
   get fileBasename() {
     return `${this.shapeName.value || 'shape'}__${
       tryResolvePath(this, ['texture', 'pattern', 'sourceFileName']) || 'undecorated'}`;
   }
 
-  // TODO: add limits for view scale and
-  // these seem like the domain of the texture model but setters for
-  // textureScaleDiff (and more to follow) need boundary
   @action
   absoluteMovementToSvg(absCoords) {
     return scalePoint(absCoords, 1 / (this.viewerModel.viewScaleDragged * this.faceFittingScale.scale));
@@ -419,9 +414,6 @@ export class TextureEditorModel {
     }
   }
 
-  // TODO: although it may be ok to directly edit the dieline texture in the texture editor,
-  //  consider using drafts with own history or scope history to on opened state of texture
-
   @action
   saveTextureArrangement() {
     if (!this.faceDecoration) { return; }
@@ -447,7 +439,6 @@ export class TextureEditorModel {
     this.parentPyramidNetWidgetModel.setFaceDecoration(fromSnapshot<PositionableFaceDecorationModel>(textureSnapshot));
   }
 
-  // TODO: ts type the patternInfo
   @action
   assignTextureFromPatternInfo(patternInfo: PatternInfo) {
     if (patternInfo) {

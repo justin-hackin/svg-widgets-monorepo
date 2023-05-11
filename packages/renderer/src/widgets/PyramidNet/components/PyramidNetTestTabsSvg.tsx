@@ -28,7 +28,7 @@ export function PyramidNetTestTabs({ widgetStore }: { widgetStore: PyramidNetWid
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {tabs.reduce((acc, { id, paths }) => {
-        // TODO: the boundingViewBoxAttrs doesn't calculate path region property (seems to include control points),
+        // NOTE: the boundingViewBoxAttrs doesn't calculate path region property (seems to include control points),
         // thus items are improperly spaced
         const { ymin, ymax } = getBoundingBoxAttrs(paths.cut.getD());
         acc.y += -1 * ymin;

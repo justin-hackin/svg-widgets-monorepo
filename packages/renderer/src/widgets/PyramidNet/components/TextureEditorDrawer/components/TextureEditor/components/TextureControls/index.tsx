@@ -403,7 +403,6 @@ export const TextureControls = observer(({ hasCloseButton }) => {
               }}
               variant="filled"
             />
-            {/* TODO: use draft? */}
           </>
         )}
         { IS_WEB_BUILD && (

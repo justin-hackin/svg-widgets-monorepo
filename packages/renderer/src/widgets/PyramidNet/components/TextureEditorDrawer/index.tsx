@@ -7,7 +7,6 @@ import { PyramidNetWidgetModel } from '../../models/PyramidNetWidgetStore';
 import { TextureEditor } from './components/TextureEditor';
 import { useWorkspaceMst } from '../../../../WidgetWorkspace/rootStore';
 
-// TODO: make #texture-bounds based on path bounds and account for underflow, giving proportional margin
 const DrawerStyled = styled(Drawer)({
   '& .MuiDrawer-paper': {
     width: '100%',

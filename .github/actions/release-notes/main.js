@@ -1,5 +1,3 @@
-// TODO: Refactor this action
-
 const {execSync} = require('child_process');
 
 /**

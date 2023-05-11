@@ -45,7 +45,6 @@ export interface OptionsListItem<T> {
   label?: string,
 }
 
-// TODO: is this the best parameter order?
 export type OptionsListResolverFactory<T> = (rootStore: object, node: object) => (() => OptionsListItem<T>[]);
 export type MetadataOptions<T> = OptionsListItem<T>[] | OptionsListResolverFactory<T>;
 

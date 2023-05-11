@@ -21,7 +21,6 @@ export const ScoreControls = observer(() => {
       />
       {useDottedStroke && (
         <>
-          {/* TODO: add headers, consider computed labelOverride */}
           <TweakableChildrenInputs parentNode={interFaceScoreDashSpec} />
           <TweakableChildrenInputs parentNode={baseScoreDashSpec} />
 

@@ -103,7 +103,6 @@ export const WidgetControlPanel = observer(() => {
     setSettingsDialogIsOpen(false);
   };
 
-  // TODO: move handler logic into WorkspaceModel actions
   const newHandler = () => {
     workspaceStore.newWidget();
     resetFileMenuRef();
