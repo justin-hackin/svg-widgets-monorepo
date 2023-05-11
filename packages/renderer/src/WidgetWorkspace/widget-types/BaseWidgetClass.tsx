@@ -1,7 +1,14 @@
 import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
 import { FC } from 'react';
 import { observable } from 'mobx';
-import { AdditionalFileMenuItemsProps, AssetDefinition } from './types';
+import { SvgIcon } from '@mui/material';
+import { AssetDefinition } from './types';
+
+export interface FileMenuItem {
+  action: Function,
+  MenuIcon: typeof SvgIcon,
+  menuText: string,
+}
 
 export abstract class BaseWidgetClass extends Model({}) {
   abstract get fileBasename(): string;
@@ -13,7 +20,7 @@ export abstract class BaseWidgetClass extends Model({}) {
   // see https://github.com/Microsoft/TypeScript/issues/6413#issuecomment-361869751
   AdditionalToolbarContent?: () => JSX.Element;
 
-  AdditionalFileMenuItems?: FC<AdditionalFileMenuItemsProps>;
+  additionalFileMenuItems?: FileMenuItem[];
 
   AdditionalMainContent?: FC;
 

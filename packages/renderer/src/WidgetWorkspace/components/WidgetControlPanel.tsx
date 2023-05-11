@@ -26,6 +26,7 @@ import { AssetsAccordion } from './AssetsAccordion';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 import { HistoryButtons } from '../../widgets/PyramidNet/components/HistoryButtons';
 import { useWorkspaceMst } from '../rootStore';
+import { AdditionalFileMenuItems } from './AdditionalFileMenuItems';
 
 const OPEN_TXT = 'Open';
 const SAVE_TXT = 'Save';
@@ -73,7 +74,7 @@ export const WidgetControlPanel = observer(() => {
   const { selectedStore }: { selectedStore: BaseWidgetClass } = workspaceStore;
   const {
     AdditionalToolbarContent,
-    AdditionalFileMenuItems,
+    additionalFileMenuItems,
     PanelContent,
     history,
   } = selectedStore;
@@ -188,7 +189,13 @@ export const WidgetControlPanel = observer(() => {
                 </ListItemIcon>
                 <Typography variant="inherit">Save as ...</Typography>
               </MenuItem>
-              {AdditionalFileMenuItems && <AdditionalFileMenuItems resetFileMenuRef={resetFileMenuRef} />}
+              {additionalFileMenuItems
+                && (
+                <AdditionalFileMenuItems
+                  additionalFileMenuItems={additionalFileMenuItems}
+                  resetFileMenuRef={resetFileMenuRef}
+                />
+                )}
             </Menu>
             <IconButton
               onClick={handleSettingsDialogOpen}

@@ -16,7 +16,6 @@ import { DecorationBoundarySVG } from '../components/DecorationBoundarySVG';
 import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
-import { AdditionalFileMenuItems } from '../components/AdditionalFileMenuItems';
 import { PanelContent } from '../components/PanelContent';
 import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
 import { AdditionalToolbarContent } from '../components/AdditionalToolbarContent';
@@ -47,6 +46,7 @@ import { closedPolygonPath, roundedEdgePath } from '../../../common/path/shapes/
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
 import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { additionalFileMenuItemsFactory } from '../components/additionalFileMenuItemsFactory';
 
 const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
@@ -608,7 +608,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
 
   AdditionalToolbarContent = AdditionalToolbarContent;
 
-  AdditionalFileMenuItems = AdditionalFileMenuItems;
+  additionalFileMenuItems = additionalFileMenuItemsFactory(this);
 
   AdditionalMainContent = TextureEditorDrawer;
 }
