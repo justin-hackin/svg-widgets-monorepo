@@ -12,7 +12,7 @@ import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
   TextureEditorModel,
 } from '../components/TextureEditorDrawer/components/TextureEditor/models/TextureEditorModel';
-import { DashPatternModel, dashPatternsDefaultFn, strokeDashPath } from '../../../common/path/shapes/strokeDashPath';
+import { DashPatternModel, strokeDashPath } from '../../../common/path/shapes/strokeDashPath';
 import { DecorationBoundarySVG } from '../components/DecorationBoundarySVG';
 import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
@@ -81,12 +81,10 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
   useDottedStroke: prop(false),
   baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
   interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
+  // dashPatterns: prop(() => dashPatternsDefaultFn()),
 }) {
   @observable
     textureEditorOpen = false;
-
-  @observable
-    dashPatterns = dashPatternsDefaultFn();
 
   preferences = new PyramidNetPreferencesModel({});
 
