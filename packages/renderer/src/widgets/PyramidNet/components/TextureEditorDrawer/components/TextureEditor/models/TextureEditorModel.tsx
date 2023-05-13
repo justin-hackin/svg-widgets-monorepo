@@ -63,7 +63,7 @@ const MAX_VIEW_SCALE = 3;
 
 @model('TextureEditorViewerModel')
 export class TextureEditorViewerModel extends Model({
-  viewScale: prop<number>(DEFAULT_VIEW_SCALE),
+  viewScale: prop<number>(DEFAULT_VIEW_SCALE).withSetter(),
   modifierTracking: prop<ModifierTrackingModel>(() => new ModifierTrackingModel({})),
   nodeScaleMux: sliderProp(1, {
     labelOverride: 'Node size', min: 0.1, max: 10, step: DEFAULT_SLIDER_STEP,
@@ -88,7 +88,7 @@ export class TextureEditorViewerModel extends Model({
   }
 
   @modelAction
-  setViewScaleDiff(mux) {
+  setViewScaleDiffClamped(mux) {
     if (inRange(mux * this.viewScale, MIN_VIEW_SCALE, MAX_VIEW_SCALE)) {
       this.viewScaleDiff = mux;
     }
@@ -96,19 +96,24 @@ export class TextureEditorViewerModel extends Model({
 
   @modelAction
   reconcileViewScaleDiff() {
-    this.viewScale = this.viewScaleDragged;
-    this.viewScaleDiff = 1;
+    this.setViewScale(this.viewScaleDragged);
+    this.setViewScaleDiffClamped(1);
   }
 }
 
 export class TextureEditorModel {
   constructor(parentPyramidNetWidgetModel: PyramidNetWidgetModel) {
-    this.parentPyramidNetWidgetModel = parentPyramidNetWidgetModel;
+    this.setParentPyramidNetWidgetModel(parentPyramidNetWidgetModel);
     makeObservable(this);
   }
 
   @observable
     parentPyramidNetWidgetModel: PyramidNetWidgetModel;
+
+  @action
+  setParentPyramidNetWidgetModel(parentPyramidNetWidgetModel) {
+    this.parentPyramidNetWidgetModel = parentPyramidNetWidgetModel;
+  }
 
   @observable
     viewerModel = new TextureEditorViewerModel({});
@@ -228,7 +233,7 @@ export class TextureEditorModel {
   @action
   setShowNodes(showNodes) {
     this.showNodes = showNodes;
-    if (!this.showNodes) { this.selectedTextureNodeIndex = undefined; }
+    if (!this.showNodes) { this.setSelectedTextureNodeIndex(undefined); }
   }
 
   @action
@@ -240,12 +245,12 @@ export class TextureEditorModel {
     }
     const { height, width, xmin } = boundingBoxAttrs;
     const { scale, widthIsClamp } = this.imageCoverScale;
-    this.faceDecoration.transform = new TransformModel({
+    this.faceDecoration.setTransform(new TransformModel({
       translate: widthIsClamp
         ? { x: xmin, y: (height - (textureDimensions.height * scale)) / 2 }
         : { x: xmin + (width - (textureDimensions.width * scale)) / 2, y: 0 },
       scale,
-    });
+    }));
   }
 
   @action
@@ -258,8 +263,8 @@ export class TextureEditorModel {
 
   @action
   resetNodesEditor() {
-    this.showNodes = false;
-    this.selectedTextureNodeIndex = null;
+    this.setShowNodes(false);
+    this.setSelectedTextureNodeIndex(null);
   }
 
   @action
@@ -326,11 +331,11 @@ export class TextureEditorModel {
       this.faceDecoration.transformMatrixDragged,
       this.faceDecoration.transform.transformOrigin,
     );
-    this.faceDecoration.transform.translate = sumPoints(
+    this.faceDecoration.transform.setTranslate(sumPoints(
       this.faceDecoration.transform.translate,
       scalePoint(originAbsolute, -1),
       point,
-    );
+    ));
   }
 
   @action
@@ -350,7 +355,9 @@ export class TextureEditorModel {
     }
     const svgTextureNode = transformPoint(this.faceDecoration.transformMatrixDragged, this.selectedTextureNode);
     const diff = sumPoints(svgTextureNode, scalePoint(point, -1));
-    this.faceDecoration.transform.translate = sumPoints(scalePoint(diff, -1), this.faceDecoration.transform.translate);
+    this.faceDecoration.transform.setTranslate(
+      sumPoints(scalePoint(diff, -1), this.faceDecoration.transform.translate),
+    );
   }
 
   @action
@@ -383,7 +390,7 @@ export class TextureEditorModel {
       transformOrigin, translate, scale, rotate,
     } = this.faceDecoration.transform;
     const newTransformOrigin = sumPoints(delta, transformOrigin);
-    this.faceDecoration.transform.translate = sumPoints(
+    this.faceDecoration.transform.setTranslate(sumPoints(
       translate,
       scalePoint(calculateTransformOriginChangeOffset(
         transformOrigin,
@@ -392,8 +399,8 @@ export class TextureEditorModel {
         rotate,
         translate,
       ), -1),
-    );
-    this.faceDecoration.transform.transformOrigin = newTransformOrigin;
+    ));
+    this.faceDecoration.transform.setTransformOrigin(newTransformOrigin);
   }
 
   @action

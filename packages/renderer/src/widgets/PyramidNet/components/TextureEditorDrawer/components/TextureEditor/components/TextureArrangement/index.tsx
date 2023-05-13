@@ -44,7 +44,7 @@ export const TextureArrangement = observer(() => {
 
     if (dragMode === DRAG_MODES.SCALE_VIEW) {
       if (down) {
-        textureEditor.viewerModel.setViewScaleDiff((movementPt.y / placementAreaDimensions.height) + 1);
+        textureEditor.viewerModel.setViewScaleDiffClamped((movementPt.y / placementAreaDimensions.height) + 1);
       } else {
         textureEditor.viewerModel.reconcileViewScaleDiff();
         incrementTransformTracking(TRANSFORM_METHODS.DRAG, TRANSFORM_OPERATIONS.SCALE_VIEW);
@@ -110,7 +110,7 @@ export const TextureArrangement = observer(() => {
       const percentHeightDelta = (y / placementAreaDimensions.height);
       if (dragMode === DRAG_MODES.SCALE_VIEW) {
         const newViewScaleMux = (percentHeightDelta + 1) * viewScaleDiff;
-        textureEditor.viewerModel.setViewScaleDiff(newViewScaleMux);
+        textureEditor.viewerModel.setViewScaleDiffClamped(newViewScaleMux);
         return;
       }
       if (!faceDecoration) { return; }

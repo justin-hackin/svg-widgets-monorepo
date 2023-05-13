@@ -10,11 +10,13 @@ export function AdditionalFileMenuItems({ resetFileMenuRef, additionalFileMenuIt
 : { resetFileMenuRef: Function, additionalFileMenuItems: FileMenuItem[] }) {
   return (
     <>
-      {additionalFileMenuItems.map(({ MenuIcon, menuText, action }) => (
-        <MenuItem onClick={async () => {
-          await action();
-          resetFileMenuRef();
-        }}
+      {additionalFileMenuItems.map(({ MenuIcon, menuText, action }, index) => (
+        <MenuItem
+          key={index}
+          onClick={async () => {
+            await action();
+            resetFileMenuRef();
+          }}
         >
           <ListItemIconStyled>
             <MenuIcon fontSize="small" />

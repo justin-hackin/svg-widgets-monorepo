@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
-import { computed, observable, reaction } from 'mobx';
+import {
+  action, computed, observable, reaction,
+} from 'mobx';
 import {
   _async,
   _await,
@@ -72,10 +74,15 @@ export function WidgetExtendedModel(modelProps: ModelProps) {
 @model('WorkspaceModel')
 export class WorkspaceModel extends Model({
   selectedStore: prop<BaseWidgetClass>(undefined).withSetter(),
-  preferences: prop(() => (new WorkspacePreferencesModel({}))),
+  preferences: prop(() => (new WorkspacePreferencesModel({}))).withSetter(),
 }) {
   @observable
     selectedWidgetModelType: string = null;
+
+  @action
+  setSelectedWidgetModelType(selectedWidgetModelType) {
+    this.selectedWidgetModelType = selectedWidgetModelType;
+  }
 
   @observable
     savedSnapshot = undefined;
@@ -109,7 +116,7 @@ export class WorkspaceModel extends Model({
   onAttachedToRootStore() {
     if (this.availableWidgetTypes.length === 1) {
       // @ts-ignore
-      this.selectedWidgetModelType = widgetList[0].$modelType;
+      this.setSelectedWidgetModelType(widgetList[0].$modelType);
       this.resetModelToDefault();
     } else {
       this.newWidget();
@@ -180,12 +187,12 @@ export class WorkspaceModel extends Model({
     );
   }
 
-  @modelAction
+  @action
   setWidgetPickerOpen(val: boolean) {
     this.widgetPickerOpen = val;
   }
 
-  @modelAction
+  @action
   newWidget() {
     if (this.availableWidgetTypes.length > 1) {
       this.setWidgetPickerOpen(true);
@@ -194,27 +201,27 @@ export class WorkspaceModel extends Model({
     }
   }
 
-  @modelAction
+  @action
   setAlertDialogContent(content: ReactNode) {
     this.alertDialogContent = content;
   }
 
-  @modelAction
+  @action
   resetAlertDialogContent() {
     this.alertDialogContent = null;
   }
 
-  @modelAction
+  @action
   fitToDocument() {
     this.setZoomPanValue(fitToViewer(this.zoomPanValue));
   }
 
-  @modelAction
+  @action
   setZoomPanTool(tool: Tool) {
     this.zoomPanTool = tool;
   }
 
-  @modelAction
+  @action
   setZoomPanValue(value: Value) {
     this.zoomPanValue = value;
   }
@@ -234,7 +241,7 @@ export class WorkspaceModel extends Model({
   @modelAction
   resetPreferences() {
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
-    this.preferences = new WorkspacePreferencesModel({});
+    this.setPreferences(new WorkspacePreferencesModel({}));
     return this.persistPreferences();
   }
 
@@ -252,10 +259,10 @@ export class WorkspaceModel extends Model({
     this.resetCurrentFileData();
   }
 
-  @modelAction
+  @action
   newWidgetStore(widgetType: string) {
     if (widgetType !== this.selectedWidgetModelType) {
-      this.selectedWidgetModelType = widgetType;
+      this.setSelectedWidgetModelType(widgetType);
     }
 
     this.resetModelToDefault();
@@ -303,7 +310,6 @@ export class WorkspaceModel extends Model({
   //   }
   // }
 
-  @modelAction
   getWidgetSpecJSON(): WidgetJSON {
     const snapshot = getSnapshot(this.selectedStore);
     return {

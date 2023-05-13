@@ -69,16 +69,16 @@ export class BaseEdgeTabsModel extends Model({
   tabConjunctionClearance: sliderWithTextProp(0.1, {
     min: 0.05, max: 0.4, step: 0.01,
   }),
-  bendGuideValley: prop<BendGuideValleyModel | undefined>(() => undefined),
+  bendGuideValley: prop<BendGuideValleyModel | undefined>(() => undefined).withSetter(),
 }) {
   @modelAction
   unsetBendGuideValley() {
-    this.bendGuideValley = null;
+    this.setBendGuideValley(undefined);
   }
 
   @modelAction
   resetBendGuideValleyToDefault() {
-    this.bendGuideValley = new BendGuideValleyModel({});
+    this.setBendGuideValley(new BendGuideValleyModel({}));
   }
 }
 

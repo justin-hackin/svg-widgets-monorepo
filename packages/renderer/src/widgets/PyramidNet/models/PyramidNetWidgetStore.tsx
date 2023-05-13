@@ -3,7 +3,9 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
 import { modelAction, prop } from 'mobx-keystone';
-import { computed, observable, reaction } from 'mobx';
+import {
+  action, computed, observable, reaction,
+} from 'mobx';
 import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash';
 import BrushIcon from '@mui/icons-material/Brush';
@@ -560,7 +562,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
     );
   }
 
-  @modelAction
+  @action
   setTextureEditorOpen(isOpen) {
     if (this.faceDecoration instanceof RawFaceDecorationModel) {
       // texture editor directly references faceDecoration and will not render TextureSvg if it is Raw
@@ -569,7 +571,6 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
     this.textureEditorOpen = isOpen;
   }
 
-  @modelAction
   renderDecorationBoundaryToString():string {
     return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: this }));
   }
@@ -582,7 +583,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
     }`;
   }
 
-  @modelAction
+  @action
   persistPreferences() {
     return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
       .catch((e) => {
@@ -594,7 +595,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       });
   }
 
-  @modelAction
+  @action
   resetPreferences() {
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
     this.preferences = new PyramidNetPreferencesModel({});

@@ -11,8 +11,8 @@ export function AdditionalToolbarContent({ additionalToolbarContent }:
 { additionalToolbarContent: AdditionalToolbarItem[] }) {
   return (
     <>
-      {additionalToolbarContent.map(({ tooltipText, action, ButtonIcon }) => (
-        <Tooltip title={tooltipText} arrow>
+      {additionalToolbarContent.map(({ tooltipText, action, ButtonIcon }, index) => (
+        <Tooltip key={index} title={tooltipText} arrow>
           <IconButton
             onClick={action}
           >

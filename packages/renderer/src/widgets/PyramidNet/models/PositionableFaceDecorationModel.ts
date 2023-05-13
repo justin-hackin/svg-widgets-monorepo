@@ -97,46 +97,46 @@ export class PositionableFaceDecorationModel extends Model({
   @modelAction
   setScaleDiff(mux) {
     this.parentHistoryManager.withoutUndo(() => {
-      this.transformDiff.scale = mux;
+      this.transformDiff.setScale(mux);
     });
   }
 
   @modelAction
   reconcileScaleDiff() {
     this.transform.scale *= this.transformDiff.scale;
-    this.transformDiff.scale = 1;
+    this.transformDiff.setScale(1);
   }
 
   @modelAction
   setTranslateDiff(delta) {
     this.parentHistoryManager.withoutUndo(() => {
-      this.transformDiff.translate = delta;
+      this.transformDiff.setTranslate(delta);
     });
   }
 
   @modelAction
   reconcileTranslateDiff() {
-    this.transform.translate = sumPoints(this.transform.translate, this.transformDiff.translate);
-    this.transformDiff.translate = getOriginPoint();
+    this.transform.setTranslate(sumPoints(this.transform.translate, this.transformDiff.translate));
+    this.transformDiff.setTranslate(getOriginPoint());
   }
 
   @modelAction
   setRotateDiff(delta) {
     this.parentHistoryManager.withoutUndo(() => {
-      this.transformDiff.rotate = delta;
+      this.transformDiff.setRotate(delta);
     });
   }
 
   @modelAction
   reconcileRotateDiff() {
-    this.transform.rotate = wrapDegrees(this.transform.rotate + this.transformDiff.rotate);
-    this.transformDiff.rotate = 0;
+    this.transform.setRotate(wrapDegrees(this.transform.rotate + this.transformDiff.rotate));
+    this.transformDiff.setRotate(0);
   }
 
   @modelAction
   setTransformOriginDiff(delta) {
     this.parentHistoryManager.withoutUndo(() => {
-      this.transformDiff.transformOrigin = delta;
+      this.transformDiff.setTransformOrigin(delta);
     });
   }
 
@@ -149,8 +149,8 @@ export class PositionableFaceDecorationModel extends Model({
       this.rotateDragged,
       this.translateDragged,
     );
-    this.transform.transformOrigin = this.transformOriginDragged;
-    this.transform.translate = sumPoints(this.transform.translate, scalePoint(relativeDifference, -1));
-    this.transformDiff.transformOrigin = getOriginPoint();
+    this.transform.setTransformOrigin(this.transformOriginDragged);
+    this.transform.setTranslate(sumPoints(this.transform.translate, scalePoint(relativeDifference, -1)));
+    this.transformDiff.setTransformOrigin(getOriginPoint());
   }
 }

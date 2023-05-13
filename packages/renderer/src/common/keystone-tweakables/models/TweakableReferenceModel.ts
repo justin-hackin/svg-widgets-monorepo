@@ -8,7 +8,7 @@ import { ReferenceMetadata } from '../types';
 
 @model('TweakableReferenceModel')
 export class TweakableReferenceModel<T extends object, M extends ReferenceMetadata> extends Model(
-  <T extends object>() => ({ valueRef: prop<Ref<T> | undefined>() }),
+  <T extends object>() => ({ valueRef: prop<Ref<T> | undefined>().withSetter() }),
 )<T> {
   // helps prevent controls from being rendered before onAttachedToRootStore has a chance to set up metadata getters
   @observable
@@ -26,7 +26,7 @@ export class TweakableReferenceModel<T extends object, M extends ReferenceMetada
 
   @modelAction
   setValue(modelValue: T) {
-    this.valueRef = this.metadata.typeRef(modelValue);
+    this.setValueRef(this.metadata.typeRef(modelValue));
   }
 
   // a bit un-DRY

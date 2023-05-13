@@ -8,8 +8,7 @@ import { PrimitiveMetadata } from '../types';
 
 @model('TweakablePrimitiveModel')// eslint-disable-next-line @typescript-eslint/no-shadow
 export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Model(<T>() => ({
-  value: prop<T>()
-    .withSetter(),
+  value: prop<T>().withSetter(),
 }))<T> {
   // helps prevent controls from being rendered before onAttachedToRootStore has a chance to set up metadata getters
   @observable
@@ -19,7 +18,7 @@ export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Mod
 
   @modelAction
   reset() {
-    this.value = this.defaultValue;
+    this.setValue(this.defaultValue);
   }
 
   @computed
