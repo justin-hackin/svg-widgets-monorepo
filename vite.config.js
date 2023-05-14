@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => ({
       safari10: false,
     },
     emptyOutDir: true,
-    brotliSize: false,
+    reportCompressedSize: false,
   },
 }
 ));
