@@ -50,6 +50,7 @@ import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/model
 import { additionalFileMenuItemsFactory } from '../components/additionalFileMenuItemsFactory';
 import { FileInputs } from '../components/FileInputs';
 import { DEFAULT_SLIDER_STEP } from '../../../common/constants';
+import previewIcon from '../static/widget-preview.png';
 
 const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
@@ -70,7 +71,7 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-@widgetModel('PolyhedralNet')
+@widgetModel('PolyhedralNet', previewIcon)
 export class PyramidNetWidgetModel extends WidgetExtendedModel({
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),

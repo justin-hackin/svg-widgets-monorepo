@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     assetsDir: '.',
     dynamicImportVarsOptions: {
-      include: ['static/**/*.jpg', 'static/**/*.png', 'static/**/*.gltf'],
+      include: ['**/static/**/*.jpg', '**/static/**/*.png', '**/static/**/*.gltf'],
     },
     // web mode is also for production
     minify: mode === 'development' ? false : 'terser',

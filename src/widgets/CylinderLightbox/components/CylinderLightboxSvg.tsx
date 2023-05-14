@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CylinderLightboxWidgetModel } from '../models';
+import { CylinderLightboxWidgetModel } from '../index';
 
 export function CylinderLightboxSvg({ widgetStore }: { widgetStore: CylinderLightboxWidgetModel }) {
   const {

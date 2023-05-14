@@ -12,6 +12,8 @@ import { getBoundingBoxAttrs } from '../../common/util/svg';
 import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
 import { WidgetExtendedModel, widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
+import widgetPreview from './previews/diamond-grid-divider.png';
+
 import Point = Flatten.Point;
 import point = Flatten.point;
 import segment = Flatten.segment;
@@ -25,7 +27,7 @@ interface SegmentInfo {
   firstIndex: number,
 }
 
-@widgetModel('DiamondGridDivider')
+@widgetModel('DiamondGridDivider', widgetPreview)
 export class DiamondGridDividerWidgetModel extends WidgetExtendedModel({
   ...dividerBaseModelProps,
   flushPostProcess: switchProp(false),

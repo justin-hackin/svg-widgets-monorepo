@@ -78,7 +78,7 @@ export const ShapeSelect = observer(({
               <Avatar
                 alt={label}
                 className={classes.shapeAvatar}
-                src={new URL(`../../../../static/images/model-previews/${value}.png`, import.meta.url).href}
+                src={new URL(`../static/model-previews/${value}.png`, import.meta.url).href}
               />
             </ListItemAvatar>
             <ListItemText className={classes.shapeName} primary={label} />

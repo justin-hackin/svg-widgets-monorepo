@@ -56,11 +56,14 @@ const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 
 export const widgetOptions = new Map();
 observable(widgetOptions);
+export const widgetIconMap = new Map();
+observable(widgetIconMap);
 
-export function widgetModel(modelName: string) {
+export function widgetModel(modelName: string, previewIcon: string) {
   return function <C extends ModelClass<BaseWidgetClass>>(constructor: C): C {
     const decoratedClass = model(modelName)(constructor);
     widgetOptions.set(modelName, decoratedClass);
+    widgetIconMap.set(modelName, previewIcon);
     return decoratedClass;
   };
 }

@@ -3,16 +3,17 @@ import { computed } from 'mobx';
 import React from 'react';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
-} from '../../../common/util/geom';
-import { subtractDValues, unifyDValues } from '../../../common/util/path-boolean';
-import { PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
-import { sliderProp, sliderWithTextProp } from '../../../common/keystone-tweakables/props';
-import { closedPolygonPath } from '../../../common/path/shapes/generic';
-import { DestinationCommand, PathData } from '../../../common/path/PathData';
-import { pathDToViewBoxStr } from '../../../common/util/svg';
-import { DisjunctAssetsDefinition } from '../../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { DEFAULT_SLIDER_STEP } from '../../../common/constants';
+} from '../../common/util/geom';
+import { subtractDValues, unifyDValues } from '../../common/util/path-boolean';
+import { PIXELS_PER_CM, radToDeg } from '../../common/util/units';
+import { sliderProp, sliderWithTextProp } from '../../common/keystone-tweakables/props';
+import { closedPolygonPath } from '../../common/path/shapes/generic';
+import { DestinationCommand, PathData } from '../../common/path/PathData';
+import { pathDToViewBoxStr } from '../../common/util/svg';
+import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
+import { WidgetExtendedModel, widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
+import { DEFAULT_SLIDER_STEP } from '../../common/constants';
+import widgetPreview from './widget-preview.png';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -25,7 +26,7 @@ const rectanglePathCenteredOnOrigin = (width: number, height:number) => closedPo
 
 const polygonSideLength = (numSides: number, inRadius: number) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
-@widgetModel('CylinderLightbox')
+@widgetModel('CylinderLightbox', widgetPreview)
 export class CylinderLightboxWidgetModel extends WidgetExtendedModel({
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,

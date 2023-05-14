@@ -98,53 +98,50 @@ export class ShapePreviewModel {
       this.alphaOnChange();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const disposers = [
-      // update renderer dimensions
-      reaction(() => [this.canvasDimensions, this.renderer], () => {
-        if (this.renderer) {
-          const {
-            width,
-            height,
-          } = this.canvasDimensions;
-          this.renderer.setSize(width, height);
-          this.camera.aspect = width / height;
-          this.camera.updateProjectionMatrix();
-        }
-      }, { fireImmediately: true }),
+    // update renderer dimensions
+    reaction(() => [this.canvasDimensions, this.renderer], () => {
+      if (this.renderer) {
+        const {
+          width,
+          height,
+        } = this.canvasDimensions;
+        this.renderer.setSize(width, height);
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+      }
+    }, { fireImmediately: true });
 
-      // auto rotate update controls
-      reaction(() => [this.parentTextureEditor.autoRotatePreview], () => {
-        this.controls.autoRotate = this.parentTextureEditor.autoRotatePreview;
-      }, { fireImmediately: true }),
+    // auto rotate update controls
+    reaction(() => [this.parentTextureEditor.autoRotatePreview], () => {
+      this.controls.autoRotate = this.parentTextureEditor.autoRotatePreview;
+    }, { fireImmediately: true });
 
-      // shape change
-      reaction(() => [this.parentTextureEditor.shapeName.value], async () => {
-        await this.setShape(this.parentTextureEditor.shapeName.value);
-      }, { fireImmediately: true }),
+    // shape change
+    reaction(() => [this.parentTextureEditor.shapeName.value], async () => {
+      await this.setShape(this.parentTextureEditor.shapeName.value);
+    }, { fireImmediately: true });
 
-      // texture change
-      reaction(() => {
-        const { faceDecoration, faceBoundary } = this.parentTextureEditor;
-        const listenProps:any[] = [this.shapeMesh, faceBoundary];
-        if (!faceDecoration || faceDecoration instanceof RawFaceDecorationModel) { return listenProps; }
-        const { pattern, transform: { transformMatrix } } = faceDecoration;
-        listenProps.push(transformMatrix);
-        if (pattern instanceof PathFaceDecorationPatternModel) {
-          listenProps.push(pattern.isPositive, pattern.pathD);
-        } else if (pattern instanceof ImageFaceDecorationPatternModel) {
-          listenProps.push(pattern.imageData, pattern.isBordered);
-        }
-        return listenProps;
-      }, () => {
-        this.applyTextureToMesh();
-      }),
+    // texture change
+    reaction(() => {
+      const { faceDecoration, faceBoundary } = this.parentTextureEditor;
+      const listenProps:any[] = [this.shapeMesh, faceBoundary];
+      if (!faceDecoration || faceDecoration instanceof RawFaceDecorationModel) { return listenProps; }
+      const { pattern, transform: { transformMatrix } } = faceDecoration;
+      listenProps.push(transformMatrix);
+      if (pattern instanceof PathFaceDecorationPatternModel) {
+        listenProps.push(pattern.isPositive, pattern.pathD);
+      } else if (pattern instanceof ImageFaceDecorationPatternModel) {
+        listenProps.push(pattern.imageData, pattern.isBordered);
+      }
+      return listenProps;
+    }, () => {
+      this.applyTextureToMesh();
+    });
 
-      // use alpha change
-      reaction(() => [this.resolvedUseAlphaTexturePreview, this.useAlpha], () => {
-        this.alphaOnChange();
-      }),
-    ];
+    // use alpha change
+    reaction(() => [this.resolvedUseAlphaTexturePreview, this.useAlpha], () => {
+      this.alphaOnChange();
+    });
 
     this.animationFrame = requestAnimationFrame(((renderer, controls, camera, scene) => {
       const animate = () => {
@@ -273,7 +270,7 @@ export class ShapePreviewModel {
 
   @action
   async setShape(shapeName: string) {
-    const modelUrl = new URL(`../../../../../../../../static/models/${shapeName}.gltf`, import.meta.url).href;
+    const modelUrl = new URL(`../../../../../static/models/${shapeName}.gltf`, import.meta.url).href;
     const importScene = await resolveSceneFromModelPath(this.gltfLoader, modelUrl);
     const meshChild = importScene.children.find((child) => (child as Mesh).isMesh) as Mesh;
     const normalizingScale = this.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;

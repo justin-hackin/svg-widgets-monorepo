@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import {
   Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText,
 } from '@mui/material';
-import { kebabCase, startCase } from 'lodash';
+import { startCase } from 'lodash';
 import { styled } from '@mui/styles';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
@@ -13,7 +13,7 @@ import { WidgetControlPanel } from './components/WidgetControlPanel';
 import { FullPageDiv } from '../common/style/style';
 import { DielineViewToolbar } from './components/DielineViewToolbar';
 import { useWorkspaceMst } from './rootStore';
-import { widgetOptions } from './models/WorkspaceModel';
+import { widgetIconMap, widgetOptions } from './models/WorkspaceModel';
 import { FileInputs } from './components/FileInputs';
 import 'react-reflex/styles.css';
 import { ResizeDetector } from './components/ResizeDetector';
@@ -154,7 +154,7 @@ const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer((
                   <Avatar
                     alt={startCase(widgetName)}
                     className={classes.widgetAvatar}
-                    src={new URL(`../../static/images/widgets/${kebabCase(widgetName)}.png`, import.meta.url).href}
+                    src={widgetIconMap.get(widgetName)}
                   />
                 </ListItemAvatar>
                 <ListItemText

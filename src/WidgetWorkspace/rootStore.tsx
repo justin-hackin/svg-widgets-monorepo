@@ -1,9 +1,9 @@
 import { connectReduxDevTools, registerRootStore } from 'mobx-keystone';
 import React, { createContext, useContext } from 'react';
 import { WorkspaceModel } from './models/WorkspaceModel';
-// widgets must follow WorkspaceModel import
+// previews must follow WorkspaceModel import
 import { PyramidNetWidgetModel } from '../widgets/PyramidNet/models/PyramidNetWidgetStore';
-import { CylinderLightboxWidgetModel } from '../widgets/CylinderLightbox/models';
+import { CylinderLightboxWidgetModel } from '../widgets/CylinderLightbox';
 import { SquareGridDividerWidgetModel } from '../widgets/CrosshatchShelves/SquareGridDividerWidgetModel';
 import { DiamondGridDividerWidgetModel } from '../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
 import { TriangularGridWidgetModel } from '../widgets/CrosshatchShelves/TriangularGrid';

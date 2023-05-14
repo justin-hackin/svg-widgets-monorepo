@@ -14,6 +14,8 @@ import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { TRI_NOTCH_LEVEL, triNotchPanel } from './util';
 import { augmentSegmentEndpoints } from '../util';
 import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import widgetPreview from '../previews/triangle-grid-divider.png';
+
 import point = Flatten.point;
 import segment = Flatten.segment;
 import Segment = Flatten.Segment;
@@ -45,7 +47,7 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
 
 const POLYGON_SIDES = 6;
 
-@widgetModel('TriangleGridDivider')
+@widgetModel('TriangleGridDivider', widgetPreview)
 export class TriangularGridWidgetModel extends WidgetExtendedModel({
   hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,

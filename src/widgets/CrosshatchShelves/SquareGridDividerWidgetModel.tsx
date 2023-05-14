@@ -8,6 +8,7 @@ import { dividerBaseModelProps } from './DividerBasePersistedSpec';
 import { centeredNotchPanel, getMarginLength } from './util';
 import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
 import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
+import widgetPreview from './previews/square-grid-divider.png';
 
 enum REMAINDER_SIZES {
   SMALL = 'small',
@@ -17,7 +18,7 @@ enum REMAINDER_SIZES {
 
 const cubbiesDecrementOptions = Object.values(REMAINDER_SIZES).map((size, index) => ({ value: index, label: size }));
 
-@widgetModel('SquareGridDivider')
+@widgetModel('SquareGridDivider', widgetPreview)
 export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
   ...dividerBaseModelProps,
   widthCubbiesDecrement: radioProp(0, {
