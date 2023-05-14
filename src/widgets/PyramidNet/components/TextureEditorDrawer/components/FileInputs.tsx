@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import { fromSnapshot } from 'mobx-keystone';
 import { InvisibleTextFileInput } from '../../../../../common/InvisibleTextFileInput';
 import { useWorkspaceMst } from '../../../../../WidgetWorkspace/rootStore';

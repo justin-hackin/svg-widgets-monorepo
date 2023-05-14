@@ -1,5 +1,5 @@
 import { getParent, Model, model } from 'mobx-keystone';
-import { isInteger, sortBy, startCase } from 'lodash';
+import { isInteger, sortBy, startCase } from 'lodash-es';
 import { polyhedra } from '../polyhedra';
 import { radioProp, selectProp } from '../../../common/keystone-tweakables/props';
 

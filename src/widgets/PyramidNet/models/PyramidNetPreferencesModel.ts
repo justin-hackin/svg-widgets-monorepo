@@ -1,7 +1,7 @@
 // Post-launch, migration schemes will be needed upon data shape changes
 // in order to not invalidate localstorage after upgrade
 import { Model, model, prop } from 'mobx-keystone';
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import {
   colorPickerProp,
   numberTextProp,

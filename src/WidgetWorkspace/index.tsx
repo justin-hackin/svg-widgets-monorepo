@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import {
   Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText,
 } from '@mui/material';
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import { styled } from '@mui/styles';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
 import { ResizableZoomPan } from './components/ResizableZoomPan';

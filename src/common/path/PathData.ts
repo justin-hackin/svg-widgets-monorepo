@@ -1,4 +1,4 @@
-import { cloneDeep, includes, last } from 'lodash';
+import { cloneDeep, includes, last } from 'lodash-es';
 import svgpath from 'svgpath';
 import { reverse } from 'svg-path-reverse';
 import {

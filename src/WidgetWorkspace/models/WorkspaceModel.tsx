@@ -16,7 +16,7 @@ import {
   SnapshotInOfModel,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import {
 // @ts-ignore
   fitToViewer, INITIAL_VALUE, Tool, TOOL_PAN, Value,

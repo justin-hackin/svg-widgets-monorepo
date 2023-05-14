@@ -1,6 +1,6 @@
 import { getParent, getParentToChildPath } from 'mobx-keystone';
 import { computed, makeObservable } from 'mobx';
-import { isFunction, startCase } from 'lodash';
+import { isFunction, startCase } from 'lodash-es';
 import { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
 import { TweakableReferenceWithOptionsModel } from './models/TweakableReferenceWithOptionsModel';
 import {

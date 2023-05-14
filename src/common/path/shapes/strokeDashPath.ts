@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import {
   chunk, last, range, startCase, sum, uniq,
-} from 'lodash';
+} from 'lodash-es';
 import {
   detach, getRootPath, Model, model, prop, rootRef,
 } from 'mobx-keystone';

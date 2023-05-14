@@ -7,7 +7,7 @@ import {
   action, computed, observable, reaction,
 } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
-import { chunk, flatten, range } from 'lodash';
+import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';

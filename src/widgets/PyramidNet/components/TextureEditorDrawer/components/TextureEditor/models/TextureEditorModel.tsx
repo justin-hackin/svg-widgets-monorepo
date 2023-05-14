@@ -1,4 +1,4 @@
-import { inRange } from 'lodash';
+import { inRange } from 'lodash-es';
 import fileDownload from 'js-file-download';
 import {
   fromSnapshot, getSnapshot, Model, model, modelAction, prop,

@@ -4,7 +4,7 @@ import {
   IconButton, Menu, MenuItem, Tooltip,
 } from '@mui/material';
 import { observer } from 'mobx-react';
-import { range } from 'lodash';
+import { range } from 'lodash-es';
 import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../../common/util/tour';
 import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';

@@ -1,4 +1,4 @@
-import { range } from 'lodash';
+import { range } from 'lodash-es';
 import { Model, model, prop } from 'mobx-keystone';
 import { PathData } from '../../common/path/PathData';
 import {

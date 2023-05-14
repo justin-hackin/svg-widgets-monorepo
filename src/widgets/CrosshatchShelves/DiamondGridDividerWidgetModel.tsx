@@ -1,7 +1,7 @@
 import { computed } from 'mobx';
 import React from 'react';
 import Flatten from '@flatten-js/core';
-import { round } from 'lodash';
+import { round } from 'lodash-es';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,

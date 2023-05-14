@@ -2,7 +2,7 @@ import {
   // @ts-ignore
   Line, point, Polygon, segment,
 } from '@flatten-js/core';
-import { isNaN, isNumber, range } from 'lodash';
+import { isNaN, isNumber, range } from 'lodash-es';
 import offset from '@flatten-js/polygon-offset';
 
 import { circularSlice } from './data';

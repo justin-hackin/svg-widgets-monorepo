@@ -25,7 +25,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import FilePicker from '@mavedev/react-file-picker';
 import HelpIcon from '@mui/icons-material/Help';
 
-import { isNaN, isNumber } from 'lodash';
+import { isNaN, isNumber } from 'lodash-es';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 

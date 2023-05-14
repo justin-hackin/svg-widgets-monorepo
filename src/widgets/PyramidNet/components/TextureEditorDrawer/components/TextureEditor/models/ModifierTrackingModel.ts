@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { flatten, includes } from 'lodash';
+import { flatten, includes } from 'lodash-es';
 import { Model, model, modelAction } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
 
