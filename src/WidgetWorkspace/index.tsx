@@ -158,7 +158,6 @@ const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer((
   );
 });
 
-// eslint-disable-next-line react/function-component-definition
 export const WidgetWorkspace: FunctionComponent<WidgetWorkspaceOptionalProps> = (props) => (
   <ResizeDetector>
     {({ width }:{ width: number }) => (<SizedWidgetWorkspace {...props} width={width} />)}

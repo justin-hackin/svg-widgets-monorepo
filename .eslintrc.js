@@ -46,6 +46,7 @@ module.exports = {
         'react/no-array-index': 0,
         'react/no-array-index-key': 0,
         'react/require-default-props': 0,
+        'react/function-component-definition': 0,
         'no-param-reassign': 0,
         'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
         'no-continue': 0,
