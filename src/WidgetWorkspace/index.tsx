@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { kebabCase, startCase } from 'lodash';
 import { styled } from '@mui/styles';
+import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
 import { ResizableZoomPan } from './components/ResizableZoomPan';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
 import { FullPageDiv } from '../common/style/style';
@@ -12,6 +13,7 @@ import { DielineViewToolbar } from './components/DielineViewToolbar';
 import { useWorkspaceMst } from './rootStore';
 import { widgetOptions } from './models/WorkspaceModel';
 import { FileInputs } from './components/FileInputs';
+import 'react-reflex/styles.css';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
 const CLASS_BASE = 'workspace';
@@ -42,6 +44,17 @@ const DialogStyled = styled(Dialog)(({ theme }) => ({
   },
 }));
 
+const splitterSelector = '.reflex-splitter';
+const StyledReflexContainer = styled(ReflexContainer)(({ theme }) => ({
+  [`&.reflex-container > ${splitterSelector}`]: {
+    borderColor: theme.palette.grey.A400,
+  },
+  [`&.reflex-container > ${splitterSelector}.active, &.reflex-container ${splitterSelector}:hover`]: {
+    borderColor: theme.palette.primary.main,
+  },
+
+}));
+
 export const WidgetWorkspace = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { selectedStore, selectedWidgetModelType } = workspaceStore;
@@ -56,13 +69,18 @@ export const WidgetWorkspace = observer(() => {
     <>
       <WidgetWorkspaceStyled>
         {selectedStore && (
-          <>
-            <ResizableZoomPan SVGBackground="url(#grid-pattern)">
-              { selectedStore.assetDefinition.WorkspaceView }
-            </ResizableZoomPan>
-            <WidgetControlPanel />
-            <DielineViewToolbar />
-          </>
+          <StyledReflexContainer orientation="vertical">
+            <ReflexElement>
+              <ResizableZoomPan SVGBackground="url(#grid-pattern)">
+                {selectedStore.assetDefinition.WorkspaceView}
+              </ResizableZoomPan>
+            </ReflexElement>
+            <ReflexSplitter />
+            <ReflexElement>
+              <WidgetControlPanel />
+              <DielineViewToolbar />
+            </ReflexElement>
+          </StyledReflexContainer>
         )}
       </WidgetWorkspaceStyled>
       <FileInputs />
