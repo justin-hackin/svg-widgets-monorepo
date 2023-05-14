@@ -1,14 +1,12 @@
 import React from 'react';
 import {
-  Divider,
-  IconButton, Paper, ToggleButton, ToggleButtonGroup,
+  Divider, IconButton, Paper, ToggleButton, ToggleButtonGroup,
 } from '@mui/material';
 import {
-  Tool, TOOL_NONE, TOOL_PAN, TOOL_ZOOM_IN, TOOL_ZOOM_OUT,
+  Tool, TOOL_PAN, TOOL_ZOOM_IN, TOOL_ZOOM_OUT,
 } from 'react-svg-pan-zoom';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 import PanToolIcon from '@mui/icons-material/PanTool';
-import MouseIcon from '@mui/icons-material/Mouse';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { styled } from '@mui/styles';
@@ -17,7 +15,6 @@ import { WorkspaceModel } from '../models/WorkspaceModel';
 import { useWorkspaceMst } from '../rootStore';
 
 const TOOL_ICON_MAP = {
-  [TOOL_NONE]: MouseIcon,
   [TOOL_PAN]: PanToolIcon,
   [TOOL_ZOOM_IN]: ZoomInIcon,
   [TOOL_ZOOM_OUT]: ZoomOutIcon,
