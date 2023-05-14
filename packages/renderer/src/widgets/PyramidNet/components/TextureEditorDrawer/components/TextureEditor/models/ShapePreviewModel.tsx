@@ -31,11 +31,9 @@ import React from 'react';
 import { TextureSvgUnobserved } from '../components/TextureArrangement/components/TextureSvg';
 import { TextureEditorModel } from './TextureEditorModel';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
-import { IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../../../../../../../common/constants';
 import { RawFaceDecorationModel } from '../../../../../models/RawFaceDecorationModel';
 import { PathFaceDecorationPatternModel } from '../../../../../models/PathFaceDecorationPatternModel';
 import { boundingBoxAttrsToViewBoxStr } from '../../../../../../../common/util/svg';
-import { electronApi } from '../../../../../../../../../common/electron';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -360,12 +358,7 @@ export class ShapePreviewModel {
     return this.gltfExporter
       // @ts-ignore
       .parse(this.shapeMesh, async (shapeGLTF: ArrayBuffer) => {
-        if (IS_ELECTRON_BUILD) {
-          await electronApi.saveGlbWithDialog(shapeGLTF, 'Save shape preview', defaultPath);
-        }
-        if (IS_WEB_BUILD) {
-          fileDownload(new Blob([shapeGLTF]), defaultPath);
-        }
+        fileDownload(new Blob([shapeGLTF]), defaultPath);
       }, { binary: true });
   }
 }

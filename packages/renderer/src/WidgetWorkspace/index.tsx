@@ -11,6 +11,7 @@ import { FullPageDiv } from '../common/style/style';
 import { DielineViewToolbar } from './components/DielineViewToolbar';
 import { useWorkspaceMst } from './rootStore';
 import { widgetOptions } from './models/WorkspaceModel';
+import { FileInputs } from './components/FileInputs';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
 const CLASS_BASE = 'workspace';
@@ -64,6 +65,7 @@ export const WidgetWorkspace = observer(() => {
           </>
         )}
       </WidgetWorkspaceStyled>
+      <FileInputs />
       <DialogStyled
         disableEscapeKeyDown={!selectedStore}
         disableRestoreFocus={!selectedStore}

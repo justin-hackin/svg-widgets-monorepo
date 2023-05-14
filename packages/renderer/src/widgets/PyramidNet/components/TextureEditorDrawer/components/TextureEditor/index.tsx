@@ -7,15 +7,14 @@ import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
 import {
-  StepWithNextAction,
   SAMPLE_IMAGE_SNAPSHOT,
   SAMPLE_PATH_SNAPSHOT,
   STEP_ACTIONS,
+  StepWithNextAction,
   TOUR_STEPS,
 } from '../../../../../../common/util/tour';
 import { FullPageDiv } from '../../../../../../common/style/style';
 import { RawFaceDecorationModel } from '../../../../models/RawFaceDecorationModel';
-import { IS_WEB_BUILD } from '../../../../../../../../common/constants';
 import { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
@@ -121,7 +120,7 @@ export const TextureEditor = observer(({ hasCloseButton = false }) => {
             textColor: theme.palette.grey['300'],
           },
         }}
-        run={IS_WEB_BUILD && needsTour}
+        run={needsTour}
         showSkipButton
         continuous
         disableCloseOnEsc

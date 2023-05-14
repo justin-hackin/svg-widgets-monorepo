@@ -1,6 +1,6 @@
 import { connectReduxDevTools, registerRootStore } from 'mobx-keystone';
 import React, { createContext, useContext } from 'react';
-import { IS_DEVELOPMENT_BUILD, IS_ELECTRON_BUILD } from '../../../common/constants';
+import { IS_DEVELOPMENT_BUILD } from '../../../common/constants';
 import { WorkspaceModel } from './models/WorkspaceModel';
 // widgets must follow WorkspaceModel import
 import { PyramidNetWidgetModel } from '../widgets/PyramidNet/models/PyramidNetWidgetStore';
@@ -33,18 +33,16 @@ export function useWorkspaceMst() {
 }
 
 if (IS_DEVELOPMENT_BUILD) {
-  window.workpsaceStore = workspaceStore;
-  if (IS_ELECTRON_BUILD) {
-    // if this module is imported in web build,
-    // `import "querystring"` appears in index bundle, breaks app
-    // eslint-disable-next-line import/no-extraneous-dependencies
-    import('remotedev').then(({ default: remotedev }) => {
-      // create a connection to the monitor (for example with connectViaExtension)
-      const connection = remotedev.connectViaExtension({
-        name: 'Polyhedral Net Studio',
-      });
-
-      connectReduxDevTools(remotedev, connection, workspaceStore);
+  window.workspaceStore = workspaceStore;
+  // if this module is imported in web build,
+  // `import "querystring"` appears in index bundle, breaks app
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  import('remotedev').then(({ default: remotedev }) => {
+    // create a connection to the monitor (for example with connectViaExtension)
+    const connection = remotedev.connectViaExtension({
+      name: 'Polyhedral Net Studio',
     });
-  }
+
+    connectReduxDevTools(remotedev, connection, workspaceStore);
+  });
 }

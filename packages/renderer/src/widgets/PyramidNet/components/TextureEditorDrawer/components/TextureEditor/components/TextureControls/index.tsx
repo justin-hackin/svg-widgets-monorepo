@@ -33,7 +33,6 @@ import { styled } from '@mui/styles';
 import { SnapMenu } from './components/SnapMenu';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../../../../../common/util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
-import { IS_ELECTRON_BUILD, IS_WEB_BUILD, WIDGET_EXT } from '../../../../../../../../../../common/constants';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
 import { HistoryButtons } from '../../../../../HistoryButtons';
 import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
@@ -42,7 +41,6 @@ import { TweakableInput } from '../../../../../../../../common/keystone-tweakabl
 import { ShapeSelect } from '../../../../../ShapeSelect';
 import { PathFaceDecorationPatternModel } from '../../../../../../models/PathFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../../models/PositionableFaceDecorationModel';
-import { electronApi } from '../../../../../../../../../../common/electron';
 import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/rootStore';
 
 // @ts-ignore
@@ -143,12 +141,12 @@ export const TextureControls = observer(({ hasCloseButton }) => {
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
 
+  // TODO: no defining component inside component
   const ForwardRefdOpenMenuItem = forwardRef((_, ref) => (
     <FilePicker
-      extensions={[`.${WIDGET_EXT}`]}
+      extensions={['.json']}
       onFilePicked={async (file) => {
-        // TODO: why doesn't file.type match downloadFile mime type 'application/json'
-        if (file.type === '') {
+        if (file.type === 'application/json') {
           textureEditor.setTextureArrangementFromFileData(JSON.parse(await file.text()));
         }
         resetFileMenuRef();
@@ -195,18 +193,7 @@ export const TextureControls = observer(({ hasCloseButton }) => {
           </IconButton>
         </Tooltip>
         <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
-          {(() => {
-            if (IS_WEB_BUILD) {
-              return (<ForwardRefdOpenMenuItem />);
-            }
-            return (
-              <OpenTextureArrangementMenuItem onClick={() => {
-                textureEditor.openTextureArrangement();
-                resetFileMenuRef();
-              }}
-              />
-            );
-          })()}
+          <ForwardRefdOpenMenuItem />
           {/* Menu component emits error when child is React.Fragment */}
           { faceDecoration
           && [
@@ -236,53 +223,36 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             ),
           ]}
         </Menu>
-
-        {(() => {
-          if (IS_ELECTRON_BUILD) {
-            return (
-              <UploadButton onClick={async () => {
-                const patternInfo = await electronApi.getPatternInfoFromDialog();
-                textureEditor.assignTextureFromPatternInfo(patternInfo);
-              }}
-              />
-            );
-          }
-          if (IS_WEB_BUILD) {
-            return (
-              <FilePicker
-                extensions={['.jpg', '.jpeg', '.png', '.svg']}
-                onFilePicked={async (file) => {
-                  if (file) {
-                    if (file.type === 'image/svg+xml') {
-                      const svgString = await file.text();
-                      textureEditor.assignTextureFromPatternInfo({
-                        isPath: true,
-                        svgString,
-                        sourceFileName: file.name,
-                      });
-                    } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
-                      //  file is either png or jpg
-                      const imageData = await toBase64(file);
-                      const dimensions = await resolveImageDimensionsFromBase64(imageData);
-                      textureEditor.assignTextureFromPatternInfo({
-                        isPath: false,
-                        pattern: {
-                          imageData,
-                          dimensions,
-                          sourceFileName: file.name,
-                        },
-                      });
-                    }
-                    // TODO: user can still pick non-image, emit snackbar error in this case
-                  }
-                }}
-              >
-                <UploadButton />
-              </FilePicker>
-            );
-          }
-          throw new Error('unexpected build environment');
-        })()}
+        <FilePicker
+          extensions={['.jpg', '.jpeg', '.png', '.svg']}
+          onFilePicked={async (file) => {
+            if (file) {
+              if (file.type === 'image/svg+xml') {
+                const svgString = await file.text();
+                textureEditor.assignTextureFromPatternInfo({
+                  isPath: true,
+                  svgString,
+                  sourceFileName: file.name,
+                });
+              } else if (file.type === 'image/png' || file.type === 'image/jpeg') {
+                //  file is either png or jpg
+                const imageData = await toBase64(file);
+                const dimensions = await resolveImageDimensionsFromBase64(imageData);
+                textureEditor.assignTextureFromPatternInfo({
+                  isPath: false,
+                  pattern: {
+                    imageData,
+                    dimensions,
+                    sourceFileName: file.name,
+                  },
+                });
+              }
+              // TODO: user can still pick non-image, emit snackbar error in this case
+            }
+          }}
+        >
+          <UploadButton />
+        </FilePicker>
         <ShapeSelect
           className={TOUR_ELEMENT_CLASSES.SHAPE_SELECT}
           isCompactDisplay
@@ -405,18 +375,16 @@ export const TextureControls = observer(({ hasCloseButton }) => {
             />
           </>
         )}
-        { IS_WEB_BUILD && (
-          <IconButton
-            onClick={() => {
-              preferences.setNeedsTour(true);
-            }}
-            aria-label="send texture"
-            component="span"
-            size="large"
-          >
-            <HelpIcon fontSize="large" />
-          </IconButton>
-        )}
+        <IconButton
+          onClick={() => {
+            preferences.setNeedsTour(true);
+          }}
+          aria-label="send texture"
+          component="span"
+          size="large"
+        >
+          <HelpIcon fontSize="large" />
+        </IconButton>
       </Toolbar>
     </TextureEditorAppBar>
   );

@@ -17,7 +17,7 @@ import React from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { observer } from 'mobx-react';
 import { styled } from '@mui/styles';
-import { AssetDefinition } from '../widget-types/types';
+import { BaseAssetDefinition } from '../widget-types/types';
 import { RegisteredAssetsDefinition } from '../widget-types/RegisteredAssetsDefinition';
 import { DisjunctAssetsDefinition } from '../widget-types/DisjunctAssetsDefinition';
 import { SolitaryAssetDefinition } from '../widget-types/SolitaryAssetDefinition';
@@ -46,7 +46,7 @@ const AccordionStyled = styled(Accordion)(({ theme }) => ({
   },
 }));
 
-export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition: AssetDefinition }) => {
+export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition: BaseAssetDefinition }) => {
   if (assetDefinition instanceof SolitaryAssetDefinition) {
     return null;
   }
@@ -71,7 +71,7 @@ export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition
           />
         )}
         <List disablePadding>
-          {assetDefinition.members.map((member, index) => {
+          {(assetDefinition as RegisteredAssetsDefinition).members.map((member, index) => {
             const labelId = `visibility-label-${member.name}`;
             return (
               <ListItem

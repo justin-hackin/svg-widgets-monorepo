@@ -24,7 +24,7 @@
     "typecheck-preload": "tsc --noEmit -p packages/preload/tsconfig.json",
     "typecheck-renderer": "tsc --noEmit -p packages/renderer/tsconfig.json",
     "typecheck": "npm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer",
-    "web-build": "vite build --mode=web --config=packages/renderer/vite.config.js --root=packages/renderer/",
+    "web": "vite --config=packages/renderer/vite.config.js --root=packages/renderer/",
     "web-serve": "http-server _static/ -p 3000"
   },
   "browserslist": [
@@ -84,6 +84,7 @@
     "gcd": "0.0.1",
     "image-size": "^0.9.3",
     "js-file-download": "^0.4.12",
+    "jszip": "^3.10.1",
     "lodash": "^4.17.19",
     "mobx": "^6.3.2",
     "mobx-keystone": "1.3.0",

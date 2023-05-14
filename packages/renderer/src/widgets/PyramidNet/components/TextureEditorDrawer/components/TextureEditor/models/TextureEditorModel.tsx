@@ -18,12 +18,7 @@ import {
 import { ShapePreviewModel } from './ShapePreviewModel';
 import { sliderProp } from '../../../../../../../common/keystone-tweakables/props';
 import { tryResolvePath } from '../../../../../../../common/util/mobx-keystone';
-import {
-  DEFAULT_SLIDER_STEP,
-  IS_ELECTRON_BUILD,
-  IS_WEB_BUILD,
-  WIDGET_EXT,
-} from '../../../../../../../../../common/constants';
+import { DEFAULT_SLIDER_STEP } from '../../../../../../../../../common/constants';
 import { TransformModel } from '../../../../../models/TransformModel';
 import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
@@ -31,7 +26,6 @@ import { PositionableFaceDecorationModel } from '../../../../../models/Positiona
 import { extractCutHolesFromSvgString } from '../../../../../../../common/util/svg';
 import { PathFaceDecorationPatternModel } from '../../../../../models/PathFaceDecorationPatternModel';
 import { PatternInfo } from '../../../../../../../../../common/types';
-import { electronApi } from '../../../../../../../../../common/electron';
 
 const DEFAULT_IS_POSITIVE = true;
 const DEFAULT_VIEW_SCALE = 0.7;
@@ -135,6 +129,19 @@ export class TextureEditorModel {
 
   @observable
     shapePreview:ShapePreviewModel;
+
+  @observable
+    importTextureArrangementDialogActive = false;
+
+  @action
+  activateImportTextureArrangementDialog() {
+    this.importTextureArrangementDialogActive = true;
+  }
+
+  @action
+  deactivateImportTextureArrangementDialog() {
+    this.importTextureArrangementDialogActive = false;
+  }
 
   SEND_ANALYTICS_INTERVAL_MS = 10000;
 
@@ -429,16 +436,7 @@ export class TextureEditorModel {
       textureSnapshot: getSnapshot(this.faceDecoration),
     };
     const defaultBasename = `${this.shapeName.value}__${this.faceDecoration.pattern.sourceFileName}`;
-    if (IS_ELECTRON_BUILD) {
-      electronApi.saveJSONWithDialog(
-        JSON.stringify(fileData),
-        'Save texture arrangement',
-        defaultBasename,
-      );
-    }
-    if (IS_WEB_BUILD) {
-      fileDownload(JSON.stringify(fileData), `${defaultBasename}.${WIDGET_EXT}`, 'application/json');
-    }
+    fileDownload(JSON.stringify(fileData), `${defaultBasename}.json`, 'application/json');
   }
 
   @action
@@ -475,15 +473,6 @@ export class TextureEditorModel {
   @action
   setAutoRotatePreview(shouldRotate) {
     this.autoRotatePreview = shouldRotate;
-  }
-
-  @action
-  async openTextureArrangement() {
-    const res = await electronApi.getJsonFromDialog('Import texture arrangement');
-    if (res === undefined) { return; }
-
-    const { fileData } = res;
-    this.setTextureArrangementFromFileData(fileData);
   }
 
   @action

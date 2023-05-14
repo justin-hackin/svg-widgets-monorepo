@@ -49,6 +49,7 @@ import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
 import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { additionalFileMenuItemsFactory } from '../components/additionalFileMenuItemsFactory';
+import { FileInputs } from '../components/FileInputs';
 
 const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
@@ -88,7 +89,21 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
   @observable
     textureEditorOpen = false;
 
-  preferences = new PyramidNetPreferencesModel({});
+  @observable
+    importFaceDialogActive = false;
+
+  @action
+  activateImportFaceDialog() {
+    this.importFaceDialogActive = true;
+  }
+
+  @action
+  deactivateImportFaceDialog() {
+    this.importFaceDialogActive = false;
+  }
+
+  @observable
+    preferences = new PyramidNetPreferencesModel({});
 
   @observable
     textureEditor = new TextureEditorModel(this);
@@ -612,5 +627,11 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
 
   additionalFileMenuItems = additionalFileMenuItemsFactory(this);
 
-  AdditionalMainContent = TextureEditorDrawer;
+  // eslint-disable-next-line class-methods-use-this
+  AdditionalMainContent = () => (
+    <>
+      <FileInputs />
+      <TextureEditorDrawer />
+    </>
+  );
 }

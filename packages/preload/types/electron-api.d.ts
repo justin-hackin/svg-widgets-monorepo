@@ -14,6 +14,6 @@ declare interface Window {
 declare global {
   interface Window {
     dataLayer: Array<any>,
-    workpsaceStore: WorkspaceModel
+    workspaceStore: WorkspaceModel
   }
 }

@@ -2,8 +2,6 @@
 import { flatten, includes } from 'lodash';
 import { Model, model, modelAction } from 'mobx-keystone';
 import { computed, observable } from 'mobx';
-import { IS_ELECTRON_BUILD, IS_WEB_BUILD } from '../../../../../../../../../common/constants';
-import { electronApi } from '../../../../../../../../../common/electron';
 
 export const DRAG_MODES = {
   TRANSLATE: 'translate',
@@ -87,21 +85,11 @@ export class ModifierTrackingModel extends Model({
   onInit():(() => void) {
     window.addEventListener('keyup', this.keyupHandler.bind(this));
     window.addEventListener('keydown', this.keydownHandler.bind(this));
-
-    if (IS_ELECTRON_BUILD) {
-      electronApi.addDragModeResetHandler(this.resetHandler);
-    } else if (IS_WEB_BUILD) {
-      window.addEventListener('blur', this.resetHandler);
-    }
+    window.addEventListener('blur', this.resetHandler);
     return () => {
       window.removeEventListener('keyup', this.keyupHandler);
       window.removeEventListener('keydown', this.keydownHandler);
-
-      if (IS_ELECTRON_BUILD) {
-        electronApi.removeDragModeResetHandler(this.resetHandler);
-      } else if (IS_WEB_BUILD) {
-        window.removeEventListener('blur', this.resetHandler);
-      }
+      window.removeEventListener('blur', this.resetHandler);
     };
   }
 }

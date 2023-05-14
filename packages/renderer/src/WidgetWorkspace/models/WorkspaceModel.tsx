@@ -3,34 +3,29 @@ import {
   action, computed, observable, reaction,
 } from 'mobx';
 import {
-  _async,
-  _await,
   applySnapshot,
-  detach, ExtendedModel,
+  detach,
+  ExtendedModel,
   getSnapshot,
   model,
   Model,
   modelAction,
   ModelClass,
-  modelFlow, ModelProps,
+  ModelProps,
   prop,
   SnapshotInOfModel,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash';
 import {
-  fitToViewer,
-  // @ts-ignore
-  INITIAL_VALUE,
-  Tool,
-  TOOL_PAN,
-  Value,
+// @ts-ignore
+  fitToViewer, INITIAL_VALUE, Tool, TOOL_PAN, Value,
 } from 'react-svg-pan-zoom';
-import { IS_ELECTRON_BUILD } from '../../../../common/constants';
+import JSZip from 'jszip';
+import fileDownload from 'js-file-download';
 import { radioProp, switchProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
-import { electronApi } from '../../../../common/electron';
 
 type WidgetJSON = {
   widget: {
@@ -85,12 +80,6 @@ export class WorkspaceModel extends Model({
   }
 
   @observable
-    savedSnapshot = undefined;
-
-  @observable
-    currentFilePath = undefined;
-
-  @observable
     zoomPanValue: Value = INITIAL_VALUE;
 
   @observable
@@ -101,6 +90,9 @@ export class WorkspaceModel extends Model({
 
   @observable
     alertDialogContent = null;
+
+  @observable
+    openWidgetFileFlag = false;
 
   // eslint-disable-next-line class-methods-use-this
   @computed
@@ -151,34 +143,9 @@ export class WorkspaceModel extends Model({
   }
 
   @computed
-  get selectedStoreIsSaved() {
-    if (!this.selectedStore) { return false; }
-    // TODO: consider custom middleware that would obviate the need to compare snapshots on every change,
-    // instead flagging history records with the associated file name upon save
-    // + creating a middleware variable currentSnapshotIsSaved
-    // this will also allow history to become preserved across files with titlebar accuracy
-    const currentSnapshot = getSnapshot(this.selectedStore);
-    // why does lodash isEqual fail to accurately compare these and why no comparator with mst?
-    return JSON.stringify(this.savedSnapshot) === JSON.stringify(currentSnapshot);
-  }
-
-  @computed
-  get currentFileName() {
-    return this.currentFilePath ? this.currentFilePath : `New ${this.selectedWidgetNameReadable}`;
-  }
-
-  @computed
-  get fileTitleFragment() {
-    return `${this.selectedStoreIsSaved ? '' : '*'}${this.currentFileName}`;
-  }
-
-  @computed
   get titleBarText() {
-    if (!this.selectedStore) {
-      return '';
-    }
-    return IS_ELECTRON_BUILD
-      ? `${this.selectedWidgetNameReadable} ‖ ${this.fileTitleFragment}` : 'Polyhedral Decoration Studio';
+    return `Widget Factory ${
+      this.selectedWidgetNameReadable ? `|| ${this.selectedWidgetNameReadable}` : ''}`;
   }
 
   getSelectedModelAssetsFileData() {
@@ -190,6 +157,45 @@ export class WorkspaceModel extends Model({
   @action
   setWidgetPickerOpen(val: boolean) {
     this.widgetPickerOpen = val;
+  }
+
+  @action
+  _setFileDialogActive(isActive: boolean) {
+    if (isActive === this.openWidgetFileFlag) {
+      throw new Error(
+        '_setFileDialogActive: expected parameter isActive to be different than existing value for openWidgetFileFlag',
+      );
+    }
+    this.openWidgetFileFlag = isActive;
+  }
+
+  @action
+  activateOpenWidgetFilePicker() {
+    this._setFileDialogActive(true);
+  }
+
+  @action
+  deactivateWidgetFilePicker() {
+    this._setFileDialogActive(false);
+  }
+
+  downloadWidgetWithAssets() {
+    const zip = new JSZip();
+    const widgetSpecJSON = this.getWidgetSpecJSON();
+    const filePath = `${this.selectedStore.fileBasename}.widget`;
+    zip.file(
+      filePath,
+      JSON.stringify(widgetSpecJSON, null, 2),
+    );
+    this.getSelectedModelAssetsFileData().forEach(({ filePath, fileString }) => {
+      zip.file(filePath, fileString);
+    });
+
+    zip.generateAsync({ type: 'blob' })
+      .then((content) => {
+        // see FileSaver.js
+        fileDownload(content, `${this.selectedStore.fileBasename}.zip`);
+      });
   }
 
   @action
@@ -256,7 +262,6 @@ export class WorkspaceModel extends Model({
       const newStore = new SelectedModel({});
       this.setSelectedStore(newStore);
     }
-    this.resetCurrentFileData();
   }
 
   @action
@@ -274,9 +279,8 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
-  setSelectedStoreFromData(widgetType: string, persistedSpecSnapshot: SnapshotInOfModel<any>, filePath: string) {
+  setSelectedStoreFromData(widgetType: string, persistedSpecSnapshot: SnapshotInOfModel<any>) {
     this.newWidgetStore(widgetType);
-    this.setCurrentFileData(filePath, persistedSpecSnapshot);
     const { history } = this.selectedStore;
     history.withoutUndo(() => {
       this.applySpecSnapshot(persistedSpecSnapshot);
@@ -284,7 +288,7 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
-  initializeWidgetFromSnapshot(widgetJSON: WidgetJSON, filePath: string) {
+  initializeWidgetFromSnapshot(widgetJSON: WidgetJSON) {
     const { modelType, modelSnapshot } = widgetJSON.widget;
     if (!widgetOptions.has(modelType)) {
       this.setAlertDialogContent(`Invalid widget spec file: JSON data must contain property widget.$modelType with value
@@ -292,23 +296,8 @@ export class WorkspaceModel extends Model({
       return;
     }
 
-    this.setSelectedStoreFromData(modelType, modelSnapshot, filePath);
+    this.setSelectedStoreFromData(modelType, modelSnapshot);
   }
-
-  // @modelAction
-  // saveWidget() {
-  //   const snapshot = getSnapshot(this.selectedStore.persistedSpec);
-  //   const filePath = await electronApi.saveSvgAndAssetsWithDialog(
-  //     this.getSelectedModelAssetsFileData(),
-  //     snapshot,
-  //     'Save assets svg with widget settings',
-  //     this.selectedStore.fileBasename,
-  //   );
-  //
-  //   if (filePath) {
-  //     this.setCurrentFileData(filePath, snapshot);
-  //   }
-  // }
 
   getWidgetSpecJSON(): WidgetJSON {
     const snapshot = getSnapshot(this.selectedStore);
@@ -321,52 +310,5 @@ export class WorkspaceModel extends Model({
         version: 1,
       },
     };
-  }
-
-  @modelFlow
-    saveWidgetWithDialog = _async(function* (this: WorkspaceModel) {
-      const widgetJSON = this.getWidgetSpecJSON();
-      const filePath = yield* _await(electronApi.saveSvgAndAssetsWithDialog(
-        this.getSelectedModelAssetsFileData(),
-        widgetJSON,
-        'Save assets svg with widget settings',
-        this.selectedStore.fileBasename,
-      ));
-
-      if (filePath) {
-        this.setCurrentFileData(filePath, widgetJSON.widget.modelSnapshot);
-      }
-    });
-
-  @modelFlow
-    saveWidget = _async(function* (this: WorkspaceModel) {
-      if (!this.currentFilePath) {
-        yield* _await(this.saveWidgetWithDialog());
-      } else {
-        const widgetJSON = this.getWidgetSpecJSON();
-        yield* _await(
-          electronApi.saveSvgAndModel(this.getSelectedModelAssetsFileData(), widgetJSON, this.currentFilePath),
-        );
-
-        this.setCurrentFileData(this.currentFilePath, widgetJSON.widget.modelSnapshot);
-      }
-    });
-
-  @modelAction
-  resetCurrentFileData() {
-    this.currentFilePath = undefined;
-    this.savedSnapshot = undefined;
-  }
-
-  @modelAction
-  setCurrentFileData(filePath: string, snapshot: object) {
-    this.currentFilePath = filePath;
-    this.savedSnapshot = snapshot;
-  }
-
-  @modelAction
-  clearCurrentFileData() {
-    this.currentFilePath = undefined;
-    this.savedSnapshot = undefined;
   }
 }

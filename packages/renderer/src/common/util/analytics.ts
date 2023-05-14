@@ -1,6 +1,4 @@
-import { IS_PRODUCTION_BUILD, IS_WEB_BUILD } from '../../../../common/constants';
-
-const SHOULD_REPORT = IS_WEB_BUILD && IS_PRODUCTION_BUILD;
+import { IS_PRODUCTION_BUILD } from '../../../../common/constants';
 
 export enum TRANSFORM_METHODS {
   DRAG = 'drag',
@@ -25,7 +23,7 @@ type TransformTrackingObject = Partial<Record<TRANSFORM_METHODS, TransformOperat
 const transformTracking: TransformTrackingObject = {};
 
 export const incrementTransformTracking = (method: TRANSFORM_METHODS, operation: TRANSFORM_OPERATIONS) => {
-  if (SHOULD_REPORT) {
+  if (IS_PRODUCTION_BUILD) {
     if (!transformTracking[method]) { transformTracking[method] = {}; }
     if (!transformTracking[method][operation]) {
       transformTracking[method][operation] = 0;
@@ -46,7 +44,7 @@ const getTransformDataLayerObject = (operation: TRANSFORM_OPERATIONS, method: TR
 });
 
 export const reportTransformsTally = () => {
-  if (SHOULD_REPORT) {
+  if (IS_PRODUCTION_BUILD) {
     for (const method of Object.values(TRANSFORM_METHODS)) {
       for (const operation of Object.values(TRANSFORM_OPERATIONS)) {
         if (transformTracking[method] && transformTracking[method][operation]) {

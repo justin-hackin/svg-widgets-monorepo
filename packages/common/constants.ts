@@ -11,13 +11,8 @@ export enum EVENTS {
 export const DEFAULT_SLIDER_STEP = 0.01;
 export const VERY_LARGE_NUMBER = 1000000000000000;
 
-export const IS_ELECTRON_BUILD = import.meta.env.VITE_BUILD_ENV === 'electron';
-export const IS_WEB_BUILD = import.meta.env.VITE_BUILD_ENV === 'web';
 export const IS_PRODUCTION_BUILD = import.meta.env.MODE === 'production';
 export const IS_DEVELOPMENT_BUILD = import.meta.env.MODE === 'development';
 
-if (!IS_WEB_BUILD && !IS_ELECTRON_BUILD) {
-  throw new Error(`unexpected BUILD_ENV, should be "electron" or "web" but saw: "${import.meta.env.VITE_BUILD_ENV}"`);
-}
 export const WIDGET_EXT = 'widget';
 export const WIDGET_DESC = 'widget spec file';

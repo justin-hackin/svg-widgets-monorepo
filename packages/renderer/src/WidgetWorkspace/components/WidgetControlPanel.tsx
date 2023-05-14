@@ -11,16 +11,12 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import FlareIcon from '@mui/icons-material/Flare';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SaveIcon from '@mui/icons-material/Save';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import {
   AppBar, ListItemIcon, Menu, MenuItem, Tooltip, Typography,
 } from '@mui/material';
-
-import { SnapshotInOfModel } from 'mobx-keystone';
 import { styled } from '@mui/material/styles';
 import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
 import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
-import { electronApi } from '../../../../common/electron';
 import { TweakableChildrenInputs } from '../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
 import { AssetsAccordion } from './AssetsAccordion';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
@@ -109,23 +105,12 @@ export const WidgetControlPanel = observer(() => {
   };
 
   const openSpecHandler = async () => {
-    const res = await electronApi.getJsonFromDialog(OPEN_TXT);
-    if (res !== undefined) {
-      const { filePath } = res;
-      const fileData = res.fileData as SnapshotInOfModel<any>;
-
-      workspaceStore.initializeWidgetFromSnapshot(fileData, filePath);
-    }
-    resetFileMenuRef();
-  };
-
-  const saveAsHandler = async () => {
-    await workspaceStore.saveWidgetWithDialog();
+    workspaceStore.activateOpenWidgetFilePicker();
     resetFileMenuRef();
   };
 
   const saveHandler = async () => {
-    await workspaceStore.saveWidget();
+    await workspaceStore.downloadWidgetWithAssets();
     resetFileMenuRef();
   };
 
@@ -180,15 +165,6 @@ export const WidgetControlPanel = observer(() => {
                   <SaveIcon fontSize="small" />
                 </ListItemIcon>
                 <Typography variant="inherit">{SAVE_TXT}</Typography>
-              </MenuItem>
-              <MenuItem
-                disabled={!workspaceStore.currentFileName}
-                onClick={saveAsHandler}
-              >
-                <ListItemIcon className={classes.listItemIcon}>
-                  <SaveAltIcon fontSize="small" />
-                </ListItemIcon>
-                <Typography variant="inherit">Save as ...</Typography>
               </MenuItem>
               {additionalFileMenuItems
                 && (

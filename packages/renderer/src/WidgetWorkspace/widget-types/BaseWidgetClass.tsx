@@ -2,7 +2,7 @@ import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
 import { FC } from 'react';
 import { observable } from 'mobx';
 import { SvgIcon } from '@mui/material';
-import { AssetDefinition } from './types';
+import { BaseAssetDefinition } from './types';
 import { AdditionalToolbarItem } from '../../widgets/PyramidNet/components/AdditionalToolbarContent';
 
 export interface FileMenuItem {
@@ -27,7 +27,7 @@ export abstract class BaseWidgetClass extends Model({}) {
 
   PanelContent?: FC;
 
-  abstract get assetDefinition(): AssetDefinition;
+  abstract get assetDefinition(): BaseAssetDefinition;
 
   protected onInit() {
     this.history = undoMiddleware(this);
