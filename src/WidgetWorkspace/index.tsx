@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText, Paper,
+  Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText,
 } from '@mui/material';
 import { kebabCase, startCase } from 'lodash';
 import { styled } from '@mui/styles';
@@ -119,9 +119,7 @@ const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer((
               maxSize={maxPanelSize}
               size={panelSize}
             >
-              <Paper elevation={100}>
-                <WidgetControlPanel />
-              </Paper>
+              <WidgetControlPanel />
             </ReflexElement>
           </StyledReflexContainer>
         )}
