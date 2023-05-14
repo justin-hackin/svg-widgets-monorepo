@@ -26,6 +26,7 @@ import fileDownload from 'js-file-download';
 import { radioProp, switchProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
+import { Orientation } from '../index';
 
 type WidgetJSON = {
   widget: {
@@ -48,6 +49,7 @@ class WorkspacePreferencesModel extends Model({
     }),
     darkModeEnabled: switchProp(true),
     panelSizePercent: prop<number>(33).withSetter(),
+    panelOrientation: prop<Orientation>('vertical').withSetter(),
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';

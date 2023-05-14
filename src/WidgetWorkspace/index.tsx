@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText,
+  Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText, Paper,
 } from '@mui/material';
 import { kebabCase, startCase } from 'lodash';
 import { styled } from '@mui/styles';
@@ -58,10 +58,12 @@ const StyledReflexContainer = styled(ReflexContainer)(({ theme }) => ({
 
 type WidgetWorkspaceRequiredProps = {
   width: number,
+  height: number,
 };
 
+export type Orientation = ComponentProps<typeof ReflexContainer>['orientation'];
 type WidgetWorkspaceOptionalProps = {
-  panelOrientation?: ComponentProps<typeof ReflexContainer>['orientation'],
+  panelOrientation?: Orientation,
   maxPanelWidthPercent?: number,
   minPanelWidthPercent?: number,
 };
@@ -69,19 +71,29 @@ type WidgetWorkspaceOptionalProps = {
 type WidgetWorkspaceProps = WidgetWorkspaceRequiredProps & WidgetWorkspaceOptionalProps;
 
 const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer(({
-  panelOrientation, width, maxPanelWidthPercent, minPanelWidthPercent,
+  panelOrientation, width, height, maxPanelWidthPercent, minPanelWidthPercent,
 }) => {
   const workspaceStore = useWorkspaceMst();
   const { selectedStore, selectedWidgetModelType, preferences } = workspaceStore;
-  const { panelSizePercent } = preferences;
+  const { panelSizePercent, panelOrientation: preferencesPanelOrientation } = preferences;
+  const resolvedPanelOrientation = panelOrientation || preferencesPanelOrientation;
 
   useLayoutEffect(() => {
     workspaceStore.fitToDocument();
   }, [workspaceStore?.selectedWidgetModelType]);
-
-  const maxPanelSize = useMemo(() => width * (maxPanelWidthPercent / 100), [width]);
-  const minPanelSize = useMemo(() => width * (minPanelWidthPercent / 100), [width]);
-  const panelSize = useMemo(() => width * (panelSizePercent / 100), [width]);
+  const dimensionValue = resolvedPanelOrientation === 'vertical' ? width : height;
+  const maxPanelSize = useMemo(
+    () => dimensionValue * (maxPanelWidthPercent / 100),
+    [dimensionValue, resolvedPanelOrientation],
+  );
+  const minPanelSize = useMemo(
+    () => dimensionValue * (minPanelWidthPercent / 100),
+    [dimensionValue, resolvedPanelOrientation],
+  );
+  const panelSize = useMemo(
+    () => dimensionValue * (panelSizePercent / 100),
+    [dimensionValue, resolvedPanelOrientation],
+  );
 
   // wrap with observer here so WidgetSVG can be rendered with ReactDOMServer for saving to string
 
@@ -89,8 +101,9 @@ const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer((
     <>
       <WidgetWorkspaceStyled>
         {selectedStore && (
-          <StyledReflexContainer orientation={panelOrientation}>
+          <StyledReflexContainer orientation={resolvedPanelOrientation}>
             <ReflexElement>
+              <DielineViewToolbar orientation={resolvedPanelOrientation} showOrientationToggle={!panelOrientation} />
               <ResizableZoomPan SVGBackground="url(#grid-pattern)">
                 {selectedStore.assetDefinition.WorkspaceView}
               </ResizableZoomPan>
@@ -106,8 +119,9 @@ const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer((
               maxSize={maxPanelSize}
               size={panelSize}
             >
-              <WidgetControlPanel />
-              <DielineViewToolbar />
+              <Paper elevation={100}>
+                <WidgetControlPanel />
+              </Paper>
             </ReflexElement>
           </StyledReflexContainer>
         )}
@@ -160,12 +174,13 @@ const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer((
 
 export const WidgetWorkspace: FunctionComponent<WidgetWorkspaceOptionalProps> = (props) => (
   <ResizeDetector>
-    {({ width }:{ width: number }) => (<SizedWidgetWorkspace {...props} width={width} />)}
+    {({ width, height }:
+    { width: number, height: number }) => (<SizedWidgetWorkspace {...props} width={width} height={height} />)}
   </ResizeDetector>
 );
 
 WidgetWorkspace.defaultProps = {
-  panelOrientation: 'vertical',
+  panelOrientation: undefined,
   maxPanelWidthPercent: 50,
   minPanelWidthPercent: 25,
 };

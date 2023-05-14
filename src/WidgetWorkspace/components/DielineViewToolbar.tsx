@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Divider, IconButton, Paper, ToggleButton, ToggleButtonGroup,
+  Divider, IconButton, Orientation, Paper, ToggleButton, ToggleButtonGroup,
 } from '@mui/material';
 import {
   Tool, TOOL_PAN, TOOL_ZOOM_IN, TOOL_ZOOM_OUT,
@@ -11,6 +11,7 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { styled } from '@mui/styles';
 import { observer } from 'mobx-react';
+import { HorizontalSplit, VerticalSplit } from '@mui/icons-material';
 import { WorkspaceModel } from '../models/WorkspaceModel';
 import { useWorkspaceMst } from '../rootStore';
 
@@ -21,21 +22,31 @@ const TOOL_ICON_MAP = {
 };
 
 const PaperStyled = styled(Paper)(({ theme }) => ({
-  flexDirection: 'column',
-  position: 'fixed',
-  top: theme.spacing(1),
-  left: theme.spacing(1),
+  flexDirection: 'row',
+  position: 'absolute',
+  display: 'flex',
+  right: theme.spacing(1),
+  bottom: theme.spacing(1),
   padding: theme.spacing(0.5),
+  zIndex: 1,
+  '&.orientation-horizontal': {
+    flexDirection: 'column',
+    top: theme.spacing(1),
+    bottom: 'initial',
+  },
 }));
 
-export const DielineViewToolbar = observer(() => {
+export const DielineViewToolbar = observer((
+  { orientation, showOrientationToggle }:
+  { orientation: Orientation, showOrientationToggle: boolean },
+) => {
   const workspaceStore: WorkspaceModel = useWorkspaceMst();
-  const { zoomPanTool } = workspaceStore;
-
+  const { zoomPanTool, preferences } = workspaceStore;
+  const oppositeOrientation: Orientation = orientation === 'vertical' ? 'horizontal' : 'vertical';
   return (
-    <PaperStyled elevation={3}>
+    <PaperStyled elevation={3} className={`orientation-${oppositeOrientation}`}>
       <ToggleButtonGroup
-        orientation="vertical"
+        orientation={orientation}
         exclusive
         value={zoomPanTool}
         aria-label="zoom pan mode"
@@ -52,7 +63,29 @@ export const DielineViewToolbar = observer(() => {
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
-      <Divider flexItem orientation="horizontal" sx={{ my: 1, mx: 0.5 }} />
+      {showOrientationToggle && (
+        <>
+          <Divider flexItem orientation={oppositeOrientation} />
+
+          <ToggleButtonGroup
+            orientation={orientation}
+            exclusive
+            value={orientation}
+            onChange={(_, orientation) => {
+              preferences.setPanelOrientation(orientation);
+            }}
+          >
+            <ToggleButton value="horizontal">
+              <HorizontalSplit />
+            </ToggleButton>
+            <ToggleButton value="vertical">
+              <VerticalSplit />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </>
+      )}
+
+      <Divider flexItem orientation={oppositeOrientation} />
       <IconButton
         sx={{ mx: 0.5 }}
         onClick={() => {
