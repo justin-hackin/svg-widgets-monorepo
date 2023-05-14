@@ -1,4 +1,6 @@
-import React, { useLayoutEffect } from 'react';
+import React, {
+  ComponentProps, FunctionComponent, useLayoutEffect, useMemo,
+} from 'react';
 import { observer } from 'mobx-react';
 import {
   Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText,
@@ -14,6 +16,7 @@ import { useWorkspaceMst } from './rootStore';
 import { widgetOptions } from './models/WorkspaceModel';
 import { FileInputs } from './components/FileInputs';
 import 'react-reflex/styles.css';
+import { ResizeDetector } from './components/ResizableZoomPan/components/ResizeDetector';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
 const CLASS_BASE = 'workspace';
@@ -29,7 +32,6 @@ const WidgetWorkspaceStyled = styled(FullPageDiv)(({ theme }) => ({
     left: theme.spacing(1),
     position: 'absolute',
   },
-
 }));
 
 const DialogStyled = styled(Dialog)(({ theme }) => ({
@@ -52,16 +54,34 @@ const StyledReflexContainer = styled(ReflexContainer)(({ theme }) => ({
   [`&.reflex-container > ${splitterSelector}.active, &.reflex-container ${splitterSelector}:hover`]: {
     borderColor: theme.palette.primary.main,
   },
-
 }));
 
-export const WidgetWorkspace = observer(() => {
+type WidgetWorkspaceRequiredProps = {
+  width: number,
+};
+
+type WidgetWorkspaceOptionalProps = {
+  panelOrientation?: ComponentProps<typeof ReflexContainer>['orientation'],
+  maxPanelWidthPercent?: number,
+  minPanelWidthPercent?: number,
+};
+
+type WidgetWorkspaceProps = WidgetWorkspaceRequiredProps & WidgetWorkspaceOptionalProps;
+
+const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer(({
+  panelOrientation, width, maxPanelWidthPercent, minPanelWidthPercent,
+}) => {
   const workspaceStore = useWorkspaceMst();
-  const { selectedStore, selectedWidgetModelType } = workspaceStore;
+  const { selectedStore, selectedWidgetModelType, preferences } = workspaceStore;
+  const { panelSizePercent } = preferences;
 
   useLayoutEffect(() => {
     workspaceStore.fitToDocument();
   }, [workspaceStore?.selectedWidgetModelType]);
+
+  const maxPanelSize = useMemo(() => width * (maxPanelWidthPercent / 100), [width]);
+  const minPanelSize = useMemo(() => width * (minPanelWidthPercent / 100), [width]);
+  const panelSize = useMemo(() => width * (panelSizePercent / 100), [width]);
 
   // wrap with observer here so WidgetSVG can be rendered with ReactDOMServer for saving to string
 
@@ -69,14 +89,23 @@ export const WidgetWorkspace = observer(() => {
     <>
       <WidgetWorkspaceStyled>
         {selectedStore && (
-          <StyledReflexContainer orientation="vertical">
+          <StyledReflexContainer orientation={panelOrientation}>
             <ReflexElement>
               <ResizableZoomPan SVGBackground="url(#grid-pattern)">
                 {selectedStore.assetDefinition.WorkspaceView}
               </ResizableZoomPan>
             </ReflexElement>
             <ReflexSplitter />
-            <ReflexElement>
+            <ReflexElement
+              onResize={({ domElement }) => {
+                preferences.setPanelSizePercent(
+                  ((domElement as HTMLDivElement).getBoundingClientRect().width / width) * 100,
+                );
+              }}
+              minSize={minPanelSize}
+              maxSize={maxPanelSize}
+              size={panelSize}
+            >
               <WidgetControlPanel />
               <DielineViewToolbar />
             </ReflexElement>
@@ -128,3 +157,16 @@ export const WidgetWorkspace = observer(() => {
     </>
   );
 });
+
+// eslint-disable-next-line react/function-component-definition
+export const WidgetWorkspace: FunctionComponent<WidgetWorkspaceOptionalProps> = (props) => (
+  <ResizeDetector>
+    {({ width }:{ width: number }) => (<SizedWidgetWorkspace {...props} width={width} />)}
+  </ResizeDetector>
+);
+
+WidgetWorkspace.defaultProps = {
+  panelOrientation: 'vertical',
+  maxPanelWidthPercent: 50,
+  minPanelWidthPercent: 25,
+};

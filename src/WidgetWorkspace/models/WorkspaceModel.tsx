@@ -47,6 +47,7 @@ class WorkspacePreferencesModel extends Model({
       isRow: true,
     }),
     darkModeEnabled: switchProp(true),
+    panelSizePercent: prop<number>(33).withSetter(),
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';

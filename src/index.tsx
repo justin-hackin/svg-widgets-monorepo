@@ -1,9 +1,9 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { observer } from 'mobx-react';
-import { WidgetWorkspace } from './WidgetWorkspace';
 import { ProvidersWrapper } from './common/components/ProvidersWrapper';
 import { useWorkspaceMst } from './WidgetWorkspace/rootStore';
+import { WidgetWorkspace } from './WidgetWorkspace';
 
 const AllRoutes = observer(() => {
   const workspaceStore = useWorkspaceMst();
