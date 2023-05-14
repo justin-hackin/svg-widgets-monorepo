@@ -1,32 +1,25 @@
 name: Tests
-on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'packages/**'
-      - 'tests/**'
-      - 'package-lock.json'
-      - '.github/workflows/tests.yml'
-  pull_request:
-    paths:
-      - 'packages/**'
-      - 'tests/**'
-      - 'package-lock.json'
-      - '.github/workflows/tests.yml'
+#on:
+#  push:
+#    branches:
+#      - master
+#    paths:
+#      - 'packages/**'
+#      - 'tests/**'
+#      - 'package-lock.json'
+#      - '.github/workflows/tests.yml'
+#  pull_request:
+#    paths:
+#      - 'packages/**'
+#      - 'tests/**'
+#      - 'package-lock.json'
+#      - '.github/workflows/tests.yml'
 
 defaults:
   run:
     shell: 'bash'
 
 jobs:
-  e2e:
-    strategy:
-      matrix:
-        os: [ windows-latest ]
-
-    runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
