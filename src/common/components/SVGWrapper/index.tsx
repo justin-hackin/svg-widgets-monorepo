@@ -1,7 +1,7 @@
-import React from 'react';
-import { namespacedElementFactory } from '../../common/util/svg';
-import { LicenseGroup } from './LicenseGroup';
-import { DocumentMetadata } from '../DocumentMetadata';
+import React, { SVGProps } from 'react';
+import { namespacedElementFactory } from '../../util/svg';
+import { LicenseGroup } from './components/LicenseGroup';
+import { DocumentMetadata } from '../../../WidgetWorkspace/DocumentMetadata';
 
 const svgNamespaceAttributes = {
   'xmlns:sodipodi': 'http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd',
@@ -21,7 +21,7 @@ const namedviewAttributes = {
   'current-layer': 'dielines',
 };
 
-export function SVGWrapper({ children, ...rest }) {
+export function SVGWrapper({ children, ...rest }:SVGProps<any>) {
   return (
     <svg {...rest} {...svgNamespaceAttributes}>
       <DocumentMetadata />

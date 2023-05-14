@@ -16,7 +16,7 @@ import { useWorkspaceMst } from './rootStore';
 import { widgetOptions } from './models/WorkspaceModel';
 import { FileInputs } from './components/FileInputs';
 import 'react-reflex/styles.css';
-import { ResizeDetector } from './components/ResizableZoomPan/components/ResizeDetector';
+import { ResizeDetector } from './components/ResizeDetector';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
 const CLASS_BASE = 'workspace';

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 import { startCase } from 'lodash';
 import { fromSnapshot } from 'mobx-keystone';
-import { InvisibleTextFileInput } from '../../../../../WidgetWorkspace/components/InvisibleTextFileInput';
+import { InvisibleTextFileInput } from '../../../../../common/InvisibleTextFileInput';
 import { useWorkspaceMst } from '../../../../../WidgetWorkspace/rootStore';
 import { PyramidNetWidgetModel } from '../../../models/PyramidNetWidgetStore';
 import { TextureEditorModel } from './TextureEditor/models/TextureEditorModel';

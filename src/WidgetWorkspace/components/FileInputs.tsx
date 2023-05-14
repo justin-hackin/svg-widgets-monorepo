@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 import { useWorkspaceMst } from '../rootStore';
-import { InvisibleTextFileInput } from './InvisibleTextFileInput';
+import { InvisibleTextFileInput } from '../../common/InvisibleTextFileInput';
 
 export const FileInputs = observer(() => {
   const workspaceStore = useWorkspaceMst();

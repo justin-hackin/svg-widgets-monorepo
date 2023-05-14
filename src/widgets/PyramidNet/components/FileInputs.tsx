@@ -4,7 +4,7 @@ import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { RawFaceDecorationModel } from '../models/RawFaceDecorationModel';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
-import { InvisibleTextFileInput } from '../../../WidgetWorkspace/components/InvisibleTextFileInput';
+import { InvisibleTextFileInput } from '../../../common/InvisibleTextFileInput';
 
 export const FileInputs = observer(() => {
   const workspaceStore = useWorkspaceMst();

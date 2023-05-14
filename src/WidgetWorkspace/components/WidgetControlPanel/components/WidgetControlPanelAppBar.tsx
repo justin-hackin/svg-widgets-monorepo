@@ -10,13 +10,13 @@ import FlareIcon from '@mui/icons-material/Flare';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { Download } from '@mui/icons-material';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { AdditionalFileMenuItems } from './AdditionalFileMenuItems';
-import { AdditionalToolbarContent } from '../../widgets/PyramidNet/components/AdditionalToolbarContent';
-import { HistoryButtons } from '../../widgets/PyramidNet/components/HistoryButtons';
-import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
-import { useWorkspaceMst } from '../rootStore';
-import { SimpleDialog } from '../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
-import { PreferencesControls } from '../../widgets/PyramidNet/components/PreferencesControls';
+import { AdditionalFileMenuItems } from '../../AdditionalFileMenuItems';
+import { AdditionalToolbarContent } from '../../../../widgets/PyramidNet/components/AdditionalToolbarContent';
+import { HistoryButtons } from '../../../../widgets/PyramidNet/components/HistoryButtons';
+import { BaseWidgetClass } from '../../../widget-types/BaseWidgetClass';
+import { useWorkspaceMst } from '../../../rootStore';
+import { SimpleDialog } from '../../../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
+import { PreferencesControls } from '../../../../widgets/PyramidNet/components/PreferencesControls';
 
 export const WidgetControlPanelAppBar = observer(() => {
   const workspaceStore = useWorkspaceMst();

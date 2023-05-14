@@ -11,7 +11,7 @@ import {
   boundingBoxOfBoundingBoxes,
   viewBoxStrToBoundingBoxAttrs,
 } from '../../common/util/svg';
-import { SVGWrapper } from '../components/SVGWrapper';
+import { SVGWrapper } from '../../common/components/SVGWrapper';
 import { dimensions } from '../../common/util/data';
 import { RegisteredWidgetAssetMember } from './RegisteredAssetsDefinition';
 import {

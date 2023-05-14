@@ -5,7 +5,7 @@ import {
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { GridPattern } from '../components/ResizableZoomPan/components/GridPattern';
-import { SVGWrapper } from '../components/SVGWrapper';
+import { SVGWrapper } from '../../common/components/SVGWrapper';
 import {
   BaseAssetDefinition, DocumentAreaProps, filePathConstructor, WidgetSVGComponent,
 } from './types';

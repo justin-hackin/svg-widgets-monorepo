@@ -2,7 +2,7 @@ import React from 'react';
 import { POSITION_LEFT, ReactSVGPanZoom } from 'react-svg-pan-zoom';
 import { observer } from 'mobx-react';
 import { useTheme } from '@mui/styles';
-import { ResizeDetector } from './components/ResizeDetector';
+import { ResizeDetector } from '../ResizeDetector';
 import { useWorkspaceMst } from '../../rootStore';
 
 export const ResizableZoomPan = observer(({ children, ...props }) => {

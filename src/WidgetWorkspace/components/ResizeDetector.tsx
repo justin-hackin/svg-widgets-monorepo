@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactResizeDetector from 'react-resize-detector';
-import { isValidNumber } from '../../../../common/util/geom';
+import { isValidNumber } from '../../common/util/geom';
 
 export function ResizeDetector({ children }) {
   return (

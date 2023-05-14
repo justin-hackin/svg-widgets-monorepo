@@ -1,15 +1,9 @@
 import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
 import { FC } from 'react';
 import { observable } from 'mobx';
-import { SvgIcon } from '@mui/material';
 import { BaseAssetDefinition } from './types';
 import { AdditionalToolbarItem } from '../../widgets/PyramidNet/components/AdditionalToolbarContent';
-
-export interface FileMenuItem {
-  action: Function,
-  MenuIcon: typeof SvgIcon,
-  menuText: string,
-}
+import { FileMenuItem } from '../components/AdditionalFileMenuItems';
 
 export abstract class BaseWidgetClass extends Model({}) {
   abstract get fileBasename(): string;

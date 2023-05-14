@@ -1,7 +1,7 @@
 // @ts-nocheck
 /* eslint-disable max-len,jsx-a11y/anchor-is-valid */
 import React from 'react';
-import { viewBoxStrToBoundingBoxAttrs } from '../../common/util/svg';
+import { viewBoxStrToBoundingBoxAttrs } from '../../../util/svg';
 
 export function LicenseGroup({ viewBox }: { viewBox: string | undefined }) {
   let transformVal;

@@ -6,10 +6,10 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import React from 'react';
 import fileDownload from 'js-file-download';
 import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { SVGWrapper } from '../../../WidgetWorkspace/components/SVGWrapper';
+import { SVGWrapper } from '../../../common/components/SVGWrapper';
 import { PyramidNetTestTabs } from './PyramidNetTestTabsSvg';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
-import { FileMenuItem } from '../../../WidgetWorkspace/widget-types/BaseWidgetClass';
+import { FileMenuItem } from '../../../WidgetWorkspace/components/AdditionalFileMenuItems';
 
 export const renderTestTabsToString = (widgetStore): string => ReactDOMServer.renderToString(
   <SVGWrapper>

@@ -1,11 +1,19 @@
 import React from 'react';
-import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
+import {
+  ListItemIcon, ListItemText, MenuItem, SvgIcon,
+} from '@mui/material';
 import { styled } from '@mui/styles';
-import { FileMenuItem } from '../widget-types/BaseWidgetClass';
 
 const ListItemIconStyled = styled(ListItemIcon)(({ theme }) => ({
   minWidth: theme.spacing(4),
 }));
+
+export interface FileMenuItem {
+  action: Function,
+  MenuIcon: typeof SvgIcon,
+  menuText: string,
+}
+
 export function AdditionalFileMenuItems({ resetFileMenuRef, additionalFileMenuItems }
 : { resetFileMenuRef: Function, additionalFileMenuItems: FileMenuItem[] }) {
   return (
