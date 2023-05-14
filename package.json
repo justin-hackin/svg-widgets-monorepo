@@ -12,20 +12,12 @@
   },
   "main": "packages/main/dist/index.cjs",
   "scripts": {
-    "build": "node scripts/build.js",
-    "precompile": "cross-env MODE=production npm run build",
-    "compile": "electron-builder build --config electron-builder.config.js --dir --config.asar=false",
-    "pretest": "npm run build",
-    "test": "node tests/app.spec.js",
-    "watch": "node scripts/watch.js",
     "lint": "eslint . --ext js,ts,tsx",
     "lint-fix": "eslint . --ext js,ts,tsx --fix",
-    "typecheck-main": "tsc --noEmit -p packages/main/tsconfig.json",
-    "typecheck-preload": "tsc --noEmit -p packages/preload/tsconfig.json",
-    "typecheck-renderer": "tsc --noEmit -p packages/renderer/tsconfig.json",
-    "typecheck": "npm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer",
-    "web": "vite --config=packages/renderer/vite.config.js --root=packages/renderer/",
-    "web-serve": "http-server _static/ -p 3000"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "watch": "vite",
+    "build": "vite build",
+    "serve-build": "http-server dist/ -p 3000"
   },
   "browserslist": [
     "Chrome 93"
@@ -38,17 +30,12 @@
     "*.{js,ts,tsx}": "eslint --cache --fix"
   },
   "devDependencies": {
-    "@types/electron-devtools-installer": "2.2.0",
     "@types/node": "^13.13.52",
     "@types/react-svg-pan-zoom": "^3.3.2",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
     "@vitejs/plugin-react-refresh": "^1.3.6",
     "cross-env": "7.0.3",
-    "electron": "14.0.1",
-    "electron-builder": "22.11.7",
-    "electron-extension-installer": "1.1.3",
-    "electron-icon-maker": "^0.0.5",
     "eslint": "^8.40.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -79,8 +66,6 @@
     "canvg": "^3.0.6",
     "clsx": "^1.1.1",
     "datauri": "^3.0.0",
-    "electron-debug": "^3.2.0",
-    "electron-updater": "4.6.0",
     "gcd": "0.0.1",
     "image-size": "^0.9.3",
     "js-file-download": "^0.4.12",
