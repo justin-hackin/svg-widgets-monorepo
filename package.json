@@ -10,7 +10,6 @@
     "node": ">=v14.16",
     "npm": ">=7.7"
   },
-  "main": "packages/main/dist/index.cjs",
   "scripts": {
     "lint": "eslint . --ext js,ts,tsx",
     "lint-fix": "eslint . --ext js,ts,tsx --fix",

@@ -4,9 +4,7 @@ import React from 'react';
 
 export function DocumentMetadata() {
   return (
-    <metadata
-      id="metadata23"
-    >
+    <metadata>
       <rdf:RDF>
         <cc:Work
           rdf:about=""
