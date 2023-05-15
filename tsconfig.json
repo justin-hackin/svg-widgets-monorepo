@@ -14,6 +14,10 @@
     "typeRoots": [
       "node_modules/@types",
     ],
+    "paths": {
+      "@/*": ["./*"],
+    },
+    "baseUrl": "./src",
     "lib": ["ESNext", "DOM"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -39,5 +43,5 @@
     "node_modules/**/*",
     "**/dist/**/*",
     "_static/**/*",
-  ]
+  ],
 }

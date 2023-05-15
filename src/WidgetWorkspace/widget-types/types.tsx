@@ -1,10 +1,10 @@
 import { FC, ReactElement } from 'react';
 
+import { TxtFileInfo } from '@/common/types';
 import { dimensions } from '../../common/util/data';
 import { RegisteredAssetsDefinition } from './RegisteredAssetsDefinition';
 import { DisjunctAssetsDefinition } from './DisjunctAssetsDefinition';
 import { SolitaryAssetDefinition } from './SolitaryAssetDefinition';
-import { TxtFileInfo } from '../../common/types';
 
 export interface viewBoxProps { viewBox: string }
 

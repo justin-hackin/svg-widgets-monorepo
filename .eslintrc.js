@@ -33,10 +33,33 @@ module.exports = {
         sourceType: 'module',
         project: '**/tsconfig.json',
       },
+      plugins: [
+        '@typescript-eslint',
+        'import',
+      ],
+      settings: {
+        'import/resolver': {
+          typescript: {
+            project: ['tsconfig.json'],
+          },
+        },
+      },
       rules: {
         ...commonRules,
         '@typescript-eslint/naming-convention': 0,
         'import/prefer-default-export': 0,
+        'import/extensions': [
+          'error',
+          'ignorePackages',
+          {
+            // https://stackoverflow.com/a/72643821
+            '': 'never',
+            js: 'never',
+            jsx: 'never',
+            ts: 'never',
+            tsx: 'never',
+          },
+        ],
         'import/no-extraneous-dependencies': 1,
         'max-len': ['error', { code: 120 }],
         // TODO: remove below, enforce rule

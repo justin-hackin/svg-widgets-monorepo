@@ -2,6 +2,7 @@
 /* eslint-env node */
 import reactRefresh from '@vitejs/plugin-react-refresh';
 import { defineConfig } from 'vite';
+import path from 'path';
 
 const PACKAGE_ROOT = __dirname;
 
@@ -14,15 +15,17 @@ export default defineConfig(({ mode }) => ({
   mode,
   root: PACKAGE_ROOT,
   plugins: [
-    ...(mode === 'development' ? [reactRefresh()] : []),
+    // universal plugins here
+    ...(mode === 'development' ? [
+      // development-only plugins here
+      reactRefresh(),
+    ] : []),
   ],
-  base: '',
-  server: mode === 'web' ? undefined : {
-    fs: {
-      strict: true,
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
     },
   },
-  assetsInclude: ['**/*.gltf'],
   build: {
     sourcemap: true,
     outDir: 'dist',
