@@ -1,6 +1,8 @@
 # Polyhedz Studio 
 
-A desktop application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedz Studio represents the (potential) fulfillment of a wish to share this art/craft with other makers. In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system  was a tedious task that made design iteration difficult. With Polyhedz Studio, cutout paths are generated based on algorithms in which every parameter is tweakable.  The [latest release](https://github.com/justin-hackin/polyhedz-studio/releases/latest) is available for Windows, OSX, or Linux. 
+A web application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedz Studio represents the (potential) fulfillment of a wish to share this art/craft with other makers. In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system  was a tedious task that made design iteration difficult. With Polyhedz Studio, cutout paths are generated based on algorithms in which every parameter is tweakable.  
+
+Previously this app was a [desktop application](https://github.com/justin-hackin/polyhedz-studio/releases/latest) but it has since been ported to a [web application](https://polyhedz-studio.vercel.app). Note the default branch is `web` whereas the legacy Electron app exists on `master`. The code that is not specific to the particular designs (widgets) will serve as the foundation for a more general-purpose framework that will enable inventors/designers/makers to code their own design objects. This framework will be extracted from this repo which will serve as the repository for the widgets only.
 
 | ![polyhedral lantern sculpture with print face decoration](/packages/renderer/static/images/widgets/polyhedral-net.png) | ![polyhedral lantern sculpture with cut holes face decoration](/docs/images/polyhedral-net-vector.png) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -8,9 +10,9 @@ A desktop application for the fabrication of interlocking pyramid nets which for
 
 ## App info
 
-This app consists of 2 main views:
+This app consists of 2 main sections:
 
-### Dieline Editor
+### Design Area
 
 | ![Dieline Editor with vector graphics](/docs/images/dieline_editor_vector.png) | ![Dieline Editor with raster graphics](/docs/images/dieline_editor_raster.png) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -28,7 +30,6 @@ Allows viewing of the SVG dielines and optional print layer with controls for ad
 - Break outside the suggested slider range with with text input toggle, enabling precision adjustment and non-standard settings exploration (use with caution)
 - Choose your preferred unit of display/input in settings, measurement data is saved in unit-agnostic pixels (96dpi)
 - Supports fractional display/input of inches or cm
-- Customized cut and score stroke properties
 - User settings persisted across sessions
 - View print/cut components separately with the Assets accordion
 - Save the dielines file and optional print file SVG alongside a .pns file that will allow you to re-open your parameter settings later
@@ -40,7 +41,6 @@ Allows viewing of the SVG dielines and optional print layer with controls for ad
 - Break a single pyramid net up into multiple sections (nets per pyramid), allowing maximum shape size with limited cutting area
 - View test tabs via multi-widget interface
 - Download/import SVG template for editing cut paths with your own vector editor of choice as an alternative to texture editor
-- Optional path scoring: adjust the dasharray pattern ratios independent of length of the pattern repetition and offset. Instead of simply styling a solid path to look like dashes, this feature makes a series of `<path>` lines that can be sent directly to a laser cutter
 
 ### Texture Editor
 
@@ -67,7 +67,7 @@ Interactively apply cut patterns or print textures to the faces of your shape an
 
 ### Bonus Widgets
 
-Using the wrench icon in the lower left corner allows you to access some additional "widgets" that have been authored using the same structure as the polyhedral net.
+While this application was originally designed only for creating polyhedral nets, it has been extended to enable multiple design "widgets". 
 
 #### Cylinder Lightbox
 <p alt="cylinder lightbox" align="center">
@@ -93,41 +93,18 @@ KDE users will experience issues with Alt-dragging modifiers in Texture Editor d
 
 ## Developer notes
 
-This Electron app is built with webpack-electron. To start its dev server, do:
+To start its dev server, do:
 ```
-npm run dev
+npm run watch
 ```
 
 or to run the production version of the app do:
 
 ```
-npm run compile && npm run start
+npm run build && npm run serve-build
 ```
 
-After cutting a new npm tag and compiling, the app is deployed to github releases with 
-```
-npm run release
-```
-
-You will not be able to complete this operation unless you have set up GH_TOKEN environment variable.
-
-### Texture editor web port
-
-In the interests of attracting graphic designers and artists to use the texture editing feature without the overhead of downloading the app, the texture editor is also deployed as a [stand-alone web application](https://polyhedral-net-factory-bahby.ondigitalocean.app/). Users can then save the texture arrangement and have a fabricator apply the pattern to the dielines in the desktop app.
-
-To build the web texture editor do:
-
-```
-npm run web-build
-```
-
-and to serve the web texture editor do
-
-```
-npm run web-serve
-```
-
-Pushing code to the branch `web-deploy` will cause DigitalOcean App Platform to fetch the code from the branch and re-deploy.
+Changes to the `web` branch will cause the [Vercel-hosted web application](https://polyhedz-studio.vercel.app) to redeploy.
 
 ## Author's note
  
