@@ -1,7 +1,6 @@
 import {
   Model, model, modelAction, prop,
 } from 'mobx-keystone';
-import { PathData } from '../../common/path/PathData';
 import {
   distanceBetweenPoints,
   getLineLineIntersection,
@@ -10,12 +9,13 @@ import {
   hingedPlotLerp,
   RawPoint,
   symmetricHingePlotByProjectionDistance,
-} from '../../common/util/geom';
-import { DashPatternModel, strokeDashPath } from '../../common/path/shapes/strokeDashPath';
-import { arrowTabPlots } from '../../common/path/shapes/symmetricRoundedTab';
-import { sliderProp, sliderWithTextProp, switchProp } from '../../common/keystone-tweakables/props';
+} from '@/common/util/geom';
+import { PathData } from '@/common/path/PathData';
+import { DashPatternModel, strokeDashPath } from '@/common/path/shapes/strokeDashPath';
+import { arrowTabPlots } from '@/common/path/shapes/symmetricRoundedTab';
+import { sliderProp, sliderWithTextProp, switchProp } from '@/common/keystone-tweakables/props';
+import { DEFAULT_SLIDER_STEP, VERY_LARGE_NUMBER } from '@/common/constants';
 import { ratioSliderProps } from './constants';
-import { DEFAULT_SLIDER_STEP, VERY_LARGE_NUMBER } from '../../common/constants';
 
 export interface BaseEdgeConnectionTab {
   score: PathData,

@@ -5,9 +5,9 @@ import {
 } from '@mui/material';
 import { observer } from 'mobx-react';
 import { range } from 'lodash-es';
+import { TOUR_ELEMENT_CLASSES } from '@/common/util/tour';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
-import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../../common/util/tour';
-import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
 export const SnapMenu = observer(() => {
   // when truthy, snap menu is open

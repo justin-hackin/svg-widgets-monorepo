@@ -1,8 +1,8 @@
 import { connectReduxDevTools, registerRootStore } from 'mobx-keystone';
 import React, { createContext, useContext } from 'react';
+import { IS_DEVELOPMENT_BUILD } from '@/common/constants';
 import { WorkspaceModel } from './models/WorkspaceModel';
 // previews must follow WorkspaceModel import
-import { IS_DEVELOPMENT_BUILD } from '../common/constants';
 
 export const workspaceStore = new WorkspaceModel({});
 registerRootStore(workspaceStore);

@@ -1,15 +1,15 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
+import { PRINT_REGISTRATION_TYPES } from '@/WidgetWorkspace/models/PreferencesModel';
 import {
   lineLerp, matrixWithTransformOrigin, pointToTranslateString, scalePoint,
-} from '../../../common/util/geom';
+} from '@/common/util/geom';
 import {
   boundingBoxMinPoint,
   expandBoundingBoxAttrs,
   registrationMarksPath,
   toRectangleCoordinatesAttrs,
-} from '../../../common/util/svg';
+} from '@/common/util/svg';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { PathFaceDecorationPatternModel } from '../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';

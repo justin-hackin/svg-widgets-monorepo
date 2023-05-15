@@ -2,9 +2,9 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { Drawer } from '@mui/material';
 import { styled } from '@mui/styles';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
 import type { PyramidNetWidgetModel } from '../../models/PyramidNetWidgetStore';
 import { TextureEditor } from './components/TextureEditor';
-import { useWorkspaceMst } from '../../../../WidgetWorkspace/rootStore';
 
 const DrawerStyled = styled(Drawer)({
   '& .MuiDrawer-paper': {

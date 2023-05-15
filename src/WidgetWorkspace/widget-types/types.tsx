@@ -1,7 +1,7 @@
 import { FC, ReactElement } from 'react';
 
 import { TxtFileInfo } from '@/common/types';
-import { dimensions } from '../../common/util/data';
+import { dimensions } from '@/common/util/data';
 
 export interface viewBoxProps { viewBox: string }
 

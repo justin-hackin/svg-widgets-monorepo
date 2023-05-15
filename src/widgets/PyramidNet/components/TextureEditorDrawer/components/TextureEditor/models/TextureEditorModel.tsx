@@ -6,26 +6,26 @@ import {
 import {
   action, computed, makeObservable, observable,
 } from 'mobx';
-import { BoundaryModel } from './BoundaryModel';
-import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset,
   RawPoint,
   scalePoint,
   sumPoints,
   transformPoint,
-} from '../../../../../../../common/util/geom';
+} from '@/common/util/geom';
+import { sliderProp } from '@/common/keystone-tweakables/props';
+import { tryResolvePath } from '@/common/util/mobx-keystone';
+import { extractCutHolesFromSvgString } from '@/common/util/svg';
+import { PatternInfo } from '@/common/types';
+import { DEFAULT_SLIDER_STEP } from '@/common/constants';
+import { BoundaryModel } from './BoundaryModel';
+import { ModifierTrackingModel } from './ModifierTrackingModel';
 import { ShapePreviewModel } from './ShapePreviewModel';
-import { sliderProp } from '../../../../../../../common/keystone-tweakables/props';
-import { tryResolvePath } from '../../../../../../../common/util/mobx-keystone';
 import { TransformModel } from '../../../../../models/TransformModel';
 import type { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../models/PositionableFaceDecorationModel';
-import { extractCutHolesFromSvgString } from '../../../../../../../common/util/svg';
 import { PathFaceDecorationPatternModel } from '../../../../../models/PathFaceDecorationPatternModel';
-import { PatternInfo } from '../../../../../../../common/types';
-import { DEFAULT_SLIDER_STEP } from '../../../../../../../common/constants';
 
 const DEFAULT_IS_POSITIVE = true;
 const DEFAULT_VIEW_SCALE = 0.7;

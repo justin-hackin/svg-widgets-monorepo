@@ -30,18 +30,18 @@ import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
 import { styled } from '@mui/styles';
+import { resolveImageDimensionsFromBase64, toBase64 } from '@/common/util/data';
+import { TOUR_ELEMENT_CLASSES } from '@/common/util/tour';
+import { TweakableInput } from '@/common/keystone-tweakables/material-ui-controls/TweakableInput';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
 import { SnapMenu } from './components/SnapMenu';
-import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../../../../../common/util/data';
-import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
 import { HistoryButtons } from '../../../../../HistoryButtons';
 import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../models/ImageFaceDecorationPatternModel';
-import { TweakableInput } from '../../../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 import { ShapeSelect } from '../../../../../ShapeSelect';
 import { PathFaceDecorationPatternModel } from '../../../../../../models/PathFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../../models/PositionableFaceDecorationModel';
-import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/rootStore';
 
 // @ts-ignore
 const NumberFormatDecimalDegrees = forwardRef(({ onChange, ...other }, ref) => (

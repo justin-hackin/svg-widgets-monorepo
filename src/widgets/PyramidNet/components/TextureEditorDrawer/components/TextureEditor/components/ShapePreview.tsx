@@ -5,9 +5,9 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import { IconButton } from '@mui/material';
 import { styled } from '@mui/styles';
 import clsx from 'clsx';
+import { TOUR_ELEMENT_CLASSES } from '@/common/util/tour';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
 import type { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
-import { TOUR_ELEMENT_CLASSES } from '../../../../../../../common/util/tour';
-import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/rootStore';
 
 const classes = {
   enterFullScreenButton: 'shape-preview__enter-full-screen-button',

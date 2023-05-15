@@ -3,20 +3,20 @@ import { useDrag, useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash-es';
 import { Paper } from '@mui/material';
 import { observer } from 'mobx-react';
-import { castCoordToRawPoint } from '../../../../../../../../common/util/geom';
-import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
+import { castCoordToRawPoint } from '@/common/util/geom';
 import {
   incrementTransformTracking,
   TRANSFORM_METHODS,
   TRANSFORM_OPERATIONS,
-} from '../../../../../../../../common/util/analytics';
-import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
+} from '@/common/util/analytics';
+import { TOUR_ELEMENT_CLASSES } from '@/common/util/tour';
+import { boundingBoxAttrsToViewBoxStr } from '@/common/util/svg';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
+import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import { DRAG_MODES } from '../../models/ModifierTrackingModel';
-import { boundingBoxAttrsToViewBoxStr } from '../../../../../../../../common/util/svg';
 import { TextureSvg } from './components/TextureSvg';
 import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
-import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/rootStore';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();

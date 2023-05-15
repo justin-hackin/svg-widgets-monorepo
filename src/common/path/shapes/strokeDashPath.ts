@@ -6,14 +6,14 @@ import {
 } from 'mobx-keystone';
 
 import { computed } from 'mobx';
+import { WorkspaceModel } from '@/WidgetWorkspace/models/WorkspaceModel';
+import type { PyramidNetWidgetModel } from '@/widgets/PyramidNet/models/PyramidNetWidgetStore';
+import { ratioSliderProps } from '@/widgets/PyramidNet/constants';
 import {
   distanceFromOrigin, lineLerp, PointLike, subtractPoints,
 } from '../../util/geom';
 import { PathData } from '../PathData';
 import { referenceSelectProp, sliderWithTextProp } from '../../keystone-tweakables/props';
-import { WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import type { PyramidNetWidgetModel } from '../../../widgets/PyramidNet/models/PyramidNetWidgetStore';
-import { ratioSliderProps } from '../../../widgets/PyramidNet/constants';
 import { DEFAULT_SLIDER_STEP } from '../../constants';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);

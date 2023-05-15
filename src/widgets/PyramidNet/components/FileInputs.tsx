@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
-import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import { extractCutHolesFromSvgString } from '@/common/util/svg';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
+import { InvisibleTextFileInput } from '@/common/InvisibleTextFileInput';
 import { RawFaceDecorationModel } from '../models/RawFaceDecorationModel';
-import { extractCutHolesFromSvgString } from '../../../common/util/svg';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
-import { InvisibleTextFileInput } from '../../../common/InvisibleTextFileInput';
+import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
 export const FileInputs = observer(() => {
   const workspaceStore = useWorkspaceMst();

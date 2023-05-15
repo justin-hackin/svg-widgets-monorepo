@@ -3,22 +3,22 @@ import React, { useEffect, useRef, useState } from 'react';
 import { styled, useTheme } from '@mui/styles';
 import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
 
-import { TextureControls } from './components/TextureControls';
-import { TextureArrangement } from './components/TextureArrangement';
-import { ShapePreview } from './components/ShapePreview';
 import {
   SAMPLE_IMAGE_SNAPSHOT,
   SAMPLE_PATH_SNAPSHOT,
   STEP_ACTIONS,
   StepWithNextAction,
   TOUR_STEPS,
-} from '../../../../../../common/util/tour';
-import { FullPageDiv } from '../../../../../../common/style/style';
+} from '@/common/util/tour';
+import { FullPageDiv } from '@/common/style/style';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
+import { TextureControls } from './components/TextureControls';
+import { TextureArrangement } from './components/TextureArrangement';
+import { ShapePreview } from './components/ShapePreview';
 import { RawFaceDecorationModel } from '../../../../models/RawFaceDecorationModel';
 import type { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
-import { useWorkspaceMst } from '../../../../../../WidgetWorkspace/rootStore';
 
 const classes = { mainArea: 'main-area' };
 const TextureEditorRoot = styled(FullPageDiv)(({ theme }) => ({

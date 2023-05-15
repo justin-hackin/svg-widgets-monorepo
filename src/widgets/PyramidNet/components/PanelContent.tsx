@@ -4,12 +4,12 @@ import { Paper, Tab, Tabs } from '@mui/material';
 import { observer } from 'mobx-react';
 
 import { styled } from '@mui/styles';
+import { TweakableInput } from '@/common/keystone-tweakables/material-ui-controls/TweakableInput';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
 import { BaseEdgeTabControls } from './BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './AscendantEdgeTabsControls';
 import { ShapeSelect } from './ShapeSelect';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { TweakableInput } from '../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 const controlsTabs = [
   {

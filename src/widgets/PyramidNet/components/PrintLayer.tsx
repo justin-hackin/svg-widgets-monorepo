@@ -2,13 +2,13 @@ import { observer } from 'mobx-react';
 import React from 'react';
 
 import { useTheme } from '@mui/styles';
-import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
+import { PRINT_REGISTRATION_TYPES } from '@/WidgetWorkspace/models/PreferencesModel';
+import { boundingBoxMinPoint, expandBoundingBoxAttrs, registrationMarksPath } from '@/common/util/svg';
+import { pointToTranslateString, scalePoint } from '@/common/util/geom';
+import { closedPolygonPath } from '@/common/path/shapes/generic';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
-import { boundingBoxMinPoint, expandBoundingBoxAttrs, registrationMarksPath } from '../../../common/util/svg';
-import { pointToTranslateString, scalePoint } from '../../../common/util/geom';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
-import { closedPolygonPath } from '../../../common/path/shapes/generic';
 
 function PrintGroup({ children }) {
   return (

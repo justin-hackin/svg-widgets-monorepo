@@ -5,11 +5,11 @@ import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import React from 'react';
 import fileDownload from 'js-file-download';
+import { SVGWrapper } from '@/common/components/SVGWrapper';
+import { FileMenuItem } from '@/WidgetWorkspace/components/AdditionalFileMenuItems';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { SVGWrapper } from '../../../common/components/SVGWrapper';
 import { PyramidNetTestTabs } from './PyramidNetTestTabsSvg';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
-import { FileMenuItem } from '../../../WidgetWorkspace/components/AdditionalFileMenuItems';
 
 export const renderTestTabsToString = (widgetStore): string => ReactDOMServer.renderToString(
   <SVGWrapper>

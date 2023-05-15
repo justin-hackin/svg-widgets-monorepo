@@ -2,14 +2,14 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { HookReturnType, UseDragConfig } from 'react-use-gesture/dist/types';
-import { RawPoint, scalePoint } from '../../../../../../../../../common/util/geom';
+import { RawPoint, scalePoint } from '@/common/util/geom';
+import { useWorkspaceMst } from '@/WidgetWorkspace/rootStore';
 import { TexturePathNodes } from './TexturePathNodes';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
 import type { TextureEditorModel } from '../../../models/TextureEditorModel';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
 import { PathFaceDecorationPatternModel } from '../../../../../../../models/PathFaceDecorationPatternModel';
-import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';
