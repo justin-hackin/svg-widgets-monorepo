@@ -4,8 +4,8 @@ A web application for the fabrication of interlocking pyramid nets which form st
 
 Previously this app was a [desktop application](https://github.com/justin-hackin/polyhedz-studio/releases/latest) but it has since been ported to a [web application](https://polyhedz-studio.vercel.app). Note the default branch is `web` whereas the legacy Electron app exists on `master`. The code that is not specific to the particular designs (widgets) will serve as the foundation for a more general-purpose framework that will enable inventors/designers/makers to code their own design objects. This framework will be extracted from this repo which will serve as the repository for the widgets only.
 
-| ![polyhedral lantern sculpture with print face decoration](/packages/renderer/static/images/widgets/polyhedral-net.png) | ![polyhedral lantern sculpture with cut holes face decoration](/docs/images/polyhedral-net-vector.png) |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ![polyhedral lantern sculpture with print face decoration](/src/widgets/PyramidNet/static/widget-preview.png) | ![polyhedral lantern sculpture with cut holes face decoration](/docs/images/polyhedral-net-vector.png) |
+|----------------------------------------------------------------------------------------------| ------------------------------------------------------------ |
 
 
 ## App info
@@ -71,7 +71,7 @@ While this application was originally designed only for creating polyhedral nets
 
 #### Cylinder Lightbox
 <p alt="cylinder lightbox" align="center">
-  <img width="160px" src="/packages/renderer/static/images/widgets/cylinder-lightbox.png" />
+  <img width="160px" src="/src/widgets/CylinderLightbox/widget-preview.png" />
 </p>
 
 An open polygon prism box with ring-shaped sleeve edges. This allows one to efficiently construct a (roughly) cylindrical form out of flat panels. It has been used to create circular LED lightboxes. 
@@ -81,9 +81,9 @@ This widget has a different UI configuration in the Assets accordion known as a 
 #### Grid dividers
 
 <p alt="crosshatch shelf" align="center">
-  <img width="160px" src="/packages/renderer/static/images/widgets/square-grid-divider.png" /><img width="160px" src="/packages/renderer/static/images/widgets/diamond-grid-divider.png" />
+  <img width="160px" src="/src/widgets/CrosshatchShelves/previews/square-grid-divider.png" /><img width="160px" src="/src/widgets/CrosshatchShelves/previews/diamond-grid-divider.png" /><img width="160px" src="/src/widgets/CrosshatchShelves/previews/triangle-grid-divider.png" />
 </p>
-Enables the creation of slotted cross-hatched shelving inserts. One widget creates square grids while the other creates "diamond" (45° rotated square) grid. Target application: spatial organization, storage of many bottles and/or cans within larger shelf section, collectibles box divider.
+Enables the creation of slotted cross-hatched shelving inserts. Target application: spatial organization, storage of many bottles and/or cans within larger shelf section, collectibles box divider.
 
 ## Warning
 
