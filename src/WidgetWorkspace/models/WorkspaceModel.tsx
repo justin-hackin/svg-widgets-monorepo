@@ -23,8 +23,8 @@ import {
 } from 'react-svg-pan-zoom';
 import JSZip from 'jszip';
 import fileDownload from 'js-file-download';
-import { radioProp, switchProp } from '../../common/keystone-tweakables/props';
-import { UNITS } from '../../common/util/units';
+import { radioProp, switchProp } from '@/common/keystone-tweakables/props';
+import { UNITS } from '@/common/util/units';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 import type { Orientation } from '../index';
 
@@ -112,14 +112,6 @@ export class WorkspaceModel extends Model({
   }
 
   onAttachedToRootStore() {
-    if (this.availableWidgetTypes.length === 1) {
-      // @ts-ignore
-      this.setSelectedWidgetModelType(widgetList[0].$modelType);
-      this.resetModelToDefault();
-    } else {
-      this.newWidget();
-    }
-
     const disposers = [
       // title bar changes for file status indication
       reaction(() => [this.titleBarText], () => {
@@ -267,6 +259,17 @@ export class WorkspaceModel extends Model({
     if (SelectedModel) {
       const newStore = new SelectedModel({});
       this.setSelectedStore(newStore);
+    }
+  }
+
+  @action
+  widgetsReady() {
+    if (this.availableWidgetTypes.length === 1) {
+      // @ts-ignore
+      this.setSelectedWidgetModelType(widgetList[0].$modelType);
+      this.resetModelToDefault();
+    } else {
+      this.newWidget();
     }
   }
 

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { ProvidersWrapper } from './common/components/ProvidersWrapper';
 import { useWorkspaceMst } from './WidgetWorkspace/rootStore';
 import { WidgetWorkspace } from './WidgetWorkspace';
+import './widgets/index';
 
 const AllRoutes = observer(() => {
   const workspaceStore = useWorkspaceMst();
