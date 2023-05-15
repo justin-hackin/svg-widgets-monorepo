@@ -1,9 +1,9 @@
 import { getParent, getParentToChildPath } from 'mobx-keystone';
 import { computed, makeObservable } from 'mobx';
 import { isFunction, startCase } from 'lodash-es';
-import { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
-import { TweakableReferenceWithOptionsModel } from './models/TweakableReferenceWithOptionsModel';
-import {
+import type { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
+import type { TweakableReferenceWithOptionsModel } from './models/TweakableReferenceWithOptionsModel';
+import type {
   TweakableModel,
   labelGenerator,
   labelOverride,

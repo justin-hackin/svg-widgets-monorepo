@@ -4,9 +4,8 @@ import { reverse } from 'svg-path-reverse';
 import {
   castCoordToRawPoint, Coord, PointLike, pointsAreEqual, RawPoint, rawPointToString,
 } from '../util/geom';
+// eslint-disable-next-line import/no-cycle
 import { roundedEdgePath } from './shapes/generic';
-
-/* eslint-disable no-param-reassign */
 
 enum CommandCodes { M = 'M', L = 'L', C = 'C', S = 'S', Q = 'Q', T = 'T', A = 'A', Z = 'Z' }
 

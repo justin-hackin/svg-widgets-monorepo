@@ -1,13 +1,12 @@
-/* eslint-disable react/require-default-props */
 import React from 'react';
 import { observer } from 'mobx-react';
 
 import { HookReturnType, UseDragConfig } from 'react-use-gesture/dist/types';
 import { RawPoint, scalePoint } from '../../../../../../../../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
-import { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
-import { TextureEditorModel } from '../../../models/TextureEditorModel';
+import type { TextureEditorModel } from '../../../models/TextureEditorModel';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
 import { PathFaceDecorationPatternModel } from '../../../../../../../models/PathFaceDecorationPatternModel';
 import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';

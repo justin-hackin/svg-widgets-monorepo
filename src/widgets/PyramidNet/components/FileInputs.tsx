@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
-import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { RawFaceDecorationModel } from '../models/RawFaceDecorationModel';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';

@@ -4,9 +4,9 @@ import {
 import { computed, observable } from 'mobx';
 import { ownPropertyName, resolveLabel } from '../util';
 import { propertyMetadataCtx } from '../data';
-import { PrimitiveMetadata } from '../types';
+import type { PrimitiveMetadata } from '../types';
 
-@model('TweakablePrimitiveModel')// eslint-disable-next-line @typescript-eslint/no-shadow
+@model('TweakablePrimitiveModel')
 export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Model(<T>() => ({
   value: prop<T>().withSetter(),
 }))<T> {

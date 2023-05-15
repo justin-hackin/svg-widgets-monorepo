@@ -12,7 +12,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { styled } from '@mui/styles';
 import { observer } from 'mobx-react';
 import { HorizontalSplit, VerticalSplit } from '@mui/icons-material';
-import { WorkspaceModel } from '../models/WorkspaceModel';
+import type { WorkspaceModel } from '../models/WorkspaceModel';
 import { useWorkspaceMst } from '../rootStore';
 
 const TOOL_ICON_MAP = {

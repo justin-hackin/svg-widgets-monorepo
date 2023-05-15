@@ -2,21 +2,7 @@ import { connectReduxDevTools, registerRootStore } from 'mobx-keystone';
 import React, { createContext, useContext } from 'react';
 import { WorkspaceModel } from './models/WorkspaceModel';
 // previews must follow WorkspaceModel import
-import { PyramidNetWidgetModel } from '../widgets/PyramidNet/models/PyramidNetWidgetStore';
-import { CylinderLightboxWidgetModel } from '../widgets/CylinderLightbox';
-import { SquareGridDividerWidgetModel } from '../widgets/CrosshatchShelves/SquareGridDividerWidgetModel';
-import { DiamondGridDividerWidgetModel } from '../widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
-import { TriangularGridWidgetModel } from '../widgets/CrosshatchShelves/TriangularGrid';
 import { IS_DEVELOPMENT_BUILD } from '../common/constants';
-
-// eslint-disable-next-line no-console
-console.log('Widgets: ', [
-  PyramidNetWidgetModel,
-  CylinderLightboxWidgetModel,
-  SquareGridDividerWidgetModel,
-  DiamondGridDividerWidgetModel,
-  TriangularGridWidgetModel,
-]);
 
 export const workspaceStore = new WorkspaceModel({});
 registerRootStore(workspaceStore);

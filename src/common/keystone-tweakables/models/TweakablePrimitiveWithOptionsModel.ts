@@ -1,7 +1,7 @@
 import { ExtendedModel, model, modelClass } from 'mobx-keystone';
 import { TweakablePrimitiveModel } from './TweakablePrimitiveModel';
 import { createOptionsGetter } from '../util';
-import { OptionsListItem, WithOptionsMetadata } from '../types';
+import type { OptionsListItem, WithOptionsMetadata } from '../types';
 
 @model('TweakablePrimitiveWithOptionsModel')
 export class TweakablePrimitiveWithOptionsModel<T, M extends WithOptionsMetadata<T>>

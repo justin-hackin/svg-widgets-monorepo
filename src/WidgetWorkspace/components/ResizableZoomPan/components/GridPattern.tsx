@@ -8,7 +8,6 @@ export function GridPattern({ patternId }) {
   return (
     <defs>
       <pattern id={patternId} patternUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
-        {/* eslint-disable-next-line max-len */}
         <g>
           <rect x={0} y={0} width={100} height={100} fill={theme.palette.background.paper} />
           {/* eslint-disable-next-line max-len,react/jsx-first-prop-new-line,react/jsx-max-props-per-line */}

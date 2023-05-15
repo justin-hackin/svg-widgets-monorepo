@@ -1,6 +1,6 @@
 import React from 'react';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
-import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
 export function PyramidNetTestTabs({ widgetStore }: { widgetStore: PyramidNetWidgetModel }) {
   const {
@@ -24,6 +24,7 @@ export function PyramidNetTestTabs({ widgetStore }: { widgetStore: PyramidNetWid
     },
   ];
   const Y_SPACING = 0;
+  // returning the results of the reduce caused errors
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
@@ -41,7 +42,6 @@ export function PyramidNetTestTabs({ widgetStore }: { widgetStore: PyramidNetWid
         acc.y += ymax + Y_SPACING;
         return acc;
       }, { children: [], y: 0 }).children}
-
     </>
   );
 }

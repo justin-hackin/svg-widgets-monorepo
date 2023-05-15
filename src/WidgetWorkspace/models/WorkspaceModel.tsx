@@ -26,7 +26,7 @@ import fileDownload from 'js-file-download';
 import { radioProp, switchProp } from '../../common/keystone-tweakables/props';
 import { UNITS } from '../../common/util/units';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
-import { Orientation } from '../index';
+import type { Orientation } from '../index';
 
 type WidgetJSON = {
   widget: {

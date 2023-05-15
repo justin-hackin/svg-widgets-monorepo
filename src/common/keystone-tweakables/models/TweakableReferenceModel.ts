@@ -4,7 +4,7 @@ import {
 import { computed, observable } from 'mobx';
 import { propertyMetadataCtx } from '../data';
 import { ownPropertyName, resolveLabel } from '../util';
-import { ReferenceMetadata } from '../types';
+import type { ReferenceMetadata } from '../types';
 
 @model('TweakableReferenceModel')
 export class TweakableReferenceModel<T extends object, M extends ReferenceMetadata> extends Model(

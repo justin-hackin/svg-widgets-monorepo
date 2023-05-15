@@ -5,7 +5,7 @@ import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import React from 'react';
 import fileDownload from 'js-file-download';
-import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { SVGWrapper } from '../../../common/components/SVGWrapper';
 import { PyramidNetTestTabs } from './PyramidNetTestTabsSvg';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';

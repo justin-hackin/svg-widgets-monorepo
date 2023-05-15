@@ -10,7 +10,7 @@ import {
   registrationMarksPath,
   toRectangleCoordinatesAttrs,
 } from '../../../common/util/svg';
-import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { PathFaceDecorationPatternModel } from '../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';

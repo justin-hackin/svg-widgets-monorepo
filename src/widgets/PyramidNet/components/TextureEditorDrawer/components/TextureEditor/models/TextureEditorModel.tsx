@@ -19,7 +19,7 @@ import { ShapePreviewModel } from './ShapePreviewModel';
 import { sliderProp } from '../../../../../../../common/keystone-tweakables/props';
 import { tryResolvePath } from '../../../../../../../common/util/mobx-keystone';
 import { TransformModel } from '../../../../../models/TransformModel';
-import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../models/PositionableFaceDecorationModel';
 import { extractCutHolesFromSvgString } from '../../../../../../../common/util/svg';

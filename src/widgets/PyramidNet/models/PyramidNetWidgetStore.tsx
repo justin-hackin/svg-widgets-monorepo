@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file,no-param-reassign */
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 

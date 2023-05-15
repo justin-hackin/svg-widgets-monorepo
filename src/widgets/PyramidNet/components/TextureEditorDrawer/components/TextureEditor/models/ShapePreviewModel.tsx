@@ -29,7 +29,7 @@ import {
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { TextureSvgUnobserved } from '../components/TextureArrangement/components/TextureSvg';
-import { TextureEditorModel } from './TextureEditorModel';
+import type { TextureEditorModel } from './TextureEditorModel';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
 import { RawFaceDecorationModel } from '../../../../../models/RawFaceDecorationModel';
 import { PathFaceDecorationPatternModel } from '../../../../../models/PathFaceDecorationPatternModel';

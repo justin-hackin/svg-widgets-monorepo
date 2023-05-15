@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import {
   Model, model, modelAction, prop,
 } from 'mobx-keystone';

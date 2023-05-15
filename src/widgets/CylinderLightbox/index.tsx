@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import { computed } from 'mobx';
 import React from 'react';
 import {

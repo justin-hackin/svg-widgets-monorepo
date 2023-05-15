@@ -6,7 +6,7 @@ import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/Prefer
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
 import { boundingBoxMinPoint, expandBoundingBoxAttrs, registrationMarksPath } from '../../../common/util/svg';
 import { pointToTranslateString, scalePoint } from '../../../common/util/geom';
-import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 

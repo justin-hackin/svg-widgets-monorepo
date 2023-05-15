@@ -1,7 +1,7 @@
 import React from 'react';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
-import { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
 export function DecorationBoundarySVG({ store }: { store: PyramidNetWidgetModel }) {
   const {

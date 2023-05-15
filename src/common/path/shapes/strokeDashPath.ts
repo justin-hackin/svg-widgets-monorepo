@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import {
   chunk, last, range, startCase, sum, uniq,
 } from 'lodash-es';
@@ -13,7 +12,7 @@ import {
 import { PathData } from '../PathData';
 import { referenceSelectProp, sliderWithTextProp } from '../../keystone-tweakables/props';
 import { WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import { PyramidNetWidgetModel } from '../../../widgets/PyramidNet/models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { ratioSliderProps } from '../../../widgets/PyramidNet/constants';
 import { DEFAULT_SLIDER_STEP } from '../../constants';
 

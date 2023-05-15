@@ -2,6 +2,7 @@ import {
   distanceBetweenPoints,
   hingedPlot, PointLike, RawPoint,
 } from '../../util/geom';
+// eslint-disable-next-line import/no-cycle
 import { PathData } from '../PathData';
 
 interface RoundPoint {

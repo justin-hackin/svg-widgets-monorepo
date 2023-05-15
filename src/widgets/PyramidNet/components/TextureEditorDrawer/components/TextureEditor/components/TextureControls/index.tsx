@@ -35,7 +35,7 @@ import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../../../..
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
 import { HistoryButtons } from '../../../../../HistoryButtons';
-import { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../models/ImageFaceDecorationPatternModel';
 import { TweakableInput } from '../../../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 import { ShapeSelect } from '../../../../../ShapeSelect';

@@ -15,7 +15,7 @@ import {
 } from '../../../../../../common/util/tour';
 import { FullPageDiv } from '../../../../../../common/style/style';
 import { RawFaceDecorationModel } from '../../../../models/RawFaceDecorationModel';
-import { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
 import { useWorkspaceMst } from '../../../../../../WidgetWorkspace/rootStore';

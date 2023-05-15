@@ -5,7 +5,7 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import { IconButton } from '@mui/material';
 import { styled } from '@mui/styles';
 import clsx from 'clsx';
-import { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
+import type { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../common/util/tour';
 import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/rootStore';
 
