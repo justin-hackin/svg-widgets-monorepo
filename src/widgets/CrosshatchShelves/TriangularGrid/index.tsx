@@ -2,6 +2,7 @@ import React from 'react';
 import { computed } from 'mobx';
 import { flatten, range } from 'lodash-es';
 import Flatten from '@flatten-js/core';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../../common/util/units';
 import {
@@ -213,4 +214,6 @@ export class TriangularGridWidgetModel extends WidgetExtendedModel({
       ...this.panelAssetMembers,
     ]);
   }
+
+  WatermarkContent = LicenseWatermarkContent;
 }

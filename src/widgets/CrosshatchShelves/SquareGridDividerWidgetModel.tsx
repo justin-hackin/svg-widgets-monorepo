@@ -1,6 +1,7 @@
 import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { PathData } from '../../common/path/PathData';
 import { radioProp } from '../../common/keystone-tweakables/props';
@@ -169,4 +170,6 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
       },
     ]);
   }
+
+  WatermarkContent = LicenseWatermarkContent;
 }

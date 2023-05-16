@@ -2,6 +2,7 @@ import { computed } from 'mobx';
 import React from 'react';
 import Flatten from '@flatten-js/core';
 import { round } from 'lodash-es';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
@@ -163,4 +164,6 @@ export class DiamondGridDividerWidgetModel extends WidgetExtendedModel({
       ],
     );
   }
+
+  WatermarkContent = LicenseWatermarkContent;
 }

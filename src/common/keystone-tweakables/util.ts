@@ -33,6 +33,7 @@ export function createOptionsGetter(
       : () => node.metadata.options,
     configurable: true,
   });
+
   makeObservable(node, { options: computed });
 }
 

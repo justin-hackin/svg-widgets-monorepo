@@ -8,6 +8,7 @@ import {
 import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
@@ -634,4 +635,6 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       <TextureEditorDrawer />
     </>
   );
+
+  WatermarkContent = LicenseWatermarkContent;
 }
