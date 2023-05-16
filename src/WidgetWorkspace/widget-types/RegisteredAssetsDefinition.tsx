@@ -17,20 +17,19 @@ export interface RegisteredWidgetAssetMember {
 }
 
 export class RegisteredAssetsDefinition implements BaseAssetDefinition {
+  @observable
   public memberVisibility: boolean[];
 
   constructor(
     public documentAreaProps: DocumentAreaProps,
     public members: RegisteredWidgetAssetMember[],
   ) {
-    makeObservable(this, {
-      memberVisibility: observable,
-      setMemberVisibility: action,
-    });
+    makeObservable(this);
     this.memberVisibility = Array(members.length)
       .fill(true);
   }
 
+  @action
   setMemberVisibility(index: number, isVisible: boolean) {
     if (this.memberVisibility[index] === undefined) {
       throw new Error('out of range index while setting member visibility');

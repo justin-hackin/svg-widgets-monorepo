@@ -42,8 +42,10 @@ const castDocumentAreaPropsToBoundingBoxAttrs = (dap: DocumentAreaProps): Boundi
 };
 
 export class DisjunctAssetsDefinition implements BaseAssetDefinition {
+  @observable
   public overlayModeEnabled = false;
 
+  @observable
   public selectedMember = 0;
 
   constructor(
@@ -51,18 +53,15 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
     public allowOverlayMode: boolean = true,
   ) {
     if (allowOverlayMode) { this.overlayModeEnabled = true; }
-    makeObservable(this, {
-      selectedMember: observable,
-      setSelectedMember: action,
-      overlayModeEnabled: observable,
-      setOverlayModeEnabled: action,
-    });
+    makeObservable(this);
   }
 
+  @action
   setSelectedMember(selectedIndex: number) {
     this.selectedMember = selectedIndex;
   }
 
+  @action
   setOverlayModeEnabled(enabled: boolean) {
     this.overlayModeEnabled = enabled;
   }

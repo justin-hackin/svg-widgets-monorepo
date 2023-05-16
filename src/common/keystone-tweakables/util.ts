@@ -1,14 +1,13 @@
 import { getParent, getParentToChildPath } from 'mobx-keystone';
-import { computed, makeObservable } from 'mobx';
 import { isFunction, startCase } from 'lodash-es';
 import type { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
 import type { TweakableReferenceWithOptionsModel } from './models/TweakableReferenceWithOptionsModel';
 import type {
-  TweakableModel,
   labelGenerator,
   labelOverride,
   MetadataOptions,
   OptionsListResolverFactory,
+  TweakableModel,
 } from './types';
 
 export const ownPropertyName = (node) => {
@@ -33,8 +32,6 @@ export function createOptionsGetter(
       : () => node.metadata.options,
     configurable: true,
   });
-
-  makeObservable(node, { options: computed });
 }
 
 export const isFunctionOverride = (override: labelOverride): override is labelGenerator => isFunction(override);
