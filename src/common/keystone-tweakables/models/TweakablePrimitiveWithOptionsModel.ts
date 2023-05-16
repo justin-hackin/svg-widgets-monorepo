@@ -3,7 +3,7 @@ import { TweakablePrimitiveModel } from './TweakablePrimitiveModel';
 import { createOptionsGetter } from '../util';
 import type { OptionsListItem, WithOptionsMetadata } from '../types';
 
-@model('TweakablePrimitiveWithOptionsModel')
+@model('SvgWidgetStudio/TweakablePrimitiveWithOptionsModel')
 export class TweakablePrimitiveWithOptionsModel<T, M extends WithOptionsMetadata<T>>
   extends ExtendedModel(<T, M extends WithOptionsMetadata<T>>() => ({
     baseModel: modelClass<TweakablePrimitiveModel<T, M>>(TweakablePrimitiveModel),

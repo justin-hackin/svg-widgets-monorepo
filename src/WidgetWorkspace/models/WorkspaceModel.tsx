@@ -41,7 +41,7 @@ type WidgetJSON = {
   }
 };
 
-@model('WorkspacePreferencesModel')
+@model('SvgWidgetStudio/WorkspacePreferencesModel')
 class WorkspacePreferencesModel extends Model({
     displayUnit: radioProp(UNITS.cm, {
       options: Object.values(UNITS).map((unit) => ({ value: unit, label: unit })),
@@ -61,7 +61,7 @@ observable(widgetIconMap);
 
 export function widgetModel(modelName: string, previewIcon: string) {
   return function <C extends ModelClass<BaseWidgetClass>>(constructor: C): C {
-    const decoratedClass = model(modelName)(constructor);
+    const decoratedClass = model(`SvgWidgetStudio/widgets/${modelName}`)(constructor);
     widgetOptions.set(modelName, decoratedClass);
     widgetIconMap.set(modelName, previewIcon);
     return decoratedClass;
@@ -72,7 +72,7 @@ export function WidgetExtendedModel(modelProps: ModelProps) {
   return ExtendedModel(BaseWidgetClass, modelProps);
 }
 
-@model('WorkspaceModel')
+@model('SvgWidgetStudio/WorkspaceModel')
 export class WorkspaceModel extends Model({
   selectedStore: prop<BaseWidgetClass>(undefined).withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))).withSetter(),
