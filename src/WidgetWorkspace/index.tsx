@@ -8,10 +8,9 @@ import {
 import { startCase } from 'lodash-es';
 import { styled } from '@mui/styles';
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex';
-import { ResizableZoomPan } from './components/ResizableZoomPan';
+import { WidgetDesignArea } from '@/WidgetWorkspace/components/WidgetDesignArea';
+import { FullPageDiv } from '@/common/style/style';
 import { WidgetControlPanel } from './components/WidgetControlPanel';
-import { FullPageDiv } from '../common/style/style';
-import { DielineViewToolbar } from './components/DielineViewToolbar';
 import { useWorkspaceMst } from './rootStore';
 import { widgetIconMap, widgetOptions } from './models/WorkspaceModel';
 import { FileInputs } from './components/FileInputs';
@@ -103,10 +102,10 @@ const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer((
         {selectedStore && (
           <StyledReflexContainer orientation={resolvedPanelOrientation}>
             <ReflexElement>
-              <DielineViewToolbar orientation={resolvedPanelOrientation} showOrientationToggle={!panelOrientation} />
-              <ResizableZoomPan SVGBackground="url(#grid-pattern)">
-                {selectedStore.assetDefinition.WorkspaceView}
-              </ResizableZoomPan>
+              <WidgetDesignArea
+                orientation={resolvedPanelOrientation}
+                showOrientationToggle={!panelOrientation}
+              />
             </ReflexElement>
             <ReflexSplitter />
             <ReflexElement
