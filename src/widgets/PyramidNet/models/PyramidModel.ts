@@ -28,7 +28,7 @@ export class PyramidModel extends Model({
   }),
   netsPerPyramid: radioProp(1, {
     isRow: true,
-    options: (_, self) => () => (getParent(self).netsPerPyramidOptions as number[])
+    options: (self) => (getParent(self).netsPerPyramidOptions as number[])
       .map((value) => ({ value, label: value.toString() })),
   }),
 }) {

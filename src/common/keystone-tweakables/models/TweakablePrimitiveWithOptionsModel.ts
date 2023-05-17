@@ -11,8 +11,11 @@ export class TweakablePrimitiveWithOptionsModel<T, M extends WithOptionsMetadata
   }))<T, M> {
   readonly options: OptionsListItem<T>[] | undefined;
 
+  onInit() {
+    createOptionsGetter(this);
+  }
+
   onAttachedToRootStore(rootStore) {
-    createOptionsGetter(this, rootStore);
     super.onAttachedToRootStore(rootStore);
   }
 }

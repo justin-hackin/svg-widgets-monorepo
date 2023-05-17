@@ -12,15 +12,7 @@ export class TweakableReferenceWithOptionsModel<T extends object, M extends Refe
   }))<T, M> {
   readonly options: OptionsListItem<T>[] | undefined;
 
-  onAttachedToRootStore(rootStore) {
-    createOptionsGetter(this, rootStore);
-
-    if (this.value === undefined && this.metadata.initialSelectionResolver !== undefined) {
-      const value = this.metadata.initialSelectionResolver(this.options.map(({ value }) => value), rootStore);
-      if (value) {
-        this.valueRef = this.metadata.typeRef(value);
-      }
-    }
-    super.onAttachedToRootStore(rootStore);
+  onInit() {
+    createOptionsGetter(this);
   }
 }

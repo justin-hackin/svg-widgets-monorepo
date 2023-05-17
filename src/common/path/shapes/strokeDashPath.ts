@@ -2,7 +2,7 @@ import {
   chunk, last, range, startCase, sum, uniq,
 } from 'lodash-es';
 import {
-  detach, getRootPath, Model, model, prop, rootRef,
+  customRef, detach, getRootPath, Model, model, prop,
 } from 'mobx-keystone';
 
 import { computed } from 'mobx';
@@ -11,8 +11,6 @@ import {
 } from '../../util/geom';
 import { PathData } from '../PathData';
 import { referenceSelectProp, sliderWithTextProp } from '../../keystone-tweakables/props';
-import { WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import type { PyramidNetWidgetModel } from '../../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { ratioSliderProps } from '../../../widgets/PyramidNet/constants';
 import { DEFAULT_SLIDER_STEP } from '../../constants';
 
@@ -52,17 +50,24 @@ export class StrokeDashPathPatternModel extends Model({
   }
 }
 
-const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
+export const dashPatternsById = dasharrays.reduce((acc, relativeStrokeDasharray) => {
+  const inst = new StrokeDashPathPatternModel({
+    relativeStrokeDasharray,
+  });
+  acc[inst.label] = inst;
+  return acc;
+}, {} as Record<string, StrokeDashPathPatternModel>);
+
+const patternRef = customRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
   onResolvedValueChange(ref, newInst, oldInst) {
     if (oldInst && !newInst) {
       detach(ref);
     }
   },
+  resolve(ref) {
+    return dashPatternsById[ref.id];
+  },
 });
-
-export const dashPatternsDefaultFn = () => dasharrays.map((relativeStrokeDasharray) => (new StrokeDashPathPatternModel({
-  relativeStrokeDasharray,
-})));
 
 const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 @model('DashPatternModel')
@@ -78,7 +83,7 @@ export class DashPatternModel extends Model({
       return node.ownPropertyName;
     },
     typeRef: patternRef,
-    options: (rootStore) => () => ((rootStore as WorkspaceModel).selectedStore as PyramidNetWidgetModel).dashPatterns
+    options: Object.values(dashPatternsById)
       .map((pattern) => ({
         value: pattern,
         label: pattern.label,

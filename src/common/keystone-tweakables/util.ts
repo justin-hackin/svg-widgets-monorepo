@@ -23,19 +23,20 @@ export function optionsIsListResolver<T>(
 
 export function createOptionsGetter(
   node: TweakablePrimitiveWithOptionsModel<any, any> | TweakableReferenceWithOptionsModel<any, any>,
-  rootStore: object,
 ) {
-  if (node.options) { return; }
   Object.defineProperty(node, 'options', {
-    get: optionsIsListResolver(node.metadata.options)
-      ? node.metadata.options(rootStore, node)
-      : () => node.metadata.options,
-    configurable: true,
+    get() {
+      if (!this.metadata) { return undefined; }
+      return optionsIsListResolver(this.metadata.options)
+        ? this.metadata.options(this)
+        : this.metadata.options;
+    },
   });
 }
 
 export const isFunctionOverride = (override: labelOverride): override is labelGenerator => isFunction(override);
 export const resolveLabel = (node: TweakableModel) => {
+  if (!node.metadata) { return ''; }
   const {
     ownPropertyName,
     metadata: { labelOverride },

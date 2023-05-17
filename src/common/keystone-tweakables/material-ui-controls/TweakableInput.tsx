@@ -27,6 +27,7 @@ INPUT_TYPE,
 
 export function TweakableInput({ node, className }:
 { node: TweakableModel, className?: string }) {
+  if (!node || !node.metadata) { return null; }
   const Component = TYPE_COMPONENT_MAP[node.metadata.type];
   return <Component className={className} node={node} />;
 }

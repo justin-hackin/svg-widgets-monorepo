@@ -85,7 +85,6 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
   useDottedStroke: prop(false),
   baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
   interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
-  // dashPatterns: prop(() => dashPatternsDefaultFn()),
 }) {
   @observable
     textureEditorOpen = false;

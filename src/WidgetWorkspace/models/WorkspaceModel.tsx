@@ -18,8 +18,7 @@ import {
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash-es';
 import {
-// @ts-ignore
-  fitToViewer, INITIAL_VALUE, Tool, TOOL_PAN, Value,
+  fitToViewer, Tool, TOOL_PAN, Value,
 } from 'react-svg-pan-zoom';
 import JSZip from 'jszip';
 import fileDownload from 'js-file-download';
@@ -85,8 +84,9 @@ export class WorkspaceModel extends Model({
     this.selectedWidgetModelType = selectedWidgetModelType;
   }
 
+  // package used to export INITIAL_VALUE but this somehow works okay
   @observable
-    zoomPanValue: Value = INITIAL_VALUE;
+    zoomPanValue: Value = {} as Value;
 
   @observable
     zoomPanTool: Tool = TOOL_PAN;

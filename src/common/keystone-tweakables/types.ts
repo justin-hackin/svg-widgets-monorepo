@@ -18,7 +18,7 @@ export enum INPUT_TYPE {
 export type labelGenerator = (node: TweakableModel) => string;
 export type labelOverride = string | labelGenerator;
 
-interface BasePrimitiveMetadata {
+export interface BasePrimitiveMetadata {
   labelOverride?: labelOverride,
 }
 
@@ -45,7 +45,7 @@ export interface OptionsListItem<T> {
   label?: string,
 }
 
-export type OptionsListResolverFactory<T> = (rootStore: object, node: object) => (() => OptionsListItem<T>[]);
+export type OptionsListResolverFactory<T> = (node: object) => (OptionsListItem<T>[]);
 export type MetadataOptions<T> = OptionsListItem<T>[] | OptionsListResolverFactory<T>;
 
 export interface RadioMetadata<T> extends BasePrimitiveMetadata {
@@ -89,7 +89,7 @@ export type TweakableModel =
   TweakablePrimitiveModel<any, PrimitiveMetadata>
   | TweakableReferenceModel<any, ReferenceMetadata>
   | TweakablePrimitiveWithOptionsModel<any, WithOptionsMetadata<any>>;
-type InitialSelectionResolver<T> = (optionValues: T[], rootStore: object) => (T | undefined);
+type InitialSelectionResolver<T> = (optionValues: T[]) => (T | undefined);
 
 export interface ReferenceResolvingOptionsMetadata<T extends object> extends BasePrimitiveMetadata {
   initialSelectionResolver?: InitialSelectionResolver<T>,
