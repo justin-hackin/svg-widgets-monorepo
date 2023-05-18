@@ -134,10 +134,7 @@ export class DiamondGridDividerWidgetModel extends WidgetExtendedModel({
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get fileBasename() {
-    return 'DiamondShelves';
-  }
+  fileBasename = 'DiamondShelves';
 
   @computed
   get assetDefinition() {

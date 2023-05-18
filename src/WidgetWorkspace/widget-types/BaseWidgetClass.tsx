@@ -7,7 +7,7 @@ import { AdditionalToolbarItem } from '../../widgets/PyramidNet/components/Addit
 import { FileMenuItem } from '../components/AdditionalFileMenuItems';
 
 export abstract class BaseWidgetClass extends Model({}) {
-  abstract get fileBasename(): string;
+  abstract fileBasename: string;
 
   @observable
     history: UndoManager;

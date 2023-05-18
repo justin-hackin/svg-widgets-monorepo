@@ -181,10 +181,7 @@ export class TriangularGridWidgetModel extends WidgetExtendedModel({
         }))));
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get fileBasename() {
-    return 'TriangularGrid';
-  }
+  fileBasename = 'TriangularGrid';
 
   @computed
   get assetDefinition() {

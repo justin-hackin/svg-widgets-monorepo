@@ -105,10 +105,7 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
     return path;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get fileBasename() {
-    return 'CrossHatchShelves';
-  }
+  fileBasename = 'CrossHatchShelves';
 
   @computed
   get assetDefinition() {
