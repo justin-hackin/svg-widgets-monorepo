@@ -83,9 +83,9 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   faceDecoration: prop<PositionableFaceDecorationModel | RawFaceDecorationModel>(
     () => new PositionableFaceDecorationModel({}),
   ).withSetter(),
-  useDottedStroke: prop(false),
-  baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined).withSetter(),
-  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined).withSetter(),
+  useDottedStroke: prop(true),
+  baseScoreDashSpec: prop<DashPatternModel | undefined>(() => (new DashPatternModel({}))).withSetter(),
+  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(() => (new DashPatternModel({}))).withSetter(),
 }) {
   @observable
     textureEditorOpen = false;
