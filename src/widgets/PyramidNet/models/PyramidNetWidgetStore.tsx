@@ -84,8 +84,8 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     () => new PositionableFaceDecorationModel({}),
   ).withSetter(),
   useDottedStroke: prop(false),
-  baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
-  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
+  baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined).withSetter(),
+  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined).withSetter(),
 }) {
   @observable
     textureEditorOpen = false;
@@ -479,15 +479,6 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       : this.faceDecoration?.pattern?.sourceFileName;
   }
 
-  // temporarily force no dotted stroke due to issues
-  // with tweakable reference select on restoring snapshot
-  onInit() {
-    super.onInit();
-    this.history.withoutUndo(() => {
-      this.setUseDottedStroke(false);
-    });
-  }
-
   onAttachedToRootStore() {
     this.persistPreferences();
     this.history.withoutUndo(() => {
@@ -537,11 +528,11 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   setUseDottedStroke(useDotted) {
     this.useDottedStroke = useDotted;
     if (useDotted) {
-      this.interFaceScoreDashSpec = new DashPatternModel({});
-      this.baseScoreDashSpec = new DashPatternModel({});
+      this.setInterFaceScoreDashSpec(new DashPatternModel({}));
+      this.setBaseScoreDashSpec(new DashPatternModel({}));
     } else {
-      this.interFaceScoreDashSpec = undefined;
-      this.baseScoreDashSpec = undefined;
+      this.setInterFaceScoreDashSpec(undefined);
+      this.setBaseScoreDashSpec(undefined);
     }
   }
 
