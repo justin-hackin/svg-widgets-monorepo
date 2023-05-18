@@ -58,7 +58,7 @@ export const dashPatternsById = dasharrays.reduce((acc, relativeStrokeDasharray)
   return acc;
 }, {} as Record<string, StrokeDashPathPatternModel>);
 
-const patternRef = customRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
+const patternRef = customRef<StrokeDashPathPatternModel>(`${STROKE_DASH_PATH_PATTERN_MODEL_TYPE}--ref`, {
   onResolvedValueChange(ref, newInst, oldInst) {
     if (oldInst && !newInst) {
       detach(ref);
