@@ -83,15 +83,19 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   faceDecoration: prop<PositionableFaceDecorationModel | RawFaceDecorationModel>(
     () => new PositionableFaceDecorationModel({}),
   ).withSetter(),
-  useDottedStroke: prop(true),
-  baseScoreDashSpec: prop<DashPatternModel | undefined>(() => (new DashPatternModel({}))).withSetter(),
-  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(() => (new DashPatternModel({}))).withSetter(),
+  baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined).withSetter(),
+  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined).withSetter(),
 }) {
   @observable
     textureEditorOpen = false;
 
   @observable
     importFaceDialogActive = false;
+
+  @computed
+  get useDottedStroke() {
+    return !!this.baseScoreDashSpec && !!this.interFaceScoreDashSpec;
+  }
 
   @action
   activateImportFaceDialog() {
@@ -525,8 +529,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   }
 
   @modelAction
-  setUseDottedStroke(useDotted) {
-    this.useDottedStroke = useDotted;
+  setUseDottedStroke(useDotted: boolean) {
     if (useDotted) {
       this.setInterFaceScoreDashSpec(new DashPatternModel({}));
       this.setBaseScoreDashSpec(new DashPatternModel({}));
