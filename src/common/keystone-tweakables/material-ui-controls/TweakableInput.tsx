@@ -1,4 +1,5 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 import { INPUT_TYPE, TweakableModel } from '../types';
 import { TweakableSlider } from './TweakableSlider';
 import { TweakableRadio } from './TweakableRadio';
@@ -25,9 +26,9 @@ INPUT_TYPE,
   [INPUT_TYPE.REFERENCE_SELECT]: TweakableReferenceSelect,
 };
 
-export function TweakableInput({ node, className }:
-{ node: TweakableModel, className?: string }) {
-  if (!node || !node.metadata) { return null; }
+export const TweakableInput = observer(({ node, className }:
+{ node: TweakableModel, className?: string }) => {
+  if (!node || !node.onAttachedComplete || !node.metadata) { return null; }
   const Component = TYPE_COMPONENT_MAP[node.metadata.type];
   return <Component className={className} node={node} />;
-}
+});
