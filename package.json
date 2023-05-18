@@ -29,6 +29,7 @@
     "*.{js,ts,tsx}": "eslint --cache --fix"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.7",
     "@types/node": "^18.16.9",
     "@types/react-svg-pan-zoom": "^3.3.2",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
@@ -61,7 +62,6 @@
     "@mui/material": "^5.0.3",
     "@mui/styles": "^5.0.1",
     "@mui/types": "^7.0.0",
-    "@types/lodash": "^4.14.172",
     "@types/react-dom": "^17.0.9",
     "canvg": "^3.0.6",
     "clsx": "^1.1.1",
