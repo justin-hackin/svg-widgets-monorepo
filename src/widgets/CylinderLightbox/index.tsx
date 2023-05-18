@@ -1,5 +1,7 @@
 import { computed } from 'mobx';
 import React from 'react';
+import { ExtendedModel } from 'mobx-keystone';
+import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
 } from '../../common/util/geom';
@@ -10,7 +12,7 @@ import { closedPolygonPath } from '../../common/path/shapes/generic';
 import { DestinationCommand, PathData } from '../../common/path/PathData';
 import { pathDToViewBoxStr } from '../../common/util/svg';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { WidgetExtendedModel, widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
+import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import { DEFAULT_SLIDER_STEP } from '../../common/constants';
 import widgetPreview from './widget-preview.png';
 
@@ -26,7 +28,7 @@ const rectanglePathCenteredOnOrigin = (width: number, height:number) => closedPo
 const polygonSideLength = (numSides: number, inRadius: number) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
 @widgetModel('CylinderLightbox', widgetPreview)
-export class CylinderLightboxWidgetModel extends WidgetExtendedModel({
+export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,
   }),

@@ -1,7 +1,7 @@
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
-import { modelAction, prop } from 'mobx-keystone';
+import { ExtendedModel, modelAction, prop } from 'mobx-keystone';
 import {
   action, computed, observable, reaction,
 } from 'mobx';
@@ -9,6 +9,7 @@ import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
+import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
@@ -46,7 +47,7 @@ import {
 import { closedPolygonPath, roundedEdgePath } from '../../../common/path/shapes/generic';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
-import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { additionalFileMenuItemsFactory } from '../components/additionalFileMenuItemsFactory';
 import { FileInputs } from '../components/FileInputs';
 import { DEFAULT_SLIDER_STEP } from '../../../common/constants';
@@ -72,7 +73,7 @@ const applyFlap = (
 };
 
 @widgetModel('PolyhedralNet', previewIcon)
-export class PyramidNetWidgetModel extends WidgetExtendedModel({
+export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),
   baseEdgeTabsSpec: prop<BaseEdgeTabsModel>(() => (new BaseEdgeTabsModel({}))),

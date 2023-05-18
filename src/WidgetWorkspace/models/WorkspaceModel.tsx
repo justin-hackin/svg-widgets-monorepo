@@ -5,13 +5,11 @@ import {
 import {
   applySnapshot,
   detach,
-  ExtendedModel,
   getSnapshot,
   model,
   Model,
   modelAction,
   ModelClass,
-  ModelProps,
   prop,
   SnapshotInOfModel,
 } from 'mobx-keystone';
@@ -65,10 +63,6 @@ export function widgetModel(modelName: string, previewIcon: string) {
     widgetIconMap.set(modelName, previewIcon);
     return decoratedClass;
   };
-}
-
-export function WidgetExtendedModel(modelProps: ModelProps) {
-  return ExtendedModel(BaseWidgetClass, modelProps);
 }
 
 @model('SvgWidgetStudio/WorkspaceModel')
