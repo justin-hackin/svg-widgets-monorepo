@@ -41,7 +41,7 @@ type WidgetJSON = {
 @model('SvgWidgetStudio/WorkspacePreferencesModel')
 class WorkspacePreferencesModel extends Model({
     displayUnit: radioProp(UNITS.cm, {
-      options: Object.values(UNITS).map((unit) => ({ value: unit, label: unit })),
+      options: Object.values(UNITS),
       isRow: true,
     }),
     darkModeEnabled: switchProp(true),

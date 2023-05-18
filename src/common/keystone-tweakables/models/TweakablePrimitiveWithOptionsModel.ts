@@ -1,7 +1,8 @@
 import { ExtendedModel, model, modelClass } from 'mobx-keystone';
+import { stringifier } from '@/common/util/data';
 import { TweakablePrimitiveModel } from './TweakablePrimitiveModel';
 import { createOptionsGetter } from '../util';
-import type { OptionsListItem, WithOptionsMetadata } from '../types';
+import type { WithOptionsMetadata } from '../types';
 
 @model('SvgWidgetStudio/TweakablePrimitiveWithOptionsModel')
 export class TweakablePrimitiveWithOptionsModel<T, M extends WithOptionsMetadata<T>>
@@ -9,7 +10,11 @@ export class TweakablePrimitiveWithOptionsModel<T, M extends WithOptionsMetadata
     baseModel: modelClass<TweakablePrimitiveModel<T, M>>(TweakablePrimitiveModel),
     props: {},
   }))<T, M> {
-  readonly options: OptionsListItem<T>[] | undefined;
+  readonly options: T[] | undefined;
+
+  get optionLabelMap() {
+    return this.metadata?.optionLabelMap || stringifier;
+  }
 
   onInit() {
     createOptionsGetter(this);

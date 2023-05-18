@@ -24,3 +24,4 @@ export const resolveImageDimensionsFromBase64 = (base64): Promise<dimensions> =>
     };
     img.src = base64;
   }));
+export const stringifier = (option) => (`${option}`);

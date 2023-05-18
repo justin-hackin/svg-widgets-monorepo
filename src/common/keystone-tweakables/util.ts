@@ -8,6 +8,7 @@ import type {
   MetadataOptions,
   OptionsListResolverFactory,
   TweakableModel,
+  ReferenceWithOptionsMetadata, WithOptionsMetadata,
 } from './types';
 
 export const ownPropertyName = (node) => {
@@ -20,10 +21,15 @@ export function optionsIsListResolver<T>(
 ): options is OptionsListResolverFactory<T> {
   return isFunction(options);
 }
+type referenceNodeType = TweakableReferenceWithOptionsModel<any, ReferenceWithOptionsMetadata<any>>;
+type nodeType = TweakablePrimitiveWithOptionsModel<any, WithOptionsMetadata<any>>
+| referenceNodeType;
 
-export function createOptionsGetter(
-  node: TweakablePrimitiveWithOptionsModel<any, any> | TweakableReferenceWithOptionsModel<any, any>,
-) {
+const isRefModel = (
+  node: nodeType,
+): node is referenceNodeType => !!(node as referenceNodeType).metadata?.typeRef;
+
+export function createOptionsGetter(node: nodeType) {
   Object.defineProperty(node, 'options', {
     get() {
       if (!this.metadata) { return undefined; }
@@ -32,6 +38,15 @@ export function createOptionsGetter(
         : this.metadata.options;
     },
   });
+
+  if (node.metadata.initialSelectionResolver) {
+    const resolvedInitialSelection = node.metadata.initialSelectionResolver(node.options);
+    if (isRefModel(node)) {
+      node.setValueRef(node.metadata.typeRef(resolvedInitialSelection));
+    } else {
+      node.setValue(resolvedInitialSelection);
+    }
+  }
 }
 
 export const isFunctionOverride = (override: labelOverride): override is labelGenerator => isFunction(override);

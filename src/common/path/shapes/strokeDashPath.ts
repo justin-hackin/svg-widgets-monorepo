@@ -83,12 +83,9 @@ export class DashPatternModel extends Model({
       return node.ownPropertyName;
     },
     typeRef: patternRef,
-    options: Object.values(dashPatternsById)
-      .map((pattern) => ({
-        value: pattern,
-        label: pattern.label,
-      })),
-    initialSelectionResolver: (options) => options[0],
+    options: Object.values(dashPatternsById),
+    optionLabelMap: (option) => option.label,
+    initialSelectionResolver: (options) => options[1],
   }),
   strokeDashLength: sliderWithTextProp(11, {
     ...strokeLengthProps,

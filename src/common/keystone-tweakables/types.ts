@@ -40,17 +40,15 @@ export interface ColorPickerMetadata extends BasePrimitiveMetadata {
   type: INPUT_TYPE.COLOR_PICKER,
 }
 
-export interface OptionsListItem<T> {
-  value: T,
-  label?: string,
-}
-
-export type OptionsListResolverFactory<T> = (node: object) => (OptionsListItem<T>[]);
-export type MetadataOptions<T> = OptionsListItem<T>[] | OptionsListResolverFactory<T>;
+export type OptionsListResolverFactory<T> = (node: object) => (T[]);
+export type MetadataOptions<T> = T[] | OptionsListResolverFactory<T>;
+type OptionLabelMapFn<T> = (t: T, index?: number)=>string;
 
 export interface RadioMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.RADIO,
   options: MetadataOptions<T>,
+  optionLabelMap?: OptionLabelMapFn<T>,
+  initialSelectionResolver?: InitialSelectionResolver<T>,
   isRow?: boolean,
   valueParser?: (value: string)=>T,
 }
@@ -58,6 +56,8 @@ export interface RadioMetadata<T> extends BasePrimitiveMetadata {
 export interface SelectMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.SELECT,
   options: MetadataOptions<T>,
+  optionLabelMap?: OptionLabelMapFn<T>,
+  initialSelectionResolver?: InitialSelectionResolver<T>,
 }
 
 export type WithOptionsMetadata<T> = SelectMetadata<T> | RadioMetadata<T>;
@@ -95,6 +95,7 @@ export interface ReferenceResolvingOptionsMetadata<T extends object> extends Bas
   initialSelectionResolver?: InitialSelectionResolver<T>,
   typeRef: RefConstructor<T>,
   options: MetadataOptions<T>,
+  optionLabelMap?: OptionLabelMapFn<T>,
 }
 
 export interface ReferenceSelectMetadata<T extends object> extends ReferenceResolvingOptionsMetadata<T> {

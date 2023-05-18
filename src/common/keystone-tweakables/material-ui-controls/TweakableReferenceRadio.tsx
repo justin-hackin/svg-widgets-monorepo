@@ -24,7 +24,10 @@ export const TweakableReferenceRadio = observer((
         onChange: (e) => {
           node.setValue(idToOptions[e.target.value].value);
         },
-        options,
+        options: options.map((value, index) => ({
+          value: value.getRefId(),
+          label: node.optionLabelMap(value, index),
+        })),
         row: node.metadata.isRow,
         value: node.value.$modelId,
         label,

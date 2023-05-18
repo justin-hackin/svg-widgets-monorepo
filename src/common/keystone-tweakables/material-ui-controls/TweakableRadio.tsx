@@ -13,7 +13,10 @@ export const TweakableRadio = observer((
         const value = node.metadata.valueParser ? node.metadata.valueParser(e.target.value) : e.target.value;
         node.setValue(value);
       },
-      options: node.options,
+      options: node.options.map((value) => ({
+        value,
+        label: node.optionLabelMap(value),
+      })),
       row: node.metadata.isRow,
       value: node.value,
       label: node.label,

@@ -71,19 +71,22 @@ export const ShapeSelect = observer(({
           className: classes.shapeSelectDisplay,
         }}
       >
-        {node.options.map(({ value, label }, i) => (
-          <MenuItem key={i} value={value}>
-            {/* preview images generated with https://codesandbox.io/s/youthful-joliot-uxiy */}
-            <ListItemAvatar>
-              <Avatar
-                alt={label}
-                className={classes.shapeAvatar}
-                src={new URL(`../static/model-previews/${value}.png`, import.meta.url).href}
-              />
-            </ListItemAvatar>
-            <ListItemText className={classes.shapeName} primary={label} />
-          </MenuItem>
-        ))}
+        {node.options.map((value, i) => {
+          const label = node.optionLabelMap(value, i);
+          return (
+            <MenuItem key={i} value={value}>
+              {/* preview images generated with https://codesandbox.io/s/youthful-joliot-uxiy */}
+              <ListItemAvatar>
+                <Avatar
+                  alt={label}
+                  className={classes.shapeAvatar}
+                  src={new URL(`../static/model-previews/${value}.png`, import.meta.url).href}
+                />
+              </ListItemAvatar>
+              <ListItemText className={classes.shapeName} primary={label} />
+            </MenuItem>
+          );
+        })}
       </Select>
     </ShapeSelectFormControl>
   );
