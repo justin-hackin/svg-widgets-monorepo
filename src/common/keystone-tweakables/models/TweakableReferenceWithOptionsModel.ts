@@ -20,4 +20,12 @@ export class TweakableReferenceWithOptionsModel<T extends object, M extends Refe
   onInit() {
     createOptionsGetter(this);
   }
+
+  onAttachedToRootStore(rootStore) {
+    if (this.metadata.initialSelectionResolver) {
+      const resolvedInitialSelection = this.metadata.initialSelectionResolver(this.options);
+      this.setValueRef(this.metadata.typeRef(resolvedInitialSelection));
+    }
+    super.onAttachedToRootStore(rootStore);
+  }
 }

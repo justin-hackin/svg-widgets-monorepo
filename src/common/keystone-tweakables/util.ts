@@ -25,10 +25,6 @@ type referenceNodeType = TweakableReferenceWithOptionsModel<any, ReferenceWithOp
 type nodeType = TweakablePrimitiveWithOptionsModel<any, WithOptionsMetadata<any>>
 | referenceNodeType;
 
-const isRefModel = (
-  node: nodeType,
-): node is referenceNodeType => !!(node as referenceNodeType).metadata?.typeRef;
-
 export function createOptionsGetter(node: nodeType) {
   Object.defineProperty(node, 'options', {
     get() {
@@ -38,15 +34,6 @@ export function createOptionsGetter(node: nodeType) {
         : this.metadata.options;
     },
   });
-
-  if (node.metadata.initialSelectionResolver) {
-    const resolvedInitialSelection = node.metadata.initialSelectionResolver(node.options);
-    if (isRefModel(node)) {
-      node.setValueRef(node.metadata.typeRef(resolvedInitialSelection));
-    } else {
-      node.setValue(resolvedInitialSelection);
-    }
-  }
 }
 
 export const isFunctionOverride = (override: labelOverride): override is labelGenerator => isFunction(override);

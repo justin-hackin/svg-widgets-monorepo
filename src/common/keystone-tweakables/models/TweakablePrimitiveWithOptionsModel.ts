@@ -21,6 +21,10 @@ export class TweakablePrimitiveWithOptionsModel<T, M extends WithOptionsMetadata
   }
 
   onAttachedToRootStore(rootStore) {
+    if (this.metadata.initialSelectionResolver) {
+      const resolvedInitialSelection = this.metadata.initialSelectionResolver(this.options);
+      this.setValue(resolvedInitialSelection);
+    }
     super.onAttachedToRootStore(rootStore);
   }
 }
