@@ -583,7 +583,9 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   }
 
   renderDecorationBoundaryToString():string {
-    return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: this }));
+    return ReactDOMServer.renderToString(
+      <DecorationBoundarySVG normalizedDecorationBoundaryPoints={this.normalizedDecorationBoundaryPoints} />,
+    );
   }
 
   get fileBasename() {
