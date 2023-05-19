@@ -1,6 +1,8 @@
 import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
+import { range } from 'lodash-es';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { PathData } from '../../common/path/PathData';
 import { radioProp } from '../../common/keystone-tweakables/props';
@@ -10,13 +12,9 @@ import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetCl
 import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from './previews/square-grid-divider.png';
 
-enum REMAINDER_SIZES {
-  SMALL = 'small',
-  MEDIUM = 'medium',
-  LARGE = 'large',
-}
-
-const cubbiesDecrementOptions = Object.values(REMAINDER_SIZES).map((size, index) => ({ value: index, label: size }));
+const REMAINDER_SIZES: string[] = ['small', 'medium', 'large'];
+const cubbiesDecrementOptions = range(0, REMAINDER_SIZES.length);
+const optionLabelMap = (opt) => REMAINDER_SIZES[opt];
 
 @widgetModel('SquareGridDivider', widgetPreview)
 export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
@@ -24,12 +22,14 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
   widthCubbiesDecrement: radioProp(0, {
     labelOverride: 'Left/right section size',
     options: cubbiesDecrementOptions,
+    optionLabelMap,
     valueParser: parseInt,
     isRow: true,
   }),
   heightCubbiesDecrement: radioProp(0, {
     labelOverride: 'Top/bottom section size',
     options: cubbiesDecrementOptions,
+    optionLabelMap,
     valueParser: parseInt,
     isRow: true,
   }),
@@ -104,10 +104,7 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
     return path;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get fileBasename() {
-    return 'CrossHatchShelves';
-  }
+  fileBasename = 'CrossHatchShelves';
 
   @computed
   get assetDefinition() {
@@ -169,4 +166,6 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
       },
     ]);
   }
+
+  WatermarkContent = LicenseWatermarkContent;
 }

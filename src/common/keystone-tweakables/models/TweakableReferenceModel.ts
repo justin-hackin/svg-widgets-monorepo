@@ -6,7 +6,7 @@ import { propertyMetadataCtx } from '../data';
 import { ownPropertyName, resolveLabel } from '../util';
 import type { ReferenceMetadata } from '../types';
 
-@model('TweakableReferenceModel')
+@model('SvgWidgetStudio/TweakableReferenceModel')
 export class TweakableReferenceModel<T extends object, M extends ReferenceMetadata> extends Model(
   <T extends object>() => ({ valueRef: prop<Ref<T> | undefined>().withSetter() }),
 )<T> {

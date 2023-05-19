@@ -5,21 +5,18 @@ import {
 import {
   applySnapshot,
   detach,
-  ExtendedModel,
   getSnapshot,
   model,
   Model,
   modelAction,
   ModelClass,
-  ModelProps,
   prop,
   SnapshotInOfModel,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash-es';
 import {
-// @ts-ignore
-  fitToViewer, INITIAL_VALUE, Tool, TOOL_PAN, Value,
+  fitToViewer, Tool, TOOL_PAN, Value,
 } from 'react-svg-pan-zoom';
 import JSZip from 'jszip';
 import fileDownload from 'js-file-download';
@@ -41,10 +38,10 @@ type WidgetJSON = {
   }
 };
 
-@model('WorkspacePreferencesModel')
+@model('SvgWidgetStudio/WorkspacePreferencesModel')
 class WorkspacePreferencesModel extends Model({
     displayUnit: radioProp(UNITS.cm, {
-      options: Object.values(UNITS).map((unit) => ({ value: unit, label: unit })),
+      options: Object.values(UNITS),
       isRow: true,
     }),
     darkModeEnabled: switchProp(true),
@@ -61,18 +58,14 @@ observable(widgetIconMap);
 
 export function widgetModel(modelName: string, previewIcon: string) {
   return function <C extends ModelClass<BaseWidgetClass>>(constructor: C): C {
-    const decoratedClass = model(modelName)(constructor);
+    const decoratedClass = model(`SvgWidgetStudio/widgets/${modelName}`)(constructor);
     widgetOptions.set(modelName, decoratedClass);
     widgetIconMap.set(modelName, previewIcon);
     return decoratedClass;
   };
 }
 
-export function WidgetExtendedModel(modelProps: ModelProps) {
-  return ExtendedModel(BaseWidgetClass, modelProps);
-}
-
-@model('WorkspaceModel')
+@model('SvgWidgetStudio/WorkspaceModel')
 export class WorkspaceModel extends Model({
   selectedStore: prop<BaseWidgetClass>(undefined).withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))).withSetter(),
@@ -85,8 +78,9 @@ export class WorkspaceModel extends Model({
     this.selectedWidgetModelType = selectedWidgetModelType;
   }
 
+  // package used to export INITIAL_VALUE but this somehow works okay
   @observable
-    zoomPanValue: Value = INITIAL_VALUE;
+    zoomPanValue: Value = {} as Value;
 
   @observable
     zoomPanTool: Tool = TOOL_PAN;
@@ -149,6 +143,7 @@ export class WorkspaceModel extends Model({
   getSelectedModelAssetsFileData() {
     return this.selectedStore.assetDefinition.getAssetsFileData(
       this.selectedStore.fileBasename,
+      this.selectedStore.WatermarkContent,
     );
   }
 

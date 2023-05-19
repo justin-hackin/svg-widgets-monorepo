@@ -4,6 +4,7 @@ import { Paper, Tab, Tabs } from '@mui/material';
 import { observer } from 'mobx-react';
 
 import { styled } from '@mui/styles';
+import { ScoreControls } from '@/widgets/PyramidNet/components/ScoreControls';
 import { BaseEdgeTabControls } from './BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './AscendantEdgeTabsControls';
 import { ShapeSelect } from './ShapeSelect';
@@ -22,11 +23,11 @@ const controlsTabs = [
     title: 'Ascendant Edge Tab',
     component: AscendantEdgeTabsControls,
   },
-  // {
-  //   label: 'Score',
-  //   title: 'Score Pattern',
-  //   component: ScoreControls,
-  // },
+  {
+    label: 'Score',
+    title: 'Score Pattern',
+    component: ScoreControls,
+  },
 ];
 const classes = {
   shapeHeightFormControl: 'shape-height-form-control',

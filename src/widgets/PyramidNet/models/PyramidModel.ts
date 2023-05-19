@@ -23,13 +23,13 @@ const getDivisors = (num) => {
 export class PyramidModel extends Model({
   shapeName: selectProp('small-triambic-icosahedron', {
     labelOverride: 'Polyhedron',
-    options: sortBy(Object.keys(polyhedra))
-      .map((shapeId) => ({ value: shapeId, label: startCase(shapeId) })),
+    options: sortBy(Object.keys(polyhedra)),
+    optionLabelMap: (option: string) => startCase(option),
+    // .map((shapeId) => ({ value: shapeId, label: startCase(shapeId) })),
   }),
   netsPerPyramid: radioProp(1, {
     isRow: true,
-    options: (_, self) => () => (getParent(self).netsPerPyramidOptions as number[])
-      .map((value) => ({ value, label: value.toString() })),
+    options: (self) => (getParent(self).netsPerPyramidOptions as number[]),
   }),
 }) {
   get geometry() {

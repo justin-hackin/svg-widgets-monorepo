@@ -1,26 +1,23 @@
 import { ExtendedModel, model, modelClass } from 'mobx-keystone';
+import { stringifier } from '@/common/util/data';
 import { TweakableReferenceModel } from './TweakableReferenceModel';
 import { createOptionsGetter } from '../util';
-import { OptionsListItem, ReferenceWithOptionsMetadata } from '../types';
+import { ReferenceWithOptionsMetadata } from '../types';
 
 // NOTE: controls depend on reference models having a defined id via getRefId
-@model('TweakableReferenceWithOptionsModel')
+@model('SvgWidgetStudio/TweakableReferenceWithOptionsModel')
 export class TweakableReferenceWithOptionsModel<T extends object, M extends ReferenceWithOptionsMetadata<T> >
   extends ExtendedModel(<T extends object, M extends ReferenceWithOptionsMetadata<T>>() => ({
     baseModel: modelClass<TweakableReferenceModel<T, M>>(TweakableReferenceModel),
     props: {},
   }))<T, M> {
-  readonly options: OptionsListItem<T>[] | undefined;
+  readonly options: T[] | undefined;
 
-  onAttachedToRootStore(rootStore) {
-    createOptionsGetter(this, rootStore);
+  get optionLabelMap() {
+    return this.metadata?.optionLabelMap || stringifier;
+  }
 
-    if (this.value === undefined && this.metadata.initialSelectionResolver !== undefined) {
-      const value = this.metadata.initialSelectionResolver(this.options.map(({ value }) => value), rootStore);
-      if (value) {
-        this.valueRef = this.metadata.typeRef(value);
-      }
-    }
-    super.onAttachedToRootStore(rootStore);
+  onInit() {
+    createOptionsGetter(this);
   }
 }

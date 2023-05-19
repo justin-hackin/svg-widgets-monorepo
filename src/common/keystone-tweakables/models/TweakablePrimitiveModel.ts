@@ -6,7 +6,7 @@ import { ownPropertyName, resolveLabel } from '../util';
 import { propertyMetadataCtx } from '../data';
 import type { PrimitiveMetadata } from '../types';
 
-@model('TweakablePrimitiveModel')
+@model('SvgWidgetStudio/TweakablePrimitiveModel')
 export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Model(<T>() => ({
   value: prop<T>().withSetter(),
 }))<T> {

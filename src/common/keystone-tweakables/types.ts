@@ -18,7 +18,7 @@ export enum INPUT_TYPE {
 export type labelGenerator = (node: TweakableModel) => string;
 export type labelOverride = string | labelGenerator;
 
-interface BasePrimitiveMetadata {
+export interface BasePrimitiveMetadata {
   labelOverride?: labelOverride,
 }
 
@@ -40,17 +40,14 @@ export interface ColorPickerMetadata extends BasePrimitiveMetadata {
   type: INPUT_TYPE.COLOR_PICKER,
 }
 
-export interface OptionsListItem<T> {
-  value: T,
-  label?: string,
-}
-
-export type OptionsListResolverFactory<T> = (rootStore: object, node: object) => (() => OptionsListItem<T>[]);
-export type MetadataOptions<T> = OptionsListItem<T>[] | OptionsListResolverFactory<T>;
+export type OptionsListResolverFactory<T> = (node: object) => (T[]);
+export type MetadataOptions<T> = T[] | OptionsListResolverFactory<T>;
+type OptionLabelMapFn<T> = (t: T, index?: number)=>string;
 
 export interface RadioMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.RADIO,
   options: MetadataOptions<T>,
+  optionLabelMap?: OptionLabelMapFn<T>,
   isRow?: boolean,
   valueParser?: (value: string)=>T,
 }
@@ -58,6 +55,7 @@ export interface RadioMetadata<T> extends BasePrimitiveMetadata {
 export interface SelectMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.SELECT,
   options: MetadataOptions<T>,
+  optionLabelMap?: OptionLabelMapFn<T>,
 }
 
 export type WithOptionsMetadata<T> = SelectMetadata<T> | RadioMetadata<T>;
@@ -89,12 +87,11 @@ export type TweakableModel =
   TweakablePrimitiveModel<any, PrimitiveMetadata>
   | TweakableReferenceModel<any, ReferenceMetadata>
   | TweakablePrimitiveWithOptionsModel<any, WithOptionsMetadata<any>>;
-type InitialSelectionResolver<T> = (optionValues: T[], rootStore: object) => (T | undefined);
 
 export interface ReferenceResolvingOptionsMetadata<T extends object> extends BasePrimitiveMetadata {
-  initialSelectionResolver?: InitialSelectionResolver<T>,
   typeRef: RefConstructor<T>,
   options: MetadataOptions<T>,
+  optionLabelMap?: OptionLabelMapFn<T>,
 }
 
 export interface ReferenceSelectMetadata<T extends object> extends ReferenceResolvingOptionsMetadata<T> {

@@ -1,12 +1,13 @@
 import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
 import { FC } from 'react';
 import { observable } from 'mobx';
+import { WatermarkContentComponent } from '@/common/components/SVGWrapper';
 import { BaseAssetDefinition } from './types';
 import { AdditionalToolbarItem } from '../../widgets/PyramidNet/components/AdditionalToolbarContent';
 import { FileMenuItem } from '../components/AdditionalFileMenuItems';
 
 export abstract class BaseWidgetClass extends Model({}) {
-  abstract get fileBasename(): string;
+  abstract fileBasename: string;
 
   @observable
     history: UndoManager;
@@ -20,6 +21,8 @@ export abstract class BaseWidgetClass extends Model({}) {
   AdditionalMainContent?: FC;
 
   PanelContent?: FC;
+
+  WatermarkContent?: WatermarkContentComponent;
 
   abstract get assetDefinition(): BaseAssetDefinition;
 

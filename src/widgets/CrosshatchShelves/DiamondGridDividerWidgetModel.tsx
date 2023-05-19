@@ -2,6 +2,9 @@ import { computed } from 'mobx';
 import React from 'react';
 import Flatten from '@flatten-js/core';
 import { round } from 'lodash-es';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
+import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
+import { ExtendedModel } from 'mobx-keystone';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
@@ -11,9 +14,8 @@ import { PathData } from '../../common/path/PathData';
 import { getBoundingBoxAttrs } from '../../common/util/svg';
 import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
-import { WidgetExtendedModel, widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
+import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from './previews/diamond-grid-divider.png';
-
 import Point = Flatten.Point;
 import point = Flatten.point;
 import segment = Flatten.segment;
@@ -28,7 +30,7 @@ interface SegmentInfo {
 }
 
 @widgetModel('DiamondGridDivider', widgetPreview)
-export class DiamondGridDividerWidgetModel extends WidgetExtendedModel({
+export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
   ...dividerBaseModelProps,
   flushPostProcess: switchProp(false),
 }) {
@@ -133,10 +135,7 @@ export class DiamondGridDividerWidgetModel extends WidgetExtendedModel({
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get fileBasename() {
-    return 'DiamondShelves';
-  }
+  fileBasename = 'DiamondShelves';
 
   @computed
   get assetDefinition() {
@@ -163,4 +162,6 @@ export class DiamondGridDividerWidgetModel extends WidgetExtendedModel({
       ],
     );
   }
+
+  WatermarkContent = LicenseWatermarkContent;
 }

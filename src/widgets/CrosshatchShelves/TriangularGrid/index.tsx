@@ -2,6 +2,9 @@ import React from 'react';
 import { computed } from 'mobx';
 import { flatten, range } from 'lodash-es';
 import Flatten from '@flatten-js/core';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
+import { ExtendedModel } from 'mobx-keystone';
+import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../../common/util/units';
 import {
@@ -13,9 +16,8 @@ import { pathDToViewBoxStr } from '../../../common/util/svg';
 import { closedPolygonPath } from '../../../common/path/shapes/generic';
 import { TRI_NOTCH_LEVEL, triNotchPanel } from './util';
 import { augmentSegmentEndpoints } from '../util';
-import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from '../previews/triangle-grid-divider.png';
-
 import point = Flatten.point;
 import segment = Flatten.segment;
 import Segment = Flatten.Segment;
@@ -48,7 +50,7 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
 const POLYGON_SIDES = 6;
 
 @widgetModel('TriangleGridDivider', widgetPreview)
-export class TriangularGridWidgetModel extends WidgetExtendedModel({
+export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
   hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,
   }),
@@ -180,10 +182,7 @@ export class TriangularGridWidgetModel extends WidgetExtendedModel({
         }))));
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get fileBasename() {
-    return 'TriangularGrid';
-  }
+  fileBasename = 'TriangularGrid';
 
   @computed
   get assetDefinition() {
@@ -213,4 +212,6 @@ export class TriangularGridWidgetModel extends WidgetExtendedModel({
       ...this.panelAssetMembers,
     ]);
   }
+
+  WatermarkContent = LicenseWatermarkContent;
 }

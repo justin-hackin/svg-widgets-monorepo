@@ -31,11 +31,8 @@ export class PyramidNetPreferencesModel extends Model({
   needsTour: prop(true)
     .withSetter(),
   printRegistrationType: radioProp<PRINT_REGISTRATION_TYPES>(PRINT_REGISTRATION_TYPES.LASER_CUTTER, {
-    options: Object.values(PRINT_REGISTRATION_TYPES)
-      .map((type) => ({
-        value: type,
-        label: startCase(type),
-      })),
+    options: Object.values(PRINT_REGISTRATION_TYPES),
+    optionLabelMap: (opt: string) => startCase(opt),
   }),
   registrationPadding: numberTextProp(PIXELS_PER_INCH * 0.5, { useUnits: true }),
   registrationMarkLength: numberTextProp(PIXELS_PER_INCH * 0.5, { useUnits: true }),

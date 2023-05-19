@@ -67,18 +67,18 @@ export const numberTextProp = (
   { type: INPUT_TYPE.NUMBER_TEXT, ...metadata },
 );
 
-export function referenceSelectProp<T extends object>(metadata: Omit<ReferenceSelectMetadata<T>, 'type'>) {
+export function referenceSelectProp<T extends object>(value: T, metadata: Omit<ReferenceSelectMetadata<T>, 'type'>) {
   const defaultFn = () => propertyMetadataCtx.apply(
-    () => new TweakableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({ valueRef: undefined }),
+    () => new TweakableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>({ valueRef: metadata.typeRef(value) }),
     { type: INPUT_TYPE.REFERENCE_SELECT, ...metadata },
   );
   return prop<TweakableReferenceWithOptionsModel<T, ReferenceSelectMetadata<T>>>(defaultFn);
 }
 
-export function referenceRadioProp<T extends object>(metadata: Omit<ReferenceRadioMetadata<T>, 'type'>) {
+export function referenceRadioProp<T extends object>(value: T, metadata: Omit<ReferenceRadioMetadata<T>, 'type'>) {
   return prop<TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>>(
     () => propertyMetadataCtx.apply(
-      () => new TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({ valueRef: undefined }),
+      () => new TweakableReferenceWithOptionsModel<T, ReferenceRadioMetadata<T>>({ valueRef: metadata.typeRef(value) }),
       {
         type: INPUT_TYPE.REFERENCE_RADIO, ...metadata,
       },

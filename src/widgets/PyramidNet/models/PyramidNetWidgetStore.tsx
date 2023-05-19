@@ -1,13 +1,15 @@
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
-import { modelAction, prop } from 'mobx-keystone';
+import { ExtendedModel, modelAction, prop } from 'mobx-keystone';
 import {
   action, computed, observable, reaction,
 } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
+import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
@@ -45,7 +47,7 @@ import {
 import { closedPolygonPath, roundedEdgePath } from '../../../common/path/shapes/generic';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
-import { WidgetExtendedModel, widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
+import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { additionalFileMenuItemsFactory } from '../components/additionalFileMenuItemsFactory';
 import { FileInputs } from '../components/FileInputs';
 import { DEFAULT_SLIDER_STEP } from '../../../common/constants';
@@ -71,7 +73,7 @@ const applyFlap = (
 };
 
 @widgetModel('PolyhedralNet', previewIcon)
-export class PyramidNetWidgetModel extends WidgetExtendedModel({
+export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),
   baseEdgeTabsSpec: prop<BaseEdgeTabsModel>(() => (new BaseEdgeTabsModel({}))),
@@ -81,10 +83,9 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
   faceDecoration: prop<PositionableFaceDecorationModel | RawFaceDecorationModel>(
     () => new PositionableFaceDecorationModel({}),
   ).withSetter(),
-  useDottedStroke: prop(false),
-  baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
-  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined),
-  // dashPatterns: prop(() => dashPatternsDefaultFn()),
+  useDottedStroke: prop(false).withSetter(),
+  baseScoreDashSpec: prop<DashPatternModel>(() => (new DashPatternModel({}))).withSetter(),
+  interFaceScoreDashSpec: prop<DashPatternModel>(() => (new DashPatternModel({}))).withSetter(),
 }) {
   @observable
     textureEditorOpen = false;
@@ -242,7 +243,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       this.faceBoundaryPoints[2],
       this.baseTabDepth,
       this.baseEdgeTabsSpec,
-      this.baseScoreDashSpec,
+      this.baseScoreDashSpecForDashing,
     );
   }
 
@@ -264,7 +265,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       endPt,
       this.baseTabDepth,
       this.baseEdgeTabsSpec,
-      this.baseScoreDashSpec,
+      this.baseScoreDashSpecForDashing,
     );
     const cut = (new PathData()).concatPath(innerCut).concatPath(boundaryCut);
     applyFlap(
@@ -291,7 +292,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       startPt,
       endPt,
       this.ascendantEdgeTabsSpec,
-      this.interFaceScoreDashSpec,
+      this.interFaceScoreDashSpecForDashing,
       this.tabIntervalRatios,
       this.tabGapIntervalRatios,
       this.ascendantEdgeTabDepth,
@@ -344,10 +345,20 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
   }
 
   @computed
+  get interFaceScoreDashSpecForDashing() {
+    return this.useDottedStroke ? this.interFaceScoreDashSpec : undefined;
+  }
+
+  @computed
+  get baseScoreDashSpecForDashing() {
+    return this.useDottedStroke ? this.baseScoreDashSpec : undefined;
+  }
+
+  @computed
   get nonTabbedAscendantScores() {
     // inter-face scoring
     return this.faceTabFenceposts.slice(1, -1).reduce((path, endPt) => {
-      const pathData = strokeDashPath(this.faceBoundaryPoints[0], endPt, this.interFaceScoreDashSpec);
+      const pathData = strokeDashPath(this.faceBoundaryPoints[0], endPt, this.interFaceScoreDashSpecForDashing);
       return path.concatPath(pathData);
     }, (new PathData()));
   }
@@ -358,7 +369,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       this.faceBoundaryPoints[1],
       this.faceBoundaryPoints[0],
       this.ascendantEdgeTabsSpec,
-      this.interFaceScoreDashSpec,
+      this.interFaceScoreDashSpecForDashing,
       this.tabIntervalRatios,
       this.tabGapIntervalRatios,
       this.ascendantEdgeTabDepth,
@@ -371,7 +382,7 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
 
   @computed
   get netPaths() {
-    const { baseScoreDashSpec, baseEdgeTabsSpec } = this;
+    const { baseScoreDashSpecForDashing, baseEdgeTabsSpec } = this;
     const { baseTabDepth, faceTabFenceposts } = this;
     const score = new PathData();
     const innerCut = new PathData();
@@ -382,7 +393,13 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
     // base edge tabs
     faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
       const edgePt2 = faceTabFenceposts[index + 1];
-      const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, baseTabDepth, baseEdgeTabsSpec, baseScoreDashSpec);
+      const baseEdgeTab = baseEdgeConnectionTab(
+        edgePt1,
+        edgePt2,
+        baseTabDepth,
+        baseEdgeTabsSpec,
+        baseScoreDashSpecForDashing,
+      );
       boundaryCut.weldPath(baseEdgeTab.boundaryCut);
       innerCut.concatPath(baseEdgeTab.innerCut);
       score.concatPath(baseEdgeTab.score);
@@ -478,15 +495,6 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       : this.faceDecoration?.pattern?.sourceFileName;
   }
 
-  // temporarily force no dotted stroke due to issues
-  // with tweakable reference select on restoring snapshot
-  onInit() {
-    super.onInit();
-    this.history.withoutUndo(() => {
-      this.setUseDottedStroke(false);
-    });
-  }
-
   onAttachedToRootStore() {
     this.persistPreferences();
     this.history.withoutUndo(() => {
@@ -532,18 +540,6 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
     this.baseEdgeTabsSpec.finOffsetRatio.setValue(interpolateBetween(0, 0.8, 1 - inverseAspectRatio));
   }
 
-  @modelAction
-  setUseDottedStroke(useDotted) {
-    this.useDottedStroke = useDotted;
-    if (useDotted) {
-      this.interFaceScoreDashSpec = new DashPatternModel({});
-      this.baseScoreDashSpec = new DashPatternModel({});
-    } else {
-      this.interFaceScoreDashSpec = undefined;
-      this.baseScoreDashSpec = undefined;
-    }
-  }
-
   @computed
   get boundingBox() {
     return getBoundingBoxAttrs(this.netPaths.cut.getD());
@@ -587,7 +583,9 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
   }
 
   renderDecorationBoundaryToString():string {
-    return ReactDOMServer.renderToString(React.createElement(DecorationBoundarySVG, { store: this }));
+    return ReactDOMServer.renderToString(
+      <DecorationBoundarySVG normalizedDecorationBoundaryPoints={this.normalizedDecorationBoundaryPoints} />,
+    );
   }
 
   get fileBasename() {
@@ -634,4 +632,6 @@ export class PyramidNetWidgetModel extends WidgetExtendedModel({
       <TextureEditorDrawer />
     </>
   );
+
+  WatermarkContent = LicenseWatermarkContent;
 }

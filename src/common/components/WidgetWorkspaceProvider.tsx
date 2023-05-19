@@ -2,8 +2,8 @@ import { StyledEngineProvider, Theme, ThemeProvider } from '@mui/material/styles
 import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { observer } from 'mobx-react';
+import { useWorkspaceMst, WorkspaceStoreProvider } from '@/WidgetWorkspace/rootStore';
 import { theme } from '../style/style';
-import { useWorkspaceMst, WorkspaceStoreProvider } from '../../WidgetWorkspace/rootStore';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -23,7 +23,7 @@ const StylesWrapper = observer(({ children }) => {
   );
 });
 
-export function ProvidersWrapper({ children }) {
+export function WidgetWorkspaceProvider({ children }) {
   return (
     <WorkspaceStoreProvider>
       <StylesWrapper>

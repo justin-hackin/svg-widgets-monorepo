@@ -16,15 +16,12 @@ export const SimpleSelect = observer(({
 }) => {
   const labelId = `${label}__${uuid()}`;
 
-  if (value === undefined) {
-    return null;
-  }
   return (
     <FormControlStyled>
       <InputLabel id={labelId}>{label}</InputLabel>
       <Select {...{
         labelId,
-        value,
+        value: value || '',
         name,
         displayEmpty,
         onChange,

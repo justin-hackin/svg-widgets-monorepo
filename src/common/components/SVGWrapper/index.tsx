@@ -1,14 +1,14 @@
-import React, { SVGProps } from 'react';
+import React, { FC, SVGProps } from 'react';
 import { namespacedElementFactory } from '../../util/svg';
-import { LicenseGroup } from './components/LicenseGroup';
-import { DocumentMetadata } from '../../../WidgetWorkspace/DocumentMetadata';
 
 const svgNamespaceAttributes = {
+  xmlns: 'http://www.w3.org/2000/svg',
   'xmlns:sodipodi': 'http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd',
   'xmlns:inkscape': 'http://www.inkscape.org/namespaces/inkscape',
   'xmlns:cc': 'http://creativecommons.org/ns#',
   'xmlns:rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-  xmlns: 'http://www.w3.org/2000/svg',
+  'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
+  'xmlns:xlink': 'http://www.w3.org/1999/xlink',
 };
 
 // TODO: leverage coming support for colon syntax for namespaced xml elements
@@ -21,11 +21,13 @@ const namedviewAttributes = {
   'current-layer': 'dielines',
 };
 
-export function SVGWrapper({ children, ...rest }:SVGProps<any>) {
+export type WatermarkContentComponent = FC<{ viewBox: string }>;
+
+export function SVGWrapper({ children, WatermarkContent, ...rest }:
+SVGProps<any> & { WatermarkContent?: WatermarkContentComponent }) {
   return (
     <svg {...rest} {...svgNamespaceAttributes}>
-      <DocumentMetadata />
-      <LicenseGroup viewBox={rest.viewBox} />
+      { WatermarkContent && (<WatermarkContent viewBox={rest.viewBox} />)}
       <SodipodiNamedview {...namedviewAttributes} />
       {children}
     </svg>

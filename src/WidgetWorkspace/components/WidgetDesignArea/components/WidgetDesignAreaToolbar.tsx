@@ -12,8 +12,8 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { styled } from '@mui/styles';
 import { observer } from 'mobx-react';
 import { HorizontalSplit, VerticalSplit } from '@mui/icons-material';
-import type { WorkspaceModel } from '../models/WorkspaceModel';
-import { useWorkspaceMst } from '../rootStore';
+import type { WorkspaceModel } from '../../../models/WorkspaceModel';
+import { useWorkspaceMst } from '../../../rootStore';
 
 const TOOL_ICON_MAP = {
   [TOOL_PAN]: PanToolIcon,
@@ -36,7 +36,7 @@ const PaperStyled = styled(Paper)(({ theme }) => ({
   },
 }));
 
-export const DielineViewToolbar = observer((
+export const WidgetDesignAreaToolbar = observer((
   { orientation, showOrientationToggle }:
   { orientation: Orientation, showOrientationToggle: boolean },
 ) => {

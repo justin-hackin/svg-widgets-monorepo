@@ -2,7 +2,7 @@ import {
   chunk, last, range, startCase, sum, uniq,
 } from 'lodash-es';
 import {
-  detach, getRootPath, Model, model, prop, rootRef,
+  customRef, detach, getRootPath, Model, model, prop,
 } from 'mobx-keystone';
 
 import { computed } from 'mobx';
@@ -11,8 +11,6 @@ import {
 } from '../../util/geom';
 import { PathData } from '../PathData';
 import { referenceSelectProp, sliderWithTextProp } from '../../keystone-tweakables/props';
-import { WorkspaceModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
-import type { PyramidNetWidgetModel } from '../../../widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { ratioSliderProps } from '../../../widgets/PyramidNet/constants';
 import { DEFAULT_SLIDER_STEP } from '../../constants';
 
@@ -52,22 +50,30 @@ export class StrokeDashPathPatternModel extends Model({
   }
 }
 
-const patternRef = rootRef<StrokeDashPathPatternModel>(STROKE_DASH_PATH_PATTERN_MODEL_TYPE, {
+export const dashPatternsById = dasharrays.reduce((acc, relativeStrokeDasharray) => {
+  const inst = new StrokeDashPathPatternModel({
+    relativeStrokeDasharray,
+  });
+  acc[inst.label] = inst;
+  return acc;
+}, {} as Record<string, StrokeDashPathPatternModel>);
+
+const patternRef = customRef<StrokeDashPathPatternModel>(`${STROKE_DASH_PATH_PATTERN_MODEL_TYPE}--ref`, {
   onResolvedValueChange(ref, newInst, oldInst) {
     if (oldInst && !newInst) {
       detach(ref);
     }
   },
+  resolve(ref) {
+    return dashPatternsById[ref.id];
+  },
 });
 
-export const dashPatternsDefaultFn = () => dasharrays.map((relativeStrokeDasharray) => (new StrokeDashPathPatternModel({
-  relativeStrokeDasharray,
-})));
-
+const options = Object.values(dashPatternsById);
 const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 @model('DashPatternModel')
 export class DashPatternModel extends Model({
-  strokeDashPathPattern: referenceSelectProp<StrokeDashPathPatternModel>({
+  strokeDashPathPattern: referenceSelectProp<StrokeDashPathPatternModel>(options[0], {
     labelOverride: (node) => {
       const { path } = getRootPath(node);
       if (path.length) {
@@ -78,12 +84,8 @@ export class DashPatternModel extends Model({
       return node.ownPropertyName;
     },
     typeRef: patternRef,
-    options: (rootStore) => () => ((rootStore as WorkspaceModel).selectedStore as PyramidNetWidgetModel).dashPatterns
-      .map((pattern) => ({
-        value: pattern,
-        label: pattern.label,
-      })),
-    initialSelectionResolver: (options) => options[0],
+    options,
+    optionLabelMap: (option) => option.label,
   }),
   strokeDashLength: sliderWithTextProp(11, {
     ...strokeLengthProps,
@@ -94,8 +96,8 @@ export class DashPatternModel extends Model({
 }) {
 }
 
-export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec: DashPatternModel) {
-  if (!dashSpec?.strokeDashPathPattern?.value) { return [[0, 1]]; }
+export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec: DashPatternModel | undefined) {
+  if (!dashSpec) { return [[0, 1]]; }
   const vector = subtractPoints(end, start);
   const vectorLength = distanceFromOrigin(vector);
   const {
@@ -149,7 +151,7 @@ export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec:
     .map((item, index, array) => item.map((val) => val + (1 - last(array)[1]) / 2));
 }
 
-export function strokeDashPath(start: PointLike, end: PointLike, dashSpec: DashPatternModel) {
+export function strokeDashPath(start: PointLike, end: PointLike, dashSpec: DashPatternModel | undefined) {
   const ratios = strokeDashPathRatios(start, end, dashSpec);
   return lineSeries(ratios
     .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp))));
