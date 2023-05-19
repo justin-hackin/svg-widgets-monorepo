@@ -83,19 +83,15 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   faceDecoration: prop<PositionableFaceDecorationModel | RawFaceDecorationModel>(
     () => new PositionableFaceDecorationModel({}),
   ).withSetter(),
-  baseScoreDashSpec: prop<DashPatternModel | undefined>(undefined).withSetter(),
-  interFaceScoreDashSpec: prop<DashPatternModel | undefined>(undefined).withSetter(),
+  useDottedStroke: prop(false).withSetter(),
+  baseScoreDashSpec: prop<DashPatternModel>(() => (new DashPatternModel({}))).withSetter(),
+  interFaceScoreDashSpec: prop<DashPatternModel>(() => (new DashPatternModel({}))).withSetter(),
 }) {
   @observable
     textureEditorOpen = false;
 
   @observable
     importFaceDialogActive = false;
-
-  @computed
-  get useDottedStroke() {
-    return !!this.baseScoreDashSpec && !!this.interFaceScoreDashSpec;
-  }
 
   @action
   activateImportFaceDialog() {
@@ -247,7 +243,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       this.faceBoundaryPoints[2],
       this.baseTabDepth,
       this.baseEdgeTabsSpec,
-      this.baseScoreDashSpec,
+      this.baseScoreDashSpecForDashing,
     );
   }
 
@@ -269,7 +265,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       endPt,
       this.baseTabDepth,
       this.baseEdgeTabsSpec,
-      this.baseScoreDashSpec,
+      this.baseScoreDashSpecForDashing,
     );
     const cut = (new PathData()).concatPath(innerCut).concatPath(boundaryCut);
     applyFlap(
@@ -296,7 +292,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       startPt,
       endPt,
       this.ascendantEdgeTabsSpec,
-      this.interFaceScoreDashSpec,
+      this.interFaceScoreDashSpecForDashing,
       this.tabIntervalRatios,
       this.tabGapIntervalRatios,
       this.ascendantEdgeTabDepth,
@@ -349,10 +345,20 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   }
 
   @computed
+  get interFaceScoreDashSpecForDashing() {
+    return this.useDottedStroke ? this.interFaceScoreDashSpec : undefined;
+  }
+
+  @computed
+  get baseScoreDashSpecForDashing() {
+    return this.useDottedStroke ? this.baseScoreDashSpec : undefined;
+  }
+
+  @computed
   get nonTabbedAscendantScores() {
     // inter-face scoring
     return this.faceTabFenceposts.slice(1, -1).reduce((path, endPt) => {
-      const pathData = strokeDashPath(this.faceBoundaryPoints[0], endPt, this.interFaceScoreDashSpec);
+      const pathData = strokeDashPath(this.faceBoundaryPoints[0], endPt, this.interFaceScoreDashSpecForDashing);
       return path.concatPath(pathData);
     }, (new PathData()));
   }
@@ -363,7 +369,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       this.faceBoundaryPoints[1],
       this.faceBoundaryPoints[0],
       this.ascendantEdgeTabsSpec,
-      this.interFaceScoreDashSpec,
+      this.interFaceScoreDashSpecForDashing,
       this.tabIntervalRatios,
       this.tabGapIntervalRatios,
       this.ascendantEdgeTabDepth,
@@ -376,7 +382,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   @computed
   get netPaths() {
-    const { baseScoreDashSpec, baseEdgeTabsSpec } = this;
+    const { baseScoreDashSpecForDashing, baseEdgeTabsSpec } = this;
     const { baseTabDepth, faceTabFenceposts } = this;
     const score = new PathData();
     const innerCut = new PathData();
@@ -387,7 +393,13 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     // base edge tabs
     faceTabFenceposts.slice(0, -1).forEach((edgePt1, index) => {
       const edgePt2 = faceTabFenceposts[index + 1];
-      const baseEdgeTab = baseEdgeConnectionTab(edgePt1, edgePt2, baseTabDepth, baseEdgeTabsSpec, baseScoreDashSpec);
+      const baseEdgeTab = baseEdgeConnectionTab(
+        edgePt1,
+        edgePt2,
+        baseTabDepth,
+        baseEdgeTabsSpec,
+        baseScoreDashSpecForDashing,
+      );
       boundaryCut.weldPath(baseEdgeTab.boundaryCut);
       innerCut.concatPath(baseEdgeTab.innerCut);
       score.concatPath(baseEdgeTab.score);
@@ -526,17 +538,6 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       interpolateBetween(MIN_BREADTH, MAX_BREADTH, inverseAspectRatio),
     );
     this.baseEdgeTabsSpec.finOffsetRatio.setValue(interpolateBetween(0, 0.8, 1 - inverseAspectRatio));
-  }
-
-  @modelAction
-  setUseDottedStroke(useDotted: boolean) {
-    if (useDotted) {
-      this.setInterFaceScoreDashSpec(new DashPatternModel({}));
-      this.setBaseScoreDashSpec(new DashPatternModel({}));
-    } else {
-      this.setInterFaceScoreDashSpec(undefined);
-      this.setBaseScoreDashSpec(undefined);
-    }
   }
 
   @computed

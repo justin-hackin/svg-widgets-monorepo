@@ -96,8 +96,8 @@ export class DashPatternModel extends Model({
 }) {
 }
 
-export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec: DashPatternModel) {
-  if (!dashSpec?.strokeDashPathPattern?.value) { return [[0, 1]]; }
+export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec: DashPatternModel | undefined) {
+  if (!dashSpec) { return [[0, 1]]; }
   const vector = subtractPoints(end, start);
   const vectorLength = distanceFromOrigin(vector);
   const {
@@ -151,7 +151,7 @@ export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec:
     .map((item, index, array) => item.map((val) => val + (1 - last(array)[1]) / 2));
 }
 
-export function strokeDashPath(start: PointLike, end: PointLike, dashSpec: DashPatternModel) {
+export function strokeDashPath(start: PointLike, end: PointLike, dashSpec: DashPatternModel | undefined) {
   const ratios = strokeDashPathRatios(start, end, dashSpec);
   return lineSeries(ratios
     .map((startEndLerp) => startEndLerp.map((lerp) => lineLerp(start, end, lerp))));
