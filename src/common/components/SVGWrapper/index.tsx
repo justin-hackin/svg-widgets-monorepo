@@ -2,12 +2,13 @@ import React, { FC, SVGProps } from 'react';
 import { namespacedElementFactory } from '../../util/svg';
 
 const svgNamespaceAttributes = {
+  xmlns: 'http://www.w3.org/2000/svg',
   'xmlns:sodipodi': 'http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd',
   'xmlns:inkscape': 'http://www.inkscape.org/namespaces/inkscape',
   'xmlns:cc': 'http://creativecommons.org/ns#',
   'xmlns:rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
   'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
-  xmlns: 'http://www.w3.org/2000/svg',
+  'xmlns:xlink': 'http://www.w3.org/1999/xlink',
 };
 
 // TODO: leverage coming support for colon syntax for namespaced xml elements
