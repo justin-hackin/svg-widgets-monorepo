@@ -15,12 +15,16 @@ const classes = {
 };
 
 const NodesGroup = styled('g')({
-  [`& .${classes.textureNode}`]: {
+  [`& circle.${classes.textureNode}`]: {
     fill: '#00A9F4',
+    '&:hover': {
+      fill: 'purple',
+    },
     [`&.${classes.selected}`]: {
       fill: '#ff00ff',
     },
   },
+
 });
 
 export const TexturePathNodes = observer(() => {
@@ -47,16 +51,8 @@ export const TexturePathNodes = observer(() => {
             <g key={`${index}--${cx},${cy}`}>
               <circle
                 {...{ cx, cy }}
-                className={clsx(classes.textureNode, (selectedTextureNodeIndex === index) && 'selected')}
+                className={clsx(classes.textureNode, (selectedTextureNodeIndex === index) && classes.selected)}
                 stroke="none"
-                r={(nodeScaleMux * longerTextureSideLength) / 500}
-              />
-              <circle
-                {...{ cx, cy }}
-                stroke="none"
-                className={`${classes.highlight
-                } ${index === selectedTextureNodeIndex ? classes.selected : undefined
-                }`}
                 r={(nodeScaleMux * longerTextureSideLength) / 100}
                 onClick={() => {
                   textureEditor.setSelectedTextureNodeIndex(index);
