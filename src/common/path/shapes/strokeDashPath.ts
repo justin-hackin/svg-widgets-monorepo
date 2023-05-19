@@ -69,10 +69,11 @@ const patternRef = customRef<StrokeDashPathPatternModel>(`${STROKE_DASH_PATH_PAT
   },
 });
 
+const options = Object.values(dashPatternsById);
 const strokeLengthProps = { min: 1, max: 100, step: DEFAULT_SLIDER_STEP };
 @model('DashPatternModel')
 export class DashPatternModel extends Model({
-  strokeDashPathPattern: referenceSelectProp<StrokeDashPathPatternModel>({
+  strokeDashPathPattern: referenceSelectProp<StrokeDashPathPatternModel>(options[0], {
     labelOverride: (node) => {
       const { path } = getRootPath(node);
       if (path.length) {
@@ -83,9 +84,8 @@ export class DashPatternModel extends Model({
       return node.ownPropertyName;
     },
     typeRef: patternRef,
-    options: Object.values(dashPatternsById),
+    options,
     optionLabelMap: (option) => option.label,
-    initialSelectionResolver: (options) => options[1],
   }),
   strokeDashLength: sliderWithTextProp(11, {
     ...strokeLengthProps,

@@ -48,7 +48,6 @@ export interface RadioMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.RADIO,
   options: MetadataOptions<T>,
   optionLabelMap?: OptionLabelMapFn<T>,
-  initialSelectionResolver?: InitialSelectionResolver<T>,
   isRow?: boolean,
   valueParser?: (value: string)=>T,
 }
@@ -57,7 +56,6 @@ export interface SelectMetadata<T> extends BasePrimitiveMetadata {
   type: INPUT_TYPE.SELECT,
   options: MetadataOptions<T>,
   optionLabelMap?: OptionLabelMapFn<T>,
-  initialSelectionResolver?: InitialSelectionResolver<T>,
 }
 
 export type WithOptionsMetadata<T> = SelectMetadata<T> | RadioMetadata<T>;
@@ -89,10 +87,8 @@ export type TweakableModel =
   TweakablePrimitiveModel<any, PrimitiveMetadata>
   | TweakableReferenceModel<any, ReferenceMetadata>
   | TweakablePrimitiveWithOptionsModel<any, WithOptionsMetadata<any>>;
-type InitialSelectionResolver<T> = (optionValues: T[]) => (T | undefined);
 
 export interface ReferenceResolvingOptionsMetadata<T extends object> extends BasePrimitiveMetadata {
-  initialSelectionResolver?: InitialSelectionResolver<T>,
   typeRef: RefConstructor<T>,
   options: MetadataOptions<T>,
   optionLabelMap?: OptionLabelMapFn<T>,
