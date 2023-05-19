@@ -11,11 +11,11 @@ import {
   boundingBoxOfBoundingBoxes,
   viewBoxStrToBoundingBoxAttrs,
 } from '../../common/util/svg';
-import { SVGWrapper } from '../../common/components/SVGWrapper';
+import { SVGWrapper, WatermarkContentComponent } from '../../common/components/SVGWrapper';
 import { dimensions } from '../../common/util/data';
 import { RegisteredWidgetAssetMember } from './RegisteredAssetsDefinition';
 import {
-  BaseAssetDefinition, DocumentAreaProps, filePathConstructor, viewBoxProps,
+  BaseAssetDefinition, castToViewBox, DocumentAreaProps, filePathConstructor, viewBoxProps,
 } from './types';
 
 export interface DisjunctWidgetAssetMember extends RegisteredWidgetAssetMember {
@@ -106,7 +106,7 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
     };
   }
 
-  getAssetsFileData(fileBaseName: string) {
+  getAssetsFileData(fileBaseName: string, WatermarkContent: WatermarkContentComponent) {
     return this.members.map(({
       Component,
       documentAreaProps,
@@ -116,6 +116,7 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
       filePath: filePathConstructor(fileBaseName, name, copies),
       fileString: ReactDOMServer.renderToString(
         <SVGWrapper {...documentAreaProps}>
+          <WatermarkContent viewBox={castToViewBox(documentAreaProps)} />
           <Component />
         </SVGWrapper>,
       ),

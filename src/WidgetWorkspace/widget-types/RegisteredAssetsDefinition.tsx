@@ -5,9 +5,9 @@ import {
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { GridPattern } from '../components/ResizableZoomPan/components/GridPattern';
-import { SVGWrapper } from '../../common/components/SVGWrapper';
+import { SVGWrapper, WatermarkContentComponent } from '../../common/components/SVGWrapper';
 import {
-  BaseAssetDefinition, DocumentAreaProps, filePathConstructor, WidgetSVGComponent,
+  BaseAssetDefinition, castToViewBox, DocumentAreaProps, filePathConstructor, WidgetSVGComponent,
 } from './types';
 
 export interface RegisteredWidgetAssetMember {
@@ -56,7 +56,7 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
     );
   }
 
-  getAssetsFileData(fileBaseName: string) {
+  getAssetsFileData(fileBaseName: string, WatermarkContent: WatermarkContentComponent) {
     return this.members.reduce((acc, {
       Component,
       name,
@@ -71,6 +71,7 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
           filePath: filePathConstructor(fileBaseName, name, copies),
           fileString: ReactDOMServer.renderToString(
             <SVGWrapper {...this.documentAreaProps}>
+              <WatermarkContent viewBox={castToViewBox(this.documentAreaProps)} />
               <Component />
             </SVGWrapper>,
           ),
