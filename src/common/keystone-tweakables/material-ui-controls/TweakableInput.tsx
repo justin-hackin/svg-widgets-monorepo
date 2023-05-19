@@ -28,7 +28,7 @@ INPUT_TYPE,
 
 export const TweakableInput = observer(({ node, className }:
 { node: TweakableModel, className?: string }) => {
-  if (!node || !node.onAttachedComplete || !node.metadata) { return null; }
+  if (!node || !node.metadata) { return null; }
   const Component = TYPE_COMPONENT_MAP[node.metadata.type];
   return <Component className={className} node={node} />;
 });
