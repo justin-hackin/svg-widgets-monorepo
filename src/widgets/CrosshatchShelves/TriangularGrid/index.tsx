@@ -5,15 +5,16 @@ import Flatten from '@flatten-js/core';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { ExtendedModel } from 'mobx-keystone';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
+import { assertNotNullish } from '@/common/util/assert';
 import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../../common/util/units';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
 } from '../../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { PathData } from '../../../common/path/PathData';
+import { PathData } from '../../../common/PathData';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
-import { closedPolygonPath } from '../../../common/path/shapes/generic';
+import { closedPolygonPath } from '../../../common/shapes/generic';
 import { TRI_NOTCH_LEVEL, triNotchPanel } from './util';
 import { augmentSegmentEndpoints } from '../util';
 import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
@@ -107,6 +108,8 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
         const traversal = j * fencepostWidth;
         const startPt = j === 0 ? startSeg.ps.clone() : startSeg.pointAtLength(Math.min(traversal, startSeg.length));
         const endPt = j === 0 ? endSeg.pe.clone() : endSeg.pointAtLength(Math.min(segLen - traversal, endSeg.length));
+        assertNotNullish(startPt);
+        assertNotNullish(endPt);
         const toWallSegment = segment(startPt, endPt);
         return [0, subs].includes(j)
           ? augmentSegmentEndpoints(toWallSegment, -1 * this.cornerFittingRetractionDistance)

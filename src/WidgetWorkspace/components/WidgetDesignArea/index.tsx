@@ -5,6 +5,7 @@ import {
 import { ResizableZoomPan } from '@/WidgetWorkspace/components/ResizableZoomPan';
 import React from 'react';
 import type { Orientation } from '@/WidgetWorkspace';
+import { assertNotNullish } from '@/common/util/assert';
 
 export function WidgetDesignArea({
   showOrientationToggle,
@@ -13,6 +14,7 @@ export function WidgetDesignArea({
 : { showOrientationToggle: boolean, orientation: Orientation }) {
   const workspaceStore = useWorkspaceMst();
   const { selectedStore } = workspaceStore;
+  assertNotNullish(selectedStore);
   return (
     <>
       <WidgetDesignAreaToolbar orientation={orientation} showOrientationToggle={showOrientationToggle} />

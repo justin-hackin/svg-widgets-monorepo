@@ -12,10 +12,10 @@ import {
   viewBoxStrToBoundingBoxAttrs,
 } from '../../common/util/svg';
 import { SVGWrapper, WatermarkContentComponent } from '../../common/components/SVGWrapper';
-import { dimensions } from '../../common/util/data';
+import { Dimensions } from '../../common/util/data';
 import { RegisteredWidgetAssetMember } from './RegisteredAssetsDefinition';
 import {
-  BaseAssetDefinition, castToViewBox, DocumentAreaProps, filePathConstructor, viewBoxProps,
+  BaseAssetDefinition, DocumentAreaProps, filePathConstructor, ViewBoxProps,
 } from './types';
 
 export interface DisjunctWidgetAssetMember extends RegisteredWidgetAssetMember {
@@ -23,14 +23,14 @@ export interface DisjunctWidgetAssetMember extends RegisteredWidgetAssetMember {
 }
 
 const castDocumentAreaPropsToBoundingBoxAttrs = (dap: DocumentAreaProps): BoundingBoxAttrs => {
-  const { viewBox } = dap as viewBoxProps;
+  const { viewBox } = dap as ViewBoxProps;
   if (viewBox) {
     return viewBoxStrToBoundingBoxAttrs(viewBox);
   }
   const {
     width,
     height,
-  } = dap as dimensions;
+  } = dap as Dimensions;
   return {
     xmin: 0,
     ymin: 0,
@@ -90,7 +90,7 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
 
   @computed
   get allAssetsDocumentAreaProps() {
-    const hasViewBoxMember = !!this.members.find((member) => !!(member.documentAreaProps as viewBoxProps).viewBox);
+    const hasViewBoxMember = !!this.members.find((member) => !!(member.documentAreaProps as ViewBoxProps).viewBox);
     const bbs = this.members.map((member) => castDocumentAreaPropsToBoundingBoxAttrs(member.documentAreaProps));
     const consolidatedBB = boundingBoxOfBoundingBoxes(bbs);
     if (hasViewBoxMember) {
@@ -115,8 +115,8 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
     }) => ({
       filePath: filePathConstructor(fileBaseName, name, copies),
       fileString: ReactDOMServer.renderToString(
-        <SVGWrapper {...documentAreaProps}>
-          <WatermarkContent viewBox={castToViewBox(documentAreaProps)} />
+        <SVGWrapper documentAreaProps={documentAreaProps}>
+          <WatermarkContent documentAreaProps={documentAreaProps} />
           <Component />
         </SVGWrapper>,
       ),

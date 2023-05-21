@@ -11,8 +11,10 @@ import type {
   ReferenceWithOptionsMetadata, WithOptionsMetadata,
 } from './types';
 
-export const ownPropertyName = (node) => {
-  const toPath = getParentToChildPath(getParent(node), node);
+export const ownPropertyName = (node: object) => {
+  const parent = getParent(node);
+  if (!parent) { return undefined; }
+  const toPath = getParentToChildPath(parent, node);
   return toPath ? (toPath[0] as string) : undefined;
 };
 

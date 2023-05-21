@@ -3,7 +3,7 @@ import {
   CompoundPath, Path, Size, Project,
 } from 'paper';
 
-import { PathData } from '../path/PathData';
+import { PathData } from '../PathData';
 import { VERY_LARGE_NUMBER } from '../constants';
 
 const tinySize = new Size(64, 48);

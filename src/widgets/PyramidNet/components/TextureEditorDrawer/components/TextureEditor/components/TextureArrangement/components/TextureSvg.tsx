@@ -37,7 +37,7 @@ export function TextureSvgUnobserved({
   } = store || (useWorkspaceMst().selectedStore as PyramidNetWidgetModel).textureEditor;
   if (
     !decorationBoundaryPathD || faceDecoration instanceof RawFaceDecorationModel
-    || !faceBoundary || !decorationBoundaryPathD
+    || !faceBoundary || !decorationBoundaryPathD || !placementAreaDimensions || !faceFittingScale
   ) { return null; }
 
   const isOnScreen = !store;

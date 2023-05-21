@@ -9,7 +9,7 @@ const getDivisors = (num) => {
   }
   // yes there are more efficient algorithms but input num unlikely to be a large number here
   // package integer-divisors emits regeneratorRuntime errors
-  const divisors = [];
+  const divisors: number[] = [];
   // eslint-disable-next-line for-direction
   for (let div = num; div >= 1; div -= 1) {
     if (isInteger(num / div)) {

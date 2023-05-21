@@ -25,7 +25,7 @@
     "incremental": true,
     "noUnusedLocals": false,
     "noStrictGenericChecks": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitAny": false,
     "noImplicitReturns": true,

@@ -1,3 +1,4 @@
+import type { DocumentAreaProps } from '@/WidgetWorkspace/widget-types/types';
 import React, { FC, SVGProps } from 'react';
 import { namespacedElementFactory } from '../../util/svg';
 
@@ -8,7 +9,7 @@ const svgNamespaceAttributes = {
   'xmlns:cc': 'http://creativecommons.org/ns#',
   'xmlns:rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
   'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
-  'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+  xmlnsXlink: 'http://www.w3.org/1999/xlink',
 };
 
 // TODO: leverage coming support for colon syntax for namespaced xml elements
@@ -21,13 +22,18 @@ const namedviewAttributes = {
   'current-layer': 'dielines',
 };
 
-export type WatermarkContentComponent = FC<{ viewBox: string }>;
+export type WatermarkContentComponent = FC<{ documentAreaProps: DocumentAreaProps }>;
+type DocumentAreaPropertyNames = 'width' | 'height' | 'viewBox';
+type SVGWrapperProps =
+  Omit<SVGProps<any>, DocumentAreaPropertyNames>
+  & { WatermarkContent?: WatermarkContentComponent } & { documentAreaProps: DocumentAreaProps };
 
-export function SVGWrapper({ children, WatermarkContent, ...rest }:
-SVGProps<any> & { WatermarkContent?: WatermarkContentComponent }) {
+export function SVGWrapper({
+  children, documentAreaProps, WatermarkContent, ...rest
+}: SVGWrapperProps) {
   return (
-    <svg {...rest} {...svgNamespaceAttributes}>
-      { WatermarkContent && (<WatermarkContent viewBox={rest.viewBox} />)}
+    <svg {...rest} {...documentAreaProps} {...svgNamespaceAttributes}>
+      { WatermarkContent && (<WatermarkContent documentAreaProps={documentAreaProps} />)}
       <SodipodiNamedview {...namedviewAttributes} />
       {children}
     </svg>

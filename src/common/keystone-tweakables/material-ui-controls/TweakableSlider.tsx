@@ -9,7 +9,7 @@ import { INPUT_TYPE, SliderMetadata } from '../types';
 import { TweakableUnlabelledSlider } from './TweakableUnlabelledSlider';
 
 export const TweakableSlider = observer(({
-  node, className = undefined,
+  node, className,
 }: { node: TweakablePrimitiveModel<number, SliderMetadata>, className?: string, useUnits?: boolean }) => {
   const labelId = uuid();
 

@@ -10,24 +10,25 @@ import FlareIcon from '@mui/icons-material/Flare';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { Download } from '@mui/icons-material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { assertNotNullish } from '@/common/util/assert';
 import { AdditionalFileMenuItems } from '../../AdditionalFileMenuItems';
 import { AdditionalToolbarContent } from '../../../../widgets/PyramidNet/components/AdditionalToolbarContent';
 import { HistoryButtons } from '../../../../widgets/PyramidNet/components/HistoryButtons';
-import { BaseWidgetClass } from '../../../widget-types/BaseWidgetClass';
 import { useWorkspaceMst } from '../../../rootStore';
 import { SimpleDialog } from '../../../../common/keystone-tweakables/material-ui-controls/SimpleDialog';
 import { PreferencesControls } from '../../../../widgets/PyramidNet/components/PreferencesControls';
 
 export const WidgetControlPanelAppBar = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const { selectedStore }: { selectedStore: BaseWidgetClass } = workspaceStore;
+  const { selectedStore } = workspaceStore;
+  assertNotNullish(selectedStore);
   const {
     additionalToolbarContent,
     additionalFileMenuItems,
     history,
   } = selectedStore;
 
-  const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
+  const [fileMenuRef, setFileMenuRef] = useState<HTMLElement | null>(null);
   const resetFileMenuRef = () => {
     setFileMenuRef(null);
   };

@@ -10,12 +10,15 @@ import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
+import { appendContinuationPath } from '@/widgets/PyramidNet/path';
+import { getCurrentSegmentStart, getLastPosition } from '@/common/PathData/helpers';
+import { assertNotNullish } from '@/common/util/assert';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
   TextureEditorModel,
 } from '../components/TextureEditorDrawer/components/TextureEditor/models/TextureEditorModel';
-import { DashPatternModel, strokeDashPath } from '../../../common/path/shapes/strokeDashPath';
+import { DashPatternModel, strokeDashPath } from '../../../common/shapes/strokeDashPath';
 import { DecorationBoundarySVG } from '../components/DecorationBoundarySVG';
 import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
@@ -33,7 +36,7 @@ import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../baseEdgeConnectionT
 import { sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 import { degToRad, PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
 import { PositionableFaceDecorationModel } from './PositionableFaceDecorationModel';
-import { PathData } from '../../../common/path/PathData';
+import { PathData } from '../../../common/PathData';
 import {
   hingedPlot,
   hingedPlotByProjectionDistance,
@@ -44,7 +47,7 @@ import {
   sumPoints,
   triangleAnglesGivenSides,
 } from '../../../common/util/geom';
-import { closedPolygonPath, roundedEdgePath } from '../../../common/path/shapes/generic';
+import { appendCurvedLineSegments, closedPolygonPath, roundedEdgePath } from '../../../common/shapes/generic';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
 import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
@@ -63,10 +66,12 @@ const applyFlap = (
   handleFlapDepth: number,
   testTabHandleFlapRounding: number,
 ) => {
-  const startPt = path.lastPosition;
-  const endPt = path.currentSegmentStart;
+  const startPt = getLastPosition(path);
+  const endPt = getCurrentSegmentStart(path);
   const startFlapEdge = { x: 0, y: (flapDirectionIsUp ? 1 : -1) * handleFlapDepth };
-  path.curvedLineSegments([
+  assertNotNullish(startPt);
+  assertNotNullish(endPt);
+  appendCurvedLineSegments(path, [
     sumPoints(startPt, startFlapEdge),
     sumPoints(endPt, startFlapEdge),
   ], testTabHandleFlapRounding, true);
@@ -400,12 +405,12 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
         baseEdgeTabsSpec,
         baseScoreDashSpecForDashing,
       );
-      boundaryCut.weldPath(baseEdgeTab.boundaryCut);
+      appendContinuationPath(boundaryCut, baseEdgeTab.boundaryCut);
       innerCut.concatPath(baseEdgeTab.innerCut);
       score.concatPath(baseEdgeTab.score);
     });
     // male tabs
-    boundaryCut.weldPath(this.ascendantEdgeTabs.male.cut, true);
+    appendContinuationPath(boundaryCut, this.ascendantEdgeTabs.male.cut, true);
     score.concatPath(this.ascendantEdgeTabs.male.score);
 
     // female inner
@@ -416,7 +421,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   }
 
   @computed
-  get decorationCutPath():PathData {
+  get decorationCutPath():PathData | null {
     if (!this.texturePathD) { return null; }
     const cut = new PathData();
     const insetDecorationPath = (new PathData(this.texturePathD))
@@ -473,7 +478,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   @computed
   get faceDecorationTransformMatricies(): DOMMatrixReadOnly[] {
-    const matrices = [];
+    const matrices: DOMMatrixReadOnly[] = [];
 
     for (let i = 0; i < this.pyramid.facesPerNet; i += 1) {
       const isMirrored = !!(i % 2) && !this.pyramid.faceIsSymmetrical;
@@ -497,7 +502,8 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   onAttachedToRootStore() {
     this.persistPreferences();
-    this.history.withoutUndo(() => {
+    // history initialized in onInit
+    this.history!.withoutUndo(() => {
       this.applyShapeBasedDefaults();
     });
 

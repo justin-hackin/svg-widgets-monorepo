@@ -78,13 +78,12 @@ export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition
                 key={index}
                 dense
                 {...(assetDefinition instanceof DisjunctAssetsDefinition ? {
-                  button: true,
                   onClick: () => {
                     assetDefinition.setSelectedMember(index);
                   },
                   disabled: assetDefinition.overlayModeEnabled,
                   selected: !assetDefinition.overlayModeEnabled && assetDefinition.selectedMember === index,
-                } : undefined)}
+                } : {})}
               >
                 {assetDefinition instanceof RegisteredAssetsDefinition && (
                   <ListItemIcon>

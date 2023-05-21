@@ -7,3 +7,4 @@ render(
   (<WidgetWorkspaceApp />),
   document.getElementById('app'),
 );
+export { assertNotNullish } from '@/common/util/assert';

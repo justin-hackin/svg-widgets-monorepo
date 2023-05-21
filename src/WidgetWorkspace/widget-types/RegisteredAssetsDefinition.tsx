@@ -4,10 +4,11 @@ import {
 } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import { TxtFileInfo } from '@/common/types';
 import { GridPattern } from '../components/ResizableZoomPan/components/GridPattern';
 import { SVGWrapper, WatermarkContentComponent } from '../../common/components/SVGWrapper';
 import {
-  BaseAssetDefinition, castToViewBox, DocumentAreaProps, filePathConstructor, WidgetSVGComponent,
+  BaseAssetDefinition, DocumentAreaProps, filePathConstructor, WidgetSVGComponent,
 } from './types';
 
 export interface RegisteredWidgetAssetMember {
@@ -70,14 +71,14 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
         acc.push({
           filePath: filePathConstructor(fileBaseName, name, copies),
           fileString: ReactDOMServer.renderToString(
-            <SVGWrapper {...this.documentAreaProps}>
-              <WatermarkContent viewBox={castToViewBox(this.documentAreaProps)} />
+            <SVGWrapper documentAreaProps={this.documentAreaProps}>
+              <WatermarkContent documentAreaProps={this.documentAreaProps} />
               <Component />
             </SVGWrapper>,
           ),
         });
       }
       return acc;
-    }, []);
+    }, [] as TxtFileInfo[]);
   }
 }

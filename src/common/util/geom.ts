@@ -182,10 +182,14 @@ export const getLineLineIntersection = (l1p1, l1p2, l2p1, l2p2) => {
   return intersections.length === 1 ? castCoordToRawPoint(intersections[0]) : null;
 };
 
-export function hingedPlotByProjectionDistance(pt1, pt2, angle, projectionDistance) {
+export function hingedPlotByProjectionDistance(pt1, pt2, angle, projectionDistance): RawPoint {
+  if (angle === 0) {
+    // so that our type coercion is accurate
+    throw new Error('hingedPlotByProjectionDistance: angle must not be zero');
+  }
   const hinge = hingedPlot(pt1, pt2, angle, Math.abs(projectionDistance));
   const [l1p1, l1p2] = parallelLinePointsAtDistance(pt1, pt2, projectionDistance);
-  return getLineLineIntersection(l1p1, l1p2, pt2, hinge);
+  return getLineLineIntersection(l1p1, l1p2, pt2, hinge) as RawPoint;
 }
 
 export function symmetricHingePlotByProjectionDistance(p1, p2, theta, distance) {

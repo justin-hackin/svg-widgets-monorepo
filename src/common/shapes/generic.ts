@@ -1,7 +1,7 @@
+import { getCurrentSegmentStart, getLastPosition } from '@/common/PathData/helpers';
 import {
-  distanceBetweenPoints,
-  hingedPlot, PointLike, RawPoint,
-} from '../../util/geom';
+  distanceBetweenPoints, hingedPlot, PointLike, RawPoint,
+} from '../util/geom';
 // eslint-disable-next-line import/no-cycle
 import { PathData } from '../PathData';
 
@@ -57,3 +57,20 @@ export const connectedLineSegments = (points: PointLike[]) => {
 };
 
 export const closedPolygonPath = (points: PointLike[]) => connectedLineSegments(points).close();
+
+export function appendCurvedLineSegments(path: PathData, toPoints, roundingRatio: number, endWithClose = false) {
+  // TODO: handle last command is close
+  const modifiedPoints = path.commands.length ? [getLastPosition(path), ...toPoints] : [...toPoints];
+  if (endWithClose) {
+    modifiedPoints.push(getCurrentSegmentStart(path));
+  }
+  const toAppendCommands = roundedEdgePath(modifiedPoints, roundingRatio);
+  toAppendCommands.dangerouslyProduceCommands(
+    (draft) => draft.slice(draft.length ? 1 : 0, endWithClose ? -1 : undefined),
+  );
+  // include move command if the path doesn't have any commands yet
+  path.concatPath(toAppendCommands);
+  if (endWithClose) {
+    path.close();
+  }
+}

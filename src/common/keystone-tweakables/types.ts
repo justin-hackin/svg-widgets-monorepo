@@ -87,7 +87,6 @@ export type TweakableModel =
   TweakablePrimitiveModel<any, PrimitiveMetadata>
   | TweakableReferenceModel<any, ReferenceMetadata>
   | TweakablePrimitiveWithOptionsModel<any, WithOptionsMetadata<any>>;
-
 export interface ReferenceResolvingOptionsMetadata<T extends object> extends BasePrimitiveMetadata {
   typeRef: RefConstructor<T>,
   options: MetadataOptions<T>,

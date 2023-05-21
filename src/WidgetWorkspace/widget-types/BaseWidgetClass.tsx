@@ -10,7 +10,7 @@ export abstract class BaseWidgetClass extends Model({}) {
   abstract fileBasename: string;
 
   @observable
-    history: UndoManager;
+    history: UndoManager | undefined;
 
   // seems abstract properties can't be optional
   // see https://github.com/Microsoft/TypeScript/issues/6413#issuecomment-361869751
@@ -25,6 +25,13 @@ export abstract class BaseWidgetClass extends Model({}) {
   WatermarkContent?: WatermarkContentComponent;
 
   abstract get assetDefinition(): BaseAssetDefinition;
+
+  getSelectedModelAssetsFileData() {
+    return this.assetDefinition.getAssetsFileData(
+      this.fileBasename,
+      this.WatermarkContent,
+    );
+  }
 
   protected onInit() {
     this.history = undoMiddleware(this);

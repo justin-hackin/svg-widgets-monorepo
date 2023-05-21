@@ -8,7 +8,7 @@ import { boundingBoxMinPoint, expandBoundingBoxAttrs, registrationMarksPath } fr
 import { pointToTranslateString, scalePoint } from '../../../common/util/geom';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
-import { closedPolygonPath } from '../../../common/path/shapes/generic';
+import { closedPolygonPath } from '../../../common/shapes/generic';
 
 function PrintGroup({ children }) {
   return (

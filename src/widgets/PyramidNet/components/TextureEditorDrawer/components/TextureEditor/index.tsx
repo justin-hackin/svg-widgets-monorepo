@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { styled, useTheme } from '@mui/styles';
 import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
 
+import { assertNotNullish } from '@/common/util/assert';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
@@ -42,12 +43,14 @@ export const TextureEditor = observer(() => {
   const incrementStepIndex = (index) => { setStepIndex(index + 1); };
   const resetStepIndex = () => { setStepIndex(0); };
 
-  const mainAreaRef = useRef<HTMLDivElement>();
+  const mainAreaRef = useRef<HTMLDivElement>(null);
 
   const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
   const { preferences, textureEditor, history } = pyramidNetPluginStore;
   const { needsTour } = preferences;
   const { faceDecoration } = textureEditor;
+  // assigned in onInit
+  assertNotNullish(history);
   // ==================================================================================================================
   useTheme();
   // Init

@@ -24,11 +24,12 @@ const transformTracking: TransformTrackingObject = {};
 
 export const incrementTransformTracking = (method: TRANSFORM_METHODS, operation: TRANSFORM_OPERATIONS) => {
   if (IS_PRODUCTION_BUILD) {
-    if (!transformTracking[method]) { transformTracking[method] = {}; }
-    if (!transformTracking[method][operation]) {
-      transformTracking[method][operation] = 0;
+    transformTracking[method] = transformTracking[method] || {};
+
+    if (!transformTracking[method]?.[operation] === undefined) {
+      transformTracking[method]![operation] = 0;
     }
-    transformTracking[method][operation] += 1;
+    (transformTracking[method]![operation] as number) += 1;
   }
 };
 
@@ -47,9 +48,9 @@ export const reportTransformsTally = () => {
   if (IS_PRODUCTION_BUILD) {
     for (const method of Object.values(TRANSFORM_METHODS)) {
       for (const operation of Object.values(TRANSFORM_OPERATIONS)) {
-        if (transformTracking[method] && transformTracking[method][operation]) {
-          window.dataLayer.push(getTransformDataLayerObject(operation, method, transformTracking[method][operation]));
-          transformTracking[method][operation] = 0;
+        if (transformTracking[method] && transformTracking[method]![operation]) {
+          window.dataLayer.push(getTransformDataLayerObject(operation, method, transformTracking[method]![operation]));
+          transformTracking[method]![operation] = 0;
         }
       }
     }

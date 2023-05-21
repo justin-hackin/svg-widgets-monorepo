@@ -1,5 +1,6 @@
 import Flatten from '@flatten-js/core';
-import { PathData } from '../../common/path/PathData';
+import { assertNotNullish } from '@/common/util/assert';
+import { PathData } from '../../common/PathData';
 import { hingedPlot, polygonWithFace } from '../../common/util/geom';
 import Segment = Flatten.Segment;
 import Point = Flatten.Point;
@@ -100,10 +101,12 @@ export const getPositiveSlopeSlatSegments = (
   const backboneLength = backboneSegment.length;
   const numCrosshatches = getNumNotches(backboneLength, matThickness, cubbyWidth);
   const centeringMargin = (backboneLength - ((numCrosshatches - 1) * (cubbyWidth + matThickness))) / 2;
-  const vertibrae = [];
+  const vertibrae: Point[] = [];
   for (let i = 0; i < numCrosshatches; i += 1) {
     const thisDist = centeringMargin + (i * (cubbyWidth + matThickness));
-    vertibrae.push(backboneSegment.pointAtLength(thisDist));
+    const point = backboneSegment.pointAtLength(thisDist);
+    assertNotNullish(point);
+    vertibrae.push(point);
   }
   return boxedDiagonalSegments(vertibrae, width, height).filter((segment) => (
     segment.length > (cubbyWidth + matThickness)));

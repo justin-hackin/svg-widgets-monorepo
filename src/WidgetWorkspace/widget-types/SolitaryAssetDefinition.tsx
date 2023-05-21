@@ -38,7 +38,7 @@ export class SolitaryAssetDefinition implements BaseAssetDefinition {
     return [{
       filePath: filePathConstructor(fileBaseName, undefined, this.copies),
       fileString: ReactDOMServer.renderToString(
-        <SVGWrapper {...documentAreaProps}>
+        <SVGWrapper documentAreaProps={documentAreaProps}>
           <Component />
         </SVGWrapper>,
       ),

@@ -2,9 +2,10 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import clsx from 'clsx';
 import { styled } from '@mui/styles';
+import { getDestinationPoints } from '@/common/PathData/helpers';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
-import { PathData } from '../../../../../../../../../common/path/PathData';
+import { PathData } from '../../../../../../../../../common/PathData';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
 import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
@@ -38,15 +39,18 @@ export const TexturePathNodes = observer(() => {
   if (
     !showNodes || faceDecoration instanceof RawFaceDecorationModel
     || faceDecoration.pattern instanceof ImageFaceDecorationPatternModel
+    || !faceDecoration
+    || !imageCoverScale
+    || !faceDecoration.pattern
+    || !faceDecoration.dimensions
   ) { return null; }
-
-  const points = (new PathData(faceDecoration.pattern.pathD)).getDestinationPoints();
+  const points = getDestinationPoints(new PathData(faceDecoration.pattern.pathD));
   return (
     <NodesGroup>
       {
         points.map(({ x: cx, y: cy }, index) => {
-          const longerTextureSideLength = imageCoverScale.widthIsClamp
-            ? faceDecoration.dimensions.width : faceDecoration.dimensions.height;
+          const longerTextureSideLength = (imageCoverScale.widthIsClamp
+            ? faceDecoration.dimensions?.width : faceDecoration.dimensions?.height) as number;
           return (
             <g key={`${index}--${cx},${cy}`}>
               <circle

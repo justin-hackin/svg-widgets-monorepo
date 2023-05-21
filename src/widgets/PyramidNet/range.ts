@@ -1,8 +1,13 @@
 import {
   cloneDeep, flatten, last, sortedIndex,
 } from 'lodash-es';
+import { assertNotNullish } from '@/common/util/assert';
+import { LerpRanges } from '@/common/shapes/strokeDashPath';
 
 const validateRange = (rangeSeries) => {
+  if (!rangeSeries.length) {
+    throw new Error('validateRange: rangeSeries must contain at least one item');
+  }
   const errorMsg = (index, item) => `Invalid range set, index: ${index}, value: ${item}`;
   for (let index = 0; index < rangeSeries.length; index += 1) {
     const range = rangeSeries[index];
@@ -22,10 +27,15 @@ const validateRange = (rangeSeries) => {
 
 const getPositionInRangeSeries = (rangeSeries, number) => sortedIndex(flatten(rangeSeries), number);
 
-export const subtractRangeSet = (baseSet, subtractSet) => {
+export const subtractRangeSet = (baseSet: LerpRanges, subtractSet: LerpRanges) => {
   validateRange(baseSet);
   validateRange(subtractSet);
-  if (subtractSet[0][0] >= last(baseSet)[1] || last(subtractSet)[1] <= baseSet[0][0]) {
+  const lastBaseSet = last(baseSet);
+  const lastSubtractSet = last(baseSet);
+  assertNotNullish(lastBaseSet);
+  assertNotNullish(lastSubtractSet);
+
+  if (subtractSet[0][0] >= lastBaseSet[1] || lastSubtractSet[1] <= baseSet[0][0]) {
     return baseSet;
   }
   const endIndex = baseSet.length * 2;

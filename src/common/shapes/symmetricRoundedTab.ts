@@ -3,7 +3,7 @@ import {
   hingedPlotByProjectionDistance,
   parallelLinePointsAtDistance,
   subtractPoints,
-} from '../../util/geom';
+} from '../util/geom';
 
 export const arrowTabPlots = (
   tabBaseStart,

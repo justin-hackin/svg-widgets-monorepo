@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { INPUT_TYPE, TweakableModel } from '../types';
 import { TweakableSlider } from './TweakableSlider';
@@ -13,7 +13,7 @@ import { TweakableReferenceSelect } from './TweakableReferenceSelect';
 
 const TYPE_COMPONENT_MAP: Record<
 INPUT_TYPE,
-({ className: string, node: TweakableModel }) => JSX.Element
+FC<{ node: any, className?: string }>
 > = {
   [INPUT_TYPE.SWITCH]: TweakableSwitch,
   [INPUT_TYPE.SLIDER]: TweakableSlider,

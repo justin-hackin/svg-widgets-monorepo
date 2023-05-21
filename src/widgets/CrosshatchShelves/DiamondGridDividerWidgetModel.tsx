@@ -10,7 +10,7 @@ import {
   DisjunctWidgetAssetMember,
 } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { augmentSegmentEndpoints, getPositiveSlopeSlatSegments, notchPanel } from './util';
-import { PathData } from '../../common/path/PathData';
+import { PathData } from '../../common/PathData';
 import { getBoundingBoxAttrs } from '../../common/util/svg';
 import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
@@ -96,6 +96,11 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
       const intersection = mirrorSegment.intersect(targetSeg);
       return intersection.length > 0;
     });
+    if (!firstIntersectionSegment) {
+      throw new Error(
+        'firstIntersectionSegment: failed to find firstIntersectionSegment in this.positiveCrosshatchSegments',
+      );
+    }
     return targetSeg.intersect(this.getMirroredSegment(firstIntersectionSegment))[0].distanceTo(targetSeg.ps)[0];
   }
 

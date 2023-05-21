@@ -2,14 +2,15 @@ import { computed } from 'mobx';
 import React from 'react';
 import { ExtendedModel } from 'mobx-keystone';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
+import { DestinationCommand } from '@/common/PathData/types';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
 } from '../../common/util/geom';
 import { subtractDValues, unifyDValues } from '../../common/util/path-boolean';
 import { PIXELS_PER_CM, radToDeg } from '../../common/util/units';
 import { sliderProp, sliderWithTextProp } from '../../common/keystone-tweakables/props';
-import { closedPolygonPath } from '../../common/path/shapes/generic';
-import { DestinationCommand, PathData } from '../../common/path/PathData';
+import { appendCurvedLineSegments, closedPolygonPath } from '../../common/shapes/generic';
+import { PathData } from '../../common/PathData';
 import { pathDToViewBoxStr } from '../../common/util/svg';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
@@ -255,18 +256,20 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     const secondFootStart = this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
     const secondFootEnd = 2 * this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
     const tabTop = -this.materialThickness.value - this.actualHolderTabFeetLength;
-    return (new PathData()).move(getOriginPoint()) // first foot start
+    const tab = (new PathData()).move(getOriginPoint()) // first foot start
       .line({ x: this.actualHolderTabFeetLength, y: 0 }) // first foot end
       .line({ x: this.actualHolderTabFeetLength, y: -this.materialThickness.value }) // crotch start
       .line({ x: secondFootStart, y: -this.materialThickness.value }) // crotch end
       .line({ x: secondFootStart, y: 0 }) // second foot start
-      .line({ x: secondFootEnd, y: 0 }) // second foot end
-      .curvedLineSegments(
-        [{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
-        0.5,
-        true,
-      )
-      .getD();
+      .line({ x: secondFootEnd, y: 0 }); // second foot end
+
+    appendCurvedLineSegments(
+      tab,
+      [{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
+      0.5,
+      true,
+    );
+    return tab.getD();
   }
 
   @computed

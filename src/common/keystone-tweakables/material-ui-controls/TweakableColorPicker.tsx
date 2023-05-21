@@ -21,12 +21,12 @@ const ThisFormControl = styled(FormControlStyled)(({ theme }) => ({
 }));
 
 export const TweakableColorPicker = observer(({
-  node,
-}: { node: TweakablePrimitiveModel<string, ColorPickerMetadata> }) => {
+  node, className,
+}: { node: TweakablePrimitiveModel<string, ColorPickerMetadata>, className?: string }) => {
   const labelId = uuid();
-  if (!node.onAttachedComplete || node.value === undefined) { return null; }
+
   return (
-    <ThisFormControl>
+    <ThisFormControl className={className}>
       <Typography id={labelId} gutterBottom>
         {node.label}
       </Typography>

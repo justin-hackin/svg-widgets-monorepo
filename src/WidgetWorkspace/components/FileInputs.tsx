@@ -7,11 +7,11 @@ export const FileInputs = observer(() => {
   const workspaceStore = useWorkspaceMst();
   const { openWidgetFileFlag } = workspaceStore;
 
-  const openWidgetInputRef = useRef<HTMLInputElement>();
+  const openWidgetInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (openWidgetFileFlag) {
-      openWidgetInputRef?.current.click();
+      openWidgetInputRef?.current?.click();
     }
   }, [openWidgetFileFlag]);
 
