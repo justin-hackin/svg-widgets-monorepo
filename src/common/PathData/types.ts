@@ -1,10 +1,20 @@
-import { RawPoint } from '@/common/util/geom';
-
 export enum CommandCodes { M = 'M', L = 'L', C = 'C', S = 'S', Q = 'Q', T = 'T', A = 'A', Z = 'Z' }
 
 export interface BaseCommand {
   code: CommandCodes,
 }
+
+export interface RawPoint {
+  x: number,
+  y: number,
+}
+
+export interface PointLike extends RawPoint {
+  [x: string]: any
+}
+
+export type PointTuple = [number, number];
+export type Coord = PointTuple | PointLike;
 
 export interface DestinationCommand extends BaseCommand {
   to: RawPoint

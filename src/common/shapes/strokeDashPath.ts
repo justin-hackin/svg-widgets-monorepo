@@ -7,8 +7,9 @@ import {
 
 import { computed } from 'mobx';
 import { assertNotNullish } from '@/common/util/assert';
+import { PointLike } from '@/common/PathData/types';
 import {
-  distanceFromOrigin, lineLerp, PointLike, subtractPoints,
+  distanceFromOrigin, lineLerp, subtractPoints,
 } from '../util/geom';
 import { PathData } from '../PathData';
 import { referenceSelectProp, sliderWithTextProp } from '../keystone-tweakables/props';

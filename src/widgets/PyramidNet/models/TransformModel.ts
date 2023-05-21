@@ -1,6 +1,7 @@
 import { Model, model, prop } from 'mobx-keystone';
 import { computed } from 'mobx';
-import { getTextureTransformMatrix, RawPoint } from '../../../common/util/geom';
+import { RawPoint } from '@/common/PathData/types';
+import { getTextureTransformMatrix } from '../../../common/util/geom';
 
 @model('TransformModel')
 export class TransformModel extends Model({

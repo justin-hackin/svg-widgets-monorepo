@@ -13,6 +13,7 @@ import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass'
 import { appendContinuationPath } from '@/widgets/PyramidNet/path';
 import { getCurrentSegmentStart, getLastPosition } from '@/common/PathData/helpers';
 import { assertNotNullish } from '@/common/util/assert';
+import { RawPoint } from '@/common/PathData/types';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
@@ -42,7 +43,6 @@ import {
   hingedPlotByProjectionDistance,
   offsetPolygonPoints,
   polygonPointsGivenAnglesAndSides,
-  RawPoint,
   scalePoint,
   sumPoints,
   triangleAnglesGivenSides,

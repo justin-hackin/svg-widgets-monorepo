@@ -2,6 +2,7 @@ import {
   Model, model, modelAction, prop,
 } from 'mobx-keystone';
 import { appendCurvedLineSegments } from '@/common/shapes/generic';
+import { RawPoint } from '@/common/PathData/types';
 import { PathData } from '../../common/PathData';
 import {
   distanceBetweenPoints,
@@ -9,7 +10,6 @@ import {
   hingedPlot,
   hingedPlotByProjectionDistance,
   hingedPlotLerp,
-  RawPoint,
   symmetricHingePlotByProjectionDistance,
 } from '../../common/util/geom';
 import { DashPatternModel, strokeDashPath } from '../../common/shapes/strokeDashPath';

@@ -8,11 +8,11 @@ import {
 } from 'mobx';
 import { Dimensions } from '@/common/util/data';
 import { assertNotNullish } from '@/common/util/assert';
+import { RawPoint } from '@/common/PathData/types';
 import { BoundaryModel } from './BoundaryModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset,
-  RawPoint,
   scalePoint,
   sumPoints,
   transformPoint,

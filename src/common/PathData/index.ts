@@ -1,12 +1,9 @@
-import { Command, ImmutableCommandArray } from '@/common/PathData/types';
+import { Command, Coord, ImmutableCommandArray } from '@/common/PathData/types';
 import { commandFactory, composeSVG, parseSVG } from '@/common/PathData/helpers';
 import { validatePushCommand } from '@/common/PathData/validation';
 import { produce } from 'immer';
 import { Producer } from 'immer/src/types/types-external';
 import { transformProducer } from '@/common/PathData/producers';
-import { Coord } from '../util/geom';
-
-// eslint-disable-next-line import/no-cycle
 
 export class PathData {
   private _commands: ImmutableCommandArray = [];

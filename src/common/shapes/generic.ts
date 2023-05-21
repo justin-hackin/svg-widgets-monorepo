@@ -1,6 +1,7 @@
 import { getCurrentSegmentStart, getLastPosition } from '@/common/PathData/helpers';
+import { PointLike, RawPoint } from '@/common/PathData/types';
 import {
-  distanceBetweenPoints, hingedPlot, PointLike, RawPoint,
+  distanceBetweenPoints, hingedPlot,
 } from '../util/geom';
 // eslint-disable-next-line import/no-cycle
 import { PathData } from '../PathData';

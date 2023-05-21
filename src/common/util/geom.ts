@@ -5,16 +5,10 @@ import {
 import { isNaN, isNumber, range } from 'lodash-es';
 import offset from '@flatten-js/polygon-offset';
 
+import type {
+  Coord, PointLike, PointTuple, RawPoint,
+} from '@/common/PathData/types';
 import { circularSlice } from './data';
-
-export interface RawPoint {
-  x: number,
-  y: number,
-}
-
-export interface PointLike extends RawPoint {
-  [x: string]: any
-}
 
 // NOTE: where possible, avoid direct use of flatten-js classes and instead use RawPoint or construct helper function
 // flatten-js is designed to conform to formal mathematical definitions and has an inconvenient interface
@@ -26,8 +20,6 @@ export interface PointLike extends RawPoint {
 // (blurs separation of concerns between data and view)
 // However, flatten-js features many valuable computations that are not present in other libraries
 
-export type PointTuple = [number, number];
-export type Coord = PointTuple | PointLike;
 const isPointLike = (coord: Coord): coord is PointLike => isNumber((coord as PointLike).x)
   && isNumber((coord as PointLike).y);
 

@@ -3,7 +3,7 @@ import {
   BezierCommand,
   CloseCommand,
   Command,
-  CommandCodes,
+  CommandCodes, Coord,
   CubicBezierCommand,
   DestinationCommand,
   LineCommand,
@@ -13,7 +13,7 @@ import {
   SymmetricCubicBezierCommand,
   SymmetricQuadraticBezierCommand,
 } from '@/common/PathData/types';
-import { castCoordToRawPoint, Coord, rawPointToString } from '@/common/util/geom';
+import { castCoordToRawPoint, rawPointToString } from '@/common/util/geom';
 import svgpath from 'svgpath';
 import type { PathData } from '@/common/PathData/index';
 import { assertNotNullish } from '@/common/util/assert';

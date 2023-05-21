@@ -1,8 +1,9 @@
 import { range } from 'lodash-es';
 import { Model, model, prop } from 'mobx-keystone';
+import { RawPoint } from '@/common/PathData/types';
 import { PathData } from '../../common/PathData';
 import {
-  hingedPlot, lineLerp, RawPoint, symmetricHingePlotByProjectionDistance,
+  hingedPlot, lineLerp, symmetricHingePlotByProjectionDistance,
 } from '../../common/util/geom';
 import { DashPatternModel, strokeDashPathRatios } from '../../common/shapes/strokeDashPath';
 import { connectedLineSegments } from '../../common/shapes/generic';
