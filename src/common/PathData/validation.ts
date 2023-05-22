@@ -1,6 +1,5 @@
 import { BEZIER_COMMAND_CODES, isBezierCommand } from '@/common/PathData/helpers';
 import { Command, CommandCodes } from '@/common/PathData/types';
-import { includes } from 'lodash-es';
 
 function lastCommandExists(commands: ReadonlyArray<Command>) {
   return !!commands.length;
@@ -25,7 +24,7 @@ export const validatePushCommand = (commands: ReadonlyArray<Command>, newCommand
   if (newCommand.code !== CommandCodes.M) {
     validateLastCommandExists(commands);
   }
-  if (includes([CommandCodes.T, CommandCodes.S], newCommand.code)) {
+  if ([CommandCodes.T, CommandCodes.S].includes(newCommand.code)) {
     validateLastCommandIsBezier(commands);
   }
 };

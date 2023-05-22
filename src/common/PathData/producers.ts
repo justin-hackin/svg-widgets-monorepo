@@ -1,9 +1,9 @@
 import { Producer } from 'immer/src/types/types-external';
 import { reverse } from 'lodash-es';
 import { composeSVG, parseSVG } from '@/common/PathData/helpers';
-import svgpath from 'svgpath';
 import { produce } from 'immer';
 import { ImmutableCommandArray } from '@/common/PathData/types';
+import SVGPathCommander, { TransformObject } from 'svg-path-commander';
 
 // Producer is a confusing type name, Recipe would have been better,
 // (https://github.com/immerjs/immer/pull/968/files)
@@ -17,7 +17,8 @@ export const reversePathRecipe: Producer<ImmutableCommandArray> = ((commands) =>
   commands.concat(parseSVG(reverse(composeSVG(commands))));
 });
 
-export const transformProducer = produce<ImmutableCommandArray, [string]>(
-  (commands, matrix) => parseSVG(svgpath(composeSVG(commands))
-    .transform(matrix).toString()),
+export const transformProducer = produce<ImmutableCommandArray, [Partial<TransformObject>]>(
+  (commands, matrix) => parseSVG(
+    (new SVGPathCommander(composeSVG(commands))).transform({ origin: [0, 0, 0], ...matrix }).toString(),
+  ),
 );

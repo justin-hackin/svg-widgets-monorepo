@@ -124,7 +124,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   @computed
   get maxIngressAngle() {
     const dovetailNotchBeforeIngress = (new PathData()).concatPath(this.absNotchPath)
-      .transform(`rotate(${this.notchRotationBeforeIngress}) translate(${this.midRadius}, 0)`);
+      .transform({ rotate: this.notchRotationBeforeIngress, translate: [this.midRadius, 0], origin: [0, 0] });
     const p1 = (dovetailNotchBeforeIngress.commands[0] as DestinationCommand).to;
     const p2 = (dovetailNotchBeforeIngress.commands[1] as DestinationCommand).to;
     return radToDeg(Math.abs(angleRelativeToOrigin(p1) - angleRelativeToOrigin(p2)));
@@ -148,13 +148,17 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   @computed
   get dovetailNotch() {
     return (new PathData()).concatPath(this.absNotchPath)
-      .transform(`rotate(${this.notchRotation}) translate(${this.midRadius}, 0)`);
+      .transform({ translate: [this.midRadius, 0] })
+      .transform({ rotate: this.notchRotation });
   }
 
   @computed
   get dovetailTab() {
     return (new PathData()).concatPath(this.absNotchPath)
-      .transform(`rotate(${this.tabRotation}) translate(${this.midRadius}, 0)`);
+      .transform({
+        rotate: this.tabRotation,
+        translate: [this.midRadius, 0],
+      });
   }
 
   @computed
@@ -164,7 +168,10 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     for (let i = 0; i < this.wallsPerArc.value; i += 1) {
       const rotation = (i - (this.wallsPerArc.value / 2) + 0.5) * sectionDegrees;
       const thisHole = rectanglePathCenteredOnOrigin(this.materialThickness.value, this.actualHoleWidth)
-        .transform(`rotate(${rotation}) translate(${this.midRadius}, 0)`);
+        .transform({
+          rotate: rotation,
+          translate: [this.midRadius, 0],
+        });
       holesPath.concatPath(thisHole);
     }
     return holesPath;
@@ -240,7 +247,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     for (let i = 0; i < this.holderTabsPerArc.value; i += 1) {
       const rotation = (i - (this.holderTabsPerArc.value / 2) + 0.5) * sectionDegrees;
       const thisHole = rectanglePathCenteredOnOrigin(this.actualHolderTabFeetLength, this.materialThickness.value)
-        .transform(`rotate(${rotation}) translate(${this.holderTabRadius}, 0)`);
+        .transform({ rotate: rotation, translate: [this.holderTabRadius, 0] });
       holesPath.concatPath(thisHole);
     }
     return holesPath;

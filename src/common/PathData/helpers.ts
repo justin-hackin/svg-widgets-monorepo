@@ -3,7 +3,8 @@ import {
   BezierCommand,
   CloseCommand,
   Command,
-  CommandCodes, Coord,
+  CommandCodes,
+  Coord,
   CubicBezierCommand,
   DestinationCommand,
   LineCommand,
@@ -13,10 +14,11 @@ import {
   SymmetricCubicBezierCommand,
   SymmetricQuadraticBezierCommand,
 } from '@/common/PathData/types';
-import { castCoordToRawPoint, rawPointToString } from '@/common/util/geom';
-import svgpath from 'svgpath';
 import type { PathData } from '@/common/PathData/index';
-import { assertNotNullish } from '@/common/util/assert';
+import { castCoordToRawPoint, rawPointToString } from '@/common/PathData/geom';
+import SVGPathCommander, { TransformObject } from 'svg-path-commander';
+import { getSVGMatrix } from '@/common/PathData/matrix.ts/getSVGMatrix';
+import CSSMatrix, { Matrix } from '@thednp/dommatrix';
 
 // why isn't return type accurate here? why can't it be explicitly defined
 function last<T>(arr: T[] | ReadonlyArray<T>): null | T {
@@ -108,37 +110,43 @@ export const commandFactory = {
   }),
 };
 export const parseSVG = (d:string):Command[] => {
-  const commandList:Command[] = [];
-  const absPath = svgpath(d).abs();
-  absPath.iterate(([code, ...params], index, x, y) => {
+  // normalize removes H/V
+  const absPathCmdr = (new SVGPathCommander(d)).normalize().toAbsolute();
+  return absPathCmdr.segments.reduce((commandList, segment) => {
+    const [code, ...params] = segment;
+    const castParams = params as number[];
     if (code === 'Z') {
       commandList.push(commandFactory.Z());
     }
     if (['L', 'M', 'T'].includes(code)) {
       commandList.push(commandFactory[code]([...params]));
-    } else if (code === 'V' || code === 'H') {
-      // V and H commands are irregular in that
-      // they don't have a .to parameter and thus complicate iteration modifications
-      // for convenience and consistency, convert to a L command
-      commandList.push(commandFactory.L(code === 'V' ? [x, params[0]] : [params[0], y]));
     } else if (code === 'C') {
+      const castParams = params as number[];
       commandList.push(commandFactory.C(
-        [params[0], params[1]],
-        [params[2], params[3]],
-        [params[4], params[5]],
+        [castParams[0], castParams[1]],
+        [castParams[2], castParams[3]],
+        [castParams[4], castParams[5]],
       ));
     } else if (code === 'Q' || code === 'S') {
+      const castParams = params as number[];
       commandList.push(commandFactory.Q(
-        [params[0], params[1]],
-        [params[2], params[3]],
+        [castParams[0], castParams[1]],
+        [castParams[2], castParams[3]],
       ));
     } else if (code === 'A') {
       commandList.push(
-        commandFactory.A(params[0], params[1], params[2], !!params[3], !!params[4], [params[5], params[6]]),
+        commandFactory.A(
+          castParams[0],
+          castParams[1],
+          castParams[2],
+          !!castParams[3],
+          !!castParams[4],
+          [castParams[5], castParams[6]],
+        ),
       );
     }
-  });
-  return commandList;
+    return commandList;
+  }, [] as Command[]);
 };
 export const composeSVG = (commands): string => commands.map((command) => commandToString(command))
   .join(' ');
@@ -165,7 +173,7 @@ export function getCurrentSegmentStart(path: PathData) {
 
 export function getLastPosition(path: PathData) {
   const lastCommand = last(path.commands);
-  assertNotNullish(lastCommand);
+  if (!lastCommand) { return undefined; }
   return lastCommand?.code === CommandCodes.Z
     ? getCurrentSegmentStart(path) : (lastCommand as DestinationCommand).to;
 }
@@ -173,4 +181,17 @@ export function getLastPosition(path: PathData) {
 export function getDestinationPoints(path: PathData) {
   return path.commands.filter((cmd) => isDestinationCommand(cmd))
     .map((cmd) => (cmd as DestinationCommand).to);
+}
+
+export function convertTransformObjectToDOMMatrixReadOnly(trans: Partial<TransformObject>): DOMMatrixReadOnly {
+  const cssMatrix = getSVGMatrix({
+    ...trans,
+    origin: [0, 0, 0],
+  });
+  const arr = CSSMatrix.toArray(cssMatrix, true) as Matrix;
+  return new DOMMatrixReadOnly(arr);
+}
+
+export function clone<T>(target: T): T {
+  return JSON.parse(JSON.stringify(target));
 }

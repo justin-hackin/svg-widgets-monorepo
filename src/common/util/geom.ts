@@ -2,12 +2,11 @@ import {
   // @ts-ignore
   Line, point, Polygon, segment,
 } from '@flatten-js/core';
-import { isNaN, isNumber, range } from 'lodash-es';
+import { isNaN, range } from 'lodash-es';
 import offset from '@flatten-js/polygon-offset';
 
-import type {
-  Coord, PointLike, PointTuple, RawPoint,
-} from '@/common/PathData/types';
+import type { PointLike, RawPoint } from '@/common/PathData/types';
+import { castCoordToRawPoint } from '@/common/PathData/geom';
 import { circularSlice } from './data';
 
 // NOTE: where possible, avoid direct use of flatten-js classes and instead use RawPoint or construct helper function
@@ -19,23 +18,6 @@ import { circularSlice } from './data';
 // there's only a way to render it to a DOM string containing a <path>
 // (blurs separation of concerns between data and view)
 // However, flatten-js features many valuable computations that are not present in other libraries
-
-const isPointLike = (coord: Coord): coord is PointLike => isNumber((coord as PointLike).x)
-  && isNumber((coord as PointLike).y);
-
-export const castCoordToRawPoint = (coord: Coord): RawPoint => {
-  if (isPointLike(coord)) {
-    const { x, y } = coord as PointLike;
-    return { x, y };
-  }
-  if ((coord as PointTuple).length !== 2) {
-    throw new Error(`expected a PointLike object or an array of length 2 but instead saw ${coord}`);
-  }
-  const [x, y] = coord as PointTuple;
-  return { x, y };
-};
-
-export const rawPointToString = ({ x, y }: RawPoint) => `${x},${y}`;
 
 export const PHI:number = (1 + Math.sqrt(5)) / 2;
 
@@ -58,8 +40,6 @@ export function triangleAnglesGivenSides(sideLengths) {
   });
 }
 
-export const pointLikeToTuple = ({ x, y }) => [x, y];
-export const pointTupleToRawPoint = ([x, y]) => ({ x, y });
 export const transformPoint = (matrix: DOMMatrixReadOnly, pt: PointLike): RawPoint => {
   const domPoint = matrix.transformPoint(new DOMPoint(pt.x, pt.y));
   return castCoordToRawPoint(domPoint);

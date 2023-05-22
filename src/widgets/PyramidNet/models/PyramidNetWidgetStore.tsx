@@ -11,9 +11,14 @@ import BrushIcon from '@mui/icons-material/Brush';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { appendContinuationPath } from '@/widgets/PyramidNet/path';
-import { getCurrentSegmentStart, getLastPosition } from '@/common/PathData/helpers';
+import {
+  convertTransformObjectToDOMMatrixReadOnly,
+  getCurrentSegmentStart,
+  getLastPosition,
+} from '@/common/PathData/helpers';
 import { assertNotNullish } from '@/common/util/assert';
 import { RawPoint } from '@/common/PathData/types';
+import { TransformObject } from 'svg-path-commander';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
@@ -379,9 +384,9 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       this.tabGapIntervalRatios,
       this.ascendantEdgeTabDepth,
     );
-    const rotationMatrix = `rotate(${radToDeg(-this.pyramid.facesPerNet * this.faceInteriorAngles[2])})`;
-    ascendantTabs.male.cut.transform(rotationMatrix);
-    ascendantTabs.male.score.transform(rotationMatrix);
+    const rotationTransform = { rotate: radToDeg(-this.pyramid.facesPerNet * this.faceInteriorAngles[2]) };
+    ascendantTabs.male.cut.transform(rotationTransform);
+    ascendantTabs.male.score.transform(rotationTransform);
     return ascendantTabs;
   }
 
@@ -425,22 +430,26 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     if (!this.texturePathD) { return null; }
     const cut = new PathData();
     const insetDecorationPath = (new PathData(this.texturePathD))
-      .transform(`${
-        this.borderInsetFaceHoleTransformMatrix.toString()} ${
-        this.pathScaleMatrix.toString()}`);
-    for (const matrix of this.faceDecorationTransformMatricies) {
-      const tiledDecorationPath = insetDecorationPath.clone().transform(matrix.toString());
+      .transform({ scale: this.faceLengthAdjustRatio })
+      .transform(this.borderInsetFaceHoleTransformObject);
+    for (const matrix of this.faceDecorationTransformObjects) {
+      const tiledDecorationPath = insetDecorationPath.clone().transform(matrix);
       cut.concatPath(tiledDecorationPath);
     }
     return cut;
   }
 
   @computed
-  get borderInsetFaceHoleTransformMatrix(): DOMMatrixReadOnly {
+  get borderInsetFaceHoleTransformObject(): Partial<TransformObject> {
     const scale = 1 / this.borderToInsetRatio;
     const insetPolygonPoints = offsetPolygonPoints(this.faceBoundaryPoints, -this.ascendantEdgeTabDepth);
     const { x: inX, y: inY } = insetPolygonPoints[0];
-    return (new DOMMatrixReadOnly()).translate(inX, inY).scale(scale, scale);
+    return { translate: [inX, inY], scale };
+  }
+
+  @computed
+  get borderInsetFaceHoleTransformMatrix(): DOMMatrixReadOnly {
+    return convertTransformObjectToDOMMatrixReadOnly(this.borderInsetFaceHoleTransformObject);
   }
 
   @computed
@@ -459,13 +468,13 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     if (!this.faceDecoration) { return null; }
 
     if (this.faceDecoration instanceof PositionableFaceDecorationModel) {
-      const { pattern, transform: { transformMatrix } } = this.faceDecoration as PositionableFaceDecorationModel;
+      const { pattern, transform: { transformObject } } = this.faceDecoration as PositionableFaceDecorationModel;
       if (pattern instanceof PathFaceDecorationPatternModel) {
         const { pathD, isPositive } = pattern as PathFaceDecorationPatternModel;
         return getBoundedTexturePathD(
           closedPolygonPath(this.normalizedDecorationBoundaryPoints).getD(),
           pathD,
-          transformMatrix.toString(),
+          transformObject,
           isPositive,
         );
       }
@@ -478,7 +487,12 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   @computed
   get faceDecorationTransformMatricies(): DOMMatrixReadOnly[] {
-    const matrices: DOMMatrixReadOnly[] = [];
+    return this.faceDecorationTransformObjects.map(convertTransformObjectToDOMMatrixReadOnly);
+  }
+
+  @computed
+  get faceDecorationTransformObjects(): Partial<TransformObject>[] {
+    const matrices: Partial<TransformObject>[] = [];
 
     for (let i = 0; i < this.pyramid.facesPerNet; i += 1) {
       const isMirrored = !!(i % 2) && !this.pyramid.faceIsSymmetrical;
@@ -487,8 +501,7 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
         ? this.faceInteriorAngles[2] - 2 * ((Math.PI / 2) - this.faceInteriorAngles[0]) : 0;
       const baseTabRotationRad = -1 * i * this.faceInteriorAngles[2];
       const decorationRotationRad = xScale * baseTabRotationRad + asymmetryNudge;
-      matrices.push((new DOMMatrixReadOnly())
-        .scale(xScale, 1).rotate(radToDeg(decorationRotationRad)));
+      matrices.push({ scale: [xScale, 1], rotate: radToDeg(decorationRotationRad) });
     }
     return matrices;
   }
