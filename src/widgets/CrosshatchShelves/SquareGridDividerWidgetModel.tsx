@@ -1,10 +1,10 @@
 import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { range } from 'lodash-es';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
+import { PathData } from '@/common/PathData/module';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { PathData } from '../../common/PathData';
 import { radioProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
 import { centeredNotchPanel, getMarginLength } from './util';

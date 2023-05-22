@@ -1,8 +1,6 @@
 import { Model, model, prop } from 'mobx-keystone';
 import { computed } from 'mobx';
-import { RawPoint } from '@/common/PathData/types';
-import { TransformObject } from 'svg-path-commander';
-import { convertTransformObjectToDOMMatrixReadOnly } from '@/common/PathData/helpers';
+import { RawPoint, convertTransformObjectToDOMMatrixReadOnly, PartialTransformObject } from '@/common/PathData/module';
 
 @model('TransformModel')
 export class TransformModel extends Model({
@@ -17,7 +15,7 @@ export class TransformModel extends Model({
   }
 
   @computed
-  get transformObject(): Partial<TransformObject> {
+  get transformObject(): PartialTransformObject {
     const {
       transformOrigin: { x: ox, y: oy }, scale, rotate, translate: { x: tx, y: ty },
     } = this;

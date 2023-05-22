@@ -2,17 +2,17 @@ import React from 'react';
 import { computed } from 'mobx';
 import { flatten, range } from 'lodash-es';
 import Flatten from '@flatten-js/core';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { ExtendedModel } from 'mobx-keystone';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { assertNotNullish } from '@/common/util/assert';
+import { PathData } from '@/common/PathData/module';
 import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../../common/util/units';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
 } from '../../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { PathData } from '../../../common/PathData';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
 import { closedPolygonPath } from '../../../common/shapes/generic';
 import { TRI_NOTCH_LEVEL, triNotchPanel } from './util';

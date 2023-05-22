@@ -1,7 +1,7 @@
 import React from 'react';
 import { svgPathBbox } from 'svg-path-bbox';
 import { Dimensions } from '@/common/util/data';
-import { PathData } from '../PathData';
+import { PathData } from '@/common/PathData/module';
 
 const parseString = (str) => {
   const parser = new window.DOMParser();

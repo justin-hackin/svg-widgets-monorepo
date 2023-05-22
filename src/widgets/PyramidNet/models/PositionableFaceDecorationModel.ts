@@ -4,8 +4,8 @@ import {
 } from 'mobx-keystone';
 
 import { computed, observable } from 'mobx';
-import { getDestinationPoints } from '@/common/PathData/helpers';
 import { Dimensions } from '@/common/util/data';
+import { PathData, getDestinationPoints } from '@/common/PathData/module';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import {
   calculateTransformOriginChangeOffset,
@@ -17,7 +17,6 @@ import { getNearestHistoryFromAncestorNode } from '../../../common/util/mobx-key
 import { TransformModel } from './TransformModel';
 import { ImageFaceDecorationPatternModel } from './ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
-import { PathData } from '../../../common/PathData';
 
 // TODO: move to util
 const negativeMod = (n, m) => ((n % m) + m) % m;

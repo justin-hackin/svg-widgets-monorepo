@@ -11,14 +11,13 @@ import BrushIcon from '@mui/icons-material/Brush';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { appendContinuationPath } from '@/widgets/PyramidNet/path';
+import { assertNotNullish } from '@/common/util/assert';
 import {
-  convertTransformObjectToDOMMatrixReadOnly,
+  PathData, convertTransformObjectToDOMMatrixReadOnly,
   getCurrentSegmentStart,
   getLastPosition,
-} from '@/common/PathData/helpers';
-import { assertNotNullish } from '@/common/util/assert';
-import { RawPoint } from '@/common/PathData/types';
-import { TransformObject } from 'svg-path-commander';
+  RawPoint, PartialTransformObject,
+} from '@/common/PathData/module';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
@@ -42,7 +41,6 @@ import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../baseEdgeConnectionT
 import { sliderWithTextProp } from '../../../common/keystone-tweakables/props';
 import { degToRad, PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
 import { PositionableFaceDecorationModel } from './PositionableFaceDecorationModel';
-import { PathData } from '../../../common/PathData';
 import {
   hingedPlot,
   hingedPlotByProjectionDistance,
@@ -385,8 +383,8 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       this.ascendantEdgeTabDepth,
     );
     const rotationTransform = { rotate: radToDeg(-this.pyramid.facesPerNet * this.faceInteriorAngles[2]) };
-    ascendantTabs.male.cut.transform(rotationTransform);
-    ascendantTabs.male.score.transform(rotationTransform);
+    ascendantTabs.male.cut.transformByObject(rotationTransform);
+    ascendantTabs.male.score.transformByObject(rotationTransform);
     return ascendantTabs;
   }
 
@@ -430,17 +428,17 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     if (!this.texturePathD) { return null; }
     const cut = new PathData();
     const insetDecorationPath = (new PathData(this.texturePathD))
-      .transform({ scale: this.faceLengthAdjustRatio })
-      .transform(this.borderInsetFaceHoleTransformObject);
-    for (const matrix of this.faceDecorationTransformObjects) {
-      const tiledDecorationPath = insetDecorationPath.clone().transform(matrix);
+      .transformByObject({ scale: this.faceLengthAdjustRatio })
+      .transformByObject(this.borderInsetFaceHoleTransformObject);
+    for (const trans of this.faceDecorationTransformObjects) {
+      const tiledDecorationPath = insetDecorationPath.clone().transformByObject(trans);
       cut.concatPath(tiledDecorationPath);
     }
     return cut;
   }
 
   @computed
-  get borderInsetFaceHoleTransformObject(): Partial<TransformObject> {
+  get borderInsetFaceHoleTransformObject(): PartialTransformObject {
     const scale = 1 / this.borderToInsetRatio;
     const insetPolygonPoints = offsetPolygonPoints(this.faceBoundaryPoints, -this.ascendantEdgeTabDepth);
     const { x: inX, y: inY } = insetPolygonPoints[0];
@@ -491,8 +489,8 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   }
 
   @computed
-  get faceDecorationTransformObjects(): Partial<TransformObject>[] {
-    const matrices: Partial<TransformObject>[] = [];
+  get faceDecorationTransformObjects(): PartialTransformObject[] {
+    const matrices: PartialTransformObject[] = [];
 
     for (let i = 0; i < this.pyramid.facesPerNet; i += 1) {
       const isMirrored = !!(i % 2) && !this.pyramid.faceIsSymmetrical;

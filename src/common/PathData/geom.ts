@@ -1,6 +1,6 @@
 import {
   Coord, PointLike, PointTuple, RawPoint,
-} from '@/common/PathData/types';
+} from './types';
 
 export function isPointLike(coord: Coord): coord is PointLike {
   return Number.isFinite((coord as PointLike).x) && Number.isFinite((coord as PointLike).y);
@@ -39,10 +39,10 @@ export function rawPointToString({ x, y }: RawPoint) {
   return `${x},${y}`;
 }
 
-export function pointLikeToTuple({ x, y }):PointTuple {
+export function pointLikeToTuple({ x, y }: PointLike):PointTuple {
   return [x, y];
 }
 
-export function pointTupleToRawPoint([x, y]):RawPoint {
+export function pointTupleToRawPoint([x, y]: PointTuple):RawPoint {
   return { x, y };
 }

@@ -69,7 +69,7 @@ export const PrintLayer = observer(({
   const borderFill = theme.palette.grey['900'];
   const faceBoundaryPath = closedPolygonPath(faceBoundaryPoints);
   const faceBoundaryPathD = faceBoundaryPath.getD();
-  const decorationBoundaryPathD = faceBoundaryPath.transform(borderInsetFaceHoleTransformObject).getD();
+  const decorationBoundaryPathD = faceBoundaryPath.transformByObject(borderInsetFaceHoleTransformObject).getD();
 
   return (
     <PrintGroup>

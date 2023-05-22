@@ -1,10 +1,10 @@
-import { getCurrentSegmentStart, getLastPosition } from '@/common/PathData/helpers';
-import { PointLike, RawPoint } from '@/common/PathData/types';
+import {
+  PathData, getCurrentSegmentStart, getLastPosition, PointLike, RawPoint,
+} from '@/common/PathData/module';
 import {
   distanceBetweenPoints, hingedPlot,
 } from '../util/geom';
 // eslint-disable-next-line import/no-cycle
-import { PathData } from '../PathData';
 
 interface RoundPoint {
   point: PointLike,

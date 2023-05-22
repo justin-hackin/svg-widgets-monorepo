@@ -1,7 +1,7 @@
-import { PathData } from '@/common/PathData';
+import {
+  DestinationCommand, getCurrentSegmentStart, getLastPosition, PathData,
+} from '@/common/PathData/module';
 import { pointsAreEqual } from '@/common/util/geom';
-import { DestinationCommand } from '@/common/PathData/types';
-import { getCurrentSegmentStart, getLastPosition } from '@/common/PathData/helpers';
 
 /**
  * often constructing complicated paths is simplified by defining

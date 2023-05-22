@@ -1,5 +1,5 @@
-import { BEZIER_COMMAND_CODES, isBezierCommand } from '@/common/PathData/helpers';
-import { Command, CommandCodes } from '@/common/PathData/types';
+import { BEZIER_COMMAND_CODES, isBezierCommand } from './helpers';
+import { Command, CommandCodes } from './types';
 
 function lastCommandExists(commands: ReadonlyArray<Command>) {
   return !!commands.length;

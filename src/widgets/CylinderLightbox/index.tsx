@@ -2,7 +2,7 @@ import { computed } from 'mobx';
 import React from 'react';
 import { ExtendedModel } from 'mobx-keystone';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { DestinationCommand } from '@/common/PathData/types';
+import { PathData, DestinationCommand } from '@/common/PathData/module';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
 } from '../../common/util/geom';
@@ -10,7 +10,6 @@ import { subtractDValues, unifyDValues } from '../../common/util/path-boolean';
 import { PIXELS_PER_CM, radToDeg } from '../../common/util/units';
 import { sliderProp, sliderWithTextProp } from '../../common/keystone-tweakables/props';
 import { appendCurvedLineSegments, closedPolygonPath } from '../../common/shapes/generic';
-import { PathData } from '../../common/PathData';
 import { pathDToViewBoxStr } from '../../common/util/svg';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
@@ -124,7 +123,9 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   @computed
   get maxIngressAngle() {
     const dovetailNotchBeforeIngress = (new PathData()).concatPath(this.absNotchPath)
-      .transform({ rotate: this.notchRotationBeforeIngress, translate: [this.midRadius, 0], origin: [0, 0] });
+      .transformByMatrix(
+        (new DOMMatrixReadOnly()).rotate(this.notchRotationBeforeIngress).translate(this.midRadius, 0),
+      );
     const p1 = (dovetailNotchBeforeIngress.commands[0] as DestinationCommand).to;
     const p2 = (dovetailNotchBeforeIngress.commands[1] as DestinationCommand).to;
     return radToDeg(Math.abs(angleRelativeToOrigin(p1) - angleRelativeToOrigin(p2)));
@@ -148,17 +149,13 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   @computed
   get dovetailNotch() {
     return (new PathData()).concatPath(this.absNotchPath)
-      .transform({ translate: [this.midRadius, 0] })
-      .transform({ rotate: this.notchRotation });
+      .transformByMatrix(new DOMMatrixReadOnly().rotate(this.notchRotation).translate(this.midRadius, 0));
   }
 
   @computed
   get dovetailTab() {
     return (new PathData()).concatPath(this.absNotchPath)
-      .transform({
-        rotate: this.tabRotation,
-        translate: [this.midRadius, 0],
-      });
+      .transformByMatrix(new DOMMatrixReadOnly().rotate(this.tabRotation).translate(this.midRadius, 0));
   }
 
   @computed
@@ -168,10 +165,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     for (let i = 0; i < this.wallsPerArc.value; i += 1) {
       const rotation = (i - (this.wallsPerArc.value / 2) + 0.5) * sectionDegrees;
       const thisHole = rectanglePathCenteredOnOrigin(this.materialThickness.value, this.actualHoleWidth)
-        .transform({
-          rotate: rotation,
-          translate: [this.midRadius, 0],
-        });
+        .transformByMatrix(new DOMMatrixReadOnly().rotate(rotation).translate(this.midRadius, 0));
       holesPath.concatPath(thisHole);
     }
     return holesPath;
@@ -185,7 +179,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     const outerArcRight = pointFromPolar(halfArcAngle, this.ringRadius.value);
     sectionArcPath
       .move(outerArcLeft)
-      .ellipticalArc(this.ringRadius.value, this.ringRadius.value, 0, true, false, outerArcRight);
+      .ellipticalArc(this.ringRadius.value, this.ringRadius.value, 0, false, true, outerArcRight);
 
     const innerArcRight = pointFromPolar(halfArcAngle, this.innerRadius);
     const innerArcLeft = pointFromPolar(-halfArcAngle, this.innerRadius);
@@ -247,7 +241,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     for (let i = 0; i < this.holderTabsPerArc.value; i += 1) {
       const rotation = (i - (this.holderTabsPerArc.value / 2) + 0.5) * sectionDegrees;
       const thisHole = rectanglePathCenteredOnOrigin(this.actualHolderTabFeetLength, this.materialThickness.value)
-        .transform({ rotate: rotation, translate: [this.holderTabRadius, 0] });
+        .transformByMatrix(new DOMMatrixReadOnly().rotate(rotation).translate(this.holderTabRadius, 0));
       holesPath.concatPath(thisHole);
     }
     return holesPath;

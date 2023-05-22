@@ -1,3 +1,9 @@
+import SVGPathCommander, {
+  ArcSegment,
+  CubicSegment, PathArray, PathSegment, TransformObject,
+} from 'svg-path-commander';
+import CSSMatrix, { Matrix } from '@thednp/dommatrix';
+import type { PathData } from '@/common/PathData/module';
 import {
   ArcCommand,
   BezierCommand,
@@ -6,28 +12,35 @@ import {
   CommandCodes,
   Coord,
   CubicBezierCommand,
-  DestinationCommand,
+  DestinationCommand, ImmutableCommandArray,
   LineCommand,
   MoveCommand,
   OnlyToParamCommand,
   QuadraticBezierCommand,
   SymmetricCubicBezierCommand,
   SymmetricQuadraticBezierCommand,
-} from '@/common/PathData/types';
-import type { PathData } from '@/common/PathData/index';
-import { castCoordToRawPoint, rawPointToString } from '@/common/PathData/geom';
-import SVGPathCommander, { TransformObject } from 'svg-path-commander';
-import { getSVGMatrix } from '@/common/PathData/matrix';
-import CSSMatrix, { Matrix } from '@thednp/dommatrix';
+} from './types';
+import { castCoordToRawPoint, rawPointToString } from './geom';
+import { getSVGMatrix } from './matrix';
 
 // why isn't return type accurate here? why can't it be explicitly defined
 function last<T>(arr: T[] | ReadonlyArray<T>): null | T {
   return arr.length > 0 ? arr[arr.length - 1] : null;
 }
 
-export const hasOnlyToParam = (command: Command): command is OnlyToParamCommand => [
+// https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_chunk
+export function chunk<T>(arr: T[], size: number) {
+  return Array.from(
+    { length: Math.ceil(arr.length / size) },
+    (_: T, i: number) => arr.slice(i * size, i * size + size),
+  );
+}
+
+const hasOnlyToParam = (command: Command): command is OnlyToParamCommand => [
   CommandCodes.L, CommandCodes.M, CommandCodes.T,
 ].includes((command as OnlyToParamCommand).code);
+
+export const booleanToFlag = (flag:boolean) => (flag ? 1 : 0);
 
 export const BEZIER_COMMAND_CODES = [CommandCodes.Q, CommandCodes.T, CommandCodes.C, CommandCodes.S];
 export const isBezierCommand = (command: Command): command is BezierCommand => BEZIER_COMMAND_CODES.includes(
@@ -54,13 +67,12 @@ export const commandToString = (command) => {
     return `${command.code} ${command.ctrl2} ${rawPointToString(command.to)}`;
   }
   if (command.code === CommandCodes.A) {
-    const booleanToFlag = (flag) => (flag ? 1 : 0);
     return `${command.code} ${command.rx} ${command.ry} ${command.xAxisRotation} ${
-      booleanToFlag(command.sweepFlag)} ${booleanToFlag(command.largeArcFlag)} ${rawPointToString(command.to)}`;
+      booleanToFlag(command.largeArcFlag)} ${booleanToFlag(command.sweepFlag)} ${rawPointToString(command.to)}`;
   }
   throw new Error('Unrecognized command code');
 };
-export const commandFactory = {
+export const CommandFactory = {
   M: (to: Coord): MoveCommand => ({
     code: CommandCodes.M,
     to: castCoordToRawPoint(to),
@@ -89,6 +101,8 @@ export const commandFactory = {
     code: CommandCodes.T,
     to: castCoordToRawPoint(to),
   }),
+  // the fluent interface doesn't use this command and instead estimates an arc with cubic
+  // it remains here for those who wish to unsafely create and array of commands to naively render path d
   A: (
     radiusX: number,
     radiusY: number,
@@ -109,47 +123,48 @@ export const commandFactory = {
     code: CommandCodes.Z,
   }),
 };
-export const parseSVG = (d:string):Command[] => {
-  // normalize removes H/V
-  const absPathCmdr = (new SVGPathCommander(d)).normalize().toAbsolute();
-  return absPathCmdr.segments.reduce((commandList, segment) => {
-    const [code, ...params] = segment;
+
+export function segmentsToCommandArray(segments: PathArray): Command[] {
+  return segments.reduce((commandList, segment: PathSegment) => {
+    const resolvedSegment = segment[0] === 'A' ? SVGPathCommander
+    // @ts-ignore
+      .arcToCubic(...(segment as ArcSegment).slice(1)) as CubicSegment : segment;
+    const [code, ...params] = resolvedSegment;
     const castParams = params as number[];
     if (code === 'Z') {
-      commandList.push(commandFactory.Z());
+      commandList.push(CommandFactory.Z());
     }
     if (['L', 'M', 'T'].includes(code)) {
-      commandList.push(commandFactory[code]([...params]));
+      commandList.push(CommandFactory[code]([...params]));
     } else if (code === 'C') {
-      const castParams = params as number[];
-      commandList.push(commandFactory.C(
+      commandList.push(CommandFactory.C(
         [castParams[0], castParams[1]],
         [castParams[2], castParams[3]],
         [castParams[4], castParams[5]],
       ));
     } else if (code === 'Q' || code === 'S') {
-      const castParams = params as number[];
-      commandList.push(commandFactory.Q(
+      commandList.push(CommandFactory.Q(
         [castParams[0], castParams[1]],
         [castParams[2], castParams[3]],
       ));
-    } else if (code === 'A') {
-      commandList.push(
-        commandFactory.A(
-          castParams[0],
-          castParams[1],
-          castParams[2],
-          !!castParams[3],
-          !!castParams[4],
-          [castParams[5], castParams[6]],
-        ),
-      );
     }
     return commandList;
   }, [] as Command[]);
+}
+
+export const pathDToCommandArray = (d:string):Command[] => {
+  // normalize removes H/V
+  const absPathCmdr = SVGPathCommander.normalizePath(SVGPathCommander.normalizePath(d));
+  return segmentsToCommandArray(absPathCmdr);
 };
-export const composeSVG = (commands): string => commands.map((command) => commandToString(command))
-  .join(' ');
+
+export function commandArrayToPathD(commands: ImmutableCommandArray): string {
+  return commands.map((command) => commandToString(command)).join(' ');
+}
+
+export function commandArrayToPathArray(commands: ImmutableCommandArray): PathArray {
+  return SVGPathCommander.parsePathString(commandArrayToPathD(commands));
+}
 
 export function getSegmentStartIndex(path: PathData, atIndex: number | undefined = undefined): number | null {
   const index = atIndex || path.commands.length - 1;

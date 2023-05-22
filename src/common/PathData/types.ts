@@ -1,3 +1,5 @@
+import { TransformObject } from 'svg-path-commander';
+
 export enum CommandCodes { M = 'M', L = 'L', C = 'C', S = 'S', Q = 'Q', T = 'T', A = 'A', Z = 'Z' }
 
 export interface BaseCommand {
@@ -74,3 +76,5 @@ export type BezierCommand = QuadraticBezierCommand | SymmetricQuadraticBezierCom
 CubicBezierCommand | SymmetricCubicBezierCommand;
 export type OnlyToParamCommand = LineCommand | MoveCommand | SymmetricQuadraticBezierCommand;
 export type ImmutableCommandArray = ReadonlyArray<Command>;
+
+export type PartialTransformObject = Partial<TransformObject>;

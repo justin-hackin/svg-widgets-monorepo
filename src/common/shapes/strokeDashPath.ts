@@ -7,11 +7,8 @@ import {
 
 import { computed } from 'mobx';
 import { assertNotNullish } from '@/common/util/assert';
-import { PointLike } from '@/common/PathData/types';
-import {
-  distanceFromOrigin, lineLerp, subtractPoints,
-} from '../util/geom';
-import { PathData } from '../PathData';
+import { PathData, PointLike } from '@/common/PathData/module';
+import { distanceFromOrigin, lineLerp, subtractPoints } from '../util/geom';
 import { referenceSelectProp, sliderWithTextProp } from '../keystone-tweakables/props';
 import { ratioSliderProps } from '../../widgets/PyramidNet/constants';
 import { DEFAULT_SLIDER_STEP } from '../constants';

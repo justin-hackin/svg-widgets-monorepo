@@ -2,10 +2,9 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import clsx from 'clsx';
 import { styled } from '@mui/styles';
-import { getDestinationPoints } from '@/common/PathData/helpers';
+import { PathData, getDestinationPoints } from '@/common/PathData/module';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
-import { PathData } from '../../../../../../../../../common/PathData';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
 import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
