@@ -284,17 +284,6 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
 
   @computed
   get assetDefinition() {
-    const {
-      ringRadius: { value: ringRadius },
-      wallsPerArc: { value: wallsPerArc },
-      arcsPerRing: { value: arcsPerRing },
-      holderTabsPerArc: { value: holderTabsPerArc },
-      sectionPathD,
-      wallPathD,
-      innerRadius,
-      designBoundaryRadius,
-      holderTabD,
-    } = this;
     return new DisjunctAssetsDefinition([
       {
         name: 'Face boundaries',
@@ -303,9 +292,9 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
         },
         Component: () => (
           <g>
-            <circle r={ringRadius} fill="none" stroke="red" />
-            <circle r={innerRadius} fill="none" stroke="green" />
-            <circle r={designBoundaryRadius} fill="none" stroke="blue" />
+            <circle r={this.ringRadius.value} fill="none" stroke="red" />
+            <circle r={this.innerRadius} fill="none" stroke="green" />
+            <circle r={this.designBoundaryRadius} fill="none" stroke="blue" />
           </g>
         ),
         copies: 1,
@@ -314,31 +303,31 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
         name: 'Wall',
         Component: () => (
           <g>
-            <path d={wallPathD} fill="white" stroke="black" />
+            <path d={this.wallPathD} fill="white" stroke="black" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(wallPathD) },
-        copies: wallsPerArc * arcsPerRing,
+        documentAreaProps: { viewBox: pathDToViewBoxStr(this.wallPathD) },
+        copies: this.wallsPerArc.value * this.arcsPerRing.value,
       },
       {
         name: 'Arc',
         Component: () => (
           <g>
-            <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
+            <path d={this.sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(sectionPathD) },
-        copies: arcsPerRing * 2,
+        documentAreaProps: { viewBox: pathDToViewBoxStr(this.sectionPathD) },
+        copies: this.arcsPerRing.value * 2,
       },
       {
         name: 'Diffuser holder',
         Component: () => (
           <g>
-            <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
+            <path d={this.holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(holderTabD) },
-        copies: holderTabsPerArc * arcsPerRing,
+        documentAreaProps: { viewBox: pathDToViewBoxStr(this.holderTabD) },
+        copies: this.holderTabsPerArc.value * this.arcsPerRing.value,
       },
     ]);
   }
