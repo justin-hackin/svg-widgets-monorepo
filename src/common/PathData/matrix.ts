@@ -1,6 +1,5 @@
 import CSSMatrix from '@thednp/dommatrix';
 import { TransformObjectValues } from 'svg-path-commander/src/types';
-// import type { TransformObject } from '../interface';
 
 /**
  * Returns a transformation matrix to apply to `<path>` elements.

@@ -17,7 +17,7 @@ import {
 import type { PathData } from '@/common/PathData/index';
 import { castCoordToRawPoint, rawPointToString } from '@/common/PathData/geom';
 import SVGPathCommander, { TransformObject } from 'svg-path-commander';
-import { getSVGMatrix } from '@/common/PathData/matrix.ts/getSVGMatrix';
+import { getSVGMatrix } from '@/common/PathData/matrix';
 import CSSMatrix, { Matrix } from '@thednp/dommatrix';
 
 // why isn't return type accurate here? why can't it be explicitly defined
