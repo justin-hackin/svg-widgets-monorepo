@@ -48,7 +48,7 @@
     "remotedev": "^0.2.9",
     "terser": "^5.17.3",
     "typescript": "4.4.2",
-    "vite": "^3.2.6"
+    "vite": "^4.3.8"
   },
   "dependencies": {
     "@emotion/react": "^11.4.1",
