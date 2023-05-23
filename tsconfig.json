@@ -24,7 +24,6 @@
     "resolveJsonModule": true,
     "incremental": true,
     "noUnusedLocals": false,
-    "noStrictGenericChecks": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitAny": false,

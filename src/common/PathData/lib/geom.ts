@@ -2,16 +2,28 @@ import {
   Coord, PointLike, PointTuple, RawPoint,
 } from './types';
 
+/**
+ * Type discriminator, true if PointLike, otherwise PointTuple
+ * @param coord
+ */
 export function isPointLike(coord: Coord): coord is PointLike {
   return Number.isFinite((coord as PointLike).x) && Number.isFinite((coord as PointLike).y);
 }
 
+/**
+ * Throws error if number is not finite
+ * @param num
+ */
 export function assertCoordinateFinite(num: number) {
   if (!Number.isFinite(num)) {
     throw new Error(`expected coordinates to be finite but instead saw: ${num}`);
   }
 }
 
+/**
+ * Throws error if number is not finite
+ * @param coord
+ */
 function assertValidCoord(coord: Coord) {
   if (isPointLike(coord)) {
     assertCoordinateFinite(coord.x);
@@ -25,6 +37,11 @@ function assertValidCoord(coord: Coord) {
   }
 }
 
+/**
+ *
+ * @param coord
+ * @returns a POJO with x & y of coordinate
+ */
 export function castCoordToRawPoint(coord: Coord): RawPoint {
   assertValidCoord(coord);
   if (isPointLike(coord)) {
@@ -35,6 +52,10 @@ export function castCoordToRawPoint(coord: Coord): RawPoint {
   return { x, y };
 }
 
+/**
+ *
+ * @returns comma-delimited point as in path strings
+ */
 export function rawPointToString({ x, y }: RawPoint) {
   return `${x},${y}`;
 }

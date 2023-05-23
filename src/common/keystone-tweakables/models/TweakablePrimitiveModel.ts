@@ -8,7 +8,7 @@ import type { PrimitiveMetadata } from '../types';
 
 @model('SvgWidgetStudio/TweakablePrimitiveModel')
 export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Model(<T>() => ({
-  value: prop<T>().withSetter(),
+  value: prop<T>(() => this.defaultValue).withSetter(),
 }))<T> {
   // helps prevent controls from being rendered before onAttachedToRootStore has a chance to set up metadata getters
   @observable

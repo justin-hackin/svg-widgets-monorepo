@@ -1,22 +1,24 @@
-import {
-  // @ts-ignore
-  Line, point, Polygon, segment,
-} from '@flatten-js/core';
+import Flatten from '@flatten-js/core';
 import { isNaN, range } from 'lodash-es';
 import offset from '@flatten-js/polygon-offset';
 import { PointLike, RawPoint, castCoordToRawPoint } from '@/common/PathData';
 import { circularSlice } from './data';
 
-// NOTE: where possible, avoid direct use of flatten-js classes and instead use RawPoint or construct helper function
-// flatten-js is designed to conform to formal mathematical definitions and has an inconvenient interface
-// vectors have arithmetic operators but can't be used to construct polygons and lines.
-// Points can be used to construct polygons and lines, but don't have arithmetic operators
-// flatten-js is designed to directly render DOM strings and is ill-suited for use with React
-// e.g. if you construct a Polygon, there's no documented way to get a path d-attribute for that polygon,
-// there's only a way to render it to a DOM string containing a <path>
-// (blurs separation of concerns between data and view)
-// However, flatten-js features many valuable computations that are not present in other libraries
-
+const {
+  Line, point, Polygon, segment,
+} = Flatten;
+/**
+ *
+ * NOTE: where possible, avoid direct use of flatten-js classes and instead use RawPoint or construct helper function
+ * flatten-js is designed to conform to formal mathematical definitions and has an inconvenient interface
+ * vectors have arithmetic operators but can't be used to construct polygons and lines.
+ * Points can be used to construct polygons and lines, but don't have arithmetic operators
+ * flatten-js is designed to directly render DOM strings and is ill-suited for use with React
+ * e.g. if you construct a Polygon, there's no documented way to get a path d-attribute for that polygon,
+ * there's only a way to render it to a DOM string containing a <path>
+ * (blurs separation of concerns between data and view)
+ * However, flatten-js features many valuable computations that are not present in other libraries
+ */
 export const PHI:number = (1 + Math.sqrt(5)) / 2;
 
 export const pointFromPolar = (theta: number, length: number):RawPoint => ({
@@ -28,7 +30,7 @@ export const pointsAreEqual = (pt1, pt2, marginOfError = 0.01) => (
 export const distanceFromOrigin = ({ x, y }) => Math.sqrt(x ** 2 + y ** 2);
 export const angleRelativeToOrigin = ({ x, y }) => Math.atan2(y, x);
 
-export function triangleAnglesGivenSides(sideLengths) {
+export function triangleAnglesGivenSides(sideLengths: number[]) {
   if (sideLengths.length !== 3) {
     throw new Error('triangleAnglesGivenSides: parameter sideLengths must be array of length 3');
   }
@@ -95,7 +97,7 @@ export const polygonPointsGivenAnglesAndSides = (angles, sides): RawPoint[] => {
   if (sides.length !== angles.length) {
     throw new Error('polygonPointsGivenSidesAndAngles: length of sides is not equal to length of angles');
   }
-  return range(2, sides.length).reduce((acc, i) => {
+  return range(2, sides.length).reduce<RawPoint[]>((acc: RawPoint[], i:number) => {
     acc.push(hingedPlot(acc[i - 2], acc[i - 1], angles[i - 2], sides[i - 1]));
     return acc;
   }, [getOriginPoint(), pointFromPolar(Math.PI - angles[0], sides[0])]);

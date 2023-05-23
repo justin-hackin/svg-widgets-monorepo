@@ -346,6 +346,7 @@ export class ShapePreviewModel {
     this.textureCanvas.setAttribute('width', `${vbWidth}`);
     this.textureCanvas.setAttribute('height', `${vbHeight}`);
     const ctx = this.textureCanvas.getContext('2d');
+    assertNotNullish(ctx);
     const v = await Canvg.from(ctx, svgStr, {
       ignoreAnimation: true,
       ignoreMouse: true,
