@@ -121,15 +121,6 @@ export function lineLerp(start, end, lerp) {
   return sumPoints(start, pointFromPolar(angleRelativeToOrigin(difference), distanceFromOrigin(difference) * lerp));
 }
 
-export function parallelLineAtDistance(pt1, pt2, distance) {
-  const sign = distance < 0 ? -1 : 1;
-  const absDist = Math.abs(distance);
-  return new Line(
-    hingedPlot(pt2, pt1, sign * (Math.PI / 2), absDist),
-    hingedPlot(pt1, pt2, -sign * (Math.PI / 2), absDist),
-  );
-}
-
 export function symmetricHingePlot(p1, p2, theta, length) {
   return [
     hingedPlot(p2, p1, theta, length),
