@@ -4,8 +4,8 @@ A web application for the fabrication of interlocking pyramid nets which form st
 
 Previously this app was a [desktop application](https://github.com/justin-hackin/polyhedz-studio/releases/latest) but it has since been ported to a [web application](https://polyhedz-studio.vercel.app). Note the default branch is `web` whereas the legacy Electron app exists on `master`. The code that is not specific to the particular designs (widgets) will serve as the foundation for a more general-purpose framework that will enable inventors/designers/makers to code their own design objects. This framework will be extracted from this repo which will serve as the repository for the widgets only.
 
-| ![polyhedral lantern sculpture with print face decoration](/src/widgets/PyramidNet/static/widget-preview.png) | ![polyhedral lantern sculpture with cut holes face decoration](/docs/images/polyhedral-net-vector.png) |
-|----------------------------------------------------------------------------------------------| ------------------------------------------------------------ |
+| ![polyhedral lantern sculpture with print face decoration](/packages/widgets/src/widgets/PyramidNet/static/widget-preview.png) | ![polyhedral lantern sculpture with cut holes face decoration](./docs/images/polyhedral-net-vector.png) |
+|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 
 
 ## App info
@@ -14,8 +14,8 @@ This app consists of 2 main sections:
 
 ### Design Area
 
-| ![Dieline Editor with vector graphics](/docs/images/dieline_editor_vector.png) | ![Dieline Editor with raster graphics](/docs/images/dieline_editor_raster.png) |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ![Dieline Editor with vector graphics](./docs/images/dieline_editor_vector.png) | ![Dieline Editor with raster graphics](./docs/images/dieline_editor_raster.png) |
+|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 
 
 Allows viewing of the SVG dielines and optional print layer with controls for adjusting every aspect of the design. Each pyramid net consists of several component parts
@@ -44,9 +44,9 @@ Allows viewing of the SVG dielines and optional print layer with controls for ad
 
 ### Texture Editor
 
-| ![Texture Editor with vector graphics](/docs/images/texture_editor_vector.png) | ![Texture Editor with raster graphics](/docs/images/texture_editor_raster.png) |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-|                                                              |                                                              |
+| ![Texture Editor with vector graphics](./docs/images/texture_editor_vector.png) | ![Texture Editor with raster graphics](./docs/images/texture_editor_raster.png) |
+|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+|                                                                                 |                                                                                 |
 
 Interactively apply cut patterns or print textures to the faces of your shape and see a 3D preview of the resultant shape
 
@@ -71,7 +71,7 @@ While this application was originally designed only for creating polyhedral nets
 
 #### Cylinder Lightbox
 <p alt="cylinder lightbox" align="center">
-  <img width="160px" src="/src/widgets/CylinderLightbox/widget-preview.png" />
+  <img width="160px" src="/packages/widgets/src/widgets/CylinderLightbox/widget-preview.png" />
 </p>
 
 An open polygon prism box with ring-shaped sleeve edges. This allows one to efficiently construct a (roughly) cylindrical form out of flat panels. It has been used to create circular LED lightboxes. 
@@ -81,7 +81,7 @@ This widget has a different UI configuration in the Assets accordion known as a 
 #### Grid dividers
 
 <p alt="crosshatch shelf" align="center">
-  <img width="160px" src="/src/widgets/CrosshatchShelves/previews/square-grid-divider.png" /><img width="160px" src="/src/widgets/CrosshatchShelves/previews/diamond-grid-divider.png" /><img width="160px" src="/src/widgets/CrosshatchShelves/previews/triangle-grid-divider.png" />
+  <img width="160px" src="/packages/widgets/src/widgets/CrosshatchShelves/previews/square-grid-divider.png" /><img width="160px" src="/packages/widgets/src/widgets/CrosshatchShelves/previews/diamond-grid-divider.png" /><img width="160px" src="/packages/widgets/src/widgets/CrosshatchShelves/previews/triangle-grid-divider.png" />
 </p>
 Enables the creation of slotted cross-hatched shelving inserts. Target application: spatial organization, storage of many bottles and/or cans within larger shelf section, collectibles box divider.
 

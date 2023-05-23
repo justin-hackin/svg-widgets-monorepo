@@ -1,11 +1,11 @@
 node_modules
-.DS_Store
-*.local
-thumbs.db
-**/dist/**/*
-_static/
-.eslintcache
-.idea/
-**/tsconfig.tsbuildinfo
+packages/*/node_modules
+packages/*/.DS_Store
+packages/*/*.local
+packages/*/thumbs.db
+packages/*/dist/**/*
+packages/*/.eslintcache
+packages/**/tsconfig.tsbuildinfo
 # temporary
-docs-site/
+packages/*/docs-site/
+.idea

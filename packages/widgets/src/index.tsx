@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import './widgets/index';
+import './widgets';
 import { WidgetWorkspaceApp } from '@/WidgetWorkspaceApp';
 
 render(

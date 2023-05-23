@@ -12,10 +12,10 @@
       "vite/client"
     ],
     "typeRoots": [
-      "node_modules/@types",
+      "node_modules/@types"
     ],
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./*"]
     },
     "baseUrl": "./src",
     "lib": ["ESNext", "DOM"],
@@ -32,7 +32,7 @@
     "experimentalDecorators": true,
     "noEmit": false,
     "downlevelIteration": true,
-    "jsx": "react",
+    "jsx": "react"
   },
   "include": [
     "**/*.ts",
