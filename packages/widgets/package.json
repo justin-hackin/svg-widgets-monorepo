@@ -36,9 +36,9 @@
     "@vitejs/plugin-react-refresh": "^1.3.6",
     "eslint": "^8.40.0",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-custom": "*",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-custom": "*",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsx-a11y": "^6.5.1",
@@ -74,7 +74,7 @@
     "lodash-es": "^4.17.21",
     "mobx": "^6.3.2",
     "mobx-keystone": "1.3.0",
-    "mobx-keystone-persist": "^1.2.0",
+    "mobx-keystone-persist": "github:justin-hackin/mobx-keystone-persist",
     "mobx-react": "^7.2.0",
     "nearest-power-of-two": "^1.0.0",
     "paper": "^0.12.11",
@@ -97,9 +97,6 @@
     "uuid": "^3.4.0"
   },
   "overrides": {
-    "mobx-keystone-persist": {
-      "mobx-keystone": "*"
-    },
     "react-resize-detector": {
       "react": "^17",
       "react-dom": "^17"
