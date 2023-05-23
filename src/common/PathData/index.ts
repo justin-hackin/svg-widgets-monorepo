@@ -1,9 +1,9 @@
 import { produce } from 'immer';
-import { Producer } from 'immer/src/types/types-external';
 import SVGPathCommander, { TransformObject } from 'svg-path-commander';
 import { Command, Coord, ImmutableCommandArray } from './types';
 import {
-  booleanToFlag, chunk,
+  booleanToFlag,
+  chunk,
   clone,
   commandArrayToPathD,
   CommandFactory,
@@ -11,7 +11,7 @@ import {
   pathDToCommandArray,
 } from './helpers';
 import { validatePushCommand } from './validation';
-import { transformByMatrixProducer, transformByObjectProducer } from './producers';
+import { reversePathRecipe, transformByMatrixProducer, transformByObjectProducer } from './producers';
 import { castCoordToRawPoint } from './geom';
 
 export class PathData {
@@ -37,10 +37,14 @@ export class PathData {
     });
   }
 
-  concatCommands(commands: Command[] | ImmutableCommandArray): PathData {
-    for (const command of commands) {
-      this.pushCommand(command);
-    }
+  concatCommands(appendCommands: Command[] | ImmutableCommandArray): PathData {
+    this._commands = produce(this._commands, (commands) => {
+      for (const command of appendCommands) {
+        validatePushCommand(this._commands, command);
+        commands.push(clone(command));
+      }
+    });
+
     return this;
   }
 
@@ -119,8 +123,17 @@ export class PathData {
     return (new PathData()).concatPath(this);
   }
 
-  dangerouslyProduceCommands(produceFn: Producer<ImmutableCommandArray>) {
-    this._commands = produce(this._commands, produceFn);
+  popCommand(): Command {
+    let item;
+    this._commands = produce(this._commands, (draft) => {
+      item = draft.pop();
+    });
+    return item;
+  }
+
+  reversePath(): PathData {
+    this._commands = produce(this._commands, reversePathRecipe);
+    return this;
   }
 
   concatPath(path: PathData): PathData {

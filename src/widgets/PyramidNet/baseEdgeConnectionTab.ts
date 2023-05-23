@@ -81,10 +81,6 @@ export class BaseEdgeTabsModel extends Model({
   }
 }
 
-const popProducer = (draft) => {
-  draft.pop();
-};
-
 export function baseEdgeConnectionTab(
   start: RawPoint,
   end: RawPoint,
@@ -192,13 +188,13 @@ export function baseEdgeConnectionTab(
   boundaryCut.move(start);
   appendCurvedLineSegments(boundaryCut, handleCornerPoints, roundingDistanceRatio);
   appendCurvedLineSegments(boundaryCut, [finBases[0], finBasesClearance[0], tabMidpoints[0]], 0.5);
-  boundaryCut.dangerouslyProduceCommands(popProducer);
+  boundaryCut.popCommand();
   appendCurvedLineSegments(
     boundaryCut,
     [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]],
     roundingDistanceRatio,
   );
-  boundaryCut.dangerouslyProduceCommands(popProducer);
+  boundaryCut.popCommand();
   appendCurvedLineSegments(boundaryCut, [finBasesClearance[1], finBases[1], end], 0.5);
 
   score.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));

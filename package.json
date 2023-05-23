@@ -90,7 +90,6 @@
     "react-use-gesture": "^7.0.15",
     "svg-path-bbox": "0.0.49",
     "svg-path-commander": "github:justin-hackin/svg-path-commander",
-    "svg-path-reverse": "^1.3.0",
     "three": "^0.125.0",
     "threejs-orbit-controls": "^1.0.3",
     "uuid": "^3.4.0"

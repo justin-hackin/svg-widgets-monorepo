@@ -65,12 +65,9 @@ export function appendCurvedLineSegments(path: PathData, toPoints, roundingRatio
   if (endWithClose) {
     modifiedPoints.push(getCurrentSegmentStart(path));
   }
-  const toAppendCommands = roundedEdgePath(modifiedPoints, roundingRatio);
-  toAppendCommands.dangerouslyProduceCommands(
-    (draft) => draft.slice(draft.length ? 1 : 0, endWithClose ? -1 : undefined),
-  );
+  const toAppendCommands = roundedEdgePath(modifiedPoints, roundingRatio).commands;
   // include move command if the path doesn't have any commands yet
-  path.concatPath(toAppendCommands);
+  path.concatCommands(toAppendCommands.slice(toAppendCommands.length ? 1 : 0, endWithClose ? -1 : undefined));
   if (endWithClose) {
     path.close();
   }
