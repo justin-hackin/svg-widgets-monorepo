@@ -5,7 +5,7 @@ import { round } from 'lodash-es';
 import { ExtendedModel } from 'mobx-keystone';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { PathData } from '@/common/PathData/module';
+import { PathData } from '@/common/PathData';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,

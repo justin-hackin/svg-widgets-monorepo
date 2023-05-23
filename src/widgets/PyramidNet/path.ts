@@ -1,7 +1,7 @@
+import { pointsAreEqual } from '@/common/util/geom';
 import {
   DestinationCommand, getCurrentSegmentStart, getLastPosition, PathData,
-} from '@/common/PathData/module';
-import { pointsAreEqual } from '@/common/util/geom';
+} from '@/common/PathData';
 
 /**
  * often constructing complicated paths is simplified by defining
@@ -15,12 +15,12 @@ export function appendContinuationPath(
   marginOfError = undefined,
 ) {
   if (basePath.commands.length) {
-    const baseLastPosition = getLastPosition(basePath);
+    const baseLastPosition = getLastPosition(basePath.commands);
     if (!pointsAreEqual(baseLastPosition, (path.commands[0] as DestinationCommand).to, marginOfError)) {
       throw new Error('invalid use of weldPath: first parameter path must'
         + ' start at the same position as the end of path instance end position');
     }
-    if (closesPath && !pointsAreEqual(getLastPosition(path), getCurrentSegmentStart(basePath))) {
+    if (closesPath && !pointsAreEqual(getLastPosition(path.commands), getCurrentSegmentStart(basePath.commands))) {
       throw new Error('invalid use of weldPath: when using closesPath option, instance\'s currentSegementStart '
         + 'must be equal to the last command of first parameter path\'s lastPosition');
     }

@@ -1,9 +1,6 @@
-import SVGPathCommander, {
-  ArcSegment,
-  CubicSegment, PathArray, PathSegment, TransformObject,
-} from 'svg-path-commander';
-import CSSMatrix, { Matrix } from '@thednp/dommatrix';
-import type { PathData } from '@/common/PathData/module';
+import SVGPathCommander, { PathArray, PathSegment, TransformObject } from 'svg-path-commander';
+import CSSMatrix, { Matrix, PointTuple } from '@thednp/dommatrix';
+import type { PathData } from './PathData';
 import {
   ArcCommand,
   BezierCommand,
@@ -12,7 +9,8 @@ import {
   CommandCodes,
   Coord,
   CubicBezierCommand,
-  DestinationCommand, ImmutableCommandArray,
+  DestinationCommand,
+  ImmutableCommandArray,
   LineCommand,
   MoveCommand,
   OnlyToParamCommand,
@@ -20,7 +18,7 @@ import {
   SymmetricCubicBezierCommand,
   SymmetricQuadraticBezierCommand,
 } from './types';
-import { castCoordToRawPoint, rawPointToString } from './geom';
+import { castCoordToRawPoint, pointLikeToTuple, rawPointToString } from './geom';
 import { getSVGMatrix } from './matrix';
 
 // why isn't return type accurate here? why can't it be explicitly defined
@@ -49,7 +47,7 @@ export const isBezierCommand = (command: Command): command is BezierCommand => B
 // TODO: how to make this custom type guard, return type "command is DestinationCommand" does not work
 // TODO: remove casting in getDestinationPoints
 export const isDestinationCommand = (command: Command): boolean => !!((command as DestinationCommand).to);
-export const commandToString = (command) => {
+export const commandToString = (command: Command) => {
   if (command.code === CommandCodes.Z) {
     return command.code;
   }
@@ -87,7 +85,7 @@ export const CommandFactory = {
     ctrl1: castCoordToRawPoint(ctrl1),
     ctrl2: castCoordToRawPoint(ctrl2),
   }),
-  S: (ctrl2, to): SymmetricCubicBezierCommand => ({
+  S: (ctrl2: Coord, to: Coord): SymmetricCubicBezierCommand => ({
     code: CommandCodes.S,
     to: castCoordToRawPoint(to),
     ctrl2: castCoordToRawPoint(ctrl2),
@@ -124,32 +122,79 @@ export const CommandFactory = {
   }),
 };
 
+export function getSegmentStartIndex(
+  commands: AnyCommandArray,
+  atIndex: number | undefined = undefined,
+): number | null {
+  const index = atIndex || commands.length - 1;
+  for (let i = index - 1; i >= 0; i -= 1) {
+    if (commands[i].code === CommandCodes.M) {
+      return i;
+    }
+    // use recursive because M0,0 L1,1 Z L2,2 Z L3,3 is still valid svg (based on Inkscape manual test not formal def)
+    if (commands[i].code === CommandCodes.Z) {
+      return getSegmentStartIndex(commands, i - 1);
+    }
+  }
+  return null;
+}
+
+export function getCurrentSegmentStart(commands: AnyCommandArray) {
+  const segmentStartIndex = getSegmentStartIndex(commands);
+  if (segmentStartIndex === null) { return null; }
+  return (commands[segmentStartIndex] as DestinationCommand).to;
+}
+
+export function getLastPosition(commands: AnyCommandArray) {
+  const lastCommand = last(commands);
+  if (!lastCommand) { return undefined; }
+  return lastCommand?.code === CommandCodes.Z
+    ? getCurrentSegmentStart(commands) : (lastCommand as DestinationCommand).to;
+}
+
 export function segmentsToCommandArray(segments: PathArray): Command[] {
-  return segments.reduce((commandList, segment: PathSegment) => {
-    const resolvedSegment = segment[0] === 'A' ? SVGPathCommander
-    // @ts-ignore
-      .arcToCubic(...(segment as ArcSegment).slice(1)) as CubicSegment : segment;
-    const [code, ...params] = resolvedSegment;
-    const castParams = params as number[];
+  const commandList = [] as Command[];
+  segments.forEach((segment: PathSegment) => {
+    const resolvedSegment = (() => {
+      if (segment[0] === 'A') {
+        const lastPosition = getLastPosition(commandList);
+        if (!lastPosition) {
+          throw new Error('failed to find last position of path while parsing segments');
+        }
+        return SVGPathCommander.arcToCubic(
+          ...pointLikeToTuple(lastPosition),
+          segment[1],
+          segment[2],
+          segment[3],
+          segment[4],
+          segment[5],
+          segment[6],
+          segment[7],
+        );
+      }
+      return segment;
+    })();
+    const code = resolvedSegment[0] as CommandCodes;
+    const castParams = resolvedSegment.slice(1) as number[];
     if (code === 'Z') {
       commandList.push(CommandFactory.Z());
     }
-    if (['L', 'M', 'T'].includes(code)) {
-      commandList.push(CommandFactory[code]([...params]));
-    } else if (code === 'C') {
+    if (code === CommandCodes.L || code === CommandCodes.M || code === CommandCodes.T) {
+      commandList.push(CommandFactory[code](castParams as unknown as PointTuple));
+    } else if (code === CommandCodes.C) {
       commandList.push(CommandFactory.C(
         [castParams[0], castParams[1]],
         [castParams[2], castParams[3]],
         [castParams[4], castParams[5]],
       ));
-    } else if (code === 'Q' || code === 'S') {
-      commandList.push(CommandFactory.Q(
+    } else if (code === CommandCodes.Q || code === CommandCodes.S) {
+      commandList.push(CommandFactory[code](
         [castParams[0], castParams[1]],
         [castParams[2], castParams[3]],
       ));
     }
-    return commandList;
-  }, [] as Command[]);
+  });
+  return commandList;
 }
 
 export const pathDToCommandArray = (d:string):Command[] => {
@@ -166,32 +211,7 @@ export function commandArrayToPathArray(commands: ImmutableCommandArray): PathAr
   return SVGPathCommander.parsePathString(commandArrayToPathD(commands));
 }
 
-export function getSegmentStartIndex(path: PathData, atIndex: number | undefined = undefined): number | null {
-  const index = atIndex || path.commands.length - 1;
-  for (let i = index - 1; i >= 0; i -= 1) {
-    if (path.commands[i].code === CommandCodes.M) {
-      return i;
-    }
-    // use recursive because M0,0 L1,1 Z L2,2 Z L3,3 is still valid svg (based on Inkscape manual test not formal def)
-    if (path.commands[i].code === CommandCodes.Z) {
-      return getSegmentStartIndex(path, i - 1);
-    }
-  }
-  return null;
-}
-
-export function getCurrentSegmentStart(path: PathData) {
-  const segmentStartIndex = getSegmentStartIndex(path);
-  if (segmentStartIndex === null) { return null; }
-  return (path.commands[segmentStartIndex] as DestinationCommand).to;
-}
-
-export function getLastPosition(path: PathData) {
-  const lastCommand = last(path.commands);
-  if (!lastCommand) { return undefined; }
-  return lastCommand?.code === CommandCodes.Z
-    ? getCurrentSegmentStart(path) : (lastCommand as DestinationCommand).to;
-}
+type AnyCommandArray = ImmutableCommandArray | Command[];
 
 export function getDestinationPoints(path: PathData) {
   return path.commands.filter((cmd) => isDestinationCommand(cmd))

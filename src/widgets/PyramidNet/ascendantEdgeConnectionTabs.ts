@@ -1,7 +1,7 @@
 import { range } from 'lodash-es';
 import { Model, model, prop } from 'mobx-keystone';
-import { PathData } from '@/common/PathData/module';
-import type { RawPoint } from '@/common/PathData/module';
+import { PathData } from '@/common/PathData';
+import type { RawPoint } from '@/common/PathData';
 import {
   hingedPlot, lineLerp, symmetricHingePlotByProjectionDistance,
 } from '../../common/util/geom';

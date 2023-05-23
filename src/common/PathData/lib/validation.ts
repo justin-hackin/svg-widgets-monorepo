@@ -24,7 +24,7 @@ export const validatePushCommand = (commands: ReadonlyArray<Command>, newCommand
   if (newCommand.code !== CommandCodes.M) {
     validateLastCommandExists(commands);
   }
-  if ([CommandCodes.T, CommandCodes.S].includes(newCommand.code)) {
+  if (newCommand.code === CommandCodes.T || newCommand.code === CommandCodes.S) {
     validateLastCommandIsBezier(commands);
   }
 };

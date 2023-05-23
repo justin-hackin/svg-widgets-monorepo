@@ -4,7 +4,7 @@ import { clamp } from 'lodash-es';
 import { Paper } from '@mui/material';
 import { observer } from 'mobx-react';
 import { assertNotNullish } from '@/common/util/assert';
-import { castCoordToRawPoint } from '@/common/PathData/module';
+import { castCoordToRawPoint } from '@/common/PathData';
 import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import {
   incrementTransformTracking,

@@ -25,6 +25,7 @@ export const getSVGMatrix = (transform: TransformObjectValues): CSSMatrix => {
     && translate.every((x) => !Number.isNaN(+x))
     && translate.some((x) => x !== 0)
   ) {
+    // @ts-ignore
     matrix = matrix.translate(...(translate as [number, number, number?]));
   } else if (typeof translate === 'number' && !Number.isNaN(translate)) {
     matrix = matrix.translate(translate);
@@ -41,6 +42,7 @@ export const getSVGMatrix = (transform: TransformObjectValues): CSSMatrix => {
       && rotate.every((x) => !Number.isNaN(+x))
       && rotate.some((x) => x !== 0)
     ) {
+      // @ts-ignore
       matrix = matrix.rotate(...(rotate as [number, number, number?]));
     } else if (typeof rotate === 'number' && !Number.isNaN(rotate)) {
       matrix = matrix.rotate(rotate);
@@ -57,6 +59,7 @@ export const getSVGMatrix = (transform: TransformObjectValues): CSSMatrix => {
     // set scale
     if (Array.isArray(scale)
       && scale.length >= 2 && scale.every((x) => !Number.isNaN(+x)) && scale.some((x) => x !== 1)) {
+      // @ts-ignore
       matrix = matrix.scale(...(scale as [number, number, number?]));
     } else if (typeof scale === 'number' && !Number.isNaN(scale)) {
       matrix = matrix.scale(scale);

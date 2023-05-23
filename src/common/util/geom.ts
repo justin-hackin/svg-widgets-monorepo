@@ -4,7 +4,7 @@ import {
 } from '@flatten-js/core';
 import { isNaN, range } from 'lodash-es';
 import offset from '@flatten-js/polygon-offset';
-import { PointLike, RawPoint, castCoordToRawPoint } from '@/common/PathData/module';
+import { PointLike, RawPoint, castCoordToRawPoint } from '@/common/PathData';
 import { circularSlice } from './data';
 
 // NOTE: where possible, avoid direct use of flatten-js classes and instead use RawPoint or construct helper function

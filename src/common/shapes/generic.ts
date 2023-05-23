@@ -1,6 +1,6 @@
 import {
   PathData, getCurrentSegmentStart, getLastPosition, PointLike, RawPoint,
-} from '@/common/PathData/module';
+} from '@/common/PathData';
 import {
   distanceBetweenPoints, hingedPlot,
 } from '../util/geom';
@@ -30,8 +30,7 @@ export const roundedEdgePath = (points: RoundPointPointsItem[], retractionDistan
   const path = new PathData();
   const retractionDistance = minSegmentLength(points) * 0.5 * retractionDistanceRatio;
   const pointOfRoundPoint = (roundPoint: RoundPointPointsItem):RawPoint => ({
-    ...(isPointLike(roundPoint)
-      ? roundPoint : roundPoint.point),
+    ...(isPointLike(roundPoint) ? roundPoint : roundPoint.point),
   });
   path.move(pointOfRoundPoint(points[0]));
   points.slice(1, -1).reduce((acc: PathData, item, pointIndex) => {
@@ -61,9 +60,9 @@ export const closedPolygonPath = (points: PointLike[]) => connectedLineSegments(
 
 export function appendCurvedLineSegments(path: PathData, toPoints, roundingRatio: number, endWithClose = false) {
   // TODO: handle last command is close
-  const modifiedPoints = path.commands.length ? [getLastPosition(path), ...toPoints] : [...toPoints];
+  const modifiedPoints = path.commands.length ? [getLastPosition(path.commands), ...toPoints] : [...toPoints];
   if (endWithClose) {
-    modifiedPoints.push(getCurrentSegmentStart(path));
+    modifiedPoints.push(getCurrentSegmentStart(path.commands));
   }
   const toAppendCommands = roundedEdgePath(modifiedPoints, roundingRatio).commands;
   // include move command if the path doesn't have any commands yet

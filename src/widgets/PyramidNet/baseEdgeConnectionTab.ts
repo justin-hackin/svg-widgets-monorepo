@@ -2,7 +2,7 @@ import {
   Model, model, modelAction, prop,
 } from 'mobx-keystone';
 import { appendCurvedLineSegments } from '@/common/shapes/generic';
-import { PathData, RawPoint } from '@/common/PathData/module';
+import { PathData, RawPoint } from '@/common/PathData';
 import {
   distanceBetweenPoints,
   getLineLineIntersection,

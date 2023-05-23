@@ -2,7 +2,7 @@ import {
   CompoundPath, Path, Project, Size,
 } from 'paper';
 
-import { PathData, PartialTransformObject } from '@/common/PathData/module';
+import { PathData, PartialTransformObject } from '@/common/PathData';
 import { VERY_LARGE_NUMBER } from '../constants';
 
 const tinySize = new Size(64, 48);

@@ -17,7 +17,7 @@ import {
   getCurrentSegmentStart,
   getLastPosition,
   RawPoint, PartialTransformObject,
-} from '@/common/PathData/module';
+} from '@/common/PathData';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
@@ -69,8 +69,8 @@ const applyFlap = (
   handleFlapDepth: number,
   testTabHandleFlapRounding: number,
 ) => {
-  const startPt = getLastPosition(path);
-  const endPt = getCurrentSegmentStart(path);
+  const startPt = getLastPosition(path.commands);
+  const endPt = getCurrentSegmentStart(path.commands);
   const startFlapEdge = { x: 0, y: (flapDirectionIsUp ? 1 : -1) * handleFlapDepth };
   assertNotNullish(startPt);
   assertNotNullish(endPt);

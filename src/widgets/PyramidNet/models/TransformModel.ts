@@ -1,6 +1,6 @@
 import { Model, model, prop } from 'mobx-keystone';
 import { computed } from 'mobx';
-import { RawPoint, convertTransformObjectToDOMMatrixReadOnly, PartialTransformObject } from '@/common/PathData/module';
+import { RawPoint, convertTransformObjectToDOMMatrixReadOnly, PartialTransformObject } from '@/common/PathData';
 
 @model('TransformModel')
 export class TransformModel extends Model({

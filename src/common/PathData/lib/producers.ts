@@ -31,6 +31,7 @@ function transformCommand(command: Command, matrix: DOMMatrixReadOnly) {
   const pointProps = Object.keys(command).filter((prop) => ['to', 'ctrl1', 'ctrl2'].includes(prop));
 
   for (const key of pointProps) {
+    // @ts-ignore
     command[key] = mapTransform(command[key], matrix);
   }
 }
