@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "prepare": "husky install"
+    "prepare-husky": "husky install"
   },
   "repository": {
     "type": "git",
