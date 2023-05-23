@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Divider, IconButton, Orientation, Paper, ToggleButton, ToggleButtonGroup,
+  Divider, IconButton, Paper, ToggleButton, ToggleButtonGroup,
 } from '@mui/material';
 import {
   Tool, TOOL_PAN, TOOL_ZOOM_IN, TOOL_ZOOM_OUT,
@@ -12,6 +12,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { styled } from '@mui/styles';
 import { observer } from 'mobx-react';
 import { HorizontalSplit, VerticalSplit } from '@mui/icons-material';
+import type { Orientation } from '@/WidgetWorkspace';
 import type { WorkspaceModel } from '../../../models/WorkspaceModel';
 import { useWorkspaceMst } from '../../../rootStore';
 

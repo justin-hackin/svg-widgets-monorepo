@@ -14,7 +14,12 @@ export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Mod
   @observable
     onAttachedComplete = false;
 
-  private defaultValue: T | undefined;
+  // @ts-ignore because defined in onInit
+  private defaultValue: T;
+
+  onInit() {
+    this.defaultValue = this.value;
+  }
 
   @modelAction
   reset() {

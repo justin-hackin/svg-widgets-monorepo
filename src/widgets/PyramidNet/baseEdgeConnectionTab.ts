@@ -1,18 +1,18 @@
 import {
   Model, model, modelAction, prop,
 } from 'mobx-keystone';
-import { PathData } from '../../common/path/PathData';
+import { appendCurvedLineSegments } from '@/common/shapes/generic';
+import { PathData, RawPoint } from '@/common/PathData';
 import {
   distanceBetweenPoints,
   getLineLineIntersection,
   hingedPlot,
   hingedPlotByProjectionDistance,
   hingedPlotLerp,
-  RawPoint,
   symmetricHingePlotByProjectionDistance,
 } from '../../common/util/geom';
-import { DashPatternModel, strokeDashPath } from '../../common/path/shapes/strokeDashPath';
-import { arrowTabPlots } from '../../common/path/shapes/symmetricRoundedTab';
+import { DashPatternModel, strokeDashPath } from '../../common/shapes/strokeDashPath';
+import { arrowTabPlots } from '../../common/shapes/symmetricRoundedTab';
 import { sliderProp, sliderWithTextProp, switchProp } from '../../common/keystone-tweakables/props';
 import { ratioSliderProps } from './constants';
 import { DEFAULT_SLIDER_STEP, VERY_LARGE_NUMBER } from '../../common/constants';
@@ -86,7 +86,7 @@ export function baseEdgeConnectionTab(
   end: RawPoint,
   tabDepth,
   tabSpec: BaseEdgeTabsModel,
-  scoreDashSpec: DashPatternModel,
+  scoreDashSpec: DashPatternModel | undefined,
 ): BaseEdgeConnectionTab {
   const {
     bendGuideValley,
@@ -160,9 +160,9 @@ export function baseEdgeConnectionTab(
   innerCut
     .move(holeBases[0])
     .line(holeBases[1])
-    .line(holeBasesClearance[1])
-    .curvedLineSegments([holeEdges[1], holeEdges[0], holeBasesClearance[0]], roundingDistanceRatio)
-    .close();
+    .line(holeBasesClearance[1]);
+  appendCurvedLineSegments(innerCut, [holeEdges[1], holeEdges[0], holeBasesClearance[0]], roundingDistanceRatio);
+  innerCut.close();
 
   const baseHandleEnd = hingedPlot(start, finBases[0], 0, clearanceLength * 2);
   const handleEdges = [
@@ -181,19 +181,21 @@ export function baseEdgeConnectionTab(
     ];
     const handleValleyEdges = handleValleyEdgeCasters.map(
       (castPt) => getLineLineIntersection(handleEdges[0], handleEdges[1], handleValleyDip, castPt),
-    );
+    ) as RawPoint[];
     handleCornerPoints.push(handleValleyEdges[0], handleValleyDip, handleValleyEdges[1]);
   }
   handleCornerPoints.push(handleEdges[1], baseHandleEnd);
-  boundaryCut.move(start).curvedLineSegments(handleCornerPoints, roundingDistanceRatio)
-    .curvedLineSegments([finBases[0], finBasesClearance[0], tabMidpoints[0]], 0.5);
-  boundaryCut.commands.pop();
-  boundaryCut.curvedLineSegments(
+  boundaryCut.move(start);
+  appendCurvedLineSegments(boundaryCut, handleCornerPoints, roundingDistanceRatio);
+  appendCurvedLineSegments(boundaryCut, [finBases[0], finBasesClearance[0], tabMidpoints[0]], 0.5);
+  boundaryCut.popCommand();
+  appendCurvedLineSegments(
+    boundaryCut,
     [tabMidpoints[0], tabApexes[0], tabApexes[1], tabMidpoints[1], finBasesClearance[1]],
     roundingDistanceRatio,
   );
-  boundaryCut.commands.pop();
-  boundaryCut.curvedLineSegments([finBasesClearance[1], finBases[1], end], 0.5);
+  boundaryCut.popCommand();
+  appendCurvedLineSegments(boundaryCut, [finBasesClearance[1], finBases[1], end], 0.5);
 
   score.concatPath(strokeDashPath(finBases[0], finBases[1], scoreDashSpec));
   if (scoreTabMidline) {

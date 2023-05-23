@@ -3,7 +3,8 @@ import { useDrag, useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash-es';
 import { Paper } from '@mui/material';
 import { observer } from 'mobx-react';
-import { castCoordToRawPoint } from '../../../../../../../../common/util/geom';
+import { assertNotNullish } from '@/common/util/assert';
+import { castCoordToRawPoint } from '@/common/PathData';
 import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import {
   incrementTransformTracking,
@@ -41,6 +42,7 @@ export const TextureArrangement = observer(() => {
   // Init
   const textureTransformationUseDrag = useDrag(({ movement, down }) => {
     const movementPt = castCoordToRawPoint(movement);
+    assertNotNullish(placementAreaDimensions);
 
     if (dragMode === DRAG_MODES.SCALE_VIEW) {
       if (down) {
@@ -92,7 +94,7 @@ export const TextureArrangement = observer(() => {
 
   // ORIGIN
   const transformOriginUseDrag = useDrag(({ movement, down, event }) => {
-    event.stopPropagation();
+    event?.stopPropagation();
     // accommodates the scale of svg so that the texture stays under the mouse
     const relDelta = textureEditor.translateAbsoluteCoordsToRelative(castCoordToRawPoint(movement));
     if (down) {
@@ -117,6 +119,8 @@ export const TextureArrangement = observer(() => {
       if (dragMode === DRAG_MODES.ROTATE) {
         faceDecoration.setRotateDiff(transformDiff.rotate + percentHeightDelta * 90);
       } else if (dragMode === DRAG_MODES.SCALE_TEXTURE) {
+        assertNotNullish(minImageScale);
+        assertNotNullish(maxImageScale);
         faceDecoration.setScaleDiff(
           clamp((percentHeightDelta + 1) * transformDiff.scale, minImageScale, maxImageScale),
         );

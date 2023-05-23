@@ -14,11 +14,11 @@ export const FileInputs = observer(() => {
   const { textureEditor } = widgetStore;
   const { importTextureArrangementDialogActive } = textureEditor as TextureEditorModel;
 
-  const openTextureInputRef = useRef<HTMLInputElement>();
+  const openTextureInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (importTextureArrangementDialogActive) {
-      openTextureInputRef?.current.click();
+      openTextureInputRef?.current?.click();
     }
   }, [importTextureArrangementDialogActive]);
 

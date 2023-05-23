@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useMemo } from 'react';
+import { assertNotNullish } from '@/common/util/assert';
 import { TweakableReferenceWithOptionsModel } from '../models/TweakableReferenceWithOptionsModel';
 import { SimpleSelect } from './SimpleSelect';
 
@@ -7,6 +8,8 @@ export const TweakableReferenceSelect = observer(({
   node,
 }: { node: TweakableReferenceWithOptionsModel<any, any> }) => {
   const { valuePath, label, options } = node;
+  // TweakableInput should ensure this
+  assertNotNullish(options);
 
   const idToOptions = useMemo(() => options.reduce((acc, option) => {
     acc[option.getRefId()] = option;

@@ -1,50 +1,24 @@
-import {
-  // @ts-ignore
-  Line, point, Polygon, segment,
-} from '@flatten-js/core';
-import { isNaN, isNumber, range } from 'lodash-es';
+import Flatten from '@flatten-js/core';
+import { isNaN, range } from 'lodash-es';
 import offset from '@flatten-js/polygon-offset';
-
+import { PointLike, RawPoint, castCoordToRawPoint } from '@/common/PathData';
 import { circularSlice } from './data';
 
-export interface RawPoint {
-  x: number,
-  y: number,
-}
-
-export interface PointLike extends RawPoint {
-  [x: string]: any
-}
-
-// NOTE: where possible, avoid direct use of flatten-js classes and instead use RawPoint or construct helper function
-// flatten-js is designed to conform to formal mathematical definitions and has an inconvenient interface
-// vectors have arithmetic operators but can't be used to construct polygons and lines.
-// Points can be used to construct polygons and lines, but don't have arithmetic operators
-// flatten-js is designed to directly render DOM strings and is ill-suited for use with React
-// e.g. if you construct a Polygon, there's no documented way to get a path d-attribute for that polygon,
-// there's only a way to render it to a DOM string containing a <path>
-// (blurs separation of concerns between data and view)
-// However, flatten-js features many valuable computations that are not present in other libraries
-
-export type PointTuple = [number, number];
-export type Coord = PointTuple | PointLike;
-const isPointLike = (coord: Coord): coord is PointLike => isNumber((coord as PointLike).x)
-  && isNumber((coord as PointLike).y);
-
-export const castCoordToRawPoint = (coord: Coord): RawPoint => {
-  if (isPointLike(coord)) {
-    const { x, y } = coord as PointLike;
-    return { x, y };
-  }
-  if ((coord as PointTuple).length !== 2) {
-    throw new Error(`expected a PointLike object or an array of length 2 but instead saw ${coord}`);
-  }
-  const [x, y] = coord as PointTuple;
-  return { x, y };
-};
-
-export const rawPointToString = ({ x, y }: RawPoint) => `${x},${y}`;
-
+const {
+  Line, point, Polygon, segment,
+} = Flatten;
+/**
+ *
+ * NOTE: where possible, avoid direct use of flatten-js classes and instead use RawPoint or construct helper function
+ * flatten-js is designed to conform to formal mathematical definitions and has an inconvenient interface
+ * vectors have arithmetic operators but can't be used to construct polygons and lines.
+ * Points can be used to construct polygons and lines, but don't have arithmetic operators
+ * flatten-js is designed to directly render DOM strings and is ill-suited for use with React
+ * e.g. if you construct a Polygon, there's no documented way to get a path d-attribute for that polygon,
+ * there's only a way to render it to a DOM string containing a <path>
+ * (blurs separation of concerns between data and view)
+ * However, flatten-js features many valuable computations that are not present in other libraries
+ */
 export const PHI:number = (1 + Math.sqrt(5)) / 2;
 
 export const pointFromPolar = (theta: number, length: number):RawPoint => ({
@@ -56,7 +30,7 @@ export const pointsAreEqual = (pt1, pt2, marginOfError = 0.01) => (
 export const distanceFromOrigin = ({ x, y }) => Math.sqrt(x ** 2 + y ** 2);
 export const angleRelativeToOrigin = ({ x, y }) => Math.atan2(y, x);
 
-export function triangleAnglesGivenSides(sideLengths) {
+export function triangleAnglesGivenSides(sideLengths: number[]) {
   if (sideLengths.length !== 3) {
     throw new Error('triangleAnglesGivenSides: parameter sideLengths must be array of length 3');
   }
@@ -66,8 +40,6 @@ export function triangleAnglesGivenSides(sideLengths) {
   });
 }
 
-export const pointLikeToTuple = ({ x, y }) => [x, y];
-export const pointTupleToRawPoint = ([x, y]) => ({ x, y });
 export const transformPoint = (matrix: DOMMatrixReadOnly, pt: PointLike): RawPoint => {
   const domPoint = matrix.transformPoint(new DOMPoint(pt.x, pt.y));
   return castCoordToRawPoint(domPoint);
@@ -125,7 +97,7 @@ export const polygonPointsGivenAnglesAndSides = (angles, sides): RawPoint[] => {
   if (sides.length !== angles.length) {
     throw new Error('polygonPointsGivenSidesAndAngles: length of sides is not equal to length of angles');
   }
-  return range(2, sides.length).reduce((acc, i) => {
+  return range(2, sides.length).reduce<RawPoint[]>((acc: RawPoint[], i:number) => {
     acc.push(hingedPlot(acc[i - 2], acc[i - 1], angles[i - 2], sides[i - 1]));
     return acc;
   }, [getOriginPoint(), pointFromPolar(Math.PI - angles[0], sides[0])]);
@@ -147,15 +119,6 @@ export function hingedPlotLerp(p1:PointLike, p2:PointLike, theta, lengthRatio) {
 export function lineLerp(start, end, lerp) {
   const difference = subtractPoints(end, start);
   return sumPoints(start, pointFromPolar(angleRelativeToOrigin(difference), distanceFromOrigin(difference) * lerp));
-}
-
-export function parallelLineAtDistance(pt1, pt2, distance) {
-  const sign = distance < 0 ? -1 : 1;
-  const absDist = Math.abs(distance);
-  return new Line(
-    hingedPlot(pt2, pt1, sign * (Math.PI / 2), absDist),
-    hingedPlot(pt1, pt2, -sign * (Math.PI / 2), absDist),
-  );
 }
 
 export function symmetricHingePlot(p1, p2, theta, length) {
@@ -182,10 +145,14 @@ export const getLineLineIntersection = (l1p1, l1p2, l2p1, l2p2) => {
   return intersections.length === 1 ? castCoordToRawPoint(intersections[0]) : null;
 };
 
-export function hingedPlotByProjectionDistance(pt1, pt2, angle, projectionDistance) {
+export function hingedPlotByProjectionDistance(pt1, pt2, angle, projectionDistance): RawPoint {
+  if (angle === 0) {
+    // so that our type coercion is accurate
+    throw new Error('hingedPlotByProjectionDistance: angle must not be zero');
+  }
   const hinge = hingedPlot(pt1, pt2, angle, Math.abs(projectionDistance));
   const [l1p1, l1p2] = parallelLinePointsAtDistance(pt1, pt2, projectionDistance);
-  return getLineLineIntersection(l1p1, l1p2, pt2, hinge);
+  return getLineLineIntersection(l1p1, l1p2, pt2, hinge) as RawPoint;
 }
 
 export function symmetricHingePlotByProjectionDistance(p1, p2, theta, distance) {

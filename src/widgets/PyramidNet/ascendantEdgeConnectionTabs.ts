@@ -1,11 +1,12 @@
 import { range } from 'lodash-es';
 import { Model, model, prop } from 'mobx-keystone';
-import { PathData } from '../../common/path/PathData';
+import { PathData } from '@/common/PathData';
+import type { RawPoint } from '@/common/PathData';
 import {
-  hingedPlot, lineLerp, RawPoint, symmetricHingePlotByProjectionDistance,
+  hingedPlot, lineLerp, symmetricHingePlotByProjectionDistance,
 } from '../../common/util/geom';
-import { DashPatternModel, strokeDashPathRatios } from '../../common/path/shapes/strokeDashPath';
-import { connectedLineSegments } from '../../common/path/shapes/generic';
+import { DashPatternModel, strokeDashPathRatios } from '../../common/shapes/strokeDashPath';
+import { connectedLineSegments } from '../../common/shapes/generic';
 import { sliderProp, sliderWithTextProp } from '../../common/keystone-tweakables/props';
 import { subtractRangeSet } from './range';
 import { ratioSliderProps } from './constants';
@@ -41,7 +42,7 @@ export const ascendantEdgeConnectionTabs = (
   start: RawPoint,
   end: RawPoint,
   tabSpec: AscendantEdgeTabsModel,
-  scoreDashSpec: DashPatternModel,
+  scoreDashSpec: DashPatternModel | undefined,
   tabIntervalRatios,
   tabGapIntervalRatios,
   tabDepth: number,
@@ -85,6 +86,7 @@ export const ascendantEdgeConnectionTabs = (
       Math.PI / 2,
       tabDepth,
     );
+
     const controlPointDistance = tabDepth * tabControlPointsProtrusion;
     const edgeInsetDistance = tabEdgeEndpointsIndentation * tabDepth;
     const baseControlAngleMux = tabControlPointsAngle * (Math.PI / 2);

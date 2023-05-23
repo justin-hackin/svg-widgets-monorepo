@@ -1,10 +1,11 @@
 import { computed, makeObservable } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import { filePathConstructor } from '@/common/util/data';
 import { GridPattern } from '../components/ResizableZoomPan/components/GridPattern';
-import { SVGWrapper } from '../../common/components/SVGWrapper';
-import {
-  BaseAssetDefinition, DocumentAreaProps, filePathConstructor, WidgetSVGComponent,
+import { SVGWrapper, WatermarkContentComponent } from '../../common/components/SVGWrapper';
+import type {
+  BaseAssetDefinition, DocumentAreaProps, WidgetSVGComponent,
 } from './types';
 
 export class SolitaryAssetDefinition implements BaseAssetDefinition {
@@ -30,7 +31,7 @@ export class SolitaryAssetDefinition implements BaseAssetDefinition {
     );
   }
 
-  getAssetsFileData(fileBaseName: string) {
+  getAssetsFileData(fileBaseName: string, WatermarkComponent?: WatermarkContentComponent) {
     const {
       Component,
       documentAreaProps,
@@ -38,7 +39,8 @@ export class SolitaryAssetDefinition implements BaseAssetDefinition {
     return [{
       filePath: filePathConstructor(fileBaseName, undefined, this.copies),
       fileString: ReactDOMServer.renderToString(
-        <SVGWrapper {...documentAreaProps}>
+        <SVGWrapper documentAreaProps={documentAreaProps}>
+          { WatermarkComponent && (<WatermarkComponent documentAreaProps={documentAreaProps} />)}
           <Component />
         </SVGWrapper>,
       ),

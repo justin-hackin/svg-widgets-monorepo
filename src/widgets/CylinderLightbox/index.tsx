@@ -2,14 +2,14 @@ import { computed } from 'mobx';
 import React from 'react';
 import { ExtendedModel } from 'mobx-keystone';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
+import { PathData, DestinationCommand } from '@/common/PathData';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
 } from '../../common/util/geom';
 import { subtractDValues, unifyDValues } from '../../common/util/path-boolean';
 import { PIXELS_PER_CM, radToDeg } from '../../common/util/units';
 import { sliderProp, sliderWithTextProp } from '../../common/keystone-tweakables/props';
-import { closedPolygonPath } from '../../common/path/shapes/generic';
-import { DestinationCommand, PathData } from '../../common/path/PathData';
+import { appendCurvedLineSegments, closedPolygonPath } from '../../common/shapes/generic';
 import { pathDToViewBoxStr } from '../../common/util/svg';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
@@ -123,7 +123,9 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   @computed
   get maxIngressAngle() {
     const dovetailNotchBeforeIngress = (new PathData()).concatPath(this.absNotchPath)
-      .transform(`rotate(${this.notchRotationBeforeIngress}) translate(${this.midRadius}, 0)`);
+      .transformByMatrix(
+        (new DOMMatrixReadOnly()).rotate(this.notchRotationBeforeIngress).translate(this.midRadius, 0),
+      );
     const p1 = (dovetailNotchBeforeIngress.commands[0] as DestinationCommand).to;
     const p2 = (dovetailNotchBeforeIngress.commands[1] as DestinationCommand).to;
     return radToDeg(Math.abs(angleRelativeToOrigin(p1) - angleRelativeToOrigin(p2)));
@@ -147,13 +149,13 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
   @computed
   get dovetailNotch() {
     return (new PathData()).concatPath(this.absNotchPath)
-      .transform(`rotate(${this.notchRotation}) translate(${this.midRadius}, 0)`);
+      .transformByMatrix(new DOMMatrixReadOnly().rotate(this.notchRotation).translate(this.midRadius, 0));
   }
 
   @computed
   get dovetailTab() {
     return (new PathData()).concatPath(this.absNotchPath)
-      .transform(`rotate(${this.tabRotation}) translate(${this.midRadius}, 0)`);
+      .transformByMatrix(new DOMMatrixReadOnly().rotate(this.tabRotation).translate(this.midRadius, 0));
   }
 
   @computed
@@ -163,7 +165,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     for (let i = 0; i < this.wallsPerArc.value; i += 1) {
       const rotation = (i - (this.wallsPerArc.value / 2) + 0.5) * sectionDegrees;
       const thisHole = rectanglePathCenteredOnOrigin(this.materialThickness.value, this.actualHoleWidth)
-        .transform(`rotate(${rotation}) translate(${this.midRadius}, 0)`);
+        .transformByMatrix(new DOMMatrixReadOnly().rotate(rotation).translate(this.midRadius, 0));
       holesPath.concatPath(thisHole);
     }
     return holesPath;
@@ -177,7 +179,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     const outerArcRight = pointFromPolar(halfArcAngle, this.ringRadius.value);
     sectionArcPath
       .move(outerArcLeft)
-      .ellipticalArc(this.ringRadius.value, this.ringRadius.value, 0, true, false, outerArcRight);
+      .ellipticalArc(this.ringRadius.value, this.ringRadius.value, 0, false, true, outerArcRight);
 
     const innerArcRight = pointFromPolar(halfArcAngle, this.innerRadius);
     const innerArcLeft = pointFromPolar(-halfArcAngle, this.innerRadius);
@@ -239,7 +241,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     for (let i = 0; i < this.holderTabsPerArc.value; i += 1) {
       const rotation = (i - (this.holderTabsPerArc.value / 2) + 0.5) * sectionDegrees;
       const thisHole = rectanglePathCenteredOnOrigin(this.actualHolderTabFeetLength, this.materialThickness.value)
-        .transform(`rotate(${rotation}) translate(${this.holderTabRadius}, 0)`);
+        .transformByMatrix(new DOMMatrixReadOnly().rotate(rotation).translate(this.holderTabRadius, 0));
       holesPath.concatPath(thisHole);
     }
     return holesPath;
@@ -255,18 +257,20 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     const secondFootStart = this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
     const secondFootEnd = 2 * this.actualHolderTabFeetLength + this.holderTabFeetCrotchWidth;
     const tabTop = -this.materialThickness.value - this.actualHolderTabFeetLength;
-    return (new PathData()).move(getOriginPoint()) // first foot start
+    const tab = (new PathData()).move(getOriginPoint()) // first foot start
       .line({ x: this.actualHolderTabFeetLength, y: 0 }) // first foot end
       .line({ x: this.actualHolderTabFeetLength, y: -this.materialThickness.value }) // crotch start
       .line({ x: secondFootStart, y: -this.materialThickness.value }) // crotch end
       .line({ x: secondFootStart, y: 0 }) // second foot start
-      .line({ x: secondFootEnd, y: 0 }) // second foot end
-      .curvedLineSegments(
-        [{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
-        0.5,
-        true,
-      )
-      .getD();
+      .line({ x: secondFootEnd, y: 0 }); // second foot end
+
+    appendCurvedLineSegments(
+      tab,
+      [{ x: secondFootEnd, y: tabTop }, { x: 0, y: tabTop }],
+      0.5,
+      true,
+    );
+    return tab.getD();
   }
 
   @computed
@@ -281,17 +285,6 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
 
   @computed
   get assetDefinition() {
-    const {
-      ringRadius: { value: ringRadius },
-      wallsPerArc: { value: wallsPerArc },
-      arcsPerRing: { value: arcsPerRing },
-      holderTabsPerArc: { value: holderTabsPerArc },
-      sectionPathD,
-      wallPathD,
-      innerRadius,
-      designBoundaryRadius,
-      holderTabD,
-    } = this;
     return new DisjunctAssetsDefinition([
       {
         name: 'Face boundaries',
@@ -300,9 +293,9 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
         },
         Component: () => (
           <g>
-            <circle r={ringRadius} fill="none" stroke="red" />
-            <circle r={innerRadius} fill="none" stroke="green" />
-            <circle r={designBoundaryRadius} fill="none" stroke="blue" />
+            <circle r={this.ringRadius.value} fill="none" stroke="red" />
+            <circle r={this.innerRadius} fill="none" stroke="green" />
+            <circle r={this.designBoundaryRadius} fill="none" stroke="blue" />
           </g>
         ),
         copies: 1,
@@ -311,31 +304,31 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
         name: 'Wall',
         Component: () => (
           <g>
-            <path d={wallPathD} fill="white" stroke="black" />
+            <path d={this.wallPathD} fill="white" stroke="black" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(wallPathD) },
-        copies: wallsPerArc * arcsPerRing,
+        documentAreaProps: { viewBox: pathDToViewBoxStr(this.wallPathD) },
+        copies: this.wallsPerArc.value * this.arcsPerRing.value,
       },
       {
         name: 'Arc',
         Component: () => (
           <g>
-            <path d={sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
+            <path d={this.sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(sectionPathD) },
-        copies: arcsPerRing * 2,
+        documentAreaProps: { viewBox: pathDToViewBoxStr(this.sectionPathD) },
+        copies: this.arcsPerRing.value * 2,
       },
       {
         name: 'Diffuser holder',
         Component: () => (
           <g>
-            <path d={holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
+            <path d={this.holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(holderTabD) },
-        copies: holderTabsPerArc * arcsPerRing,
+        documentAreaProps: { viewBox: pathDToViewBoxStr(this.holderTabD) },
+        copies: this.holderTabsPerArc.value * this.arcsPerRing.value,
       },
     ]);
   }

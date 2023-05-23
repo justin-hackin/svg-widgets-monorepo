@@ -4,10 +4,12 @@ import {
 } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import { TxtFileInfo } from '@/common/types';
+import { filePathConstructor } from '@/common/util/data';
 import { GridPattern } from '../components/ResizableZoomPan/components/GridPattern';
 import { SVGWrapper, WatermarkContentComponent } from '../../common/components/SVGWrapper';
-import {
-  BaseAssetDefinition, castToViewBox, DocumentAreaProps, filePathConstructor, WidgetSVGComponent,
+import type {
+  BaseAssetDefinition, DocumentAreaProps, WidgetSVGComponent,
 } from './types';
 
 export interface RegisteredWidgetAssetMember {
@@ -39,16 +41,11 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
 
   @computed
   get WorkspaceView() {
-    const {
-      documentAreaProps,
-      memberVisibility,
-      members,
-    } = this;
     return (
-      <svg {...documentAreaProps}>
+      <svg {...this.documentAreaProps}>
         <GridPattern patternId="grid-pattern" />
-        {members.map(({ Component }, index) => (
-          <g key={index} visibility={memberVisibility[index] ? 'visible' : 'hidden'}>
+        {this.members.map(({ Component }, index) => (
+          <g key={index} visibility={this.memberVisibility[index] ? 'visible' : 'hidden'}>
             <Component />
           </g>
         ))}
@@ -56,7 +53,7 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
     );
   }
 
-  getAssetsFileData(fileBaseName: string, WatermarkContent: WatermarkContentComponent) {
+  getAssetsFileData(fileBaseName: string, WatermarkComponent?: WatermarkContentComponent) {
     return this.members.reduce((acc, {
       Component,
       name,
@@ -70,14 +67,14 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
         acc.push({
           filePath: filePathConstructor(fileBaseName, name, copies),
           fileString: ReactDOMServer.renderToString(
-            <SVGWrapper {...this.documentAreaProps}>
-              <WatermarkContent viewBox={castToViewBox(this.documentAreaProps)} />
+            <SVGWrapper documentAreaProps={this.documentAreaProps}>
+              { WatermarkComponent && (<WatermarkComponent documentAreaProps={this.documentAreaProps} />)}
               <Component />
             </SVGWrapper>,
           ),
         });
       }
       return acc;
-    }, []);
+    }, [] as TxtFileInfo[]);
   }
 }

@@ -5,17 +5,19 @@ import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import React from 'react';
 import fileDownload from 'js-file-download';
+import { DocumentAreaProps } from '@/WidgetWorkspace/widget-types/types';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { SVGWrapper } from '../../../common/components/SVGWrapper';
 import { PyramidNetTestTabs } from './PyramidNetTestTabsSvg';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
 import { FileMenuItem } from '../../../WidgetWorkspace/components/AdditionalFileMenuItems';
 
-export const renderTestTabsToString = (widgetStore): string => ReactDOMServer.renderToString(
-  <SVGWrapper>
-    <PyramidNetTestTabs widgetStore={widgetStore} />
-  </SVGWrapper>,
-);
+export const renderTestTabsToString = (widgetStore, documentAreaProps: DocumentAreaProps): string => ReactDOMServer
+  .renderToString(
+    <SVGWrapper documentAreaProps={documentAreaProps}>
+      <PyramidNetTestTabs widgetStore={widgetStore} />
+    </SVGWrapper>,
+  );
 
 export interface TextureArrangementJsonData {
   shapeName: string,
@@ -44,7 +46,8 @@ export const additionalFileMenuItemsFactory = (store: PyramidNetWidgetModel): Fi
   menuText: DOWNLOAD_TAB_TESTER_TXT,
   MenuIcon: HowToVoteIcon,
   action: async () => {
-    fileDownload(renderTestTabsToString(store), `${store.fileBasename}--test-tabs.svg`);
+    // TODO: real bounds
+    fileDownload(renderTestTabsToString(store, { width: 100, height: 100 }), `${store.fileBasename}--test-tabs.svg`);
   },
 },
 ];

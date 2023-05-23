@@ -1,5 +1,5 @@
 import Flatten from '@flatten-js/core';
-import { PathData } from '../../../common/path/PathData';
+import { PathData } from '@/common/PathData';
 
 const { point } = Flatten;
 

@@ -72,7 +72,7 @@ export const DielinesLayer = observer(({
   const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(fittingBB), -1));
 
   function DecorationContent() {
-    if (!texturePathD) {
+    if (!texturePathD || !decorationCutPath) {
       return null;
     }
     const DECORATION_CUT_ID = 'face-decoration-cut';

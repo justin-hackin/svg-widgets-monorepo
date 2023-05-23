@@ -1,6 +1,6 @@
 import { Model, model, prop } from 'mobx-keystone';
 import { computed } from 'mobx';
-import { getTextureTransformMatrix, RawPoint } from '../../../common/util/geom';
+import { RawPoint, convertTransformObjectToDOMMatrixReadOnly, PartialTransformObject } from '@/common/PathData';
 
 @model('TransformModel')
 export class TransformModel extends Model({
@@ -11,12 +11,16 @@ export class TransformModel extends Model({
 }) {
   @computed
   get transformMatrix() {
+    return convertTransformObjectToDOMMatrixReadOnly(this.transformObject);
+  }
+
+  @computed
+  get transformObject(): PartialTransformObject {
     const {
-      transformOrigin,
-      rotate,
-      scale,
-      translate,
+      transformOrigin: { x: ox, y: oy }, scale, rotate, translate: { x: tx, y: ty },
     } = this;
-    return getTextureTransformMatrix(transformOrigin, scale, rotate, translate);
+    return {
+      origin: [ox, oy], scale, translate: [tx, ty], rotate,
+    };
   }
 }

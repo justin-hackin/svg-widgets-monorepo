@@ -28,6 +28,7 @@ import {
 } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import { assertNotNullish } from '@/common/util/assert';
 import { TextureSvgUnobserved } from '../components/TextureArrangement/components/TextureSvg';
 import type { TextureEditorModel } from './TextureEditorModel';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
@@ -153,11 +154,27 @@ export class ShapePreviewModel {
     })(this.renderer, this.controls, this.camera, this.scene));
   }
 
+  scene: Scene;
+
+  renderer: WebGLRenderer;
+
+  ambientLight: AmbientLight;
+
+  castSphere: Mesh;
+
+  internalLight: PointLight;
+
+  camera: PerspectiveCamera;
+
+  controls: OrbitControls;
+
+  animationFrame: number;
+
   @observable
     parentTextureEditor: TextureEditorModel;
 
   @observable
-    shapeMesh = null;
+    shapeMesh: Mesh | undefined;
 
   gltfExporter = new GLTFExporter() as GLTFExporter;
 
@@ -165,29 +182,11 @@ export class ShapePreviewModel {
 
   textureCanvas = document.createElement('canvas');
 
-  scene = null;
-
   lightColor = 0x404040;
 
-  internalLight = null;
+  shapeWireframe: WireframeGeometry | undefined;
 
-  ambientLight = null;
-
-  castSphere = null;
-
-  renderer = null;
-
-  shapeWireframe = null;
-
-  shapeMaterialMap = null;
-
-  camera = null;
-
-  controls = null;
-
-  disposers = null;
-
-  animationFrame = null;
+  shapeMaterialMap: Texture | undefined;
 
   // TODO: experiment with this value being adjustable (changes result in loss of shadows)
   IDEAL_RADIUS = 6;
@@ -238,6 +237,9 @@ export class ShapePreviewModel {
 
   @action
   alphaOnChange() {
+    if (!this.shapeMesh) {
+      return;
+    }
     if (this.useAlpha) {
       this.shapeMesh.material = new MeshPhongMaterial({
         map: this.shapeMaterialMap,
@@ -251,7 +253,7 @@ export class ShapePreviewModel {
       // eslint-disable-next-line max-len
       // see https://stackoverflow.com/questions/64973079/threejs-customdepthmaterial-property-on-mesh-not-included-in-scene-tojson-outp
       this.shapeMesh.customDistanceMaterial = new MeshDistanceMaterial({
-        alphaMap: this.shapeMesh.material.alphaMap,
+        alphaMap: (this.shapeMesh.material as MeshBasicMaterial).alphaMap,
         alphaTest: this.shapeMesh.material.alphaTest,
       });
       this.shapeMesh.castShadow = true;
@@ -260,6 +262,7 @@ export class ShapePreviewModel {
       this.scene.add(this.internalLight);
     } else {
       this.shapeMesh.material = new MeshBasicMaterial({ map: this.shapeMaterialMap, side: DoubleSide });
+      // @ts-ignore
       this.shapeMesh.customDistanceMaterial = undefined;
       //  if useAlphaTexturePreview initially false, we remove something that's not in the scene already on 1st call
       this.scene.remove(this.castSphere);
@@ -273,13 +276,16 @@ export class ShapePreviewModel {
     const modelUrl = new URL(`../../../../../static/models/${shapeName}.gltf`, import.meta.url).href;
     const importScene = await resolveSceneFromModelPath(this.gltfLoader, modelUrl);
     const meshChild = importScene.children.find((child) => (child as Mesh).isMesh) as Mesh;
-    const normalizingScale = this.IDEAL_RADIUS / meshChild.geometry.boundingSphere.radius;
+    assertNotNullish(meshChild);
+    const normalizingScale = this.IDEAL_RADIUS / (meshChild.geometry.boundingSphere?.radius as number);
     // move transforms into mesh so wireframe is similarly aligned
     meshChild.scale.setScalar(normalizingScale);
 
     if (this.shapeMesh) {
       this.scene.remove(this.shapeMesh);
-      this.scene.remove(this.shapeWireframe);
+    }
+    if (this.shapeWireframe) {
+      this.scene.remove(this.shapeWireframe as unknown as Scene);
     }
     if (Array.isArray(meshChild.material)) {
       throw new Error('Unexpected: mesh material as array and not single Material instance');
@@ -288,7 +294,7 @@ export class ShapePreviewModel {
     }
     this.setShapeMesh(meshChild);
     this.scene.add(meshChild);
-    const wireframe = new WireframeGeometry(this.shapeMesh.geometry);
+    const wireframe = new WireframeGeometry(meshChild.geometry);
     const wireframeLineSegments = new LineSegments(wireframe);
     const wireframeMaterial:any = wireframeLineSegments.material;
     wireframeMaterial.depthTest = true;
@@ -305,7 +311,7 @@ export class ShapePreviewModel {
   }
 
   @action
-  setMaterialMap(map) {
+  setMaterialMap(map: Texture) {
     this.shapeMaterialMap = map;
     this.shapeMaterialMap.image = this.textureCanvas;
   }
@@ -340,6 +346,7 @@ export class ShapePreviewModel {
     this.textureCanvas.setAttribute('width', `${vbWidth}`);
     this.textureCanvas.setAttribute('height', `${vbHeight}`);
     const ctx = this.textureCanvas.getContext('2d');
+    assertNotNullish(ctx);
     const v = await Canvg.from(ctx, svgStr, {
       ignoreAnimation: true,
       ignoreMouse: true,
@@ -347,6 +354,7 @@ export class ShapePreviewModel {
     });
     v.resize(scaleWidth, scaleHeight, 'none');
     await v.render();
+    // @ts-ignore
     this.shapeMesh.material.map.needsUpdate = true;
   }
 

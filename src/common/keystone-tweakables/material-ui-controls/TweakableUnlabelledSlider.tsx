@@ -26,7 +26,9 @@ export const TweakableUnlabelledSlider = observer(({
   node: TweakablePrimitiveModel<number, SliderMetadata | SliderWithTextMetadata>, labelId: string, className?: string
 }) => {
   const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
-  const [historyGroup, setHistoryGroup] = useState(null);
+  const [historyGroup, setHistoryGroup] = useState<
+  { continue<T>(fn: () => T): T, end(): void } | null
+  >(null);
   const [history] = useState(getNearestHistoryFromAncestorNode(node));
 
   const {
@@ -38,8 +40,10 @@ export const TweakableUnlabelledSlider = observer(({
   const useUnits = node.metadata.type === INPUT_TYPE.SLIDER_WITH_TEXT && node.metadata.useUnits;
 
   const endHistoryGroupAndClear = () => {
-    historyGroup.end();
-    setHistoryGroup(null);
+    if (historyGroup) {
+      historyGroup.end();
+      setHistoryGroup(null);
+    }
   };
 
   const getHistoryGroup = () => {
@@ -79,7 +83,7 @@ export const TweakableUnlabelledSlider = observer(({
       name={valuePath}
       min={min}
       max={max}
-      step={step || (useUnits && UNIT_STEP[displayUnit])}
+      step={step || (useUnits ? UNIT_STEP[displayUnit] : undefined)}
       key={valuePath}
       aria-labelledby={labelId}
       valueLabelDisplay="auto"

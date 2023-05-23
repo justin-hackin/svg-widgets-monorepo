@@ -29,11 +29,11 @@ export const ShapePreview = observer(() => {
 
   const { textureEditor } = workspaceStore.selectedStore as PyramidNetWidgetModel;
 
-  const threeContainerRef = useRef<HTMLDivElement>();
+  const threeContainerRef = useRef<HTMLDivElement>(null);
 
   // THREE rendering setup
   useEffect(() => {
-    if (!threeContainerRef) { return; }
+    if (!threeContainerRef?.current) { return; }
     textureEditor.createShapePreview(threeContainerRef.current);
   }, [threeContainerRef]);
 

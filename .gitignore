@@ -7,3 +7,5 @@ _static/
 .eslintcache
 .idea/
 **/tsconfig.tsbuildinfo
+# temporary
+docs-site/

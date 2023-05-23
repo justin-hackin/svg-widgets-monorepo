@@ -33,15 +33,15 @@ export function PyramidNetTestTabs({ widgetStore }: { widgetStore: PyramidNetWid
         // thus items are improperly spaced
         const { ymin, ymax } = getBoundingBoxAttrs(paths.cut.getD());
         acc.y += -1 * ymin;
-        acc.children.push((
+        acc.children.push(
           <g transform={`translate(0, ${acc.y})`} key={id} id={id}>
             <path className="score" {...scoreProps} d={paths.score.getD()} />
             <path className="cut" {...outerCutProps} d={paths.cut.getD()} />
-          </g>
-        ));
+          </g>,
+        );
         acc.y += ymax + Y_SPACING;
         return acc;
-      }, { children: [], y: 0 }).children}
+      }, { children: [], y: 0 } as { children: JSX.Element[], y: number }).children}
     </>
   );
 }

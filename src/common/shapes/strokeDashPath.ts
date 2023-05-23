@@ -6,13 +6,12 @@ import {
 } from 'mobx-keystone';
 
 import { computed } from 'mobx';
-import {
-  distanceFromOrigin, lineLerp, PointLike, subtractPoints,
-} from '../../util/geom';
-import { PathData } from '../PathData';
-import { referenceSelectProp, sliderWithTextProp } from '../../keystone-tweakables/props';
-import { ratioSliderProps } from '../../../widgets/PyramidNet/constants';
-import { DEFAULT_SLIDER_STEP } from '../../constants';
+import { assertNotNullish } from '@/common/util/assert';
+import { PathData, PointLike } from '@/common/PathData';
+import { distanceFromOrigin, lineLerp, subtractPoints } from '../util/geom';
+import { referenceSelectProp, sliderWithTextProp } from '../keystone-tweakables/props';
+import { ratioSliderProps } from '../../widgets/PyramidNet/constants';
+import { DEFAULT_SLIDER_STEP } from '../constants';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 
@@ -81,7 +80,7 @@ export class DashPatternModel extends Model({
         return `${startCase(parentName)} Pattern`;
       }
       // this should never happen
-      return node.ownPropertyName;
+      return node.ownPropertyName || '';
     },
     typeRef: patternRef,
     options,
@@ -95,8 +94,13 @@ export class DashPatternModel extends Model({
   }),
 }) {
 }
-
-export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec: DashPatternModel | undefined) {
+type NumberTuple = [number, number];
+export type LerpRanges = NumberTuple[];
+export function strokeDashPathRatios(
+  start: PointLike,
+  end: PointLike,
+  dashSpec: DashPatternModel | undefined,
+): LerpRanges {
   if (!dashSpec) { return [[0, 1]]; }
   const vector = subtractPoints(end, start);
   const vectorLength = distanceFromOrigin(vector);
@@ -106,7 +110,7 @@ export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec:
     strokeDashOffsetRatio: { value: strokeDashOffsetRatio },
   } = dashSpec;
   const strokeDashLengthToVectorLength = strokeDashLength / vectorLength;
-
+  assertNotNullish(relativeStrokeDasharray);
   const dashArrayTotalLength = sum(relativeStrokeDasharray);
   const startEndLerps = relativeStrokeDasharray.reduce((acc, intervalLength, index) => {
     const intervalRatio = intervalLength / dashArrayTotalLength;
@@ -118,24 +122,27 @@ export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec:
       acc.at += intervalRatio;
     }
     return acc;
-  }, { at: 0, lerps: [] }).lerps;
+  }, { at: 0, lerps: [] } as { at: number, lerps: LerpRanges }).lerps;
 
   const iterationsRequiredForCoverage = Math.ceil(vectorLength / strokeDashLength);
   return range(iterationsRequiredForCoverage)
   // compute the start-end lerps relative to the start - end vector
     .reduce((acc, iterIndex) => {
       const lerpOffset = iterIndex * strokeDashLengthToVectorLength;
-      const lerpTransform = (lerp) => lerp * strokeDashLengthToVectorLength + lerpOffset;
-      return acc.concat(startEndLerps.map((el) => el.map(lerpTransform)));
-    }, [])
+      const lerpTransform = (lerp:number):number => lerp * strokeDashLengthToVectorLength + lerpOffset;
+      const transformed = startEndLerps.map((el) => el.map(lerpTransform)) as LerpRanges;
+      return acc.concat(transformed);
+    }, [] as LerpRanges)
     // remove line segments that lie fully outside the start-end vector
     .filter(([startLerp, endLerp]) => startLerp <= 1 && endLerp <= 1)
     // nudge the segments forward based on strokeDashOffsetRatio, wrapping and/or splicing where necessary
     .reduce((acc, startEndLerp) => {
-      const startEndLerpNew = startEndLerp.map((val) => val + strokeDashOffsetRatio * strokeDashLengthToVectorLength);
+      const startEndLerpNew = startEndLerp.map(
+        (val) => val + strokeDashOffsetRatio * strokeDashLengthToVectorLength,
+      ) as NumberTuple;
       // the whole segment is past the edges of the vector, wrap whole thing
       if (startEndLerpNew[0] >= 1) {
-        acc.push(startEndLerpNew.map(wrapRatio));
+        acc.push(startEndLerpNew.map(wrapRatio) as NumberTuple);
         return acc;
       }
       // start lies within but end lies without, discard
@@ -144,11 +151,11 @@ export function strokeDashPathRatios(start: PointLike, end: PointLike, dashSpec:
       }
       acc.push(startEndLerpNew);
       return acc;
-    }, [])
+    }, [] as LerpRanges)
     // visually this should not make difference but better for plotters that don't optimize
     .sort(([start1], [start2]) => (start1 - start2))
     // center items so that the start and end points do not touch the cut
-    .map((item, index, array) => item.map((val) => val + (1 - last(array)[1]) / 2));
+    .map((item, index, array) => item.map((val) => val + (1 - last(array)![1]) / 2)) as LerpRanges;
 }
 
 export function strokeDashPath(start: PointLike, end: PointLike, dashSpec: DashPatternModel | undefined) {

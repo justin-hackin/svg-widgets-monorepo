@@ -1,6 +1,6 @@
 import { getBoundingBoxAttrs } from '../../../../../../../common/util/svg';
 import { getLineLineIntersection, lineLerp } from '../../../../../../../common/util/geom';
-import { closedPolygonPath } from '../../../../../../../common/path/shapes/generic';
+import { closedPolygonPath } from '../../../../../../../common/shapes/generic';
 
 export class BoundaryModel {
   constructor(readonly vertices) {}

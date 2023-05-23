@@ -6,19 +6,19 @@ HTMLInputElement, { changeHandler:(txt: string, path?: string) => void, accept: 
     changeHandler,
     accept,
   }, ref) => {
-    const formRef = useRef<HTMLFormElement>();
+    const formRef = useRef<HTMLFormElement>(null);
 
     return (
       <form ref={formRef}>
         <input
           ref={ref}
           onChange={async (e) => {
-            const widgetFile = e.target?.files[0];
+            const widgetFile = e.target?.files?.[0];
             if (!widgetFile) {
               return;
             }
             const widgetJSONTxt = await widgetFile.text();
-            formRef?.current.reset();
+            formRef?.current?.reset();
             changeHandler(widgetJSONTxt, widgetFile.name);
           }}
           type="file"

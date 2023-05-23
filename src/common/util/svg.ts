@@ -1,6 +1,7 @@
 import React from 'react';
 import { svgPathBbox } from 'svg-path-bbox';
-import { PathData } from '../path/PathData';
+import { Dimensions } from '@/common/util/data';
+import { PathData } from '@/common/PathData';
 
 const parseString = (str) => {
   const parser = new window.DOMParser();
@@ -13,17 +14,12 @@ export const extractCutHolesFromSvgString = (svgString:string):string => {
   return path ? (path.getAttribute('d') || '') : '';
 };
 
-export const extractViewBoxFromSvg = (svgString:string) => {
-  const doc:Document = parseString(svgString);
-  return doc.querySelector('svg').getAttribute('viewBox');
-};
-
 export const namespacedElementFactory = (elName) => function (p: any) {
   const { children, ...props } = p;
   return React.createElement(elName, props, children);
 };
 
-export const getDimensionsFromPathD = (d) => {
+export const getDimensionsFromPathD = (d): Dimensions => {
   const [xmin, ymin, xmax, ymax] = svgPathBbox(d);
   return {
     width: xmax - xmin, height: ymax - ymin,

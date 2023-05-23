@@ -8,7 +8,7 @@ import { boundingBoxMinPoint, expandBoundingBoxAttrs, registrationMarksPath } fr
 import { pointToTranslateString, scalePoint } from '../../../common/util/geom';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
-import { closedPolygonPath } from '../../../common/path/shapes/generic';
+import { closedPolygonPath } from '../../../common/shapes/generic';
 
 function PrintGroup({ children }) {
   return (
@@ -33,6 +33,7 @@ export const PrintLayer = observer(({
   }
   const {
     boundingBox,
+    borderInsetFaceHoleTransformObject,
     borderInsetFaceHoleTransformMatrix,
     faceDecoration,
     faceDecorationTransformMatricies,
@@ -68,7 +69,7 @@ export const PrintLayer = observer(({
   const borderFill = theme.palette.grey['900'];
   const faceBoundaryPath = closedPolygonPath(faceBoundaryPoints);
   const faceBoundaryPathD = faceBoundaryPath.getD();
-  const decorationBoundaryPathD = faceBoundaryPath.transform(borderInsetFaceHoleTransformMatrix.toString()).getD();
+  const decorationBoundaryPathD = faceBoundaryPath.transformByObject(borderInsetFaceHoleTransformObject).getD();
 
   return (
     <PrintGroup>

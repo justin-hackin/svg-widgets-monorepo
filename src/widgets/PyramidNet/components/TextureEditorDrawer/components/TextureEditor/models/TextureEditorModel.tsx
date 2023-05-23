@@ -6,11 +6,13 @@ import {
 import {
   action, computed, makeObservable, observable,
 } from 'mobx';
+import { Dimensions } from '@/common/util/data';
+import { assertNotNullish } from '@/common/util/assert';
+import { RawPoint } from '@/common/PathData';
 import { BoundaryModel } from './BoundaryModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {
   calculateTransformOriginChangeOffset,
-  RawPoint,
   scalePoint,
   sumPoints,
   transformPoint,
@@ -97,17 +99,12 @@ export class TextureEditorViewerModel extends Model({
 
 export class TextureEditorModel {
   constructor(parentPyramidNetWidgetModel: PyramidNetWidgetModel) {
-    this.setParentPyramidNetWidgetModel(parentPyramidNetWidgetModel);
+    this.parentPyramidNetWidgetModel = parentPyramidNetWidgetModel;
     makeObservable(this);
   }
 
   @observable
     parentPyramidNetWidgetModel: PyramidNetWidgetModel;
-
-  @action
-  setParentPyramidNetWidgetModel(parentPyramidNetWidgetModel) {
-    this.parentPyramidNetWidgetModel = parentPyramidNetWidgetModel;
-  }
 
   @observable
     viewerModel = new TextureEditorViewerModel({});
@@ -116,7 +113,7 @@ export class TextureEditorModel {
     shapePreviewIsFullScreen = false;
 
   @observable
-    placementAreaDimensions = null;
+    placementAreaDimensions: Dimensions | null = null;
 
   @observable
     autoRotatePreview = false;
@@ -125,10 +122,10 @@ export class TextureEditorModel {
     showNodes = false;
 
   @observable
-    selectedTextureNodeIndex = null;
+    selectedTextureNodeIndex: number | undefined = undefined;
 
   @observable
-    shapePreview:ShapePreviewModel;
+    shapePreview:ShapePreviewModel | undefined;
 
   @observable
     importTextureArrangementDialogActive = false;
@@ -197,8 +194,10 @@ export class TextureEditorModel {
 
   @computed
   get selectedTextureNode() {
-    return (this.selectedTextureNodeIndex !== null && this.faceDecoration)
-      && this.faceDecoration.destinationPoints[this.selectedTextureNodeIndex];
+    if (this.selectedTextureNodeIndex === undefined || !this.faceDecoration.destinationPoints) {
+      return undefined;
+    }
+    return this.faceDecoration.destinationPoints[this.selectedTextureNodeIndex];
   }
 
   // faceBoundary = decorationBoundary + border (if any)
@@ -228,12 +227,12 @@ export class TextureEditorModel {
   }
 
   @action
-  setPlacementAreaDimensions(placementAreaDimensions) {
+  setPlacementAreaDimensions(placementAreaDimensions: Dimensions) {
     this.placementAreaDimensions = placementAreaDimensions;
   }
 
   @action
-  setSelectedTextureNodeIndex(index) {
+  setSelectedTextureNodeIndex(index: number | undefined) {
     this.selectedTextureNodeIndex = index;
   }
 
@@ -247,7 +246,7 @@ export class TextureEditorModel {
   fitTextureToFace() {
     const { boundingBoxAttrs } = this.decorationBoundary;
     const { dimensions: textureDimensions } = this.faceDecoration;
-    if (!this.faceDecoration?.pattern || !this.decorationBoundary) {
+    if (!this.faceDecoration?.pattern || !this.decorationBoundary || !this.imageCoverScale || !textureDimensions) {
       return;
     }
     const { height, width, xmin } = boundingBoxAttrs;
@@ -271,7 +270,7 @@ export class TextureEditorModel {
   @action
   resetNodesEditor() {
     this.setShowNodes(false);
-    this.setSelectedTextureNodeIndex(null);
+    this.setSelectedTextureNodeIndex(undefined);
   }
 
   @action
@@ -315,6 +314,7 @@ export class TextureEditorModel {
 
   @action
   absoluteMovementToSvg(absCoords) {
+    assertNotNullish(this.faceFittingScale);
     return scalePoint(absCoords, 1 / (this.viewerModel.viewScaleDragged * this.faceFittingScale.scale));
   }
 
@@ -357,7 +357,7 @@ export class TextureEditorModel {
 
   @action
   repositionSelectedNodeOverPoint(point) {
-    if (!this.faceDecoration || !this.decorationBoundary) {
+    if (!this.faceDecoration || !this.decorationBoundary || !this.selectedTextureNode) {
       return;
     }
     const svgTextureNode = transformPoint(this.faceDecoration.transformMatrixDragged, this.selectedTextureNode);
@@ -417,20 +417,20 @@ export class TextureEditorModel {
 
   @action
   repositionOriginOverFaceCenter() {
+    assertNotNullish(this.decorationBoundary?.centerPoint);
     this.repositionOriginOverPoint(this.decorationBoundary.centerPoint);
   }
 
   @action
   repositionOriginOverTextureCenter() {
-    if (this.faceDecoration) {
-      const { width, height } = this.faceDecoration.dimensions;
-      this.repositionOriginOverRelativePoint({ x: width / 2, y: height / 2 });
-    }
+    assertNotNullish(this.faceDecoration.dimensions);
+    const { width, height } = this.faceDecoration.dimensions;
+    this.repositionOriginOverRelativePoint({ x: width / 2, y: height / 2 });
   }
 
   @action
   saveTextureArrangement() {
-    if (!this.faceDecoration) { return; }
+    assertNotNullish(this.faceDecoration.pattern);
     const fileData = {
       shapeName: this.shapeName.value,
       textureSnapshot: getSnapshot(this.faceDecoration),

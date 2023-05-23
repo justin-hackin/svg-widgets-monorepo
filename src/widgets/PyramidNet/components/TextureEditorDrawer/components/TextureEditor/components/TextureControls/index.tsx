@@ -138,7 +138,7 @@ export const TextureControls = observer(() => {
     autoRotatePreview,
   } = textureEditor;
 
-  const [fileMenuRef, setFileMenuRef] = useState<HTMLElement>(null);
+  const [fileMenuRef, setFileMenuRef] = useState<HTMLElement | null>(null);
   const resetFileMenuRef = () => { setFileMenuRef(null); };
 
   // TODO: no defining component inside component
@@ -352,8 +352,8 @@ export const TextureControls = observer(() => {
               // TODO: use onKeyPress for enter submission
               // https://github.com/mui-org/material-ui/issues/5393#issuecomment-304707345
               // TODO: once above is fixed, use textureRotateDragged as value
-                const numVal = +value;
-                if (isNumber(value) && !isNaN(value)) {
+                const numVal = +!value;
+                if (isNumber(numVal) && !isNaN(numVal)) {
                   faceDecoration.transform.setRotate(numVal);
                 }
               }}

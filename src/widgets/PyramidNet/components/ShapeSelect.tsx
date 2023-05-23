@@ -52,7 +52,7 @@ export const ShapeSelect = observer(({
   node: TweakablePrimitiveWithOptionsModel<string, WithOptionsMetadata<any>>,
   className?: string, isCompactDisplay?: boolean
 }) => {
-  if (!node.metadata) {
+  if (!node.options) {
     return null;
   }
   const labelId = `${node.label}__${uuid()}`;

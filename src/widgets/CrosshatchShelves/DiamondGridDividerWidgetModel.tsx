@@ -2,15 +2,15 @@ import { computed } from 'mobx';
 import React from 'react';
 import Flatten from '@flatten-js/core';
 import { round } from 'lodash-es';
+import { ExtendedModel } from 'mobx-keystone';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { ExtendedModel } from 'mobx-keystone';
+import { PathData } from '@/common/PathData';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
 } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { augmentSegmentEndpoints, getPositiveSlopeSlatSegments, notchPanel } from './util';
-import { PathData } from '../../common/path/PathData';
 import { getBoundingBoxAttrs } from '../../common/util/svg';
 import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
@@ -96,6 +96,11 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
       const intersection = mirrorSegment.intersect(targetSeg);
       return intersection.length > 0;
     });
+    if (!firstIntersectionSegment) {
+      throw new Error(
+        'firstIntersectionSegment: failed to find firstIntersectionSegment in this.positiveCrosshatchSegments',
+      );
+    }
     return targetSeg.intersect(this.getMirroredSegment(firstIntersectionSegment))[0].distanceTo(targetSeg.ps)[0];
   }
 

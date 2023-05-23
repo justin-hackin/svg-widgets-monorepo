@@ -4,6 +4,8 @@ import {
 } from 'mobx-keystone';
 
 import { computed, observable } from 'mobx';
+import { Dimensions } from '@/common/util/data';
+import { PathData, getDestinationPoints } from '@/common/PathData';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import {
   calculateTransformOriginChangeOffset,
@@ -15,7 +17,6 @@ import { getNearestHistoryFromAncestorNode } from '../../../common/util/mobx-key
 import { TransformModel } from './TransformModel';
 import { ImageFaceDecorationPatternModel } from './ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
-import { PathData } from '../../../common/path/PathData';
 
 // TODO: move to util
 const negativeMod = (n, m) => ((n % m) + m) % m;
@@ -32,7 +33,7 @@ export class PositionableFaceDecorationModel extends Model({
     transformDiff = new TransformModel({});
 
   @computed
-  get dimensions() {
+  get dimensions(): Dimensions | undefined {
     if (!this.pattern) { return undefined; }
     if (this.pattern instanceof PathFaceDecorationPatternModel) {
       const { pathD } = this.pattern as PathFaceDecorationPatternModel;
@@ -84,7 +85,7 @@ export class PositionableFaceDecorationModel extends Model({
   get destinationPoints() {
     if (this.pattern instanceof PathFaceDecorationPatternModel) {
       const { pathD } = this.pattern as PathFaceDecorationPatternModel;
-      return (new PathData(pathD)).getDestinationPoints();
+      return getDestinationPoints(new PathData(pathD));
     }
     return null;
   }

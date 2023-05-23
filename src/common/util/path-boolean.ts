@@ -1,9 +1,8 @@
-import svgpath from 'svgpath';
 import {
-  CompoundPath, Path, Size, Project,
+  CompoundPath, Path, Project, Size,
 } from 'paper';
 
-import { PathData } from '../path/PathData';
+import { PathData, PartialTransformObject } from '@/common/PathData';
 import { VERY_LARGE_NUMBER } from '../constants';
 
 const tinySize = new Size(64, 48);
@@ -41,12 +40,12 @@ export function unifyDValues(d1, d2) {
 }
 
 export const getBoundedTexturePathD = (
-  decorationBoundaryPathD,
-  texturePathD,
-  textureTransformMatrixStr,
-  isPositive,
+  decorationBoundaryPathD: string,
+  texturePathD: string,
+  textureTransformObject: PartialTransformObject,
+  isPositive: boolean,
 ) => {
-  const texturePathTransformedD = svgpath(texturePathD).transform(textureTransformMatrixStr).toString();
+  const texturePathTransformedD = new PathData(texturePathD).transformByObject(textureTransformObject).getD();
 
   if (isPositive) {
     const punchoutPath = new PathData();
@@ -56,9 +55,7 @@ export const getBoundedTexturePathD = (
       .line([VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
       .line([-VERY_LARGE_NUMBER, VERY_LARGE_NUMBER])
       .close();
-    const punchoutPathTransformedD = svgpath(
-      punchoutPath.getD(),
-    ).transform(textureTransformMatrixStr).toString();
+    const punchoutPathTransformedD = punchoutPath.transformByObject(textureTransformObject).getD();
     const punchedPathD = subtractDValues(punchoutPathTransformedD, texturePathTransformedD);
     return intersectDValues(punchedPathD, decorationBoundaryPathD);
   }

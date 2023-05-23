@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import uuid from 'uuid/v1';
 import Typography from '@mui/material/Typography';
 import { Switch } from '@mui/material';
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { FormControlStyled } from '../../style/style';
 
 export const SimpleSwitch = observer(({
@@ -10,14 +10,18 @@ export const SimpleSwitch = observer(({
   name,
   onChange,
   label,
+  className,
+}: {
+  value: boolean,
+  name: string,
+  onChange: (event: ChangeEvent<HTMLInputElement>, checked: boolean) => void,
+  label: string,
+  className?: string
 }) => {
   const labelId = uuid();
-  if (value === undefined) {
-    return null;
-  }
 
   return (
-    <FormControlStyled>
+    <FormControlStyled className={className}>
       <Typography id={labelId} gutterBottom>
         {label}
       </Typography>

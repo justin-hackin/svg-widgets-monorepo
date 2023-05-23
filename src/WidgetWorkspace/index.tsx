@@ -60,15 +60,14 @@ type WidgetWorkspaceRequiredProps = {
   height: number,
 };
 
-export type Orientation = ComponentProps<typeof ReflexContainer>['orientation'];
+export type Orientation = NonNullable<ComponentProps<typeof ReflexContainer>['orientation']>;
 type WidgetWorkspaceOptionalProps = {
-  panelOrientation?: Orientation,
-  maxPanelWidthPercent?: number,
-  minPanelWidthPercent?: number,
+  panelOrientation: Orientation | undefined,
+  maxPanelWidthPercent: number,
+  minPanelWidthPercent: number,
 };
 
 type WidgetWorkspaceProps = WidgetWorkspaceRequiredProps & WidgetWorkspaceOptionalProps;
-
 const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer(({
   panelOrientation, width, height, maxPanelWidthPercent, minPanelWidthPercent,
 }) => {
@@ -169,15 +168,15 @@ const SizedWidgetWorkspace: FunctionComponent<WidgetWorkspaceProps> = observer((
   );
 });
 
-export const WidgetWorkspace: FunctionComponent<WidgetWorkspaceOptionalProps> = (props) => (
+export const WidgetWorkspace: FunctionComponent<Partial<WidgetWorkspaceOptionalProps>> = (
+  { panelOrientation = undefined, maxPanelWidthPercent = 50, minPanelWidthPercent = 25 },
+) => (
   <ResizeDetector>
-    {({ width, height }:
-    { width: number, height: number }) => (<SizedWidgetWorkspace {...props} width={width} height={height} />)}
+    {({ width, height }: { width: number, height: number }) => (
+      <SizedWidgetWorkspace {...{
+        panelOrientation, maxPanelWidthPercent, minPanelWidthPercent, width, height,
+      }}
+      />
+    )}
   </ResizeDetector>
 );
-
-WidgetWorkspace.defaultProps = {
-  panelOrientation: undefined,
-  maxPanelWidthPercent: 50,
-  minPanelWidthPercent: 25,
-};

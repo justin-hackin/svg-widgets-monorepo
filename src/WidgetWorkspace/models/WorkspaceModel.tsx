@@ -22,6 +22,7 @@ import JSZip from 'jszip';
 import fileDownload from 'js-file-download';
 import { radioProp, switchProp } from '@/common/keystone-tweakables/props';
 import { UNITS } from '@/common/util/units';
+import { assertNotNullish } from '@/common/util/assert';
 import { BaseWidgetClass } from '../widget-types/BaseWidgetClass';
 import type { Orientation } from '../index';
 
@@ -67,11 +68,11 @@ export function widgetModel(modelName: string, previewIcon: string) {
 
 @model('SvgWidgetStudio/WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedStore: prop<BaseWidgetClass>(undefined).withSetter(),
+  selectedStore: prop<BaseWidgetClass | undefined>(() => undefined).withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))).withSetter(),
 }) {
   @observable
-    selectedWidgetModelType: string = null;
+    selectedWidgetModelType: string | undefined = undefined;
 
   @action
   setSelectedWidgetModelType(selectedWidgetModelType) {
@@ -89,7 +90,7 @@ export class WorkspaceModel extends Model({
     widgetPickerOpen = false;
 
   @observable
-    alertDialogContent = null;
+    alertDialogContent: ReactNode | null = null;
 
   @observable
     openWidgetFileFlag = false;
@@ -140,13 +141,6 @@ export class WorkspaceModel extends Model({
       this.selectedWidgetNameReadable ? `|| ${this.selectedWidgetNameReadable}` : ''}`;
   }
 
-  getSelectedModelAssetsFileData() {
-    return this.selectedStore.assetDefinition.getAssetsFileData(
-      this.selectedStore.fileBasename,
-      this.selectedStore.WatermarkContent,
-    );
-  }
-
   @action
   setWidgetPickerOpen(val: boolean) {
     this.widgetPickerOpen = val;
@@ -173,6 +167,7 @@ export class WorkspaceModel extends Model({
   }
 
   downloadWidgetWithAssets() {
+    assertNotNullish(this.selectedStore);
     const zip = new JSZip();
     const widgetSpecJSON = this.getWidgetSpecJSON();
     const filePath = `${this.selectedStore.fileBasename}.widget`;
@@ -180,13 +175,14 @@ export class WorkspaceModel extends Model({
       filePath,
       JSON.stringify(widgetSpecJSON, null, 2),
     );
-    this.getSelectedModelAssetsFileData().forEach(({ filePath, fileString }) => {
+    this.selectedStore.getSelectedModelAssetsFileData().forEach(({ filePath, fileString }) => {
       zip.file(filePath, fileString);
     });
 
     zip.generateAsync({ type: 'blob' })
       .then((content) => {
         // see FileSaver.js
+        assertNotNullish(this.selectedStore);
         fileDownload(content, `${this.selectedStore.fileBasename}.zip`);
       });
   }
@@ -279,13 +275,17 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   applySpecSnapshot(persistedSpecSnapshot: SnapshotInOfModel<any>) {
+    assertNotNullish(this.selectedStore);
     applySnapshot(this.selectedStore, persistedSpecSnapshot);
   }
 
   @modelAction
   setSelectedStoreFromData(widgetType: string, persistedSpecSnapshot: SnapshotInOfModel<any>) {
     this.newWidgetStore(widgetType);
+    assertNotNullish(this.selectedStore);
     const { history } = this.selectedStore;
+    // created in onInit
+    assertNotNullish(history);
     history.withoutUndo(() => {
       this.applySpecSnapshot(persistedSpecSnapshot);
     });
@@ -304,6 +304,7 @@ export class WorkspaceModel extends Model({
   }
 
   getWidgetSpecJSON(): WidgetJSON {
+    assertNotNullish(this.selectedWidgetModelType);
     const snapshot = getSnapshot(this.selectedStore);
     return {
       widget: {
