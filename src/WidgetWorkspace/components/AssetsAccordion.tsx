@@ -79,10 +79,10 @@ export const AssetsAccordion = observer(({ assetDefinition } : { assetDefinition
                 dense
                 {...(assetDefinition instanceof DisjunctAssetsDefinition ? {
                   onClick: () => {
-                    assetDefinition.setSelectedMember(index);
+                    assetDefinition.setSelectedMemberIndex(index);
                   },
                   disabled: assetDefinition.overlayModeEnabled,
-                  selected: !assetDefinition.overlayModeEnabled && assetDefinition.selectedMember === index,
+                  selected: !assetDefinition.overlayModeEnabled && assetDefinition.selectedMemberIndex === index,
                 } : {})}
               >
                 {assetDefinition instanceof RegisteredAssetsDefinition && (

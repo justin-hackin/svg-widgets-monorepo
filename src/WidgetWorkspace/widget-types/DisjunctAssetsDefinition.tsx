@@ -3,7 +3,6 @@ import {
 } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
-import { observer } from 'mobx-react';
 import { GridPattern } from '../components/ResizableZoomPan/components/GridPattern';
 import {
   BoundingBoxAttrs,
@@ -12,10 +11,10 @@ import {
   viewBoxStrToBoundingBoxAttrs,
 } from '../../common/util/svg';
 import { SVGWrapper, WatermarkContentComponent } from '../../common/components/SVGWrapper';
-import { Dimensions } from '../../common/util/data';
-import { RegisteredWidgetAssetMember } from './RegisteredAssetsDefinition';
-import {
-  BaseAssetDefinition, DocumentAreaProps, filePathConstructor, ViewBoxProps,
+import { Dimensions, filePathConstructor } from '../../common/util/data';
+import type { RegisteredWidgetAssetMember } from './RegisteredAssetsDefinition';
+import type {
+  BaseAssetDefinition, DocumentAreaProps, ViewBoxProps,
 } from './types';
 
 export interface DisjunctWidgetAssetMember extends RegisteredWidgetAssetMember {
@@ -46,19 +45,23 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
   public overlayModeEnabled = false;
 
   @observable
-  public selectedMember = 0;
+  public selectedMemberIndex = 0;
+
+  @observable
+  public members: DisjunctWidgetAssetMember[];
 
   constructor(
-    public members: DisjunctWidgetAssetMember[],
+    members: DisjunctWidgetAssetMember[],
     public allowOverlayMode: boolean = true,
   ) {
+    this.members = members;
     if (allowOverlayMode) { this.overlayModeEnabled = true; }
     makeObservable(this);
   }
 
   @action
-  setSelectedMember(selectedIndex: number) {
-    this.selectedMember = selectedIndex;
+  setSelectedMemberIndex(selectedIndex: number) {
+    this.selectedMemberIndex = selectedIndex;
   }
 
   @action
@@ -67,29 +70,26 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
   }
 
   @computed
+  get selectedMember() {
+    return this.members[this.selectedMemberIndex];
+  }
+
+  @computed
   get WorkspaceView() {
-    const {
-      Component,
-      documentAreaProps,
-    } = this.members[this.selectedMember];
-    const SelectedObserverComponent = observer(Component);
     return (
-      <svg {...(this.overlayModeEnabled ? this.allAssetsDocumentAreaProps : documentAreaProps)}>
+      <svg {...(this.overlayModeEnabled ? this.allAssetsDocumentAreaProps : this.selectedMember.documentAreaProps)}>
         <GridPattern patternId="grid-pattern" />
         {
-          this.overlayModeEnabled
-            ? this.members.map(({ Component }, index) => {
-              const ThisObserverComponent = observer(Component);
-              return (<ThisObserverComponent key={index} />);
-            })
-            : (<SelectedObserverComponent />)
-        }
+            this.overlayModeEnabled
+              ? this.members.map(({ Component }, index) => (<Component key={index} />))
+              : (<this.selectedMember.Component />)
+          }
       </svg>
     );
   }
 
   @computed
-  get allAssetsDocumentAreaProps() {
+  get allAssetsDocumentAreaProps(): DocumentAreaProps {
     const hasViewBoxMember = !!this.members.find((member) => !!(member.documentAreaProps as ViewBoxProps).viewBox);
     const bbs = this.members.map((member) => castDocumentAreaPropsToBoundingBoxAttrs(member.documentAreaProps));
     const consolidatedBB = boundingBoxOfBoundingBoxes(bbs);
@@ -106,7 +106,7 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
     };
   }
 
-  getAssetsFileData(fileBaseName: string, WatermarkContent: WatermarkContentComponent) {
+  getAssetsFileData(fileBaseName: string, WatermarkComponent?: WatermarkContentComponent) {
     return this.members.map(({
       Component,
       documentAreaProps,
@@ -116,7 +116,7 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
       filePath: filePathConstructor(fileBaseName, name, copies),
       fileString: ReactDOMServer.renderToString(
         <SVGWrapper documentAreaProps={documentAreaProps}>
-          <WatermarkContent documentAreaProps={documentAreaProps} />
+          { WatermarkComponent && (<WatermarkComponent documentAreaProps={documentAreaProps} />)}
           <Component />
         </SVGWrapper>,
       ),

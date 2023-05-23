@@ -2,6 +2,9 @@ import { FC, ReactElement } from 'react';
 
 import { TxtFileInfo } from '@/common/types';
 import { WatermarkContentComponent } from '@/common/components/SVGWrapper';
+import { DisjunctAssetsDefinition } from '@/WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
+import { RegisteredAssetsDefinition } from '@/WidgetWorkspace/widget-types/RegisteredAssetsDefinition';
+import { SolitaryAssetDefinition } from '@/WidgetWorkspace/widget-types/SolitaryAssetDefinition';
 import { Dimensions } from '../../common/util/data';
 
 export interface ViewBoxProps { viewBox: string }
@@ -18,8 +21,4 @@ export interface BaseAssetDefinition {
   getAssetsFileData(fileBaseName: string, WatermarkContent?: WatermarkContentComponent): TxtFileInfo[];
 }
 
-export const filePathConstructor = (
-  fileBaseName: string,
-  assetName: string | undefined,
-  copies: number | undefined,
-) => `${fileBaseName}${assetName ? `__${assetName}` : ''}${copies ? `__X${copies}` : ''}.svg`;
+export type AnyAssetDefinition = DisjunctAssetsDefinition | RegisteredAssetsDefinition | SolitaryAssetDefinition;

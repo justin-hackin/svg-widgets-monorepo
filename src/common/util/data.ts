@@ -25,3 +25,8 @@ export const resolveImageDimensionsFromBase64 = (base64): Promise<Dimensions> =>
     img.src = base64;
   }));
 export const stringifier = (option) => (`${option}`);
+export const filePathConstructor = (
+  fileBaseName: string,
+  assetName: string | undefined,
+  copies: number | undefined,
+) => `${fileBaseName}${assetName ? `__${assetName}` : ''}${copies ? `__X${copies}` : ''}.svg`;

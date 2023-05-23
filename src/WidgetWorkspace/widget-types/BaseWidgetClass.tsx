@@ -2,7 +2,7 @@ import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
 import { FC } from 'react';
 import { observable } from 'mobx';
 import { WatermarkContentComponent } from '@/common/components/SVGWrapper';
-import { BaseAssetDefinition } from './types';
+import { AnyAssetDefinition } from './types';
 import { AdditionalToolbarItem } from '../../widgets/PyramidNet/components/AdditionalToolbarContent';
 import { FileMenuItem } from '../components/AdditionalFileMenuItems';
 
@@ -24,7 +24,7 @@ export abstract class BaseWidgetClass extends Model({}) {
 
   WatermarkContent?: WatermarkContentComponent;
 
-  abstract get assetDefinition(): BaseAssetDefinition;
+  abstract get assetDefinition(): AnyAssetDefinition;
 
   getSelectedModelAssetsFileData() {
     return this.assetDefinition.getAssetsFileData(
