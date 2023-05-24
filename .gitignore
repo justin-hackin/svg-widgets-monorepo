@@ -7,5 +7,5 @@ packages/*/dist/**/*
 packages/*/.eslintcache
 packages/**/tsconfig.tsbuildinfo
 # temporary
-packages/*/docs-site/
+docs-site/
 .idea

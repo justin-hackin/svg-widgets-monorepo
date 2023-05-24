@@ -1,5 +1,0 @@
-{
-  "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["./src/common/PathData/index.ts"],
-  "out": "docs-site"
-}
