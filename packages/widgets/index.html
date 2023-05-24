@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body { background-color: #2c2c2c; }
+  </style>
+  <script>
+    // Solves remotedev issue causing: "https://github.com/SocketCluster/socketcluster-client/issues/118
+    window.global = window;
+  </script>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Polyhedz Studio</title>
+</head>
+<body>
+<div id="app"></div>
+<script src="src/index.tsx" type="module"></script>
+</body>
+</html>
