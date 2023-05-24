@@ -48,4 +48,4 @@ const dValue = commandArrayToPathD([
 ]);
 ```
 
-This is an alpha release. Tests and documentation to come. 
+⚠️ **WARNING**: this is an alpha release with no testing. Some mostly uncommented documentation available [here](https://justin-hackin.github.io/svg-widgets-monorepo/).
