@@ -6,7 +6,9 @@
     "doc": "docs-site"
   },
   "scripts": {
-    "prepare-husky": "husky install"
+    "prepare-husky": "husky install",
+    "build-docs": "typedoc",
+    "serve-docs": "npx serve ./docs-site"
   },
   "repository": {
     "type": "git",
@@ -23,7 +25,8 @@
   ],
   "devDependencies": {
     "husky": "^8.0.0",
-    "lerna": "^6.6.2"
+    "lerna": "^6.6.2",
+    "typedoc": "^0.24.7"
   },
   "husky": {
     "hooks": {
