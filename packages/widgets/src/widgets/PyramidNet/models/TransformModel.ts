@@ -1,6 +1,6 @@
 import { Model, model, prop } from 'mobx-keystone';
 import { computed } from 'mobx';
-import { RawPoint, convertTransformObjectToDOMMatrixReadOnly, PartialTransformObject } from '@/common/PathData';
+import { RawPoint, convertTransformObjectToDOMMatrixReadOnly, PartialTransformObject } from 'fluent-svg-path-ts';
 
 @model('TransformModel')
 export class TransformModel extends Model({

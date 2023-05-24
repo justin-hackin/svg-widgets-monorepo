@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import clsx from 'clsx';
 import { styled } from '@mui/styles';
-import { PathData, getDestinationPoints } from '@/common/PathData';
+import { PathData, getDestinationPoints } from 'fluent-svg-path-ts';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';

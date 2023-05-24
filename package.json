@@ -1,24 +1,23 @@
 {
-  "name": "polyhedz-studio",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "svg-widget-monorepo",
+  "version": "0.0.0",
+  "description": "A monorepo of SVG scripting libraries",
   "directories": {
-    "doc": "docs"
+    "doc": "docs-site"
   },
   "scripts": {
     "prepare-husky": "husky install"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/justin-hackin/polyhedz-studio.git"
+    "url": "git+https://github.com/justin-hackin/svg-widget-monorepo.git"
   },
-  "author": "",
+  "author": "Justin Barca <justinbarca@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/justin-hackin/polyhedz-studio/issues"
+    "url": "https://github.com/justin-hackin/svg-widget-monorepo/issues"
   },
-  "homepage": "https://github.com/justin-hackin/polyhedz-studio#readme",
+  "homepage": "https://github.com/justin-hackin/svg-widget-monorepo#readme",
   "workspaces": [
     "packages/*"
   ],

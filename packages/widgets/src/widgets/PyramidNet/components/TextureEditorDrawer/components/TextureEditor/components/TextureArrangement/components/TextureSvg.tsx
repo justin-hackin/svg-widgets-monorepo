@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { HookReturnType, UseDragConfig } from 'react-use-gesture/dist/types';
-import { RawPoint } from '@/common/PathData';
+import { RawPoint } from 'fluent-svg-path-ts';
 import { scalePoint } from '../../../../../../../../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';

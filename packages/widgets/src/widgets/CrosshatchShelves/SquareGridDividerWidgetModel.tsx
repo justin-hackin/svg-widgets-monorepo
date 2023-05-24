@@ -3,7 +3,7 @@ import React from 'react';
 import { computed } from 'mobx';
 import { range } from 'lodash-es';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { PathData } from '@/common/PathData';
+import { PathData } from 'fluent-svg-path-ts';
 import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
 import { radioProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';

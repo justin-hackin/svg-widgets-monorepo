@@ -17,7 +17,7 @@ import {
   getCurrentSegmentStart,
   getLastPosition,
   RawPoint, PartialTransformObject,
-} from '@/common/PathData';
+} from 'fluent-svg-path-ts';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {

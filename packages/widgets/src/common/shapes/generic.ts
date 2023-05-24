@@ -1,6 +1,6 @@
 import {
   PathData, getCurrentSegmentStart, getLastPosition, PointLike, RawPoint,
-} from '@/common/PathData';
+} from 'fluent-svg-path-ts';
 import {
   distanceBetweenPoints, hingedPlot,
 } from '../util/geom';

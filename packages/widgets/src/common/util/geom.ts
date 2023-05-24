@@ -1,7 +1,7 @@
 import Flatten from '@flatten-js/core';
 import { isNaN, range } from 'lodash-es';
 import offset from '@flatten-js/polygon-offset';
-import { PointLike, RawPoint, castCoordToRawPoint } from '@/common/PathData';
+import { PointLike, RawPoint, castCoordToRawPoint } from 'fluent-svg-path-ts';
 import { circularSlice } from './data';
 
 const {

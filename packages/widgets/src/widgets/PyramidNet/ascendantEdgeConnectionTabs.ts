@@ -1,7 +1,6 @@
 import { range } from 'lodash-es';
 import { Model, model, prop } from 'mobx-keystone';
-import { PathData } from '@/common/PathData';
-import type { RawPoint } from '@/common/PathData';
+import { PathData, RawPoint } from 'fluent-svg-path-ts';
 import {
   hingedPlot, lineLerp, symmetricHingePlotByProjectionDistance,
 } from '../../common/util/geom';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { SVGWrapper } from '@/common/components/SVGWrapper';
-import { RawPoint } from '@/common/PathData';
+import { RawPoint } from 'fluent-svg-path-ts';
 import { closedPolygonPath } from '../../../common/shapes/generic';
 import { pathDToViewBoxStr } from '../../../common/util/svg';
 

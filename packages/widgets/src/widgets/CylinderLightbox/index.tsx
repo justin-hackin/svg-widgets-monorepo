@@ -2,7 +2,7 @@ import { computed } from 'mobx';
 import React from 'react';
 import { ExtendedModel } from 'mobx-keystone';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { PathData, DestinationCommand } from '@/common/PathData';
+import { PathData, DestinationCommand } from 'fluent-svg-path-ts';
 import {
   angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
 } from '../../common/util/geom';

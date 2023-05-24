@@ -6,7 +6,7 @@ import { ExtendedModel } from 'mobx-keystone';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { assertNotNullish } from '@/common/util/assert';
-import { PathData } from '@/common/PathData';
+import { PathData } from 'fluent-svg-path-ts';
 import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../../common/util/units';
 import {

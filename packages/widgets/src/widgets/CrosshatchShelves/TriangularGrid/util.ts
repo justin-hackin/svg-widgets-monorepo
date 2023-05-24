@@ -1,5 +1,5 @@
 import Flatten from '@flatten-js/core';
-import { PathData } from '@/common/PathData';
+import { PathData } from 'fluent-svg-path-ts';
 
 const { point } = Flatten;
 

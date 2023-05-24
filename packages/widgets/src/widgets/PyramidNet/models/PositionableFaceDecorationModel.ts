@@ -5,7 +5,7 @@ import {
 
 import { computed, observable } from 'mobx';
 import { Dimensions } from '@/common/util/data';
-import { PathData, getDestinationPoints } from '@/common/PathData';
+import { PathData, getDestinationPoints } from 'fluent-svg-path-ts';
 import { getDimensionsFromPathD } from '../../../common/util/svg';
 import {
   calculateTransformOriginChangeOffset,
