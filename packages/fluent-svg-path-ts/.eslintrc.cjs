@@ -1,4 +1,4 @@
-const sharedTsRules = require('../eslint-config-custom/rules/sharedTsRules');
+const sharedTsRules = require('../eslint-config-custom-ts/rules/sharedTsRules');
 
 module.exports = {
     extends: ['eslint-config-custom'],
