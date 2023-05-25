@@ -1,14 +1,17 @@
-# Polyhedz Studio 
+# SVG widgets
 
-A web application for the fabrication of interlocking pyramid nets which form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer). The creation of Polyhedz Studio represents the (potential) fulfillment of a wish to share this art/craft with other makers. In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system  was a tedious task that made design iteration difficult. With Polyhedz Studio, cutout paths are generated based on algorithms in which every parameter is tweakable.  
+This web application used to go by the name Polyhedz Studio which is now deprecated in order to avoid confusion with SVG Widget Studio which will become a more general-purpose framework for creating parameterized exportable SVG with automated UI generation data models.
 
-Previously this app was a [desktop application](https://github.com/justin-hackin/polyhedz-studio/releases/latest) but it has since been ported to a [web application](https://polyhedz-studio.vercel.app). Note the default branch is `web` whereas the legacy Electron app exists on `master`. The code that is not specific to the particular designs (widgets) will serve as the foundation for a more general-purpose framework that will enable inventors/designers/makers to code their own design objects. This framework will be extracted from this repo which will serve as the repository for the widgets only.
+## Polyhedral Nets
+
+ Interlocking pyramid nets that form stellations and other geometric polyhedra. Flat panels become pyramids and pyramid collections are connected to become spherical star-like shapes. These shapes have been produced under the banner of [Playful Geometer](https://www.facebook.com/playful.geometer).  In the past, the dielines (cut/score vector paths) for these shapes were manually created with Inkscape. Modifying the tab system  was a tedious task that made design iteration difficult.  
+
+Previously this app was a [desktop application](https://github.com/justin-hackin/polyhedz-studio/releases/latest) but it has since been ported to a [web application](https://polyhedz-studio.vercel.app). Note the default branch is `web` whereas the legacy Electron app exists on `master`. 
 
 | ![polyhedral lantern sculpture with print face decoration](/packages/widgets/src/widgets/PyramidNet/static/widget-preview.png) | ![polyhedral lantern sculpture with cut holes face decoration](./docs/images/polyhedral-net-vector.png) |
 |----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 
 
-## App info
 
 This app consists of 2 main sections:
 
@@ -65,11 +68,9 @@ Interactively apply cut patterns or print textures to the faces of your shape an
 - Intelligent defaults for all files names (encodes shape name and texture file name)
 
 
-### Bonus Widgets
+This application was originally designed only for creating polyhedral nets, it has been extended to enable multiple design "widgets". 
 
-While this application was originally designed only for creating polyhedral nets, it has been extended to enable multiple design "widgets". 
-
-#### Cylinder Lightbox
+### Cylinder Lightbox
 <p alt="cylinder lightbox" align="center">
   <img width="160px" src="/packages/widgets/src/widgets/CylinderLightbox/widget-preview.png" />
 </p>
@@ -78,7 +79,7 @@ An open polygon prism box with ring-shaped sleeve edges. This allows one to effi
 
 This widget has a different UI configuration in the Assets accordion known as a "Disjunct Asset Definition" (as opposed to the "Registered Asset Definition" of the pyramid net). The different assets of the design can either be viewed all at once, or independently. This allows the user to see all changes to any widget parameter but also examine each component independently with less clicks than the per-asset visibility toggle. 
 
-#### Grid dividers
+### Grid dividers
 
 <p alt="crosshatch shelf" align="center">
   <img width="160px" src="/packages/widgets/src/widgets/CrosshatchShelves/previews/square-grid-divider.png" /><img width="160px" src="/packages/widgets/src/widgets/CrosshatchShelves/previews/diamond-grid-divider.png" /><img width="160px" src="/packages/widgets/src/widgets/CrosshatchShelves/previews/triangle-grid-divider.png" />
