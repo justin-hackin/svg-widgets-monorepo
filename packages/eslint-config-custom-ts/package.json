@@ -1,5 +1,5 @@
 {
-  "name": "eslint-config-custom",
+  "name": "eslint-config-custom-ts",
   "version": "1.0.0",
   "description": "Monorepo shared eslint config",
   "main": "index.js",

@@ -1,7 +1,7 @@
 const sharedTsRules = require('../eslint-config-custom-ts/rules/sharedTsRules');
 
 module.exports = {
-  extends: ['eslint-config-custom'],
+  extends: ['eslint-config-custom-ts'],
   settings: {
     'import/resolver': {
       typescript: {
