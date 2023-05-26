@@ -1,5 +1,5 @@
-import type { DocumentAreaProps } from '@/WidgetWorkspace/widget-types/types';
 import React, { FC, SVGProps } from 'react';
+import type { DocumentAreaProps } from '@/WidgetWorkspace/widget-types/types';
 import { namespacedElementFactory } from '../../util/svg';
 
 const svgNamespaceAttributes = {

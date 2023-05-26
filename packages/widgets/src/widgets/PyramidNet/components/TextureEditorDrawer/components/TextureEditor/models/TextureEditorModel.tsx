@@ -6,9 +6,9 @@ import {
 import {
   action, computed, makeObservable, observable,
 } from 'mobx';
+import { RawPoint } from 'fluent-svg-path-ts';
 import { Dimensions } from '@/common/util/data';
 import { assertNotNullish } from '@/common/util/assert';
-import { RawPoint } from 'fluent-svg-path-ts';
 import { BoundaryModel } from './BoundaryModel';
 import { ModifierTrackingModel } from './ModifierTrackingModel';
 import {

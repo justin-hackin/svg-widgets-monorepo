@@ -1,8 +1,8 @@
 import {
   Model, model, modelAction, prop,
 } from 'mobx-keystone';
-import { appendCurvedLineSegments } from '@/common/shapes/generic';
 import { PathData, RawPoint } from 'fluent-svg-path-ts';
+import { appendCurvedLineSegments } from '@/common/shapes/generic';
 import {
   distanceBetweenPoints,
   getLineLineIntersection,

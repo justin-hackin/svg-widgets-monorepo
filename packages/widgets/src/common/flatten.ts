@@ -26,4 +26,6 @@ export type FlattenCircle = Flatten.Circle;
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 type box = (xmin?: number, ymin?: number, xmax?: number, ymax?: number) => FlattenBox;
 
-export { Box, Point, Ray, Vector, Segment, point, circle, box, segment };
+export {
+  Box, Point, Ray, Vector, Segment, point, circle, box, segment,
+};

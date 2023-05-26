@@ -1,7 +1,7 @@
-import { pointsAreEqual } from '@/common/util/geom';
 import {
   DestinationCommand, getCurrentSegmentStart, getLastPosition, PathData,
 } from 'fluent-svg-path-ts';
+import { pointsAreEqual } from '@/common/util/geom';
 
 /**
  * often constructing complicated paths is simplified by defining

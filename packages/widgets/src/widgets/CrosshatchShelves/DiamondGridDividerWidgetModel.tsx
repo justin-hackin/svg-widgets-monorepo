@@ -1,11 +1,13 @@
 import { computed } from 'mobx';
 import React from 'react';
-import { FlattenPoint, point, segment, FlattenSegment } from '@/common/flatten';
 import { round } from 'lodash-es';
 import { ExtendedModel } from 'mobx-keystone';
+import { PathData } from 'fluent-svg-path-ts';
+import {
+  FlattenPoint, point, segment, FlattenSegment,
+} from '@/common/flatten';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { PathData } from 'fluent-svg-path-ts';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
@@ -16,7 +18,6 @@ import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
 import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from './previews/diamond-grid-divider.png';
-
 
 const reflectByWidth = (pt: FlattenPoint, width: number) => (point(width - pt.x, pt.y));
 
@@ -40,7 +41,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
       this.shelfHeight.value,
       this.cubbyWidth.value,
       this.materialThickness.value,
-    ).map(seg => augmentSegmentEndpoints(seg, this.matThicknessAdjust));
+    ).map((seg) => augmentSegmentEndpoints(seg, this.matThicknessAdjust));
   }
 
   @computed
@@ -58,7 +59,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
   get uniqueSegmentsInfo(): SegmentInfo[] {
     // could iterate over only half but this complicates case of centered crosshatch
     return this.positiveCrosshatchSegments
-      .map(segment => round(segment.length, 10))
+      .map((segment) => round(segment.length, 10))
       .reduce((acc, segLen, index) => {
         // could be more efficient, meh
         const lengthMatch = acc.find(({ length }) => length === segLen);

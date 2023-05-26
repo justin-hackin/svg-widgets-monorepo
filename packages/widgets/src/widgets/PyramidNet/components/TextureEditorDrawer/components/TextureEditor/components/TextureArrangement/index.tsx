@@ -3,8 +3,8 @@ import { useDrag, useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash-es';
 import { Paper } from '@mui/material';
 import { observer } from 'mobx-react';
-import { assertNotNullish } from '@/common/util/assert';
 import { castCoordToRawPoint } from 'fluent-svg-path-ts';
+import { assertNotNullish } from '@/common/util/assert';
 import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import {
   incrementTransformTracking,

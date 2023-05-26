@@ -3,10 +3,10 @@ import { computed } from 'mobx';
 import { flatten, range } from 'lodash-es';
 import Flatten from '@flatten-js/core';
 import { ExtendedModel } from 'mobx-keystone';
+import { PathData } from 'fluent-svg-path-ts';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { assertNotNullish } from '@/common/util/assert';
-import { PathData } from 'fluent-svg-path-ts';
 import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
 import { PIXELS_PER_INCH } from '../../../common/util/units';
 import {

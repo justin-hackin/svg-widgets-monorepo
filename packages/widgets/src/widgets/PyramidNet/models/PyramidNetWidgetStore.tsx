@@ -8,16 +8,16 @@ import {
 import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { appendContinuationPath } from '@/widgets/PyramidNet/path';
-import { assertNotNullish } from '@/common/util/assert';
 import {
   PathData, convertTransformObjectToDOMMatrixReadOnly,
   getCurrentSegmentStart,
   getLastPosition,
   RawPoint, PartialTransformObject,
 } from 'fluent-svg-path-ts';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
+import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
+import { appendContinuationPath } from '@/widgets/PyramidNet/path';
+import { assertNotNullish } from '@/common/util/assert';
 import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
