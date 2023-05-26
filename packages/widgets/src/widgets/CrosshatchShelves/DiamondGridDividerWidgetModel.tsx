@@ -1,6 +1,6 @@
 import { computed } from 'mobx';
 import React from 'react';
-import Flatten from '@flatten-js/core';
+import { FlattenPoint, point, segment, FlattenSegment } from '@/common/flatten';
 import { round } from 'lodash-es';
 import { ExtendedModel } from 'mobx-keystone';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
@@ -16,12 +16,9 @@ import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
 import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from './previews/diamond-grid-divider.png';
-import Point = Flatten.Point;
-import point = Flatten.point;
-import segment = Flatten.segment;
-import Segment = Flatten.Segment;
 
-const reflectByWidth = (pt: Point, width: number) => (point(width - pt.x, pt.y));
+
+const reflectByWidth = (pt: FlattenPoint, width: number) => (point(width - pt.x, pt.y));
 
 interface SegmentInfo {
   length: number,
@@ -43,7 +40,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
       this.shelfHeight.value,
       this.cubbyWidth.value,
       this.materialThickness.value,
-    ).map((seg) => augmentSegmentEndpoints(seg, this.matThicknessAdjust));
+    ).map(seg => augmentSegmentEndpoints(seg, this.matThicknessAdjust));
   }
 
   @computed
@@ -61,7 +58,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
   get uniqueSegmentsInfo(): SegmentInfo[] {
     // could iterate over only half but this complicates case of centered crosshatch
     return this.positiveCrosshatchSegments
-      .map((segment) => round(segment.length, 10))
+      .map(segment => round(segment.length, 10))
       .reduce((acc, segLen, index) => {
         // could be more efficient, meh
         const lengthMatch = acc.find(({ length }) => length === segLen);
@@ -83,7 +80,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
     return ((this.flushPostProcess.value ? 1 : -1) * (this.materialThickness.value / 2));
   }
 
-  getMirroredSegment(seg: Segment) {
+  getMirroredSegment(seg: FlattenSegment) {
     const mirrorStart = reflectByWidth(seg.ps, this.shelfWidth.value);
     const mirrorEnd = reflectByWidth(seg.pe, this.shelfWidth.value);
     return segment(mirrorStart, mirrorEnd);

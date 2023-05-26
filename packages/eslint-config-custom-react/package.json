@@ -1,7 +1,7 @@
 {
-  "name": "eslint-config-custom-ts",
+  "name": "eslint-config-custom-react",
   "version": "1.0.0",
-  "description": "Monorepo shared eslint config",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,15 +9,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@typescript-eslint/parser": "^5.59.7",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-config-airbnb-base": "^15.0.0"
+    "eslint-config-custom-ts": "*",
+    "eslint-config-airbnb": "^19.0.4"
   },
   "peerDependencies": {
-    "@typescript-eslint/eslint-plugin": ">= 5",
-    "eslint": ">= 8",
     "eslint-import-resolver-typescript": ">= 3",
     "eslint-plugin-import": ">= 2",
+    "@typescript-eslint/eslint-plugin": ">= 5",
+    "eslint": ">= 8",
+    "eslint-plugin-jsx-a11y": ">= 6",
+    "eslint-plugin-react": ">= 7",
     "typescript": ">= 4"
   }
 }
