@@ -24,24 +24,21 @@ import SaveIcon from '@mui/icons-material/Save';
 import PublishIcon from '@mui/icons-material/Publish';
 import FilePicker from '@mavedev/react-file-picker';
 import HelpIcon from '@mui/icons-material/Help';
-
 import { isNaN, isNumber } from 'lodash-es';
 import NumberFormat from 'react-number-format';
 import clsx from 'clsx';
 
 import { styled } from '@mui/styles';
+import { HistoryButtons, TweakableInput, useSelectedStore } from 'svg-widget-studio';
 import { SnapMenu } from './components/SnapMenu';
 import { resolveImageDimensionsFromBase64, toBase64 } from '../../../../../../../../common/util/data';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
-import { HistoryButtons } from '../../../../../HistoryButtons';
 import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../models/ImageFaceDecorationPatternModel';
-import { TweakableInput } from '../../../../../../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
 import { ShapeSelect } from '../../../../../ShapeSelect';
 import { PathFaceDecorationPatternModel } from '../../../../../../models/PathFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../../../../../../models/PositionableFaceDecorationModel';
-import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/rootStore';
 
 // @ts-ignore
 const NumberFormatDecimalDegrees = forwardRef(({ onChange, ...other }, ref) => (
@@ -127,8 +124,7 @@ const OpenTextureArrangementMenuItem = forwardRef<any, OpenTextureArrangementMen
 );
 
 export const TextureControls = observer(() => {
-  const workspaceStore = useWorkspaceMst();
-  const widgetModel = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const widgetModel = useSelectedStore<PyramidNetWidgetModel>();
   const { textureEditor, preferences, history } = widgetModel;
   const {
     faceDecoration,

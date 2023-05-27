@@ -4,19 +4,19 @@ import { round } from 'lodash-es';
 import { ExtendedModel } from 'mobx-keystone';
 import { PathData } from 'fluent-svg-path-ts';
 import {
-  FlattenPoint, point, segment, FlattenSegment,
-} from '@/common/flatten';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import {
+  BaseWidgetClass,
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
-} from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
+  getBoundingBoxAttrs,
+  switchProp,
+  widgetModel,
+} from 'svg-widget-studio';
+import {
+  FlattenPoint, FlattenSegment, point, segment,
+} from '@/common/flatten';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { augmentSegmentEndpoints, getPositiveSlopeSlatSegments, notchPanel } from './util';
-import { getBoundingBoxAttrs } from '../../common/util/svg';
-import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
-import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from './previews/diamond-grid-divider.png';
 
 const reflectByWidth = (pt: FlattenPoint, width: number) => (point(width - pt.x, pt.y));

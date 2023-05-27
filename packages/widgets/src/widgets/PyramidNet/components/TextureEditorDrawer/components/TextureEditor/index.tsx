@@ -2,8 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { styled, useTheme } from '@mui/styles';
 import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
-
-import { assertNotNullish } from '@/common/util/assert';
+import { assertNotNullish, FullPageDiv, useSelectedStore } from 'svg-widget-studio';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
@@ -14,12 +13,10 @@ import {
   StepWithNextAction,
   TOUR_STEPS,
 } from '../../../../../../common/util/tour';
-import { FullPageDiv } from '../../../../../../common/style/style';
 import { RawFaceDecorationModel } from '../../../../models/RawFaceDecorationModel';
 import type { PyramidNetWidgetModel } from '../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../models/ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from '../../../../models/PathFaceDecorationPatternModel';
-import { useWorkspaceMst } from '../../../../../../WidgetWorkspace/rootStore';
 
 const classes = { mainArea: 'main-area' };
 const TextureEditorRoot = styled(FullPageDiv)(({ theme }) => ({
@@ -37,7 +34,6 @@ const TextureEditorRoot = styled(FullPageDiv)(({ theme }) => ({
 }));
 
 export const TextureEditor = observer(() => {
-  const workspaceStore = useWorkspaceMst();
   const theme = useTheme();
   const [stepIndex, setStepIndex] = useState<number>(0);
   const incrementStepIndex = (index) => { setStepIndex(index + 1); };
@@ -45,7 +41,7 @@ export const TextureEditor = observer(() => {
 
   const mainAreaRef = useRef<HTMLDivElement>(null);
 
-  const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const pyramidNetPluginStore = useSelectedStore<PyramidNetWidgetModel>();
   const { preferences, textureEditor, history } = pyramidNetPluginStore;
   const { needsTour } = preferences;
   const { faceDecoration } = textureEditor;

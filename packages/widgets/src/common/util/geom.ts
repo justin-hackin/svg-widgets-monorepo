@@ -1,7 +1,7 @@
 import Flatten from '@flatten-js/core';
-import { isNaN, range } from 'lodash-es';
+import { range } from 'lodash-es';
 import offset from '@flatten-js/polygon-offset';
-import { PointLike, RawPoint, castCoordToRawPoint } from 'fluent-svg-path-ts';
+import { castCoordToRawPoint, PointLike, RawPoint } from 'fluent-svg-path-ts';
 import { circularSlice } from './data';
 
 const {
@@ -165,7 +165,6 @@ export function symmetricHingePlotByProjectionDistance(p1, p2, theta, distance) 
 export const distanceBetweenPoints = (pt1: PointLike, pt2: PointLike):number => distanceFromOrigin(
   subtractPoints(pt2, pt1),
 );
-export const isValidNumber = (num) => typeof num === 'number' && !isNaN(num);
 
 export const polygonWithFace = (faceVertices: PointLike[]) => {
   if (faceVertices.length < 3) {
@@ -187,3 +186,5 @@ export const offsetPolygonPoints = (points: RawPoint[], offsetDistance) => {
 };
 
 export const pointToTranslateString = (pt: RawPoint) => `translate(${pt.x}, ${pt.y})`;
+export const degToRad = (deg) => (deg * 2 * Math.PI) / 360;
+export const radToDeg = (rad) => (360 * rad) / (Math.PI * 2);

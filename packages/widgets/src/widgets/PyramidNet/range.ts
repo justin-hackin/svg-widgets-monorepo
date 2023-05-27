@@ -1,7 +1,7 @@
 import {
   cloneDeep, flatten, last, sortedIndex,
 } from 'lodash-es';
-import { assertNotNullish } from '@/common/util/assert';
+import { assertNotNullish } from 'svg-widget-studio';
 import { LerpRanges } from '@/common/shapes/strokeDashPath';
 
 const validateRange = (rangeSeries) => {

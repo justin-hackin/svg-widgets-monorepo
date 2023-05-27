@@ -5,12 +5,13 @@ import { startCase } from 'lodash-es';
 import {
   colorPickerProp,
   numberTextProp,
+  PIXELS_PER_CM,
+  PIXELS_PER_INCH,
   radioProp,
   sliderWithTextProp,
   switchProp,
-} from '../../../common/keystone-tweakables/props';
-import { PIXELS_PER_CM, PIXELS_PER_INCH } from '../../../common/util/units';
-import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
+} from 'svg-widget-studio';
+import { PRINT_REGISTRATION_TYPES } from '@/widgets/PyramidNet/types';
 
 @model('PyramidNetPreferencesModel')
 export class PyramidNetPreferencesModel extends Model({

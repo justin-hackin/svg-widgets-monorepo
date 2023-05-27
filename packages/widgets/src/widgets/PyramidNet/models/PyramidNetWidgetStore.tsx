@@ -9,16 +9,24 @@ import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
 import {
-  PathData, convertTransformObjectToDOMMatrixReadOnly,
+  convertTransformObjectToDOMMatrixReadOnly,
   getCurrentSegmentStart,
   getLastPosition,
-  RawPoint, PartialTransformObject,
+  PartialTransformObject,
+  PathData,
+  RawPoint,
 } from 'fluent-svg-path-ts';
+import {
+  BaseWidgetClass,
+  getBoundingBoxAttrs,
+  PIXELS_PER_CM,
+  RegisteredAssetsDefinition,
+  sliderWithTextProp,
+  widgetModel,
+} from 'svg-widget-studio';
+import { assertNotNullish } from 'svg-widget-studio/src/helpers/assert';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
 import { appendContinuationPath } from '@/widgets/PyramidNet/path';
-import { assertNotNullish } from '@/common/util/assert';
-import { getBoundingBoxAttrs } from '../../../common/util/svg';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
   TextureEditorModel,
@@ -30,7 +38,6 @@ import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
 import { PanelContent } from '../components/PanelContent';
 import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
-import { RegisteredAssetsDefinition } from '../../../WidgetWorkspace/widget-types/RegisteredAssetsDefinition';
 import { PyramidModel } from './PyramidModel';
 import {
   AscendantEdgeConnectionPaths,
@@ -38,14 +45,14 @@ import {
   AscendantEdgeTabsModel,
 } from '../ascendantEdgeConnectionTabs';
 import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../baseEdgeConnectionTab';
-import { sliderWithTextProp } from '../../../common/keystone-tweakables/props';
-import { degToRad, PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
 import { PositionableFaceDecorationModel } from './PositionableFaceDecorationModel';
 import {
+  degToRad,
   hingedPlot,
   hingedPlotByProjectionDistance,
   offsetPolygonPoints,
   polygonPointsGivenAnglesAndSides,
+  radToDeg,
   scalePoint,
   sumPoints,
   triangleAnglesGivenSides,
@@ -53,11 +60,10 @@ import {
 import { appendCurvedLineSegments, closedPolygonPath, roundedEdgePath } from '../../../common/shapes/generic';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
-import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { additionalFileMenuItemsFactory } from '../components/additionalFileMenuItemsFactory';
 import { FileInputs } from '../components/FileInputs';
-import { DEFAULT_SLIDER_STEP } from '../../../common/constants';
 import previewIcon from '../static/widget-preview.png';
+import { DEFAULT_SLIDER_STEP } from '@/common/constants';
 
 const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 

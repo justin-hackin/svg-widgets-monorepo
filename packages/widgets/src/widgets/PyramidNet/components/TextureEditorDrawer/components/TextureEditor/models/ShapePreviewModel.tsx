@@ -28,13 +28,12 @@ import {
 } from 'mobx';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
-import { assertNotNullish } from '@/common/util/assert';
+import { assertNotNullish, boundingBoxAttrsToViewBoxStr } from 'svg-widget-studio';
 import { TextureSvgUnobserved } from '../components/TextureArrangement/components/TextureSvg';
 import type { TextureEditorModel } from './TextureEditorModel';
 import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
 import { RawFaceDecorationModel } from '../../../../../models/RawFaceDecorationModel';
 import { PathFaceDecorationPatternModel } from '../../../../../models/PathFaceDecorationPatternModel';
-import { boundingBoxAttrsToViewBoxStr } from '../../../../../../../common/util/svg';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 

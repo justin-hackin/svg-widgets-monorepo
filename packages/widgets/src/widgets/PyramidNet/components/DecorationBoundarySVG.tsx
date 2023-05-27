@@ -1,8 +1,7 @@
 import React from 'react';
 import { RawPoint } from 'fluent-svg-path-ts';
-import { SVGWrapper } from '@/common/components/SVGWrapper';
+import { pathDToViewBoxStr, SVGWrapper } from 'svg-widget-studio';
 import { closedPolygonPath } from '../../../common/shapes/generic';
-import { pathDToViewBoxStr } from '../../../common/util/svg';
 
 export function DecorationBoundarySVG(
   { normalizedDecorationBoundaryPoints }: { normalizedDecorationBoundaryPoints: RawPoint[] },

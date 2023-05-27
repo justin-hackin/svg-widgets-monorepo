@@ -1,4 +1,4 @@
-import { WorkspaceModel } from './src/WidgetWorkspace/models/WorkspaceModel';
+import { WorkspaceModel } from 'svg-widget-studio';
 
 declare global {
   interface Window {

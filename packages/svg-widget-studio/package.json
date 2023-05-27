@@ -1,0 +1,54 @@
+{
+  "name": "svg-widget-studio",
+  "version": "1.0.0",
+  "description": "_A toolkit for the creation of parameterized 2D design objects._",
+  "main": "src/index.ts",
+  "scripts": {
+    "lint": "eslint . --ext js,ts,tsx",
+    "lint-fix": "eslint . --ext js,ts,tsx --fix",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gcd": "0.0.1",
+    "js-file-download": "^0.4.12",
+    "jszip": "^3.10.1",
+    "lodash-es": "^4.17.21",
+    "mobx-keystone-persist": "github:justin-hackin/mobx-keystone-persist#build",
+    "parse-fraction": "^1.2.1",
+    "react-color": "^2.18.1",
+    "react-reflex": "^4.1.0",
+    "react-resize-detector": "^4.2.3",
+    "react-svg-pan-zoom": "^3.10.0",
+    "svg-path-bbox": "^1.2.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.41.0",
+    "eslint-config-custom-react": "*",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.30.0"
+  },
+  "peerDependencies": {
+    "@mui/icons-material": ">= 5",
+    "@mui/material": ">= 5",
+    "@mui/styles": ">= 5",
+    "@emotion/styled": ">= 11",
+    "@emotion/react": ">= 11",
+    "mobx": ">= 6",
+    "mobx-keystone": ">= 1",
+    "mobx-react": ">= 7",
+    "react": ">= 17",
+    "react-dom": ">= 17"
+  },
+  "overrides": {
+    "react-resize-detector": {
+      "react": "^17",
+      "react-dom": "^17"
+    }
+  }
+}

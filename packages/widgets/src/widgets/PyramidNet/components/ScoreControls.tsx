@@ -1,14 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react';
+import { SimpleSwitch, TweakableChildrenInputs, useWorkspaceMst } from 'svg-widget-studio';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { SimpleSwitch } from '../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
-import { TweakableChildrenInputs }
-  from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 export const ScoreControls = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const selectedStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const selectedStore = workspaceStore.selectedStore as unknown as PyramidNetWidgetModel;
   const { useDottedStroke, interFaceScoreDashSpec, baseScoreDashSpec } = selectedStore;
 
   return (

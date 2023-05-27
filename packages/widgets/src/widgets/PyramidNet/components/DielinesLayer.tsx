@@ -1,19 +1,15 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
+import { boundingBoxMinPoint, expandBoundingBoxAttrs, toRectangleCoordinatesAttrs } from 'svg-widget-studio';
 import {
   lineLerp, matrixWithTransformOrigin, pointToTranslateString, scalePoint,
 } from '../../../common/util/geom';
-import {
-  boundingBoxMinPoint,
-  expandBoundingBoxAttrs,
-  registrationMarksPath,
-  toRectangleCoordinatesAttrs,
-} from '../../../common/util/svg';
+import { registrationMarksPath } from '../../../common/util/svg';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { PathFaceDecorationPatternModel } from '../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
+import { PRINT_REGISTRATION_TYPES } from '@/widgets/PyramidNet/types';
 
 function DielineGroup({ children }) {
   return (

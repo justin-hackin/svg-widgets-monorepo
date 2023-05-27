@@ -1,3 +1,5 @@
+import { Dimensions } from 'svg-widget-studio';
+
 export const circularSlice = <T>(array: T[], start: number, elements: number):T[] => {
   const slice: T[] = [];
   for (let i = 0; i < elements; i += 1) {
@@ -13,8 +15,6 @@ export const toBase64 = (file): Promise<string> => (new Promise((resolve, reject
   reader.onerror = (error) => reject(error);
 }));
 
-export interface Dimensions {width: number, height: number}
-
 export const resolveImageDimensionsFromBase64 = (base64): Promise<Dimensions> => (
   new Promise((resolve) => {
     const img = new Image();
@@ -24,9 +24,3 @@ export const resolveImageDimensionsFromBase64 = (base64): Promise<Dimensions> =>
     };
     img.src = base64;
   }));
-export const stringifier = (option) => (`${option}`);
-export const filePathConstructor = (
-  fileBaseName: string,
-  assetName: string | undefined,
-  copies: number | undefined,
-) => `${fileBaseName}${assetName ? `__${assetName}` : ''}${copies ? `__X${copies}` : ''}.svg`;

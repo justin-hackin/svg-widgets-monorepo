@@ -4,24 +4,19 @@ import { clamp } from 'lodash-es';
 import { Paper } from '@mui/material';
 import { observer } from 'mobx-react';
 import { castCoordToRawPoint } from 'fluent-svg-path-ts';
-import { assertNotNullish } from '@/common/util/assert';
+import { boundingBoxAttrsToViewBoxStr, useWorkspaceMst } from 'svg-widget-studio';
+import { assertNotNullish } from 'svg-widget-studio/src/helpers/assert';
 import type { PyramidNetWidgetModel } from '../../../../../../models/PyramidNetWidgetStore';
-import {
-  incrementTransformTracking,
-  TRANSFORM_METHODS,
-  TRANSFORM_OPERATIONS,
-} from '../../../../../../../../common/util/analytics';
+import { incrementTransformTracking, TRANSFORM_METHODS, TRANSFORM_OPERATIONS } from '../../../../../../analytics';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../common/util/tour';
 import { DRAG_MODES } from '../../models/ModifierTrackingModel';
-import { boundingBoxAttrsToViewBoxStr } from '../../../../../../../../common/util/svg';
 import { TextureSvg } from './components/TextureSvg';
 import { DragModeOptionsGroup } from './components/DragModeOptionGroup';
 import { RawFaceDecorationModel } from '../../../../../../models/RawFaceDecorationModel';
-import { useWorkspaceMst } from '../../../../../../../../WidgetWorkspace/rootStore';
 
 export const TextureArrangement = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const pyramidNetPluginStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const pyramidNetPluginStore = workspaceStore.selectedStore as unknown as PyramidNetWidgetModel;
   const { textureEditor } = pyramidNetPluginStore;
   const {
     faceDecoration,

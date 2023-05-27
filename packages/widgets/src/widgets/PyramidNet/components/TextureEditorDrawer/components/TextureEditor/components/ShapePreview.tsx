@@ -5,9 +5,9 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import { IconButton } from '@mui/material';
 import { styled } from '@mui/styles';
 import clsx from 'clsx';
+import { useWorkspaceMst } from 'svg-widget-studio';
 import type { PyramidNetWidgetModel } from '../../../../../models/PyramidNetWidgetStore';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../common/util/tour';
-import { useWorkspaceMst } from '../../../../../../../WidgetWorkspace/rootStore';
 
 const classes = {
   enterFullScreenButton: 'shape-preview__enter-full-screen-button',
@@ -27,7 +27,7 @@ export const ShapePreview = observer(() => {
   const handle = useFullScreenHandle();
   const workspaceStore = useWorkspaceMst();
 
-  const { textureEditor } = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const { textureEditor } = workspaceStore.selectedStore as unknown as PyramidNetWidgetModel;
 
   const threeContainerRef = useRef<HTMLDivElement>(null);
 

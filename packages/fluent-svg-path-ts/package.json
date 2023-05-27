@@ -41,6 +41,6 @@
   "dependencies": {
     "@thednp/dommatrix": "^2.0.4",
     "immer": "^10.0.2",
-    "svg-path-commander": "github:justin-hackin/svg-path-commander"
+    "svg-path-commander": "github:justin-hackin/svg-path-commander#built"
   }
 }

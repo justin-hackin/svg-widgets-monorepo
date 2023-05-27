@@ -1,14 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
+import { InvisibleTextFileInput, useSelectedStore } from 'svg-widget-studio';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { RawFaceDecorationModel } from '../models/RawFaceDecorationModel';
 import { extractCutHolesFromSvgString } from '../../../common/util/svg';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
-import { InvisibleTextFileInput } from '../../../common/InvisibleTextFileInput';
 
 export const FileInputs = observer(() => {
-  const workspaceStore = useWorkspaceMst();
-  const widgetStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const widgetStore = useSelectedStore<PyramidNetWidgetModel>();
   const { importFaceDialogActive } = widgetStore;
 
   const openWidgetInputRef = useRef<HTMLInputElement>(null);

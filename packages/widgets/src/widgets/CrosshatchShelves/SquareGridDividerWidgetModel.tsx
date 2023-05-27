@@ -3,13 +3,12 @@ import React from 'react';
 import { computed } from 'mobx';
 import { range } from 'lodash-es';
 import { PathData } from 'fluent-svg-path-ts';
+import {
+  BaseWidgetClass, DisjunctAssetsDefinition, radioProp, widgetModel,
+} from 'svg-widget-studio';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { radioProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
 import { centeredNotchPanel, getMarginLength } from './util';
-import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
-import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from './previews/square-grid-divider.png';
 
 const REMAINDER_SIZES: string[] = ['small', 'medium', 'large'];

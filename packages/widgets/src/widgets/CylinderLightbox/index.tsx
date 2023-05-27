@@ -1,20 +1,28 @@
 import { computed } from 'mobx';
 import React from 'react';
 import { ExtendedModel } from 'mobx-keystone';
-import { PathData, DestinationCommand } from 'fluent-svg-path-ts';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
+import { DestinationCommand, PathData } from 'fluent-svg-path-ts';
 import {
-  angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
+  BaseWidgetClass,
+  DisjunctAssetsDefinition,
+  pathDToViewBoxStr,
+  PIXELS_PER_CM,
+  sliderProp,
+  sliderWithTextProp,
+  widgetModel,
+} from 'svg-widget-studio';
+import {
+  angleRelativeToOrigin,
+  getOriginPoint,
+  lineLerp,
+  pointFromPolar,
+  radToDeg,
+  sumPoints,
 } from '../../common/util/geom';
 import { subtractDValues, unifyDValues } from '../../common/util/path-boolean';
-import { PIXELS_PER_CM, radToDeg } from '../../common/util/units';
-import { sliderProp, sliderWithTextProp } from '../../common/keystone-tweakables/props';
 import { appendCurvedLineSegments, closedPolygonPath } from '../../common/shapes/generic';
-import { pathDToViewBoxStr } from '../../common/util/svg';
-import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
-import { DEFAULT_SLIDER_STEP } from '../../common/constants';
 import widgetPreview from './widget-preview.png';
+import { DEFAULT_SLIDER_STEP } from '@/common/constants';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },

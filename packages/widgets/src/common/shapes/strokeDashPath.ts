@@ -7,11 +7,10 @@ import {
 
 import { computed } from 'mobx';
 import { PathData, PointLike } from 'fluent-svg-path-ts';
-import { assertNotNullish } from '@/common/util/assert';
+import { assertNotNullish, referenceSelectProp, sliderWithTextProp } from 'svg-widget-studio';
 import { distanceFromOrigin, lineLerp, subtractPoints } from '../util/geom';
-import { referenceSelectProp, sliderWithTextProp } from '../keystone-tweakables/props';
 import { ratioSliderProps } from '../../widgets/PyramidNet/constants';
-import { DEFAULT_SLIDER_STEP } from '../constants';
+import { DEFAULT_SLIDER_STEP } from '@/common/constants';
 
 const wrapRatio = (number) => (number > 1 ? number - Math.floor(number) : number);
 

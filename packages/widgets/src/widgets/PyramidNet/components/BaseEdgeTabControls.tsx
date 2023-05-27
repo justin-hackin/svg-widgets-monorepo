@@ -1,17 +1,13 @@
 import React from 'react';
 import { observer } from 'mobx-react';
+import { SimpleSwitch, TweakableChildrenInputs, useSelectedStore } from 'svg-widget-studio';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { BendGuideValleyModel } from '../baseEdgeConnectionTab';
-import { TweakableChildrenInputs }
-  from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
-import { SimpleSwitch } from '../../../common/keystone-tweakables/material-ui-controls/SimpleSwitch';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 export const BaseEdgeTabControls = observer(() => {
-  const workspaceStore = useWorkspaceMst();
   const {
     baseEdgeTabsSpec,
-  } = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  } = useSelectedStore<PyramidNetWidgetModel>();
 
   return (
     <>

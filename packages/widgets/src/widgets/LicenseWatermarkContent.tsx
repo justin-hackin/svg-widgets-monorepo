@@ -1,8 +1,6 @@
 import React from 'react';
-import { DocumentMetadata } from '@/WidgetWorkspace/DocumentMetadata';
-import { LicenseGroup } from '@/common/components/SVGWrapper/components/LicenseGroup';
-import { WatermarkContentComponent } from '@/common/components/SVGWrapper';
-import { castToViewBox } from '@/WidgetWorkspace/widget-types/types';
+import { castToViewBox, DocumentMetadata, WatermarkContentComponent } from 'svg-widget-studio';
+import { LicenseGroup } from '@/common/components/LicenseGroup';
 
 export const LicenseWatermarkContent: WatermarkContentComponent = ({ documentAreaProps }) => (
   <>

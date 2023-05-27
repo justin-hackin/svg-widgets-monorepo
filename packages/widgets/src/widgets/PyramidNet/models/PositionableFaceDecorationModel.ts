@@ -4,16 +4,15 @@ import {
 } from 'mobx-keystone';
 
 import { computed, observable } from 'mobx';
-import { PathData, getDestinationPoints } from 'fluent-svg-path-ts';
-import { Dimensions } from '@/common/util/data';
-import { getDimensionsFromPathD } from '../../../common/util/svg';
+import { getDestinationPoints, PathData } from 'fluent-svg-path-ts';
+import { Dimensions, getDimensionsFromPathD, getNearestHistoryFromAncestorNode } from 'svg-widget-studio';
 import {
   calculateTransformOriginChangeOffset,
   getOriginPoint,
-  getTextureTransformMatrix, scalePoint,
+  getTextureTransformMatrix,
+  scalePoint,
   sumPoints,
 } from '../../../common/util/geom';
-import { getNearestHistoryFromAncestorNode } from '../../../common/util/mobx-keystone';
 import { TransformModel } from './TransformModel';
 import { ImageFaceDecorationPatternModel } from './ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';

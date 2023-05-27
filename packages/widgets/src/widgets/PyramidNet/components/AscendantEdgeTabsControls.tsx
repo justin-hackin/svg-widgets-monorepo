@@ -1,13 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react';
+import { TweakableChildrenInputs, useSelectedStore } from 'svg-widget-studio';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { TweakableChildrenInputs }
-  from '../../../common/keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 export const AscendantEdgeTabsControls = observer(() => {
-  const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const store = useSelectedStore<PyramidNetWidgetModel>();
   return (
     <TweakableChildrenInputs parentNode={store.ascendantEdgeTabsSpec} />
   );

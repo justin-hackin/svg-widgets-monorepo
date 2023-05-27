@@ -4,20 +4,22 @@ import { flatten, range } from 'lodash-es';
 import Flatten from '@flatten-js/core';
 import { ExtendedModel } from 'mobx-keystone';
 import { PathData } from 'fluent-svg-path-ts';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { assertNotNullish } from '@/common/util/assert';
-import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
-import { PIXELS_PER_INCH } from '../../../common/util/units';
 import {
+  assertNotNullish,
+  BaseWidgetClass,
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
-} from '../../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { pathDToViewBoxStr } from '../../../common/util/svg';
+  numberTextProp,
+  pathDToViewBoxStr,
+  PIXELS_PER_INCH,
+  sliderWithTextProp,
+  switchProp,
+  widgetModel,
+} from 'svg-widget-studio';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { closedPolygonPath } from '../../../common/shapes/generic';
 import { TRI_NOTCH_LEVEL, triNotchPanel } from './util';
 import { augmentSegmentEndpoints } from '../util';
-import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from '../previews/triangle-grid-divider.png';
 import point = Flatten.point;
 import segment = Flatten.segment;

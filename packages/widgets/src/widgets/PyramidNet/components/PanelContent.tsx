@@ -4,13 +4,12 @@ import { Paper, Tab, Tabs } from '@mui/material';
 import { observer } from 'mobx-react';
 
 import { styled } from '@mui/styles';
+import { TweakableInput, useSelectedStore } from 'svg-widget-studio';
 import { ScoreControls } from '@/widgets/PyramidNet/components/ScoreControls';
 import { BaseEdgeTabControls } from './BaseEdgeTabControls';
 import { AscendantEdgeTabsControls } from './AscendantEdgeTabsControls';
 import { ShapeSelect } from './ShapeSelect';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { TweakableInput } from '../../../common/keystone-tweakables/material-ui-controls/TweakableInput';
-import { useWorkspaceMst } from '../../../WidgetWorkspace/rootStore';
 
 const controlsTabs = [
   {
@@ -51,8 +50,7 @@ const ShapeSection = styled('div')(({ theme }) => ({
 }));
 
 export const PanelContent = observer(() => {
-  const workspaceStore = useWorkspaceMst();
-  const store = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const store = useSelectedStore<PyramidNetWidgetModel>();
   if (!store) { return null; }
   const { pyramid, shapeHeight } = store;
 
