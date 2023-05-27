@@ -12,7 +12,7 @@ import {
 } from './helpers';
 import { validatePushCommand } from './validation';
 import { reversePathRecipe, transformByMatrixProducer, transformByObjectProducer } from './producers';
-import { castCoordToRawPoint } from './geom';
+import { castCoordToRawPoint, getBoundingBoxAttrs } from './geom';
 
 export class PathData {
   private _commands: ImmutableCommandArray = [];
@@ -96,7 +96,7 @@ export class PathData {
       throw new Error('could not resolve last position');
     }
     const toRaw = castCoordToRawPoint(to);
-    const cubics = SVGPathCommander.arcToCubic(
+    const cubics: number[] = SVGPathCommander.arcToCubic(
       lastPos.x,
       lastPos.y,
       radiusX,
@@ -157,5 +157,9 @@ export class PathData {
 
   getD():string {
     return commandArrayToPathD(this._commands);
+  }
+
+  getBoundingBox() {
+    return getBoundingBoxAttrs(this.getD());
   }
 }

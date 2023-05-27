@@ -10,6 +10,7 @@ import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
 import {
   convertTransformObjectToDOMMatrixReadOnly,
+  getBoundingBoxAttrs,
   getCurrentSegmentStart,
   getLastPosition,
   PartialTransformObject,
@@ -18,7 +19,6 @@ import {
 } from 'fluent-svg-path-ts';
 import {
   BaseWidgetClass,
-  getBoundingBoxAttrs,
   PIXELS_PER_CM,
   RegisteredAssetsDefinition,
   sliderWithTextProp,

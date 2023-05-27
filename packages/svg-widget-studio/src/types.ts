@@ -24,15 +24,6 @@ export type AnyAssetDefinition = DisjunctAssetsDefinition | RegisteredAssetsDefi
 export type WatermarkContentComponent = FC<{ documentAreaProps: DocumentAreaProps }>;
 export type DocumentAreaPropertyNames = 'width' | 'height' | 'viewBox';
 
-export interface BoundingBoxAttrs {
-  xmin: number
-  ymin: number
-  xmax: number
-  ymax: number
-  width: number
-  height: number
-}
-
 export interface TxtFileInfo {
   fileString: string,
   filePath: string,

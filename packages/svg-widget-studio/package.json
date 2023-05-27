@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "fluent-svg-path-ts": "*",
     "gcd": "0.0.1",
     "js-file-download": "^0.4.12",
     "jszip": "^3.10.1",
@@ -22,7 +23,6 @@
     "react-reflex": "^4.1.0",
     "react-resize-detector": "^9.1.0",
     "react-svg-pan-zoom": "^3.10.0",
-    "svg-path-bbox": "^1.2.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

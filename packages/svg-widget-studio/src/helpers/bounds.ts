@@ -1,10 +1,6 @@
-import svgPathBbox from 'svg-path-bbox';
+import { BoundingBoxAttrs, getBoundingBoxAttrs } from 'fluent-svg-path-ts';
 import {
-  BoundingBoxAttrs,
-  Dimensions,
-  DocumentAreaProps,
-  documentAreaPropsAreViewBoxProps,
-  ViewBoxProps,
+  Dimensions, DocumentAreaProps, documentAreaPropsAreViewBoxProps, ViewBoxProps,
 } from '../types';
 
 export const boundingBoxOfBoundingBoxes = (bbs: BoundingBoxAttrs[]): BoundingBoxAttrs => {
@@ -29,24 +25,7 @@ export const boundingBoxOfBoundingBoxes = (bbs: BoundingBoxAttrs[]): BoundingBox
 };
 export const castToViewBox = (dap: DocumentAreaProps) => (documentAreaPropsAreViewBoxProps(dap)
   ? dap.viewBox : `0 0 ${dap.width} ${dap.height}`);
-export const getDimensionsFromPathD = (d): Dimensions => {
-  const [xmin, ymin, xmax, ymax] = svgPathBbox(d);
-  return {
-    width: xmax - xmin,
-    height: ymax - ymin,
-  };
-};
-export const getBoundingBoxAttrs = (pathD: string): BoundingBoxAttrs => {
-  const [xmin, ymin, xmax, ymax] = svgPathBbox(pathD);
-  return {
-    xmin,
-    ymin,
-    xmax,
-    ymax,
-    width: xmax - xmin,
-    height: ymax - ymin,
-  };
-};
+
 export const toRectangleCoordinatesAttrs = (bb: BoundingBoxAttrs) => ({
   width: bb.width,
   height: bb.height,

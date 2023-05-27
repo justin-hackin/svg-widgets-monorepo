@@ -2,12 +2,11 @@ import { computed } from 'mobx';
 import React from 'react';
 import { round } from 'lodash-es';
 import { ExtendedModel } from 'mobx-keystone';
-import { PathData } from 'fluent-svg-path-ts';
+import { getBoundingBoxAttrs, PathData } from 'fluent-svg-path-ts';
 import {
   BaseWidgetClass,
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
-  getBoundingBoxAttrs,
   switchProp,
   widgetModel,
 } from 'svg-widget-studio';

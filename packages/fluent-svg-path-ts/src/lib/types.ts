@@ -78,3 +78,12 @@ export type OnlyToParamCommand = LineCommand | MoveCommand | SymmetricQuadraticB
 export type ImmutableCommandArray = ReadonlyArray<Command>;
 
 export type PartialTransformObject = Partial<TransformObject>;
+
+export interface BoundingBoxAttrs {
+  xmin: number
+  ymin: number
+  xmax: number
+  ymax: number
+  width: number
+  height: number
+}

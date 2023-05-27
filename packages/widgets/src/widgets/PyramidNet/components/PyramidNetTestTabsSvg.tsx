@@ -1,5 +1,5 @@
 import React from 'react';
-import { getBoundingBoxAttrs } from 'svg-widget-studio';
+import { getBoundingBoxAttrs } from 'fluent-svg-path-ts';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 
 export function PyramidNetTestTabs({ widgetStore }: { widgetStore: PyramidNetWidgetModel }) {

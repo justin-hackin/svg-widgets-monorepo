@@ -1,5 +1,5 @@
-import { PathData } from 'fluent-svg-path-ts';
-import { BoundingBoxAttrs, boundingBoxMinPoint, viewBoxMaxPoint } from 'svg-widget-studio';
+import { BoundingBoxAttrs, PathData } from 'fluent-svg-path-ts';
+import { boundingBoxMinPoint, viewBoxMaxPoint } from 'svg-widget-studio';
 
 const parseString = (str) => {
   const parser = new window.DOMParser();
