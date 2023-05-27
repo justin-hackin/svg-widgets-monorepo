@@ -8,6 +8,7 @@ import { WidgetDesignAreaToolbar } from './components/WidgetDesignAreaToolbar';
 import { ResizableZoomPan } from '../ResizableZoomPan/index';
 import { GridPattern } from '../ResizableZoomPan/components/GridPattern';
 import { useWorkspaceMst } from '../../rootStore';
+import { FullPageDiv } from '../../../../style';
 
 export const WidgetDesignArea = observer(({
   showOrientationToggle,
@@ -45,7 +46,7 @@ export const WidgetDesignArea = observer(({
   }
 
   return (
-    <>
+    <FullPageDiv>
       <WidgetDesignAreaToolbar orientation={orientation} showOrientationToggle={showOrientationToggle} />
       <ResizableZoomPan SVGBackground="url(#grid-pattern)">
         <svg {...svgProps}>
@@ -53,6 +54,6 @@ export const WidgetDesignArea = observer(({
           {innerContent}
         </svg>
       </ResizableZoomPan>
-    </>
+    </FullPageDiv>
   );
 });

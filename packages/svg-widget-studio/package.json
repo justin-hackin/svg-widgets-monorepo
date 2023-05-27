@@ -20,7 +20,7 @@
     "parse-fraction": "^1.2.1",
     "react-color": "^2.18.1",
     "react-reflex": "^4.1.0",
-    "react-resize-detector": "^4.2.3",
+    "react-resize-detector": "^9.1.0",
     "react-svg-pan-zoom": "^3.10.0",
     "svg-path-bbox": "^1.2.4",
     "uuid": "^9.0.0"
@@ -34,11 +34,11 @@
     "eslint-plugin-react": "^7.30.0"
   },
   "peerDependencies": {
+    "@emotion/react": ">= 11",
+    "@emotion/styled": ">= 11",
     "@mui/icons-material": ">= 5",
     "@mui/material": ">= 5",
     "@mui/styles": ">= 5",
-    "@emotion/styled": ">= 11",
-    "@emotion/react": ">= 11",
     "mobx": ">= 6",
     "mobx-keystone": ">= 1",
     "mobx-react": ">= 7",

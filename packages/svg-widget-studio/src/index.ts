@@ -27,3 +27,4 @@ export * from './components/WidgetWorkspace/widget-types/RegisteredAssetsDefinit
 export * from './components/WidgetWorkspace/widget-types/SolitaryAssetDefinition';
 export { widgetModel } from './components/WidgetWorkspace/models/WorkspaceModel';
 export { InvisibleTextFileInput } from './components/InvisibleTextFileInput';
+export { isValidNumber } from './helpers/number';
