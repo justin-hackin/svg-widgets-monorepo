@@ -2,7 +2,7 @@ import { StyledEngineProvider, Theme, ThemeProvider } from '@mui/material/styles
 import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { observer } from 'mobx-react';
-import { useWorkspaceMst, WorkspaceStoreProvider } from './WidgetWorkspace/rootStore';
+import { useWorkspaceMst, WorkspaceStoreProvider } from '../rootStore';
 import { theme } from '../style';
 
 declare module '@mui/styles/defaultTheme' {

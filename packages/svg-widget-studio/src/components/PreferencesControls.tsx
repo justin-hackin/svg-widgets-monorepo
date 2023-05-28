@@ -1,8 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
-import { useWorkspaceMst } from './WidgetWorkspace/rootStore';
-import { TweakableChildrenInputs } from '../keystone-tweakables/material-ui-controls/TweakableChildrenInputs';
+import { useWorkspaceMst } from '../rootStore';
+import { TweakableChildrenInputs } from '../inputs/TweakableChildrenInputs';
 
 export const PreferencesControls = observer(() => {
   const workspaceStore = useWorkspaceMst();

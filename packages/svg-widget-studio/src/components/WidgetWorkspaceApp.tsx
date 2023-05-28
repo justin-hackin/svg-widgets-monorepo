@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React from 'react';
-import { useWorkspaceMst } from './WidgetWorkspace/rootStore';
-import { WidgetWorkspace } from './WidgetWorkspace/index';
+import { useWorkspaceMst } from '../rootStore';
+import { WidgetWorkspace } from './WidgetWorkspace';
 import { WidgetWorkspaceProvider } from './WidgetWorkspaceProvider';
 
 const AllRoutes = observer(() => {

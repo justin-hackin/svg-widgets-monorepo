@@ -1,4 +1,5 @@
 import { createContext } from 'mobx-keystone';
-import type { AnyMetadata } from '../keystone-tweakables/types';
+
+import { AnyMetadata } from '../types';
 
 export const propertyMetadataCtx = createContext<AnyMetadata>();
