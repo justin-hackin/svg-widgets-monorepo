@@ -5,6 +5,10 @@
   "directories": {
     "doc": "docs-site"
   },
+  "engines": {
+    "node": ">=v16.20.0",
+    "npm": ">=8.19.3"
+  },
   "scripts": {
     "prepare-husky": "husky install",
     "build-docs": "typedoc",
