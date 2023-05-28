@@ -34,7 +34,6 @@
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.30.0",
-    "http-server": "^13.0.2",
     "lint-staged": "11.1.2",
     "remotedev": "^0.2.9",
     "serve": "^14.2.0",
