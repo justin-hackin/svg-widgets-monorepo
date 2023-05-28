@@ -1,6 +1,9 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["./packages/fluent-svg-path-ts"],
+  "entryPoints": [
+    "./packages/fluent-svg-path-ts",
+    "./packages/svg-widget-studio"
+  ],
   "out": "docs-site",
   "entryPointStrategy": "packages"
 }
