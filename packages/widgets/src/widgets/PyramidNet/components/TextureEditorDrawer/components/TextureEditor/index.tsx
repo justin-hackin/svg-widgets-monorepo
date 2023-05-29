@@ -1,8 +1,9 @@
 import { observer } from 'mobx-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled, useTheme } from '@mui/styles';
 import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
 import { assertNotNullish, FullPageDiv, useSelectedStore } from 'svg-widget-studio';
+import { useResizeDetector } from 'react-resize-detector';
 import { TextureControls } from './components/TextureControls';
 import { TextureArrangement } from './components/TextureArrangement';
 import { ShapePreview } from './components/ShapePreview';
@@ -39,39 +40,26 @@ export const TextureEditor = observer(() => {
   const incrementStepIndex = (index) => { setStepIndex(index + 1); };
   const resetStepIndex = () => { setStepIndex(0); };
 
-  const mainAreaRef = useRef<HTMLDivElement>(null);
-
   const pyramidNetPluginStore = useSelectedStore<PyramidNetWidgetModel>();
   const { preferences, textureEditor, history } = pyramidNetPluginStore;
-  const { needsTour } = preferences;
-  const { faceDecoration } = textureEditor;
+  const { needsTour } = preferences ?? {};
+  const { faceDecoration } = textureEditor ?? {};
+
+  const { width, height, ref } = useResizeDetector();
+  useEffect(() => {
+    if (width && height) {
+      textureEditor.setPlacementAreaDimensions({
+        width: width / 2,
+        height,
+      });
+    }
+  }, [width, height]);
+
   // assigned in onInit
   assertNotNullish(history);
   // ==================================================================================================================
   useTheme();
   // Init
-  useEffect(() => {
-    const resizeHandler = () => {
-      if (!mainAreaRef.current) {
-        return;
-      }
-      const {
-        width,
-        height,
-      } = mainAreaRef.current.getBoundingClientRect();
-      textureEditor.setPlacementAreaDimensions({
-        width: width / 2,
-        height,
-      });
-    };
-
-    window.addEventListener('resize', resizeHandler);
-    resizeHandler();
-
-    return () => {
-      window.removeEventListener('resize', resizeHandler);
-    };
-  }, []);
 
   if (!pyramidNetPluginStore?.textureEditor || faceDecoration instanceof RawFaceDecorationModel) {
     return null;
@@ -96,7 +84,7 @@ export const TextureEditor = observer(() => {
         textureEditor.setTextureFromPattern(new ImageFaceDecorationPatternModel(SAMPLE_IMAGE_SNAPSHOT));
         setTimeout(() => {
           incrementStepIndex(index);
-        }, 500);
+        }, 400);
       } else {
         incrementStepIndex(index);
       }
@@ -130,7 +118,7 @@ export const TextureEditor = observer(() => {
       />
       )}
       <TextureControls />
-      <div ref={mainAreaRef} className={classes.mainArea}>
+      <div ref={ref} className={classes.mainArea}>
         <TextureArrangement />
         <ShapePreview />
       </div>
