@@ -4,7 +4,7 @@ import {
 import { startCase } from 'lodash-es';
 import React from 'react';
 import { styled } from '@mui/styles';
-import { useLocation, useRoute } from 'wouter';
+import { useLocation } from 'wouter';
 import { useWorkspaceMst } from '../rootStore';
 
 import { widgetNameToIconMap, widgetNameToWidgetClassMap } from '../internal/data';
@@ -31,8 +31,8 @@ export const WidgetSelectionDialog = () => {
     selectedStore,
     selectedWidgetModelType,
   } = workspaceStore;
-  const [isNewRoute] = useRoute('/new');
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  const isNewRoute = location === '/new';
   return (
     <DialogStyled
       disableEscapeKeyDown={!selectedStore}

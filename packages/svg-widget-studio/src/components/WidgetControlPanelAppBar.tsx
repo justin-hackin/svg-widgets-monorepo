@@ -10,6 +10,7 @@ import FlareIcon from '@mui/icons-material/Flare';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { Download } from '@mui/icons-material';
 import SettingsIcon from '@mui/icons-material/Settings';
+
 import { useLocation } from 'wouter';
 import { useWorkspaceMst } from '../rootStore';
 import { AdditionalFileMenuItems } from './AdditionalFileMenuItems';
@@ -46,7 +47,7 @@ export const WidgetControlPanelAppBar = observer(() => {
   };
 
   const newHandler = () => {
-    navigate('/widgets/new');
+    navigate('/new');
     resetFileMenuRef();
   };
 

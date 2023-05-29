@@ -2,8 +2,8 @@ import { StyledEngineProvider, Theme, ThemeProvider } from '@mui/material/styles
 import React, { useEffect } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { observer } from 'mobx-react';
-import { useLocation } from 'wouter';
-import { useWorkspaceMst, WorkspaceStoreProvider } from '../rootStore';
+import { Router, RouterProps, useLocation } from 'wouter';
+import { useWorkspaceMst, workspaceStore, WorkspaceStoreProvider } from '../rootStore';
 import { theme } from '../style';
 import { widgetNameToWidgetClassMap } from '../internal/data';
 
@@ -12,9 +12,9 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-const WithStoreWrapper = observer(({ children }) => {
-  const workspaceStore = useWorkspaceMst();
-  const darkModeEnabled = workspaceStore.preferences.darkModeEnabled.value;
+type ProviderProps = { baseRoute?: string, children: RouterProps['children'] };
+
+const HasRouterWrapper = ({ children }) => {
   const [location, navigate] = useLocation();
 
   useEffect(() => {
@@ -29,23 +29,35 @@ const WithStoreWrapper = observer(({ children }) => {
       navigate('/new');
     }
   }, []);
+  return children;
+};
+
+const HasStoreWrapper = observer((
+  { children, baseRoute }: ProviderProps,
+) => {
+  const workspaceStore = useWorkspaceMst();
+  const darkModeEnabled = workspaceStore.preferences.darkModeEnabled.value;
 
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme(darkModeEnabled)}>
         <CssBaseline />
-        {children}
+        <Router base={baseRoute || ''}>
+          <HasRouterWrapper>
+            {children}
+          </HasRouterWrapper>
+        </Router>
       </ThemeProvider>
     </StyledEngineProvider>
   );
 });
 
-export function WidgetWorkspaceProvider({ children }) {
+export function WidgetWorkspaceProvider({ children, baseRoute }: ProviderProps) {
   return (
     <WorkspaceStoreProvider>
-      <WithStoreWrapper>
+      <HasStoreWrapper baseRoute={baseRoute}>
         {children}
-      </WithStoreWrapper>
+      </HasStoreWrapper>
     </WorkspaceStoreProvider>
   );
 }
