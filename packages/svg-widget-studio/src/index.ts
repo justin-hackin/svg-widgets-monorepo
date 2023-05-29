@@ -26,7 +26,6 @@ export * from './components/WidgetWorkspaceApp';
 export * from './classes/DisjunctAssetsDefinition';
 export * from './classes/RegisteredAssetsDefinition';
 export * from './classes/SolitaryAssetDefinition';
-export { widgetModel } from './models/WorkspaceModel';
 export { InvisibleTextFileInput } from './components/InvisibleTextFileInput';
 export { isValidNumber } from './helpers/number';
 export { INPUT_TYPE } from './internal/constants';

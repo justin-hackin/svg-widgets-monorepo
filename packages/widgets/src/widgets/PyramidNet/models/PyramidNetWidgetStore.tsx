@@ -1,7 +1,7 @@
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
-import { ExtendedModel, modelAction, prop } from 'mobx-keystone';
+import { modelAction, prop } from 'mobx-keystone';
 import {
   action, computed, observable, reaction,
 } from 'mobx';
@@ -18,10 +18,10 @@ import {
   RawPoint,
 } from 'fluent-svg-path-ts';
 import {
-  BaseWidgetClass,
   PIXELS_PER_CM,
   RegisteredAssetsDefinition,
   sliderWithTextProp,
+  WidgetModel,
   widgetModel,
 } from 'svg-widget-studio';
 import { assertNotNullish } from 'svg-widget-studio/src/helpers/assert';
@@ -87,7 +87,7 @@ const applyFlap = (
 export const POLYHEDRAL_NET_MODEL_TYPE = 'PolyhedralNet';
 
 @widgetModel(POLYHEDRAL_NET_MODEL_TYPE, previewIcon)
-export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class PyramidNetWidgetModel extends WidgetModel({
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),
   baseEdgeTabsSpec: prop<BaseEdgeTabsModel>(() => (new BaseEdgeTabsModel({}))),

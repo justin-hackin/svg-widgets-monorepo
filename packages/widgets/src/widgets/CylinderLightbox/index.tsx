@@ -1,14 +1,12 @@
 import { computed } from 'mobx';
 import React from 'react';
-import { ExtendedModel } from 'mobx-keystone';
 import { DestinationCommand, PathData } from 'fluent-svg-path-ts';
 import {
-  BaseWidgetClass,
   DisjunctAssetsDefinition,
   pathDToViewBoxStr,
   PIXELS_PER_CM,
   sliderProp,
-  sliderWithTextProp,
+  sliderWithTextProp, WidgetModel,
   widgetModel,
 } from 'svg-widget-studio';
 import {
@@ -36,7 +34,7 @@ const rectanglePathCenteredOnOrigin = (width: number, height:number) => closedPo
 const polygonSideLength = (numSides: number, inRadius: number) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
 @widgetModel('CylinderLightbox', widgetPreview)
-export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class CylinderLightboxWidgetModel extends WidgetModel({
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,
   }),

@@ -3,15 +3,7 @@ import {
   action, computed, observable, reaction,
 } from 'mobx';
 import {
-  applySnapshot,
-  detach,
-  getSnapshot,
-  model,
-  Model,
-  modelAction,
-  ModelClass,
-  prop,
-  SnapshotInOfModel,
+  applySnapshot, detach, getSnapshot, model, Model, modelAction, prop, SnapshotInOfModel,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash-es';
@@ -24,7 +16,7 @@ import { radioProp, switchProp } from '../props';
 import { assertNotNullish } from '../helpers/assert';
 import { UNITS } from '../helpers/units';
 import { ZoomPanView } from './ZoomPanView';
-import { widgetClassToWidgetNameMap, widgetNameToIconMap, widgetNameToWidgetClassMap } from '../internal/data';
+import { widgetNameToWidgetClassMap } from '../internal/data';
 
 type WidgetJSON = {
   widget: {
@@ -53,16 +45,6 @@ class WorkspacePreferencesModel extends Model({
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 const ZOOM_PAN_LOCALSTORE_NAME = 'ZoomPanView';
 const SELECTED_STORE_LOCALSTORE_NAME = 'SvgWidgetStudio/selectedStore';
-
-export function widgetModel(modelName: string, previewIcon: string) {
-  return function <C extends ModelClass<BaseWidgetClass>>(constructor: C): C {
-    const decoratedClass = model(`SvgWidgetStudio/widgets/${modelName}`)(constructor);
-    widgetNameToWidgetClassMap.set(modelName, decoratedClass);
-    widgetClassToWidgetNameMap.set(decoratedClass, modelName);
-    widgetNameToIconMap.set(modelName, previewIcon);
-    return decoratedClass;
-  };
-}
 
 @model('SvgWidgetStudio/WorkspaceModel')
 export class WorkspaceModel extends Model({

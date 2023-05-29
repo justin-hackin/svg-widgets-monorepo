@@ -1,10 +1,9 @@
-import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
 import { range } from 'lodash-es';
 import { PathData } from 'fluent-svg-path-ts';
 import {
-  BaseWidgetClass, DisjunctAssetsDefinition, radioProp, widgetModel,
+  DisjunctAssetsDefinition, radioProp, WidgetModel, widgetModel,
 } from 'svg-widget-studio';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
@@ -16,7 +15,7 @@ const cubbiesDecrementOptions = range(0, REMAINDER_SIZES.length);
 const optionLabelMap = (opt) => REMAINDER_SIZES[opt];
 
 @widgetModel('SquareGridDivider', widgetPreview)
-export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class SquareGridDividerWidgetModel extends WidgetModel({
   ...dividerBaseModelProps,
   widthCubbiesDecrement: radioProp(0, {
     labelOverride: 'Left/right section size',

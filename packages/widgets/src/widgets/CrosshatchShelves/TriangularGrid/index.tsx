@@ -2,18 +2,16 @@ import React from 'react';
 import { computed } from 'mobx';
 import { flatten, range } from 'lodash-es';
 import Flatten from '@flatten-js/core';
-import { ExtendedModel } from 'mobx-keystone';
 import { PathData } from 'fluent-svg-path-ts';
 import {
   assertNotNullish,
-  BaseWidgetClass,
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
   numberTextProp,
   pathDToViewBoxStr,
   PIXELS_PER_INCH,
   sliderWithTextProp,
-  switchProp,
+  switchProp, WidgetModel,
   widgetModel,
 } from 'svg-widget-studio';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
@@ -53,7 +51,7 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
 const POLYGON_SIDES = 6;
 
 @widgetModel('TriangleGridDivider', widgetPreview)
-export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class TriangularGridWidgetModel extends WidgetModel({
   hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,
   }),

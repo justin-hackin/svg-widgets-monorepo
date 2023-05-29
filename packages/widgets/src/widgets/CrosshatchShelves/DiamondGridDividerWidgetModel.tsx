@@ -1,13 +1,12 @@
 import { computed } from 'mobx';
 import React from 'react';
 import { round } from 'lodash-es';
-import { ExtendedModel } from 'mobx-keystone';
 import { getBoundingBoxAttrs, PathData } from 'fluent-svg-path-ts';
 import {
-  BaseWidgetClass,
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
   switchProp,
+  WidgetModel,
   widgetModel,
 } from 'svg-widget-studio';
 import {
@@ -27,7 +26,7 @@ interface SegmentInfo {
 }
 
 @widgetModel('DiamondGridDivider', widgetPreview)
-export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class DiamondGridDividerWidgetModel extends WidgetModel({
   ...dividerBaseModelProps,
   flushPostProcess: switchProp(false),
 }) {
