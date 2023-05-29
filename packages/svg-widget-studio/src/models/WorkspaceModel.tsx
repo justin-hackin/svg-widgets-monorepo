@@ -3,7 +3,15 @@ import {
   action, computed, observable, reaction,
 } from 'mobx';
 import {
-  applySnapshot, detach, getSnapshot, model, Model, modelAction, prop, SnapshotInOfModel,
+  applySnapshot,
+  detach,
+  getSnapshot,
+  model,
+  Model,
+  modelAction,
+  ModelClass,
+  prop,
+  SnapshotInOfModel,
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash-es';
@@ -188,7 +196,9 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetModelToDefault() {
-    const SelectedModel = widgetNameToWidgetClassMap.get(this.selectedWidgetModelType);
+    const SelectedModel = widgetNameToWidgetClassMap.get(
+      this.selectedWidgetModelType || '',
+    ) as ModelClass<BaseWidgetClass>;
     if (this.selectedStore) {
       detach(this.selectedStore);
     }

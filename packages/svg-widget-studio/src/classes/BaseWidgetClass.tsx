@@ -1,4 +1,6 @@
-import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
+import {
+  Model, ModelClass, UndoManager, undoMiddleware,
+} from 'mobx-keystone';
 import { FC } from 'react';
 import { computed, observable } from 'mobx';
 import { AdditionalToolbarItem } from '../components/AdditionalToolbarContent';
@@ -12,8 +14,8 @@ export abstract class BaseWidgetClass extends Model({}) {
   }
 
   @computed
-  get modelName() {
-    return widgetClassToWidgetNameMap.get(this.constructor);
+  get modelName(): string {
+    return widgetClassToWidgetNameMap.get(this.constructor as ModelClass<BaseWidgetClass>) as string;
   }
 
   @observable
