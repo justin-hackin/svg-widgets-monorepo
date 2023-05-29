@@ -12,9 +12,13 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-type ProviderProps = { baseRoute?: string, children: RouterProps['children'] };
+type ProviderProps = {
+  baseRoute?: string,
+  children: RouterProps['children'],
+  fallbackToNew?: boolean
+};
 
-const HasRouterWrapper = ({ children }) => {
+const HasRouterWrapper = ({ children, fallbackToNew = true }: Omit<ProviderProps, 'baseRoute'>) => {
   const [location, navigate] = useLocation();
 
   useEffect(() => {
@@ -25,7 +29,7 @@ const HasRouterWrapper = ({ children }) => {
   }, [location]);
 
   useEffect(() => {
-    if (location === '/') {
+    if (location === '/' && fallbackToNew) {
       navigate('/new');
     }
   }, []);
@@ -33,7 +37,7 @@ const HasRouterWrapper = ({ children }) => {
 };
 
 const HasStoreWrapper = observer((
-  { children, baseRoute }: ProviderProps,
+  { children, baseRoute, fallbackToNew }: ProviderProps,
 ) => {
   const workspaceStore = useWorkspaceMst();
   const darkModeEnabled = workspaceStore.preferences.darkModeEnabled.value;
@@ -43,7 +47,8 @@ const HasStoreWrapper = observer((
       <ThemeProvider theme={theme(darkModeEnabled)}>
         <CssBaseline />
         <Router base={baseRoute || ''}>
-          <HasRouterWrapper>
+          {/* @ts-ignore */}
+          <HasRouterWrapper fallbackToNew={fallbackToNew}>
             {children}
           </HasRouterWrapper>
         </Router>
@@ -52,10 +57,10 @@ const HasStoreWrapper = observer((
   );
 });
 
-export function WidgetWorkspaceProvider({ children, baseRoute }: ProviderProps) {
+export function WidgetWorkspaceProvider({ children, baseRoute, fallbackToNew }: ProviderProps) {
   return (
     <WorkspaceStoreProvider>
-      <HasStoreWrapper baseRoute={baseRoute}>
+      <HasStoreWrapper baseRoute={baseRoute} fallbackToNew={fallbackToNew}>
         {children}
       </HasStoreWrapper>
     </WorkspaceStoreProvider>

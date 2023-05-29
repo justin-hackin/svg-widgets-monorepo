@@ -14,8 +14,5 @@ export const WidgetRoute = observer(({ widgetName, children }) => {
       + ' to the name of the widget passed to the @widgetModel decorator');
   }
   const selectedStore = useSelectedStore();
-  if (!selectedStore) {
-    return null;
-  }
-  return <Route path={`/widgets/${widgetName}`}>{children}</Route>;
+  return <Route path={`/widgets/${widgetName}`}>{selectedStore ? children : null}</Route>;
 });
