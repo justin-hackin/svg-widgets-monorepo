@@ -10,6 +10,7 @@ import FlareIcon from '@mui/icons-material/Flare';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { Download } from '@mui/icons-material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useLocation } from 'wouter';
 import { useWorkspaceMst } from '../rootStore';
 import { AdditionalFileMenuItems } from './AdditionalFileMenuItems';
 import { SimpleDialog } from '../inputs/SimpleDialog';
@@ -19,6 +20,7 @@ import { HistoryButtons } from './HistoryButtons';
 import { AdditionalToolbarContent } from './AdditionalToolbarContent';
 
 export const WidgetControlPanelAppBar = observer(() => {
+  const [, navigate] = useLocation();
   const workspaceStore = useWorkspaceMst();
   const { selectedStore } = workspaceStore;
   assertNotNullish(selectedStore);
@@ -44,7 +46,7 @@ export const WidgetControlPanelAppBar = observer(() => {
   };
 
   const newHandler = () => {
-    workspaceStore.newWidget();
+    navigate('/widgets/new');
     resetFileMenuRef();
   };
 

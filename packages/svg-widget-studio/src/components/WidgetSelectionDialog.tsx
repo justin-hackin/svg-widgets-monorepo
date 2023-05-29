@@ -4,6 +4,7 @@ import {
 import { startCase } from 'lodash-es';
 import React from 'react';
 import { styled } from '@mui/styles';
+import { useLocation, useRoute } from 'wouter';
 import { widgetIconMap, widgetOptions } from '../models/WorkspaceModel';
 import { useWorkspaceMst } from '../rootStore';
 
@@ -29,19 +30,20 @@ export const WidgetSelectionDialog = () => {
     selectedStore,
     selectedWidgetModelType,
   } = workspaceStore;
-
+  const [isNewRoute] = useRoute('/widgets/new');
+  const [, navigate] = useLocation();
   return (
     <DialogStyled
       disableEscapeKeyDown={!selectedStore}
       disableRestoreFocus={!selectedStore}
-      open={workspaceStore.widgetPickerOpen}
+      open={isNewRoute}
       aria-labelledby={WIDGET_DIALOG_TITLE_ID}
       onClose={(_, reason) => {
         // if no store, ensure choice is made
         if (reason === 'backdropClick' && !selectedStore) {
           return;
         }
-        workspaceStore.setWidgetPickerOpen(false);
+        window.history.back();
       }}
     >
       <DialogTitle id={WIDGET_DIALOG_TITLE_ID}>Select Widget</DialogTitle>
@@ -53,8 +55,7 @@ export const WidgetSelectionDialog = () => {
                 key={widgetName}
                 selected={selectedWidgetModelType === widgetName}
                 onClick={() => {
-                  workspaceStore.newWidgetStore(widgetName);
-                  workspaceStore.setWidgetPickerOpen(false);
+                  navigate(`/widgets/${widgetName}`);
                 }}
               >
                 <ListItemAvatar>

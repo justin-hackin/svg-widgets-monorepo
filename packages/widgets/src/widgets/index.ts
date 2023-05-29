@@ -1,4 +1,3 @@
-import { workspaceStore } from 'svg-widget-studio';
 import { PyramidNetWidgetModel } from '@/widgets/PyramidNet/models/PyramidNetWidgetStore';
 import { CylinderLightboxWidgetModel } from '@/widgets/CylinderLightbox';
 import { SquareGridDividerWidgetModel } from '@/widgets/CrosshatchShelves/SquareGridDividerWidgetModel';
@@ -13,5 +12,3 @@ console.log('Widgets: ', [
   DiamondGridDividerWidgetModel,
   TriangularGridWidgetModel,
 ]);
-
-workspaceStore.widgetsReady();

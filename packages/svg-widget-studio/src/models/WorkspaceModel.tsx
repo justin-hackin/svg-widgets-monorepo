@@ -60,6 +60,11 @@ observable(widgetIconMap);
 
 export function widgetModel(modelName: string, previewIcon: string) {
   return function <C extends ModelClass<BaseWidgetClass>>(constructor: C): C {
+    if (modelName.toLowerCase() === 'new') {
+      throw new Error(
+        'naming components "new" is not allowed because routing depends on /widgets/new path for widget selection',
+      );
+    }
     const decoratedClass = model(`SvgWidgetStudio/widgets/${modelName}`)(constructor);
     widgetOptions.set(modelName, decoratedClass);
     widgetIconMap.set(modelName, previewIcon);
@@ -252,17 +257,6 @@ export class WorkspaceModel extends Model({
     if (SelectedModel) {
       const newStore = new SelectedModel({});
       this.setSelectedStore(newStore);
-    }
-  }
-
-  @action
-  widgetsReady() {
-    if (this.availableWidgetTypes.length === 1) {
-      // @ts-ignore
-      this.setSelectedWidgetModelType(widgetList[0].$modelType);
-      this.resetModelToDefault();
-    } else {
-      this.newWidget();
     }
   }
 
