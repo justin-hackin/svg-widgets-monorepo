@@ -115,8 +115,8 @@ export class WorkspaceModel extends Model({
   onAttachedToRootStore() {
     const disposers = [
       // title bar changes for file status indication
-      reaction(() => [this.titleBarText], () => {
-        document.title = this.titleBarText;
+      reaction(() => [this.documentTitle], () => {
+        document.title = this.documentTitle;
       }, { fireImmediately: true }),
     ];
 
@@ -142,9 +142,9 @@ export class WorkspaceModel extends Model({
   }
 
   @computed
-  get titleBarText() {
-    return `Widget Factory ${
-      this.selectedWidgetNameReadable ? `|| ${this.selectedWidgetNameReadable}` : ''}`;
+  get documentTitle() {
+    return `SVG Widget Studio ${
+      this.selectedWidgetNameReadable ? `⚙️${this.selectedWidgetNameReadable}` : ''}`;
   }
 
   @action
