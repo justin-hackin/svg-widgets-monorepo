@@ -69,7 +69,6 @@ export const WidgetWorkspace: FunctionComponent<Partial<WidgetWorkspaceOptionalP
     [dimensionValue, resolvedPanelOrientation],
   );
 
-  // wrap with observer here so WidgetSVG can be rendered with ReactDOMServer for saving to string
   return (
     <div ref={ref}>
       <WidgetWorkspaceStyled>

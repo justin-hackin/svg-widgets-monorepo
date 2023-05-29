@@ -1,7 +1,8 @@
 import { StyledEngineProvider, Theme, ThemeProvider } from '@mui/material/styles';
-import React from 'react';
+import React, { useEffect } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { observer } from 'mobx-react';
+import { useLocation } from 'wouter';
 import { useWorkspaceMst, WorkspaceStoreProvider } from '../rootStore';
 import { theme } from '../style';
 
@@ -10,9 +11,18 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-const StylesWrapper = observer(({ children }) => {
+const WithStoreWrapper = observer(({ children }) => {
   const workspaceStore = useWorkspaceMst();
   const darkModeEnabled = workspaceStore.preferences.darkModeEnabled.value;
+  const [location] = useLocation();
+
+  useEffect(() => {
+    const pathSegments = location.split('/').filter((part) => !!part);
+    if (pathSegments?.[0] === 'widgets' && pathSegments?.[1] !== 'new') {
+      workspaceStore.newWidgetStore(pathSegments[1]);
+    }
+  }, [location]);
+
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme(darkModeEnabled)}>
@@ -26,9 +36,9 @@ const StylesWrapper = observer(({ children }) => {
 export function WidgetWorkspaceProvider({ children }) {
   return (
     <WorkspaceStoreProvider>
-      <StylesWrapper>
+      <WithStoreWrapper>
         {children}
-      </StylesWrapper>
+      </WithStoreWrapper>
     </WorkspaceStoreProvider>
   );
 }

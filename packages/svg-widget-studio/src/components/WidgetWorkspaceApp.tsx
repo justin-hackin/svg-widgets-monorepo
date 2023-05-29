@@ -17,13 +17,6 @@ const AllRoutes = observer(() => {
     }
   }, []);
 
-  useEffect(() => {
-    const pathSegments = location.split('/').filter((part) => !!part);
-    if (pathSegments?.[0] === 'widgets' && pathSegments?.[1] !== 'new') {
-      workspaceStore.newWidgetStore(pathSegments[1]);
-    }
-  }, [location]);
-
   return (
     <>
       <WidgetWorkspace />
