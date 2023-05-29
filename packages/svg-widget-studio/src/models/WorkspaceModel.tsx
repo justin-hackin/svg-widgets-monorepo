@@ -51,6 +51,7 @@ class WorkspacePreferencesModel extends Model({
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 const ZOOM_PAN_LOCALSTORE_NAME = 'ZoomPanView';
+const SELECTED_STORE_LOCALSTORE_NAME = 'selectedStore';
 
 export const widgetOptions = new Map();
 observable(widgetOptions);
@@ -73,7 +74,7 @@ export function widgetModel(modelName: string, previewIcon: string) {
 
 @model('SvgWidgetStudio/WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedStore: prop<BaseWidgetClass | undefined>(() => undefined).withSetter(),
+  selectedStore: prop<BaseWidgetClass | undefined>(() => undefined),
   preferences: prop(() => (new WorkspacePreferencesModel({}))).withSetter(),
 }) {
   @observable
@@ -186,8 +187,7 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
-  async persistModels() {
-    await persist(ZOOM_PAN_LOCALSTORE_NAME, this.zoomPanView);
+  async persistPreferences() {
     await persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
       .catch(async (e) => {
         // eslint-disable-next-line no-console
@@ -199,11 +199,30 @@ export class WorkspaceModel extends Model({
   }
 
   @modelAction
+  async persistSelectedStore() {
+    await persist(SELECTED_STORE_LOCALSTORE_NAME, this.selectedStore);
+  }
+
+  @modelAction
+  async persistModels() {
+    await persist(ZOOM_PAN_LOCALSTORE_NAME, this.zoomPanView);
+    await this.persistSelectedStore();
+    await this.persistPreferences();
+  }
+
+  @modelAction
   resetPreferences() {
     // TODO: $$$ reset selectedModel preferences
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
     this.setPreferences(new WorkspacePreferencesModel({}));
-    return this.persistModels();
+    return this.persistPreferences();
+  }
+
+  @modelAction
+  setSelectedStore(store) {
+    this.selectedStore = store;
+    localStorage.removeItem(SELECTED_STORE_LOCALSTORE_NAME);
+    this.persistSelectedStore();
   }
 
   @modelAction
