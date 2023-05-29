@@ -9,23 +9,22 @@ import { FullPageDiv } from '../style';
 export const ResizableZoomPan = observer(({ children, ...props }) => {
   const theme = useTheme();
   const workspaceStore = useWorkspaceMst();
+  const { zoomPanView } = workspaceStore;
   const { width, height, ref } = useResizeDetector();
-  const value = workspaceStore.zoomPanValue;
-  const tool = workspaceStore.zoomPanTool;
   return (
     <FullPageDiv ref={ref}>
       <ReactSVGPanZoom
-        value={value}
+        value={zoomPanView.value}
         background={theme.palette.mode === 'dark' ? theme.palette.grey['900'] : theme.palette.grey.A400}
-        tool={tool}
+        tool={zoomPanView.tool}
         toolbarProps={{ position: POSITION_LEFT }}
         customToolbar={() => null}
         customMiniature={() => null}
         onChangeValue={(val) => {
-          workspaceStore.setZoomPanValue(val);
+          zoomPanView.setValue(val);
         }}
         onChangeTool={(tool) => {
-          workspaceStore.setZoomPanTool(tool);
+          zoomPanView.setTool(tool);
         }}
         width={width ?? 0}
         height={height ?? 0}

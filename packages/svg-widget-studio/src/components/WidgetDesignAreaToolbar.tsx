@@ -42,17 +42,17 @@ export const WidgetDesignAreaToolbar = observer((
   { orientation: Orientation, showOrientationToggle: boolean },
 ) => {
   const workspaceStore: WorkspaceModel = useWorkspaceMst();
-  const { zoomPanTool, preferences } = workspaceStore;
+  const { zoomPanView, preferences } = workspaceStore;
   const oppositeOrientation: Orientation = orientation === 'vertical' ? 'horizontal' : 'vertical';
   return (
     <PaperStyled elevation={3} className={`orientation-${oppositeOrientation}`}>
       <ToggleButtonGroup
         orientation={orientation}
         exclusive
-        value={zoomPanTool}
+        value={zoomPanView.tool}
         aria-label="zoom pan mode"
         onChange={(_, tool) => {
-          workspaceStore.setZoomPanTool(tool as Tool);
+          zoomPanView.setTool(tool as Tool);
         }}
       >
         {Object.entries(TOOL_ICON_MAP).map(([tool, Icon]) => (
@@ -90,7 +90,7 @@ export const WidgetDesignAreaToolbar = observer((
       <IconButton
         sx={{ mx: 0.5 }}
         onClick={() => {
-          workspaceStore.fitToDocument();
+          zoomPanView.fitToDocument();
         }}
       >
         <FitScreenIcon fontSize="medium" />

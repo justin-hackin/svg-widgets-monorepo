@@ -53,7 +53,7 @@ export const WidgetWorkspace: FunctionComponent<Partial<WidgetWorkspaceOptionalP
   const resolvedPanelOrientation = panelOrientation || preferencesPanelOrientation;
 
   useLayoutEffect(() => {
-    workspaceStore.fitToDocument();
+    workspaceStore.zoomPanView.fitToDocument();
   }, [selectedWidgetModelType]);
   const dimensionValue = resolvedPanelOrientation === 'vertical' ? width : height;
   const maxPanelSize = useMemo(

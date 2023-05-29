@@ -15,9 +15,6 @@ import {
 } from 'mobx-keystone';
 import { persist } from 'mobx-keystone-persist';
 import { startCase } from 'lodash-es';
-import {
-  fitToViewer, Tool, TOOL_PAN, Value,
-} from 'react-svg-pan-zoom';
 import JSZip from 'jszip';
 // TODO: remove this dep
 import fileDownload from 'js-file-download';
@@ -26,6 +23,7 @@ import type { Orientation } from '../components/WidgetWorkspace';
 import { radioProp, switchProp } from '../props';
 import { assertNotNullish } from '../helpers/assert';
 import { UNITS } from '../helpers/units';
+import { ZoomPanView } from './ZoomPanView';
 
 type WidgetJSON = {
   widget: {
@@ -52,6 +50,7 @@ class WorkspacePreferencesModel extends Model({
   }) {}
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
+const ZOOM_PAN_LOCALSTORE_NAME = 'ZoomPanView';
 
 export const widgetOptions = new Map();
 observable(widgetOptions);
@@ -86,17 +85,15 @@ export class WorkspaceModel extends Model({
   }
 
   // package used to export INITIAL_VALUE but this somehow works okay
-  @observable
-    zoomPanValue: Value = {} as Value;
-
-  @observable
-    zoomPanTool: Tool = TOOL_PAN;
 
   @observable
     alertDialogContent: ReactNode | null = null;
 
   @observable
     openWidgetFileFlag = false;
+
+  @observable
+    zoomPanView = new ZoomPanView({});
 
   // eslint-disable-next-line class-methods-use-this
   @computed
@@ -117,14 +114,7 @@ export class WorkspaceModel extends Model({
       }, { fireImmediately: true }),
     ];
 
-    this.persistPreferences()
-      .then(() => {
-        // TODO: get rid of this
-        //  why doesn't useLayoutEffect in workspace view cover first render case?
-        setTimeout(() => {
-          this.fitToDocument();
-        }, 300);
-      });
+    this.persistModels();
 
     return () => {
       for (const disposer of disposers) {
@@ -195,24 +185,10 @@ export class WorkspaceModel extends Model({
     this.alertDialogContent = null;
   }
 
-  @action
-  fitToDocument() {
-    this.setZoomPanValue(fitToViewer(this.zoomPanValue));
-  }
-
-  @action
-  setZoomPanTool(tool: Tool) {
-    this.zoomPanTool = tool;
-  }
-
-  @action
-  setZoomPanValue(value: Value) {
-    this.zoomPanValue = value;
-  }
-
   @modelAction
-  persistPreferences() {
-    return persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
+  async persistModels() {
+    await persist(ZOOM_PAN_LOCALSTORE_NAME, this.zoomPanView);
+    await persist(PREFERENCES_LOCALSTORE_NAME, this.preferences)
       .catch(async (e) => {
         // eslint-disable-next-line no-console
         console.warn('Failed to persist preferences, likely due to data schema changes, '
@@ -227,7 +203,7 @@ export class WorkspaceModel extends Model({
     // TODO: $$$ reset selectedModel preferences
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
     this.setPreferences(new WorkspacePreferencesModel({}));
-    return this.persistPreferences();
+    return this.persistModels();
   }
 
   @modelAction
