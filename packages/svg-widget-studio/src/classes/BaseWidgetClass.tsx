@@ -2,7 +2,7 @@ import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
 import { FC } from 'react';
 import { observable } from 'mobx';
 import { AdditionalToolbarItem } from '../components/AdditionalToolbarContent';
-import { AnyAssetDefinition, FileMenuItem, WatermarkContentComponent } from '../types';
+import type { AnyAssetDefinition, FileMenuItem, WatermarkContentComponent } from '../types';
 
 export abstract class BaseWidgetClass extends Model({}) {
   abstract fileBasename: string;
@@ -15,8 +15,6 @@ export abstract class BaseWidgetClass extends Model({}) {
   additionalToolbarContent?: AdditionalToolbarItem[];
 
   additionalFileMenuItems?: FileMenuItem[];
-
-  AdditionalMainContent?: FC;
 
   PanelContent?: FC;
 

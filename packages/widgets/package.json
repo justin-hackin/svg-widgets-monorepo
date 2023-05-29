@@ -73,6 +73,7 @@
     "svg-widget-studio": "*",
     "three": "^0.125.0",
     "threejs-orbit-controls": "^1.0.3",
-    "uuid": "^3.4.0"
+    "uuid": "^3.4.0",
+    "wouter": "^2.11.0"
   }
 }

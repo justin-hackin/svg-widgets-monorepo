@@ -1,13 +1,14 @@
 import React from 'react';
 import { render } from 'react-dom';
 import './widgets';
-import { WidgetWorkspaceApp, workspaceStore } from 'svg-widget-studio';
+import { workspaceStore } from 'svg-widget-studio';
 import { connectReduxDevTools } from 'mobx-keystone';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import remotedev from 'remotedev';
+import { App } from '@/App';
 
 render(
-  (<WidgetWorkspaceApp />),
+  (<App />),
   document.getElementById('app'),
 );
 

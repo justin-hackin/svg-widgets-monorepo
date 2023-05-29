@@ -8,6 +8,9 @@ import type { SolitaryAssetDefinition } from './classes/SolitaryAssetDefinition'
 import type { TweakablePrimitiveModel } from './models/TweakablePrimitiveModel';
 import type { TweakableReferenceModel } from './models/TweakableReferenceModel';
 import type { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
+// TODO: better way to export type of class only?
+// eslint-disable-next-line import/no-cycle
+import { WorkspaceModel as WorkspaceModelClass } from './models/WorkspaceModel';
 
 export interface ViewBoxProps {
   viewBox: string
@@ -145,3 +148,5 @@ export interface ReferenceRadioMetadata<T extends object> extends ReferenceResol
 }
 
 export type ReferenceWithOptionsMetadata<T extends object> = ReferenceRadioMetadata<T> | ReferenceSelectMetadata<T>;
+
+export type WorkspaceModel = typeof WorkspaceModelClass;

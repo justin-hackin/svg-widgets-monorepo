@@ -7,7 +7,8 @@ import { extractCutHolesFromSvgString } from '../../../common/util/svg';
 
 export const FileInputs = observer(() => {
   const widgetStore = useSelectedStore<PyramidNetWidgetModel>();
-  const { importFaceDialogActive } = widgetStore;
+  // TODO: route renders content before store is available, not optimal
+  const { importFaceDialogActive } = widgetStore || {};
 
   const openWidgetInputRef = useRef<HTMLInputElement>(null);
 
@@ -16,6 +17,7 @@ export const FileInputs = observer(() => {
       openWidgetInputRef?.current?.click();
     }
   }, [importFaceDialogActive]);
+  if (!widgetStore) { return null; }
 
   return (
     <InvisibleTextFileInput

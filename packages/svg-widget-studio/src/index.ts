@@ -1,5 +1,7 @@
 export { SVGWrapper } from './components/SVGWrapper';
 export { WidgetWorkspaceProvider } from './components/WidgetWorkspaceProvider';
+export { WidgetWorkspace } from './components/WidgetWorkspace';
+export { WidgetSelectionDialog } from './components/WidgetSelectionDialog';
 export { HistoryButtons } from './components/HistoryButtons';
 export * from './types';
 export * from './style';

@@ -14,7 +14,7 @@ declare module '@mui/styles/defaultTheme' {
 const WithStoreWrapper = observer(({ children }) => {
   const workspaceStore = useWorkspaceMst();
   const darkModeEnabled = workspaceStore.preferences.darkModeEnabled.value;
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
 
   useEffect(() => {
     const pathSegments = location.split('/').filter((part) => !!part);
@@ -22,6 +22,12 @@ const WithStoreWrapper = observer(({ children }) => {
       workspaceStore.newWidgetStore(pathSegments[1]);
     }
   }, [location]);
+
+  useEffect(() => {
+    if (location === '/') {
+      navigate('/widgets/new');
+    }
+  }, []);
 
   return (
     <StyledEngineProvider injectFirst>

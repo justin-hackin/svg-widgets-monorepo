@@ -37,7 +37,6 @@ import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
 import { PanelContent } from '../components/PanelContent';
-import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
 import { PyramidModel } from './PyramidModel';
 import {
   AscendantEdgeConnectionPaths,
@@ -61,7 +60,6 @@ import { appendCurvedLineSegments, closedPolygonPath, roundedEdgePath } from '..
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
 import { additionalFileMenuItemsFactory } from '../components/additionalFileMenuItemsFactory';
-import { FileInputs } from '../components/FileInputs';
 import previewIcon from '../static/widget-preview.png';
 import { DEFAULT_SLIDER_STEP } from '@/common/constants';
 
@@ -86,7 +84,9 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-@widgetModel('PolyhedralNet', previewIcon)
+export const POLYHEDRAL_NET_MODEL_TYPE = 'PolyhedralNet';
+
+@widgetModel(POLYHEDRAL_NET_MODEL_TYPE, previewIcon)
 export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),
@@ -647,14 +647,6 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   }];
 
   additionalFileMenuItems = additionalFileMenuItemsFactory(this);
-
-  // eslint-disable-next-line class-methods-use-this
-  AdditionalMainContent = () => (
-    <>
-      <FileInputs />
-      <TextureEditorDrawer />
-    </>
-  );
 
   WatermarkContent = LicenseWatermarkContent;
 }
