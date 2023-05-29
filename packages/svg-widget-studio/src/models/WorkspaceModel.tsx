@@ -51,7 +51,7 @@ class WorkspacePreferencesModel extends Model({
 
 const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 const ZOOM_PAN_LOCALSTORE_NAME = 'ZoomPanView';
-const SELECTED_STORE_LOCALSTORE_NAME = 'selectedStore';
+const SELECTED_STORE_LOCALSTORE_NAME = 'SvgWidgetStudio/selectedStore';
 
 export const widgetOptions = new Map();
 observable(widgetOptions);
@@ -74,16 +74,11 @@ export function widgetModel(modelName: string, previewIcon: string) {
 
 @model('SvgWidgetStudio/WorkspaceModel')
 export class WorkspaceModel extends Model({
-  selectedStore: prop<BaseWidgetClass | undefined>(() => undefined),
+  selectedStore: prop<BaseWidgetClass | undefined>(() => undefined).withSetter(),
   preferences: prop(() => (new WorkspacePreferencesModel({}))).withSetter(),
 }) {
   @observable
     selectedWidgetModelType: string | undefined = undefined;
-
-  @action
-  setSelectedWidgetModelType(selectedWidgetModelType) {
-    this.selectedWidgetModelType = selectedWidgetModelType;
-  }
 
   // package used to export INITIAL_VALUE but this somehow works okay
 
@@ -114,7 +109,6 @@ export class WorkspaceModel extends Model({
         document.title = this.documentTitle;
       }, { fireImmediately: true }),
     ];
-
     this.persistModels();
 
     return () => {
@@ -200,13 +194,13 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   async persistSelectedStore() {
-    await persist(SELECTED_STORE_LOCALSTORE_NAME, this.selectedStore);
+    // using the same persist key for different models doesn't work
+    await persist(`${SELECTED_STORE_LOCALSTORE_NAME}--${this.selectedWidgetModelType}`, this.selectedStore);
   }
 
   @modelAction
   async persistModels() {
     await persist(ZOOM_PAN_LOCALSTORE_NAME, this.zoomPanView);
-    await this.persistSelectedStore();
     await this.persistPreferences();
   }
 
@@ -216,13 +210,6 @@ export class WorkspaceModel extends Model({
     localStorage.removeItem(PREFERENCES_LOCALSTORE_NAME);
     this.setPreferences(new WorkspacePreferencesModel({}));
     return this.persistPreferences();
-  }
-
-  @modelAction
-  setSelectedStore(store) {
-    this.selectedStore = store;
-    localStorage.removeItem(SELECTED_STORE_LOCALSTORE_NAME);
-    this.persistSelectedStore();
   }
 
   @modelAction
@@ -240,11 +227,18 @@ export class WorkspaceModel extends Model({
 
   @action
   newWidgetStore(widgetType: string) {
-    if (widgetType !== this.selectedWidgetModelType) {
-      this.setSelectedWidgetModelType(widgetType);
+    if (this.selectedWidgetModelType) {
+      localStorage.removeItem(`${SELECTED_STORE_LOCALSTORE_NAME}--${this.selectedWidgetModelType}`);
+    }
+    const modelTypeChanged = widgetType !== this.selectedWidgetModelType;
+    if (modelTypeChanged) {
+      this.selectedWidgetModelType = widgetType;
     }
 
     this.resetModelToDefault();
+    if (modelTypeChanged) {
+      this.persistSelectedStore();
+    }
   }
 
   @modelAction
