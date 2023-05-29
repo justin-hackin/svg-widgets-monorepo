@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { useLocation } from 'wouter';
 import { useWorkspaceMst, WorkspaceStoreProvider } from '../rootStore';
 import { theme } from '../style';
+import { widgetNameToWidgetClassMap } from '../internal/data';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -18,14 +19,14 @@ const WithStoreWrapper = observer(({ children }) => {
 
   useEffect(() => {
     const pathSegments = location.split('/').filter((part) => !!part);
-    if (pathSegments?.[0] === 'widgets' && pathSegments?.[1] !== 'new') {
+    if (pathSegments?.[0] === 'widgets' && widgetNameToWidgetClassMap.has(pathSegments?.[1])) {
       workspaceStore.newWidgetStore(pathSegments[1]);
     }
   }, [location]);
 
   useEffect(() => {
     if (location === '/') {
-      navigate('/widgets/new');
+      navigate('/new');
     }
   }, []);
 

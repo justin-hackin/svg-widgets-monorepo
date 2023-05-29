@@ -31,7 +31,7 @@ export const WidgetSelectionDialog = () => {
     selectedStore,
     selectedWidgetModelType,
   } = workspaceStore;
-  const [isNewRoute] = useRoute('/widgets/new');
+  const [isNewRoute] = useRoute('/new');
   const [, navigate] = useLocation();
   return (
     <DialogStyled

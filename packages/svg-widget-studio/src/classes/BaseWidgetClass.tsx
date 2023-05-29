@@ -1,19 +1,19 @@
 import { Model, UndoManager, undoMiddleware } from 'mobx-keystone';
 import { FC } from 'react';
-import { observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import { AdditionalToolbarItem } from '../components/AdditionalToolbarContent';
 import type { AnyAssetDefinition, FileMenuItem, WatermarkContentComponent } from '../types';
 
-import { widgetClassToModelName } from '../internal/data';
+import { widgetClassToWidgetNameMap } from '../internal/data';
 
 export abstract class BaseWidgetClass extends Model({}) {
   get fileBasename() {
     return this.modelName;
   }
 
-  @observable
+  @computed
   get modelName() {
-    return widgetClassToModelName.get(this.constructor);
+    return widgetClassToWidgetNameMap.get(this.constructor);
   }
 
   @observable

@@ -24,8 +24,7 @@ import { radioProp, switchProp } from '../props';
 import { assertNotNullish } from '../helpers/assert';
 import { UNITS } from '../helpers/units';
 import { ZoomPanView } from './ZoomPanView';
-
-import { widgetClassToModelName, widgetNameToIconMap, widgetNameToWidgetClassMap } from '../internal/data';
+import { widgetClassToWidgetNameMap, widgetNameToIconMap, widgetNameToWidgetClassMap } from '../internal/data';
 
 type WidgetJSON = {
   widget: {
@@ -57,14 +56,9 @@ const SELECTED_STORE_LOCALSTORE_NAME = 'SvgWidgetStudio/selectedStore';
 
 export function widgetModel(modelName: string, previewIcon: string) {
   return function <C extends ModelClass<BaseWidgetClass>>(constructor: C): C {
-    if (modelName.toLowerCase() === 'new') {
-      throw new Error(
-        'naming components "new" is not allowed because routing depends on /widgets/new path for widget selection',
-      );
-    }
     const decoratedClass = model(`SvgWidgetStudio/widgets/${modelName}`)(constructor);
     widgetNameToWidgetClassMap.set(modelName, decoratedClass);
-    widgetClassToModelName.set(decoratedClass, modelName);
+    widgetClassToWidgetNameMap.set(decoratedClass, modelName);
     widgetNameToIconMap.set(modelName, previewIcon);
     return decoratedClass;
   };
