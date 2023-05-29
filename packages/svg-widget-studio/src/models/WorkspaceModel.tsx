@@ -93,9 +93,6 @@ export class WorkspaceModel extends Model({
     zoomPanTool: Tool = TOOL_PAN;
 
   @observable
-    widgetPickerOpen = false;
-
-  @observable
     alertDialogContent: ReactNode | null = null;
 
   @observable
@@ -148,11 +145,6 @@ export class WorkspaceModel extends Model({
   }
 
   @action
-  setWidgetPickerOpen(val: boolean) {
-    this.widgetPickerOpen = val;
-  }
-
-  @action
   _setFileDialogActive(isActive: boolean) {
     if (isActive === this.openWidgetFileFlag) {
       throw new Error(
@@ -191,15 +183,6 @@ export class WorkspaceModel extends Model({
         assertNotNullish(this.selectedStore);
         fileDownload(content, `${this.selectedStore.fileBasename}.zip`);
       });
-  }
-
-  @action
-  newWidget() {
-    if (this.availableWidgetTypes.length > 1) {
-      this.setWidgetPickerOpen(true);
-    } else {
-      this.resetModelToDefault();
-    }
   }
 
   @action
