@@ -10,7 +10,8 @@ import type { TweakableReferenceModel } from './models/TweakableReferenceModel';
 import type { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveWithOptionsModel';
 // TODO: better way to export type of class only?
 // eslint-disable-next-line import/no-cycle
-import { WorkspaceModel as WorkspaceModelClass } from './models/WorkspaceModel';
+import type { WorkspaceModel as WorkspaceModelClass } from './models/WorkspaceModel';
+import { INPUT_TYPE } from './internal/constants';
 
 export interface ViewBoxProps {
   viewBox: string
@@ -46,18 +47,6 @@ export interface FileMenuItem {
 export interface Dimensions {
   width: number,
   height: number
-}
-
-export enum INPUT_TYPE {
-  SWITCH = 'switch',
-  SLIDER = 'slider',
-  SLIDER_WITH_TEXT = 'slider-with-text',
-  NUMBER_TEXT = 'number-text',
-  SELECT = 'select',
-  RADIO = 'radio',
-  COLOR_PICKER = 'color-picker',
-  REFERENCE_SELECT = 'reference-select',
-  REFERENCE_RADIO = 'reference-radio',
 }
 
 export type labelGenerator = (node: TweakableModel) => string;

@@ -1,7 +1,8 @@
 import { findChildren } from 'mobx-keystone';
 import React from 'react';
 import { TweakableInput } from './TweakableInput';
-import { INPUT_TYPE, TweakableModel } from '../types';
+import { TweakableModel } from '../types';
+import { INPUT_TYPE } from '../internal/constants';
 
 const INPUT_TYPES_VALUES = Object.values(INPUT_TYPE);
 

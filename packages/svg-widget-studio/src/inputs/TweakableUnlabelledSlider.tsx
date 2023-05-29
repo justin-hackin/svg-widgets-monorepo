@@ -5,7 +5,8 @@ import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { useWorkspaceMst } from '../rootStore';
 import { getNearestHistoryFromAncestorNode } from '../helpers/mobx-keystone';
 import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../helpers/units';
-import { INPUT_TYPE, SliderMetadata, SliderWithTextMetadata } from '../types';
+import { SliderMetadata, SliderWithTextMetadata } from '../types';
+import { INPUT_TYPE } from '../internal/constants';
 
 function ValueLabelComponent({
   children,

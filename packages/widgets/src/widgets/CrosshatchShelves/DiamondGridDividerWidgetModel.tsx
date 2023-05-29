@@ -137,8 +137,6 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
     });
   }
 
-  fileBasename = 'DiamondShelves';
-
   @computed
   get assetDefinition() {
     return new DisjunctAssetsDefinition(

@@ -3,7 +3,7 @@ import { isFunction, startCase } from 'lodash-es';
 import type { TweakablePrimitiveWithOptionsModel } from '../models/TweakablePrimitiveWithOptionsModel';
 import type { TweakableReferenceWithOptionsModel } from '../models/TweakableReferenceWithOptionsModel';
 
-import {
+import type {
   labelGenerator,
   labelOverride,
   MetadataOptions,

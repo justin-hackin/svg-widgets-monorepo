@@ -4,8 +4,17 @@ import { observable } from 'mobx';
 import { AdditionalToolbarItem } from '../components/AdditionalToolbarContent';
 import type { AnyAssetDefinition, FileMenuItem, WatermarkContentComponent } from '../types';
 
+import { widgetClassToModelName } from '../internal/data';
+
 export abstract class BaseWidgetClass extends Model({}) {
-  abstract fileBasename: string;
+  get fileBasename() {
+    return this.modelName;
+  }
+
+  @observable
+  get modelName() {
+    return widgetClassToModelName.get(this.constructor);
+  }
 
   @observable
     history: UndoManager | undefined;

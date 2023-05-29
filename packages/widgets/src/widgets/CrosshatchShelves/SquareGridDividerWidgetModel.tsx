@@ -103,8 +103,6 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
     return path;
   }
 
-  fileBasename = 'CrossHatchShelves';
-
   @computed
   get assetDefinition() {
     const vertTransY = this.shelfHeight.value * this.panelSpacingRatio;

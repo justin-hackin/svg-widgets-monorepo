@@ -71,9 +71,6 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     min: 0, max: 1, step: DEFAULT_SLIDER_STEP,
   }),
 }) {
-  // eslint-disable-next-line class-methods-use-this
-  fileBasename = 'cylinder_lightbox';
-
   get ringRadiusVal() {
     return this.ringRadius.value;
   }

@@ -187,9 +187,6 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
         }))));
   }
 
-  fileBasename = 'TriangularGrid';
-
-  @computed
   get assetDefinition() {
     return new DisjunctAssetsDefinition([
       {

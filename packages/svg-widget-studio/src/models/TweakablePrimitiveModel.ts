@@ -5,7 +5,7 @@ import { computed, observable } from 'mobx';
 import { ownPropertyName, resolveLabel } from '../internal/tweakables';
 import { propertyMetadataCtx } from '../internal/data';
 
-import { PrimitiveMetadata } from '../types';
+import type { PrimitiveMetadata } from '../types';
 
 @model('SvgWidgetStudio/TweakablePrimitiveModel')
 export class TweakablePrimitiveModel<T, M extends PrimitiveMetadata> extends Model(<T>() => ({

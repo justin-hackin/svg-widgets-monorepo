@@ -5,8 +5,9 @@ import { startCase } from 'lodash-es';
 import React from 'react';
 import { styled } from '@mui/styles';
 import { useLocation, useRoute } from 'wouter';
-import { widgetIconMap, widgetOptions } from '../models/WorkspaceModel';
 import { useWorkspaceMst } from '../rootStore';
+
+import { widgetNameToIconMap, widgetNameToWidgetClassMap } from '../internal/data';
 
 const WIDGET_DIALOG_TITLE_ID = 'widget-dialog-title';
 export const classes = {
@@ -49,7 +50,7 @@ export const WidgetSelectionDialog = () => {
       <DialogTitle id={WIDGET_DIALOG_TITLE_ID}>Select Widget</DialogTitle>
       <List>
         {
-          Array.from(widgetOptions.keys())
+          Array.from(widgetNameToWidgetClassMap.keys())
             .map((widgetName) => (
               <ListItemButton
                 key={widgetName}
@@ -62,7 +63,7 @@ export const WidgetSelectionDialog = () => {
                   <Avatar
                     alt={startCase(widgetName)}
                     className={classes.widgetAvatar}
-                    src={widgetIconMap.get(widgetName)}
+                    src={widgetNameToIconMap.get(widgetName)}
                   />
                 </ListItemAvatar>
                 <ListItemText

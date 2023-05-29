@@ -25,6 +25,8 @@ import { assertNotNullish } from '../helpers/assert';
 import { UNITS } from '../helpers/units';
 import { ZoomPanView } from './ZoomPanView';
 
+import { widgetClassToModelName, widgetNameToIconMap, widgetNameToWidgetClassMap } from '../internal/data';
+
 type WidgetJSON = {
   widget: {
     // it's difficult to create 1-to-1 correspondence between widget model $modelType and persisted spec $modelType
@@ -53,11 +55,6 @@ const PREFERENCES_LOCALSTORE_NAME = 'WorkspacePreferencesModel';
 const ZOOM_PAN_LOCALSTORE_NAME = 'ZoomPanView';
 const SELECTED_STORE_LOCALSTORE_NAME = 'SvgWidgetStudio/selectedStore';
 
-export const widgetOptions = new Map();
-observable(widgetOptions);
-export const widgetIconMap = new Map();
-observable(widgetIconMap);
-
 export function widgetModel(modelName: string, previewIcon: string) {
   return function <C extends ModelClass<BaseWidgetClass>>(constructor: C): C {
     if (modelName.toLowerCase() === 'new') {
@@ -66,8 +63,9 @@ export function widgetModel(modelName: string, previewIcon: string) {
       );
     }
     const decoratedClass = model(`SvgWidgetStudio/widgets/${modelName}`)(constructor);
-    widgetOptions.set(modelName, decoratedClass);
-    widgetIconMap.set(modelName, previewIcon);
+    widgetNameToWidgetClassMap.set(modelName, decoratedClass);
+    widgetClassToModelName.set(decoratedClass, modelName);
+    widgetNameToIconMap.set(modelName, previewIcon);
     return decoratedClass;
   };
 }
@@ -94,12 +92,12 @@ export class WorkspaceModel extends Model({
   // eslint-disable-next-line class-methods-use-this
   @computed
   get availableWidgetTypes() {
-    return Array.from(widgetOptions.keys());
+    return Array.from(widgetNameToWidgetClassMap.keys());
   }
 
   // eslint-disable-next-line class-methods-use-this
   get widgetOptions() {
-    return widgetOptions;
+    return widgetNameToWidgetClassMap;
   }
 
   onAttachedToRootStore() {
@@ -214,7 +212,7 @@ export class WorkspaceModel extends Model({
 
   @modelAction
   resetModelToDefault() {
-    const SelectedModel = widgetOptions.get(this.selectedWidgetModelType);
+    const SelectedModel = widgetNameToWidgetClassMap.get(this.selectedWidgetModelType);
     if (this.selectedStore) {
       detach(this.selectedStore);
     }
@@ -262,7 +260,7 @@ export class WorkspaceModel extends Model({
   @modelAction
   initializeWidgetFromSnapshot(widgetJSON: WidgetJSON) {
     const { modelType, modelSnapshot } = widgetJSON.widget;
-    if (!widgetOptions.has(modelType)) {
+    if (!widgetNameToWidgetClassMap.has(modelType)) {
       this.setAlertDialogContent(`Invalid widget spec file: JSON data must contain property widget.$modelType with value
        equal to one of (${this.availableWidgetTypes.join(', ')}) but instead saw ${modelType}`);
       return;

@@ -5,9 +5,8 @@ import { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimitiveW
 import { propertyMetadataCtx } from './internal/data';
 import { TweakableReferenceWithOptionsModel } from './models/TweakableReferenceWithOptionsModel';
 
-import {
+import type {
   ColorPickerMetadata,
-  INPUT_TYPE,
   NumberTextMetadata,
   PrimitiveMetadata,
   RadioMetadata,
@@ -19,6 +18,7 @@ import {
   SwitchMetadata,
   WithOptionsMetadata,
 } from './types';
+import { INPUT_TYPE } from './internal/constants';
 
 export function controllablePrimitiveProp<T, M extends PrimitiveMetadata>(value: T, metadata: M) {
   return prop<TweakablePrimitiveModel<T, M>>(() => propertyMetadataCtx.apply(() => new TweakablePrimitiveModel<T, M>({

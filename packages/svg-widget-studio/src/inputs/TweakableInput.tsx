@@ -9,7 +9,8 @@ import { TweakableSwitch } from './TweakableSwitch';
 import { TweakableSliderOrTextInput } from './TweakableSliderOrTextInput';
 import { TweakableReferenceRadio } from './TweakableReferenceRadio';
 import { TweakableReferenceSelect } from './TweakableReferenceSelect';
-import { INPUT_TYPE, TweakableModel } from '../types';
+import { TweakableModel } from '../types';
+import { INPUT_TYPE } from '../internal/constants';
 
 const TYPE_COMPONENT_MAP: Record<
 INPUT_TYPE,

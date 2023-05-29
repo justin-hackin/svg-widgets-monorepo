@@ -2,7 +2,7 @@ import { ExtendedModel, model, modelClass } from 'mobx-keystone';
 import { TweakableReferenceModel } from './TweakableReferenceModel';
 import { createOptionsGetter } from '../internal/tweakables';
 import { stringifier } from '../internal/util';
-import { ReferenceWithOptionsMetadata } from '../types';
+import type { ReferenceWithOptionsMetadata } from '../types';
 
 // NOTE: controls depend on reference models having a defined id via getRefId
 @model('SvgWidgetStudio/TweakableReferenceWithOptionsModel')

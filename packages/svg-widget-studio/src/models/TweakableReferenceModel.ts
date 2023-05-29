@@ -5,7 +5,7 @@ import { computed, observable } from 'mobx';
 import { propertyMetadataCtx } from '../internal/data';
 import { ownPropertyName, resolveLabel } from '../internal/tweakables';
 
-import { ReferenceMetadata } from '../types';
+import type { ReferenceMetadata } from '../types';
 
 @model('SvgWidgetStudio/TweakableReferenceModel')
 export class TweakableReferenceModel<T extends object, M extends ReferenceMetadata> extends Model(

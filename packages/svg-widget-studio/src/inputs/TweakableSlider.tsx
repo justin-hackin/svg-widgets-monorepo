@@ -6,7 +6,8 @@ import { observer } from 'mobx-react';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { TweakableUnlabelledSlider } from './TweakableUnlabelledSlider';
 import { FormControlStyled } from '../style';
-import { INPUT_TYPE, SliderMetadata } from '../types';
+import { SliderMetadata } from '../types';
+import { INPUT_TYPE } from '../internal/constants';
 
 export const TweakableSlider = observer(({
   node, className,
