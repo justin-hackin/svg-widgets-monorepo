@@ -47,7 +47,12 @@ export const viewBoxMaxPoint = (bb: BoundingBoxAttrs) => ({
   y: bb.ymax,
 });
 
-export const viewBoxValuesToBoundingBoxAttrs = (xmin: number, ymin: number, width: number, height:number): BoundingBoxAttrs => ({
+export const viewBoxValuesToBoundingBoxAttrs = (
+  xmin: number,
+  ymin: number,
+  width: number,
+  height:number,
+): BoundingBoxAttrs => ({
   xmin,
   ymin,
   width,

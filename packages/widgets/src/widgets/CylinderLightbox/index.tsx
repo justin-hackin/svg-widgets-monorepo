@@ -292,7 +292,12 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
     return new DisjunctAssetsDefinition([
       {
         name: 'Face boundaries',
-        documentArea: viewBoxValuesToBoundingBoxAttrs(-this.ringRadiusVal, -this.ringRadiusVal, this.ringRadiusVal * 2, this.ringRadiusVal * 2),
+        documentArea: viewBoxValuesToBoundingBoxAttrs(
+          -this.ringRadiusVal,
+          -this.ringRadiusVal,
+          this.ringRadiusVal * 2,
+          this.ringRadiusVal * 2,
+        ),
         Component: () => (
           <g>
             <circle r={this.ringRadius.value} fill="none" stroke="red" />

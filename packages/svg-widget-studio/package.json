@@ -22,11 +22,12 @@
     "react-color": "^2.18.1",
     "react-reflex": "^4.1.0",
     "react-resize-detector": "^9.1.0",
-    "react-svg-pan-zoom": "^3.10.0",
+    "react-svg-pan-zoom": "^3.12.1",
     "uuid": "^9.0.0",
     "wouter": "^2.11.0"
   },
   "devDependencies": {
+    "@types/react-svg-pan-zoom": "^3.3.5",
     "eslint": "^8.41.0",
     "eslint-config-custom-react": "*",
     "eslint-import-resolver-typescript": "^3.5.5",

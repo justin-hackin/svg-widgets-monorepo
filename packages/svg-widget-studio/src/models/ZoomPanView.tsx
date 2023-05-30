@@ -1,6 +1,6 @@
 import { model, Model, prop } from 'mobx-keystone';
 import {
-  fitToViewer, Tool, TOOL_PAN, Value,
+  ALIGN_CENTER, fitToViewer, Tool, TOOL_PAN, Value, zoomOnViewerCenter,
 } from 'react-svg-pan-zoom';
 import { action } from 'mobx';
 
@@ -13,6 +13,9 @@ export class ZoomPanView extends Model({
 }) {
   @action
   fitToDocument() {
-    this.setValue(fitToViewer(this.value));
+    // types are wrong
+    // @ts-ignore
+    const fitValue = fitToViewer(this.value, ALIGN_CENTER, ALIGN_CENTER);
+    this.setValue(zoomOnViewerCenter(fitValue, 0.9));
   }
 }
