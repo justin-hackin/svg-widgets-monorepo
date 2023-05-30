@@ -20,7 +20,7 @@ export const FileInputs = observer(() => {
     <InvisibleTextFileInput
       ref={openWidgetInputRef}
       changeHandler={(txt) => {
-        workspaceStore.dialogManager.deactivateWidgetFilePicker();
+        deactivateWidgetFilePicker();
         workspaceStore.initializeWidgetFromSnapshot(JSON.parse(txt));
       }}
       accept={`.${WIDGET_EXT}`}

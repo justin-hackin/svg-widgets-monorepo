@@ -144,7 +144,7 @@ export const DielinesLayer = observer(({
 
   return (
     <DielineGroup>
-      <g transform={fitToCanvasTranslationStr}>
+      <g>
         {
             faceDecoration instanceof PositionableFaceDecorationModel
             && faceDecoration?.pattern instanceof ImageFaceDecorationPatternModel
@@ -168,6 +168,14 @@ export const DielinesLayer = observer(({
           </>
         )}
       </g>
+      <rect
+        x={boundingBox.xmin}
+        y={boundingBox.ymin}
+        width={boundingBox.width}
+        height={boundingBox.height}
+        stroke="pink"
+        fill="none"
+      />
     </DielineGroup>
   );
 });

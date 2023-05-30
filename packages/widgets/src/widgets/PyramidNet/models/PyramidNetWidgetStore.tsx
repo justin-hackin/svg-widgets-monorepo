@@ -568,19 +568,17 @@ export class PyramidNetWidgetModel extends WidgetModel({
     return getBoundingBoxAttrs(this.netPaths.cut.getD());
   }
 
+  BOUNDARY_MARGIN = 0.1;
+
   @computed
   get documentAreaProps() {
-    return { width: this.preferences.documentWidth.value, height: this.preferences.documentHeight.value };
+    return this.netPaths.cut.getBoundingBox();
   }
 
   @computed
   get assetDefinition() {
-    const documentAreaProps = {
-      width: this.preferences.documentWidth.value,
-      height: this.preferences.documentHeight.value,
-    };
     return new RegisteredAssetsDefinition(
-      documentAreaProps,
+      this.documentAreaProps,
       [
         {
           name: 'Print',

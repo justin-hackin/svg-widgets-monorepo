@@ -1,7 +1,5 @@
 import { BoundingBoxAttrs, getBoundingBoxAttrs } from 'fluent-svg-path-ts';
-import {
-  Dimensions, DocumentAreaProps, documentAreaPropsAreViewBoxProps, ViewBoxProps,
-} from '../types';
+import { Dimensions, DocumentArea, documentAreaPropsAreBoundingBoxAttrs } from '../types';
 
 export const boundingBoxOfBoundingBoxes = (bbs: BoundingBoxAttrs[]): BoundingBoxAttrs => {
   const noDimBB = bbs.reduce((acc, bb) => {
@@ -23,8 +21,8 @@ export const boundingBoxOfBoundingBoxes = (bbs: BoundingBoxAttrs[]): BoundingBox
     height: noDimBB.ymax - noDimBB.ymin,
   };
 };
-export const castToViewBox = (dap: DocumentAreaProps) => (documentAreaPropsAreViewBoxProps(dap)
-  ? dap.viewBox : `0 0 ${dap.width} ${dap.height}`);
+export const castToViewBox = (dap: DocumentArea) => (documentAreaPropsAreBoundingBoxAttrs(dap)
+  ? `${dap.xmin} ${dap.ymin} ${dap.width} ${dap.height}` : `0 0 ${dap.width} ${dap.height}`);
 
 export const toRectangleCoordinatesAttrs = (bb: BoundingBoxAttrs) => ({
   width: bb.width,
@@ -48,24 +46,26 @@ export const viewBoxMaxPoint = (bb: BoundingBoxAttrs) => ({
   x: bb.xmax,
   y: bb.ymax,
 });
+
+export const viewBoxValuesToBoundingBoxAttrs = (xmin: number, ymin: number, width: number, height:number): BoundingBoxAttrs => ({
+  xmin,
+  ymin,
+  width,
+  height,
+  xmax: xmin + width,
+  ymax: ymin + height,
+});
 export const viewBoxStrToBoundingBoxAttrs = (viewBoxStr: string): BoundingBoxAttrs => {
   const [xmin, ymin, width, height] = viewBoxStr.split(' ')
     .map((str) => parseFloat(str.trim()));
-  return {
-    xmin,
-    ymin,
-    width,
-    height,
-    xmax: xmin + width,
-    ymax: ymin + height,
-  };
+  return viewBoxValuesToBoundingBoxAttrs(xmin, ymin, width, height);
 };
+
 export const boundingBoxAttrsToViewBoxStr = (bb: BoundingBoxAttrs) => `${bb.xmin} ${bb.ymin} ${bb.width} ${bb.height}`;
 export const pathDToViewBoxStr = (d: string) => boundingBoxAttrsToViewBoxStr(getBoundingBoxAttrs(d));
-export const castDocumentAreaPropsToBoundingBoxAttrs = (dap: DocumentAreaProps): BoundingBoxAttrs => {
-  const { viewBox } = dap as ViewBoxProps;
-  if (viewBox) {
-    return viewBoxStrToBoundingBoxAttrs(viewBox);
+export const castDocumentAreaPropsToBoundingBoxAttrs = (dap: DocumentArea): BoundingBoxAttrs => {
+  if (documentAreaPropsAreBoundingBoxAttrs(dap)) {
+    return dap;
   }
   const {
     width,

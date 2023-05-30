@@ -2,16 +2,17 @@ import React from 'react';
 import { computed } from 'mobx';
 import { flatten, range } from 'lodash-es';
 import Flatten from '@flatten-js/core';
-import { PathData } from 'fluent-svg-path-ts';
+import { getBoundingBoxAttrs, PathData } from 'fluent-svg-path-ts';
 import {
   assertNotNullish,
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
   numberTextProp,
-  pathDToViewBoxStr,
   PIXELS_PER_INCH,
   sliderWithTextProp,
-  switchProp, WidgetModel,
+  switchProp,
+  viewBoxValuesToBoundingBoxAttrs,
+  WidgetModel,
   widgetModel,
 } from 'svg-widget-studio';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
@@ -174,7 +175,7 @@ export class TriangularGridWidgetModel extends WidgetModel({
           const transY = (index * this.hexagonDepth.value + (this.hexagonHeight / 2)) * this.spacingMarginRatio;
           return {
             name: `${triNotchLevelToLabel(notchLevel)}_${index + 1}`,
-            documentAreaProps: { viewBox: `${transX} ${transY} ${segment.length} ${this.hexagonDepth.value}` },
+            documentAreaProps: viewBoxValuesToBoundingBoxAttrs(transX, transY, segment.length, this.hexagonDepth.value),
             copies: isMiddleOfRange(index, this.subdivisions.value + 1) ? 3 : 6,
             Component: () => (
               <g transform={`translate(${transX}, ${transY})`}>
@@ -189,9 +190,7 @@ export class TriangularGridWidgetModel extends WidgetModel({
     return new DisjunctAssetsDefinition([
       {
         name: 'Profile view',
-        documentAreaProps: {
-          viewBox: pathDToViewBoxStr(this.wallSegmentsPathD),
-        },
+        documentAreaProps: getBoundingBoxAttrs(this.wallSegmentsPathD),
         Component: () => (
           <g>
             <path

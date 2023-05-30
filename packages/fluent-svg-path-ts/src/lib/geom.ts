@@ -76,7 +76,7 @@ export const getBoundingBoxAttrs = (pathD: string): BoundingBoxAttrs => {
     ymin: bb.y,
     xmax: bb.x2,
     ymax: bb.y2,
-    width: bb.x2 - bb.x,
-    height: bb.y2 - bb.y,
+    height: bb.height,
+    width: bb.width,
   };
 };

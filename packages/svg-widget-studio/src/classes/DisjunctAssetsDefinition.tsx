@@ -6,19 +6,13 @@ import React from 'react';
 
 import { GridPattern } from '../components/GridPattern';
 import type { RegisteredWidgetAssetMember } from './RegisteredAssetsDefinition';
-import {
-  boundingBoxAttrsToViewBoxStr,
-  boundingBoxOfBoundingBoxes,
-  castDocumentAreaPropsToBoundingBoxAttrs,
-} from '../helpers/bounds';
+import { boundingBoxOfBoundingBoxes, castDocumentAreaPropsToBoundingBoxAttrs } from '../helpers/bounds';
 import { filePathConstructor } from '../helpers/string';
-import {
-  BaseAssetDefinition, DocumentAreaProps, ViewBoxProps, WatermarkContentComponent,
-} from '../types';
+import { BaseAssetDefinition, DocumentArea, WatermarkContentComponent } from '../types';
 import { SVGWrapper } from '../components/SVGWrapper';
 
 export interface DisjunctWidgetAssetMember extends RegisteredWidgetAssetMember {
-  documentAreaProps: DocumentAreaProps,
+  documentAreaProps: DocumentArea,
 }
 
 export class DisjunctAssetsDefinition implements BaseAssetDefinition {
@@ -70,21 +64,9 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
   }
 
   @computed
-  get allAssetsDocumentAreaProps(): DocumentAreaProps {
-    const hasViewBoxMember = !!this.members.find((member) => !!(member.documentAreaProps as ViewBoxProps).viewBox);
+  get allAssetsDocumentAreaProps(): DocumentArea {
     const bbs = this.members.map((member) => castDocumentAreaPropsToBoundingBoxAttrs(member.documentAreaProps));
-    const consolidatedBB = boundingBoxOfBoundingBoxes(bbs);
-    if (hasViewBoxMember) {
-      return { viewBox: boundingBoxAttrsToViewBoxStr(consolidatedBB) };
-    }
-    const {
-      width,
-      height,
-    } = consolidatedBB;
-    return {
-      width,
-      height,
-    };
+    return boundingBoxOfBoundingBoxes(bbs);
   }
 
   getAssetsFileData(fileBaseName: string, WatermarkComponent?: WatermarkContentComponent) {

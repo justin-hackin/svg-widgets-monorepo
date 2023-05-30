@@ -3,7 +3,11 @@ import { computed } from 'mobx';
 import { range } from 'lodash-es';
 import { PathData } from 'fluent-svg-path-ts';
 import {
-  DisjunctAssetsDefinition, radioProp, WidgetModel, widgetModel,
+  DisjunctAssetsDefinition,
+  radioProp,
+  viewBoxValuesToBoundingBoxAttrs,
+  WidgetModel,
+  widgetModel,
 } from 'svg-widget-studio';
 import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
@@ -129,9 +133,8 @@ export class SquareGridDividerWidgetModel extends WidgetModel({
       {
         name: 'Vertical pane',
         copies: this.numCubbiesWide + 1,
-        documentAreaProps: {
-          viewBox: `${0} ${vertTransY} ${this.shelfHeight.value} ${this.shelfDepth.value}`,
-        },
+        documentAreaProps:
+          viewBoxValuesToBoundingBoxAttrs(0, vertTransY, this.shelfHeight.value, this.shelfDepth.value),
         Component: () => (
           <g transform={`translate(0, ${vertTransY})`}>
             <path
@@ -146,9 +149,8 @@ export class SquareGridDividerWidgetModel extends WidgetModel({
       {
         name: 'Horizontal pane',
         copies: this.numCubbiesHigh + 1,
-        documentAreaProps: {
-          viewBox: `${0} ${horizTransY} ${this.shelfWidth.value} ${this.shelfDepth.value}`,
-        },
+        documentAreaProps:
+          viewBoxValuesToBoundingBoxAttrs(0, horizTransY, this.shelfWidth.value, this.shelfDepth.value),
         Component: () => (
           <g transform={`translate(0, ${horizTransY})`}>
             <path

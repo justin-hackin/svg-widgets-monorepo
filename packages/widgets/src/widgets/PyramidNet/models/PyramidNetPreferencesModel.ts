@@ -5,7 +5,6 @@ import { startCase } from 'lodash-es';
 import {
   colorPickerProp,
   numberTextProp,
-  PIXELS_PER_CM,
   PIXELS_PER_INCH,
   radioProp,
   sliderWithTextProp,
@@ -16,8 +15,6 @@ import { PRINT_REGISTRATION_TYPES } from '@/widgets/PyramidNet/types';
 
 @model('PyramidNetPreferencesModel')
 export class PyramidNetPreferencesModel extends Model({
-  documentWidth: numberTextProp(PIXELS_PER_CM * 49.5, { useUnits: true }),
-  documentHeight: numberTextProp(PIXELS_PER_CM * 27.9, { useUnits: true }),
   useClonesForBaseTabs: switchProp(false),
   useClonesForDecoration: switchProp(false),
   outerCutStrokeColor: colorPickerProp('#FF3A5E'),

@@ -1,12 +1,13 @@
 import { computed } from 'mobx';
 import React from 'react';
-import { DestinationCommand, PathData } from 'fluent-svg-path-ts';
+import { DestinationCommand, getBoundingBoxAttrs, PathData } from 'fluent-svg-path-ts';
 import {
   DisjunctAssetsDefinition,
-  pathDToViewBoxStr,
   PIXELS_PER_CM,
   sliderProp,
-  sliderWithTextProp, WidgetModel,
+  sliderWithTextProp,
+  viewBoxValuesToBoundingBoxAttrs,
+  WidgetModel,
   widgetModel,
 } from 'svg-widget-studio';
 import {
@@ -291,9 +292,7 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
     return new DisjunctAssetsDefinition([
       {
         name: 'Face boundaries',
-        documentAreaProps: {
-          viewBox: `${-this.ringRadiusVal} ${-this.ringRadiusVal} ${this.ringRadiusVal * 2} ${this.ringRadiusVal * 2}`,
-        },
+        documentAreaProps: viewBoxValuesToBoundingBoxAttrs(-this.ringRadiusVal, -this.ringRadiusVal, this.ringRadiusVal * 2, this.ringRadiusVal * 2),
         Component: () => (
           <g>
             <circle r={this.ringRadius.value} fill="none" stroke="red" />
@@ -310,7 +309,7 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
             <path d={this.wallPathD} fill="white" stroke="black" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(this.wallPathD) },
+        documentAreaProps: getBoundingBoxAttrs(this.wallPathD),
         copies: this.wallsPerArc.value * this.arcsPerRing.value,
       },
       {
@@ -320,7 +319,7 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
             <path d={this.sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(this.sectionPathD) },
+        documentAreaProps: getBoundingBoxAttrs(this.sectionPathD),
         copies: this.arcsPerRing.value * 2,
       },
       {
@@ -330,7 +329,7 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
             <path d={this.holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(this.holderTabD) },
+        documentAreaProps: getBoundingBoxAttrs(this.holderTabD),
         copies: this.holderTabsPerArc.value * this.arcsPerRing.value,
       },
     ]);

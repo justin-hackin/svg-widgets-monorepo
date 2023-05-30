@@ -2,6 +2,7 @@ import { FC, ReactElement } from 'react';
 import { SvgIcon } from '@mui/material';
 import { RefConstructor, SnapshotInOfModel } from 'mobx-keystone';
 
+import { BoundingBoxAttrs } from 'fluent-svg-path-ts';
 import type { DisjunctAssetsDefinition } from './classes/DisjunctAssetsDefinition';
 import type { RegisteredAssetsDefinition } from './classes/RegisteredAssetsDefinition';
 import type { SolitaryAssetDefinition } from './classes/SolitaryAssetDefinition';
@@ -13,15 +14,11 @@ import type { TweakablePrimitiveWithOptionsModel } from './models/TweakablePrimi
 import type { WorkspaceModel as WorkspaceModelClass } from './models/WorkspaceModel';
 import { INPUT_TYPE } from './internal/constants';
 
-export interface ViewBoxProps {
-  viewBox: string
-}
-
 export type WidgetSVGComponent = FC<any>;
-export type DocumentAreaProps = (Dimensions | ViewBoxProps);
-export const documentAreaPropsAreViewBoxProps = (
-  dap: DocumentAreaProps,
-): dap is ViewBoxProps => !!(dap as ViewBoxProps).viewBox;
+export type DocumentArea = (Dimensions | BoundingBoxAttrs);
+export const documentAreaPropsAreBoundingBoxAttrs = (
+  dap: DocumentArea,
+): dap is BoundingBoxAttrs => (dap as BoundingBoxAttrs).xmin !== undefined;
 
 export interface BaseAssetDefinition {
   WorkspaceView: ReactElement<any, any>;
@@ -30,7 +27,7 @@ export interface BaseAssetDefinition {
 }
 
 export type AnyAssetDefinition = DisjunctAssetsDefinition | RegisteredAssetsDefinition | SolitaryAssetDefinition;
-export type WatermarkContentComponent = FC<{ documentAreaProps: DocumentAreaProps }>;
+export type WatermarkContentComponent = FC<{ documentAreaProps: DocumentArea }>;
 export type DocumentAreaPropertyNames = 'width' | 'height' | 'viewBox';
 
 export interface TxtFileInfo {

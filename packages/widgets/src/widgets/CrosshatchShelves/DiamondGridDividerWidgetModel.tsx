@@ -6,6 +6,7 @@ import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
   switchProp,
+  viewBoxValuesToBoundingBoxAttrs,
   WidgetModel,
   widgetModel,
 } from 'svg-widget-studio';
@@ -125,7 +126,7 @@ export class DiamondGridDividerWidgetModel extends WidgetModel({
       const { width, height } = getBoundingBoxAttrs(d);
       return {
         name: `Panel ${index + 1}`,
-        documentAreaProps: { viewBox: `0 ${transY} ${width} ${height}` },
+        documentAreaProps: viewBoxValuesToBoundingBoxAttrs(0, transY, width, height),
         copies,
         Component: () => (
           <g transform={`translate(0, ${transY})`}>

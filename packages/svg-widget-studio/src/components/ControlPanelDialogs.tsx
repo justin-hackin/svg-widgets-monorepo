@@ -33,7 +33,6 @@ export const ControlPanelDialogs = observer(() => {
         open={!!dialogManager.downloadPromptInitialText}
         initialValue={dialogManager.downloadPromptInitialText}
         handleClose={(fileBasename) => {
-          debugger;
           workspaceStore.downloadWidgetWithAssets(fileBasename);
           dialogManager.setDownloadPromptInitialText(undefined);
         }}
