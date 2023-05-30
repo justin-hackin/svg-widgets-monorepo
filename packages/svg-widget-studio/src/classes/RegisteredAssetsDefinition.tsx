@@ -6,11 +6,7 @@ import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { GridPattern } from '../components/GridPattern';
 import {
-  BaseAssetDefinition,
-  DocumentAreaProps,
-  TxtFileInfo,
-  WatermarkContentComponent,
-  WidgetSVGComponent,
+  BaseAssetDefinition, DocumentArea, TxtFileInfo, WatermarkContentComponent, WidgetSVGComponent,
 } from '../types';
 import { SVGWrapper } from '../components/SVGWrapper';
 import { filePathConstructor } from '../helpers/string';
@@ -26,7 +22,7 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
   public memberVisibility: boolean[];
 
   constructor(
-    public documentAreaProps: DocumentAreaProps,
+    public documentArea: DocumentArea,
     public members: RegisteredWidgetAssetMember[],
   ) {
     makeObservable(this);
@@ -45,7 +41,7 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
   @computed
   get WorkspaceView() {
     return (
-      <svg {...this.documentAreaProps}>
+      <svg {...this.documentArea}>
         <GridPattern patternId="grid-pattern" />
         {this.members.map(({ Component }, index) => (
           <g key={index} visibility={this.memberVisibility[index] ? 'visible' : 'hidden'}>
@@ -70,8 +66,8 @@ export class RegisteredAssetsDefinition implements BaseAssetDefinition {
         acc.push({
           filePath: filePathConstructor(fileBaseName, name, copies),
           fileString: ReactDOMServer.renderToString(
-            <SVGWrapper documentAreaProps={this.documentAreaProps}>
-              { WatermarkComponent && (<WatermarkComponent documentAreaProps={this.documentAreaProps} />)}
+            <SVGWrapper documentArea={this.documentArea}>
+              { WatermarkComponent && (<WatermarkComponent documentArea={this.documentArea} />)}
               <Component />
             </SVGWrapper>,
           ),

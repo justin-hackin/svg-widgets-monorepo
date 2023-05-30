@@ -9,7 +9,7 @@ export function DecorationBoundarySVG(
   const normalizedDecorationBoundaryPath = closedPolygonPath(normalizedDecorationBoundaryPoints);
 
   return (
-    <SVGWrapper documentAreaProps={normalizedDecorationBoundaryPath.getBoundingBox()}>
+    <SVGWrapper documentArea={normalizedDecorationBoundaryPath.getBoundingBox()}>
       <path fill="#FFD900" stroke="#000" d={normalizedDecorationBoundaryPath.getD()} />
     </SVGWrapper>
   );

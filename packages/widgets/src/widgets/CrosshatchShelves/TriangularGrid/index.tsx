@@ -175,7 +175,7 @@ export class TriangularGridWidgetModel extends WidgetModel({
           const transY = (index * this.hexagonDepth.value + (this.hexagonHeight / 2)) * this.spacingMarginRatio;
           return {
             name: `${triNotchLevelToLabel(notchLevel)}_${index + 1}`,
-            documentAreaProps: viewBoxValuesToBoundingBoxAttrs(transX, transY, segment.length, this.hexagonDepth.value),
+            documentArea: viewBoxValuesToBoundingBoxAttrs(transX, transY, segment.length, this.hexagonDepth.value),
             copies: isMiddleOfRange(index, this.subdivisions.value + 1) ? 3 : 6,
             Component: () => (
               <g transform={`translate(${transX}, ${transY})`}>
@@ -190,7 +190,7 @@ export class TriangularGridWidgetModel extends WidgetModel({
     return new DisjunctAssetsDefinition([
       {
         name: 'Profile view',
-        documentAreaProps: getBoundingBoxAttrs(this.wallSegmentsPathD),
+        documentArea: getBoundingBoxAttrs(this.wallSegmentsPathD),
         Component: () => (
           <g>
             <path

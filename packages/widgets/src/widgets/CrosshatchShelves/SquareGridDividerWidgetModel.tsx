@@ -115,7 +115,7 @@ export class SquareGridDividerWidgetModel extends WidgetModel({
     return new DisjunctAssetsDefinition([
       {
         name: 'Cross-section',
-        documentAreaProps: {
+        documentArea: {
           width: this.shelfWidth.value,
           height: this.shelfHeight.value,
         },
@@ -133,7 +133,7 @@ export class SquareGridDividerWidgetModel extends WidgetModel({
       {
         name: 'Vertical pane',
         copies: this.numCubbiesWide + 1,
-        documentAreaProps:
+        documentArea:
           viewBoxValuesToBoundingBoxAttrs(0, vertTransY, this.shelfHeight.value, this.shelfDepth.value),
         Component: () => (
           <g transform={`translate(0, ${vertTransY})`}>
@@ -149,7 +149,7 @@ export class SquareGridDividerWidgetModel extends WidgetModel({
       {
         name: 'Horizontal pane',
         copies: this.numCubbiesHigh + 1,
-        documentAreaProps:
+        documentArea:
           viewBoxValuesToBoundingBoxAttrs(0, horizTransY, this.shelfWidth.value, this.shelfDepth.value),
         Component: () => (
           <g transform={`translate(0, ${horizTransY})`}>

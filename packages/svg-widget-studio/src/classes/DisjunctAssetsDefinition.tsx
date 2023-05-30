@@ -12,7 +12,7 @@ import { BaseAssetDefinition, DocumentArea, WatermarkContentComponent } from '..
 import { SVGWrapper } from '../components/SVGWrapper';
 
 export interface DisjunctWidgetAssetMember extends RegisteredWidgetAssetMember {
-  documentAreaProps: DocumentArea,
+  documentArea: DocumentArea,
 }
 
 export class DisjunctAssetsDefinition implements BaseAssetDefinition {
@@ -52,7 +52,7 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
   @computed
   get WorkspaceView() {
     return (
-      <svg {...(this.overlayModeEnabled ? this.allAssetsDocumentAreaProps : this.selectedMember.documentAreaProps)}>
+      <svg {...(this.overlayModeEnabled ? this.allAssetsDocumentAreaProps : this.selectedMember.documentArea)}>
         <GridPattern patternId="grid-pattern" />
         {
             this.overlayModeEnabled
@@ -65,21 +65,21 @@ export class DisjunctAssetsDefinition implements BaseAssetDefinition {
 
   @computed
   get allAssetsDocumentAreaProps(): DocumentArea {
-    const bbs = this.members.map((member) => castDocumentAreaPropsToBoundingBoxAttrs(member.documentAreaProps));
+    const bbs = this.members.map((member) => castDocumentAreaPropsToBoundingBoxAttrs(member.documentArea));
     return boundingBoxOfBoundingBoxes(bbs);
   }
 
   getAssetsFileData(fileBaseName: string, WatermarkComponent?: WatermarkContentComponent) {
     return this.members.map(({
       Component,
-      documentAreaProps,
+      documentArea,
       name,
       copies,
     }) => ({
       filePath: filePathConstructor(fileBaseName, name, copies),
       fileString: ReactDOMServer.renderToString(
-        <SVGWrapper documentAreaProps={documentAreaProps}>
-          { WatermarkComponent && (<WatermarkComponent documentAreaProps={documentAreaProps} />)}
+        <SVGWrapper documentArea={documentArea}>
+          { WatermarkComponent && (<WatermarkComponent documentArea={documentArea} />)}
           <Component />
         </SVGWrapper>,
       ),

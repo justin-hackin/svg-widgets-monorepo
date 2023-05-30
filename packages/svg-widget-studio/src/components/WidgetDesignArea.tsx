@@ -9,8 +9,8 @@ import { ResizableZoomPan } from './ResizableZoomPan';
 import { GridPattern } from './GridPattern';
 import { useWorkspaceMst } from '../rootStore';
 import { FullPageDiv } from '../style';
-import { DocumentArea, documentAreaPropsAreBoundingBoxAttrs } from '../types';
-import { boundingBoxAttrsToViewBoxStr } from '../helpers/bounds';
+import { documentAreaToSVGProps } from '../helpers/bounds';
+import { DocumentArea } from '../types';
 
 export const WidgetDesignArea = observer(({
   showOrientationToggle,
@@ -21,20 +21,20 @@ export const WidgetDesignArea = observer(({
   const { selectedStore } = workspaceStore;
   assertNotNullish(selectedStore);
   const definition = selectedStore.assetDefinition;
-  let documentAreaProps: DocumentArea;
+  let documentArea: DocumentArea;
   let innerContent;
 
   if (definition instanceof DisjunctAssetsDefinition) {
     if (definition.overlayModeEnabled) {
-      documentAreaProps = definition.allAssetsDocumentAreaProps;
+      documentArea = definition.allAssetsDocumentAreaProps;
     } else {
-      documentAreaProps = definition.selectedMember.documentAreaProps;
+      documentArea = definition.selectedMember.documentArea;
     }
     innerContent = (definition.overlayModeEnabled
       ? definition.members.map(({ Component }, index) => (<Component key={index} />))
       : (<definition.selectedMember.Component />));
   } else {
-    documentAreaProps = definition.documentAreaProps;
+    documentArea = definition.documentArea;
     if (definition instanceof RegisteredAssetsDefinition) {
       innerContent = definition.members.map(({ Component }, index) => (
         <g key={index} visibility={definition.memberVisibility[index] ? 'visible' : 'hidden'}>
@@ -46,18 +46,14 @@ export const WidgetDesignArea = observer(({
       innerContent = (<definition.Component />);
     }
   }
-  const documentAreaAttrs = documentAreaPropsAreBoundingBoxAttrs(documentAreaProps)
-    ? {
-      viewBox: boundingBoxAttrsToViewBoxStr(documentAreaProps),
-      width: documentAreaProps.width,
-      height: documentAreaProps.height,
-    }
-    : documentAreaProps;
+
+  const documentAreaProps = documentAreaToSVGProps(documentArea);
+
   return (
     <FullPageDiv>
       <WidgetDesignAreaToolbar orientation={orientation} showOrientationToggle={showOrientationToggle} />
       <ResizableZoomPan SVGBackground="url(#grid-pattern)">
-        <svg {...(documentAreaAttrs)}>
+        <svg {...(documentAreaProps)}>
           <GridPattern patternId="grid-pattern" />
           {innerContent}
         </svg>

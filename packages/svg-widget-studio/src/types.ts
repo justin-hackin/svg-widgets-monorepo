@@ -16,7 +16,7 @@ import { INPUT_TYPE } from './internal/constants';
 
 export type WidgetSVGComponent = FC<any>;
 export type DocumentArea = (Dimensions | BoundingBoxAttrs);
-export const documentAreaPropsAreBoundingBoxAttrs = (
+export const documentAreaIsBoundingBoxAttrs = (
   dap: DocumentArea,
 ): dap is BoundingBoxAttrs => (dap as BoundingBoxAttrs).xmin !== undefined;
 
@@ -27,7 +27,7 @@ export interface BaseAssetDefinition {
 }
 
 export type AnyAssetDefinition = DisjunctAssetsDefinition | RegisteredAssetsDefinition | SolitaryAssetDefinition;
-export type WatermarkContentComponent = FC<{ documentAreaProps: DocumentArea }>;
+export type WatermarkContentComponent = FC<{ documentArea: DocumentArea }>;
 export type DocumentAreaPropertyNames = 'width' | 'height' | 'viewBox';
 
 export interface TxtFileInfo {

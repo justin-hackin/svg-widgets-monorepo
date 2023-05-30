@@ -1,12 +1,9 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { boundingBoxMinPoint, expandBoundingBoxAttrs, toRectangleCoordinatesAttrs } from 'svg-widget-studio';
-import {
-  lineLerp, matrixWithTransformOrigin, pointToTranslateString, scalePoint,
-} from '../../../common/util/geom';
+import { expandBoundingBoxAttrs, toRectangleCoordinatesAttrs } from 'svg-widget-studio';
+import { lineLerp, matrixWithTransformOrigin } from '../../../common/util/geom';
 import { registrationMarksPath } from '../../../common/util/svg';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { PathFaceDecorationPatternModel } from '../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
 import { PRINT_REGISTRATION_TYPES } from '@/widgets/PyramidNet/types';
@@ -59,13 +56,6 @@ export const DielinesLayer = observer(({
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
   // graphtec type frames with rectangle but laser type has registration L marks facing outward
-  const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
-    ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
-  const fittingBB = (
-    faceDecoration instanceof PositionableFaceDecorationModel
-    && faceDecoration.pattern instanceof PathFaceDecorationPatternModel
-  ) ? boundingBox : dielineRegistrationBB;
-  const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(fittingBB), -1));
 
   function DecorationContent() {
     if (!texturePathD || !decorationCutPath) {
@@ -168,14 +158,6 @@ export const DielinesLayer = observer(({
           </>
         )}
       </g>
-      <rect
-        x={boundingBox.xmin}
-        y={boundingBox.ymin}
-        width={boundingBox.width}
-        height={boundingBox.height}
-        stroke="pink"
-        fill="none"
-      />
     </DielineGroup>
   );
 });

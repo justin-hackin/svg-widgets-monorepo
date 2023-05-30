@@ -1,11 +1,6 @@
 import React, { SVGProps } from 'react';
-import {
-  DocumentArea,
-  DocumentAreaPropertyNames,
-  documentAreaPropsAreBoundingBoxAttrs,
-  WatermarkContentComponent,
-} from '../types';
-import { boundingBoxAttrsToViewBoxStr } from '../helpers/bounds';
+import { DocumentArea, DocumentAreaPropertyNames, WatermarkContentComponent } from '../types';
+import { documentAreaToSVGProps } from '../helpers/bounds';
 
 const svgNamespaceAttributes = {
   xmlns: 'http://www.w3.org/2000/svg',
@@ -36,17 +31,14 @@ const namedviewAttributes = {
 
 type SVGWrapperProps =
   Omit<SVGProps<any>, DocumentAreaPropertyNames>
-  & { WatermarkContent?: WatermarkContentComponent } & { documentAreaProps: DocumentArea };
+  & { WatermarkContent?: WatermarkContentComponent } & { documentArea: DocumentArea };
 
 export function SVGWrapper({
-  children, documentAreaProps, WatermarkContent, ...rest
+  children, documentArea, WatermarkContent, ...rest
 }: SVGWrapperProps) {
-  const documentAreaAttrs = documentAreaPropsAreBoundingBoxAttrs(documentAreaProps)
-    ? { viewBox: boundingBoxAttrsToViewBoxStr(documentAreaProps) }
-    : documentAreaProps;
   return (
-    <svg {...rest} {...documentAreaAttrs} {...svgNamespaceAttributes}>
-      { WatermarkContent && (<WatermarkContent documentAreaProps={documentAreaProps} />)}
+    <svg {...rest} {...documentAreaToSVGProps(documentArea)} {...svgNamespaceAttributes}>
+      { WatermarkContent && (<WatermarkContent documentArea={documentArea} />)}
       <SodipodiNamedview {...namedviewAttributes} />
       {children}
     </svg>

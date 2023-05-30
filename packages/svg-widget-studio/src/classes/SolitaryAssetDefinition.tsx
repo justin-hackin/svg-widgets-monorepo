@@ -4,13 +4,13 @@ import React from 'react';
 import { GridPattern } from '../components/GridPattern';
 import { SVGWrapper } from '../components/SVGWrapper';
 import {
-  BaseAssetDefinition, DocumentAreaProps, WatermarkContentComponent, WidgetSVGComponent,
+  BaseAssetDefinition, DocumentArea, WatermarkContentComponent, WidgetSVGComponent,
 } from '../types';
 import { filePathConstructor } from '../helpers/string';
 
 export class SolitaryAssetDefinition implements BaseAssetDefinition {
   constructor(
-    public documentAreaProps: DocumentAreaProps,
+    public documentArea: DocumentArea,
     public Component: WidgetSVGComponent,
     public copies?: number | undefined,
   ) {
@@ -21,10 +21,10 @@ export class SolitaryAssetDefinition implements BaseAssetDefinition {
   get WorkspaceView() {
     const {
       Component,
-      documentAreaProps,
+      documentArea,
     } = this;
     return (
-      <svg {...documentAreaProps}>
+      <svg {...documentArea}>
         <GridPattern patternId="grid-pattern" />
         <Component />
       </svg>
@@ -34,13 +34,13 @@ export class SolitaryAssetDefinition implements BaseAssetDefinition {
   getAssetsFileData(fileBaseName: string, WatermarkComponent?: WatermarkContentComponent) {
     const {
       Component,
-      documentAreaProps,
+      documentArea,
     } = this;
     return [{
       filePath: filePathConstructor(fileBaseName, undefined, this.copies),
       fileString: ReactDOMServer.renderToString(
-        <SVGWrapper documentAreaProps={documentAreaProps}>
-          { WatermarkComponent && (<WatermarkComponent documentAreaProps={documentAreaProps} />)}
+        <SVGWrapper documentArea={documentArea}>
+          { WatermarkComponent && (<WatermarkComponent documentArea={documentArea} />)}
           <Component />
         </SVGWrapper>,
       ),

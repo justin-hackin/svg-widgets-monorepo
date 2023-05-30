@@ -1,5 +1,5 @@
 import { BoundingBoxAttrs, getBoundingBoxAttrs } from 'fluent-svg-path-ts';
-import { Dimensions, DocumentArea, documentAreaPropsAreBoundingBoxAttrs } from '../types';
+import { Dimensions, DocumentArea, documentAreaIsBoundingBoxAttrs } from '../types';
 
 export const boundingBoxOfBoundingBoxes = (bbs: BoundingBoxAttrs[]): BoundingBoxAttrs => {
   const noDimBB = bbs.reduce((acc, bb) => {
@@ -21,7 +21,7 @@ export const boundingBoxOfBoundingBoxes = (bbs: BoundingBoxAttrs[]): BoundingBox
     height: noDimBB.ymax - noDimBB.ymin,
   };
 };
-export const castToViewBox = (dap: DocumentArea) => (documentAreaPropsAreBoundingBoxAttrs(dap)
+export const castToViewBox = (dap: DocumentArea) => (documentAreaIsBoundingBoxAttrs(dap)
   ? `${dap.xmin} ${dap.ymin} ${dap.width} ${dap.height}` : `0 0 ${dap.width} ${dap.height}`);
 
 export const toRectangleCoordinatesAttrs = (bb: BoundingBoxAttrs) => ({
@@ -64,7 +64,7 @@ export const viewBoxStrToBoundingBoxAttrs = (viewBoxStr: string): BoundingBoxAtt
 export const boundingBoxAttrsToViewBoxStr = (bb: BoundingBoxAttrs) => `${bb.xmin} ${bb.ymin} ${bb.width} ${bb.height}`;
 export const pathDToViewBoxStr = (d: string) => boundingBoxAttrsToViewBoxStr(getBoundingBoxAttrs(d));
 export const castDocumentAreaPropsToBoundingBoxAttrs = (dap: DocumentArea): BoundingBoxAttrs => {
-  if (documentAreaPropsAreBoundingBoxAttrs(dap)) {
+  if (documentAreaIsBoundingBoxAttrs(dap)) {
     return dap;
   }
   const {
@@ -80,3 +80,10 @@ export const castDocumentAreaPropsToBoundingBoxAttrs = (dap: DocumentArea): Boun
     height,
   };
 };
+export const documentAreaToSVGProps = (documentArea: DocumentArea) => (documentAreaIsBoundingBoxAttrs(documentArea)
+  ? {
+    viewBox: boundingBoxAttrsToViewBoxStr(documentArea),
+    width: documentArea.width,
+    height: documentArea.height,
+  }
+  : documentArea);

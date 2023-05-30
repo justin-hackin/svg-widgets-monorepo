@@ -292,7 +292,7 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
     return new DisjunctAssetsDefinition([
       {
         name: 'Face boundaries',
-        documentAreaProps: viewBoxValuesToBoundingBoxAttrs(-this.ringRadiusVal, -this.ringRadiusVal, this.ringRadiusVal * 2, this.ringRadiusVal * 2),
+        documentArea: viewBoxValuesToBoundingBoxAttrs(-this.ringRadiusVal, -this.ringRadiusVal, this.ringRadiusVal * 2, this.ringRadiusVal * 2),
         Component: () => (
           <g>
             <circle r={this.ringRadius.value} fill="none" stroke="red" />
@@ -309,7 +309,7 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
             <path d={this.wallPathD} fill="white" stroke="black" />
           </g>
         ),
-        documentAreaProps: getBoundingBoxAttrs(this.wallPathD),
+        documentArea: getBoundingBoxAttrs(this.wallPathD),
         copies: this.wallsPerArc.value * this.arcsPerRing.value,
       },
       {
@@ -319,7 +319,7 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
             <path d={this.sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: getBoundingBoxAttrs(this.sectionPathD),
+        documentArea: getBoundingBoxAttrs(this.sectionPathD),
         copies: this.arcsPerRing.value * 2,
       },
       {
@@ -329,7 +329,7 @@ export class CylinderLightboxWidgetModel extends WidgetModel({
             <path d={this.holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: getBoundingBoxAttrs(this.holderTabD),
+        documentArea: getBoundingBoxAttrs(this.holderTabD),
         copies: this.holderTabsPerArc.value * this.arcsPerRing.value,
       },
     ]);

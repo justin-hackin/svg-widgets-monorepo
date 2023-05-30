@@ -126,7 +126,7 @@ export class DiamondGridDividerWidgetModel extends WidgetModel({
       const { width, height } = getBoundingBoxAttrs(d);
       return {
         name: `Panel ${index + 1}`,
-        documentAreaProps: viewBoxValuesToBoundingBoxAttrs(0, transY, width, height),
+        documentArea: viewBoxValuesToBoundingBoxAttrs(0, transY, width, height),
         copies,
         Component: () => (
           <g transform={`translate(0, ${transY})`}>
@@ -143,7 +143,7 @@ export class DiamondGridDividerWidgetModel extends WidgetModel({
       [
         {
           name: 'Profile view',
-          documentAreaProps: {
+          documentArea: {
             width: this.shelfWidth.value,
             height: this.shelfHeight.value,
           },

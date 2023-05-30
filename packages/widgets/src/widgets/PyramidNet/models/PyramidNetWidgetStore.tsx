@@ -571,14 +571,14 @@ export class PyramidNetWidgetModel extends WidgetModel({
   BOUNDARY_MARGIN = 0.1;
 
   @computed
-  get documentAreaProps() {
+  get documentArea() {
     return this.netPaths.cut.getBoundingBox();
   }
 
   @computed
   get assetDefinition() {
     return new RegisteredAssetsDefinition(
-      this.documentAreaProps,
+      this.documentArea,
       [
         {
           name: 'Print',
