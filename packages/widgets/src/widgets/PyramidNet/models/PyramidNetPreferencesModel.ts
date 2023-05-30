@@ -29,7 +29,7 @@ export class PyramidNetPreferencesModel extends Model({
     max: 3,
     step: 0.01,
   }),
-  needsTour: prop(true)
+  needsTour: prop(false)
     .withSetter(),
   printRegistrationType: radioProp<PRINT_REGISTRATION_TYPES>(PRINT_REGISTRATION_TYPES.LASER_CUTTER, {
     options: Object.values(PRINT_REGISTRATION_TYPES),

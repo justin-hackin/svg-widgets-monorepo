@@ -12,3 +12,4 @@ console.log('Widgets: ', [
   DiamondGridDividerWidgetModel,
   TriangularGridWidgetModel,
 ]);
+export { JoyrideTour } from '@/widgets/PyramidNet/components/JoyrideTour';
