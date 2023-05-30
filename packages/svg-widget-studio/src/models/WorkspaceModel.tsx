@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import {
   action, computed, observable, reaction,
 } from 'mobx';
@@ -25,19 +24,8 @@ import { assertNotNullish } from '../helpers/assert';
 import { UNITS } from '../helpers/units';
 import { ZoomPanView } from './ZoomPanView';
 import { widgetNameToWidgetClassMap } from '../internal/data';
-
-type WidgetJSON = {
-  widget: {
-    // it's difficult to create 1-to-1 correspondence between widget model $modelType and persisted spec $modelType
-    // so instead we store the $modelType of the widget model for toggling the active widget upon file open
-    modelType: string,
-    modelSnapshot: SnapshotInOfModel<any>,
-  },
-  metadata: {
-    // for future support of migrations
-    version: number,
-  }
-};
+import { WidgetJSON } from '../types';
+import { DialogManager } from '../components/DialogManager';
 
 @model('SvgWidgetStudio/WorkspacePreferencesModel')
 class WorkspacePreferencesModel extends Model({
@@ -62,13 +50,10 @@ export class WorkspaceModel extends Model({
   @observable
     selectedWidgetModelType: string | undefined = undefined;
 
+  @observable
+    dialogManager = new DialogManager();
+
   // package used to export INITIAL_VALUE but this somehow works okay
-
-  @observable
-    alertDialogContent: ReactNode | null = null;
-
-  @observable
-    openWidgetFileFlag = false;
 
   @observable
     zoomPanView = new ZoomPanView({});
@@ -111,31 +96,13 @@ export class WorkspaceModel extends Model({
       this.selectedWidgetNameReadable ? `⚙️${this.selectedWidgetNameReadable}` : ''}`;
   }
 
-  @action
-  _setFileDialogActive(isActive: boolean) {
-    if (isActive === this.openWidgetFileFlag) {
-      throw new Error(
-        '_setFileDialogActive: expected parameter isActive to be different than existing value for openWidgetFileFlag',
-      );
-    }
-    this.openWidgetFileFlag = isActive;
-  }
-
-  @action
-  activateOpenWidgetFilePicker() {
-    this._setFileDialogActive(true);
-  }
-
-  @action
-  deactivateWidgetFilePicker() {
-    this._setFileDialogActive(false);
-  }
-
-  downloadWidgetWithAssets() {
+  downloadWidgetWithAssets(fileBasename) {
     assertNotNullish(this.selectedStore);
     const zip = new JSZip();
     const widgetSpecJSON = this.getWidgetSpecJSON();
-    const filePath = `${this.selectedStore.fileBasename}.widget`;
+    // avoid handling the case where user submits empty string and just use fallback
+    const resolvedBaseName = fileBasename || this.selectedStore.fileBasename;
+    const filePath = `${resolvedBaseName}.widget`;
     zip.file(
       filePath,
       JSON.stringify(widgetSpecJSON, null, 2),
@@ -148,18 +115,8 @@ export class WorkspaceModel extends Model({
       .then((content) => {
         // see FileSaver.js
         assertNotNullish(this.selectedStore);
-        fileDownload(content, `${this.selectedStore.fileBasename}.zip`);
+        fileDownload(content, `${resolvedBaseName}.zip`);
       });
-  }
-
-  @action
-  setAlertDialogContent(content: ReactNode) {
-    this.alertDialogContent = content;
-  }
-
-  @action
-  resetAlertDialogContent() {
-    this.alertDialogContent = null;
   }
 
   @modelAction
@@ -247,8 +204,11 @@ export class WorkspaceModel extends Model({
   initializeWidgetFromSnapshot(widgetJSON: WidgetJSON) {
     const { modelType, modelSnapshot } = widgetJSON.widget;
     if (!widgetNameToWidgetClassMap.has(modelType)) {
-      this.setAlertDialogContent(`Invalid widget spec file: JSON data must contain property widget.$modelType with value
-       equal to one of (${this.availableWidgetTypes.join(', ')}) but instead saw ${modelType}`);
+      this.dialogManager.setAlertDialogContent(
+        `Invalid widget spec file: JSON data must contain property widget.$modelType with a value equal to one of (${
+          this.availableWidgetTypes.join(', ')
+        }) but instead saw ${modelType}`,
+      );
       return;
     }
 

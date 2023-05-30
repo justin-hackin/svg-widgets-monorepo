@@ -14,16 +14,15 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useLocation } from 'wouter';
 import { useWorkspaceMst } from '../rootStore';
 import { AdditionalFileMenuItems } from './AdditionalFileMenuItems';
-import { SimpleDialog } from '../inputs/SimpleDialog';
-import { PreferencesControls } from './PreferencesControls';
 import { assertNotNullish } from '../helpers/assert';
 import { HistoryButtons } from './HistoryButtons';
 import { AdditionalToolbarContent } from './AdditionalToolbarContent';
+import { ControlPanelDialogs } from './ControlPanelDialogs';
 
 export const WidgetControlPanelAppBar = observer(() => {
   const [, navigate] = useLocation();
   const workspaceStore = useWorkspaceMst();
-  const { selectedStore } = workspaceStore;
+  const { selectedStore, dialogManager } = workspaceStore;
   assertNotNullish(selectedStore);
   const {
     additionalToolbarContent,
@@ -34,31 +33,6 @@ export const WidgetControlPanelAppBar = observer(() => {
   const [fileMenuRef, setFileMenuRef] = useState<HTMLElement | null>(null);
   const resetFileMenuRef = () => {
     setFileMenuRef(null);
-  };
-
-  const closeAlertDialog = () => workspaceStore.resetAlertDialogContent();
-
-  const [settingsDialogIsOpen, setSettingsDialogIsOpen] = useState(false);
-  const handleSettingsDialogOpen = () => {
-    setSettingsDialogIsOpen(true);
-  };
-  const handleSettingsDialogClose = () => {
-    setSettingsDialogIsOpen(false);
-  };
-
-  const newHandler = () => {
-    navigate('/new');
-    resetFileMenuRef();
-  };
-
-  const openSpecHandler = async () => {
-    workspaceStore.activateOpenWidgetFilePicker();
-    resetFileMenuRef();
-  };
-
-  const saveHandler = async () => {
-    await workspaceStore.downloadWidgetWithAssets();
-    resetFileMenuRef();
   };
 
   return (
@@ -81,7 +55,11 @@ export const WidgetControlPanelAppBar = observer(() => {
         {additionalToolbarContent
           && <AdditionalToolbarContent additionalToolbarContent={additionalToolbarContent} />}
         <Menu anchorEl={fileMenuRef} open={Boolean(fileMenuRef)} keepMounted onClose={resetFileMenuRef}>
-          <MenuItem onClick={newHandler}>
+          <MenuItem onClick={() => {
+            navigate('/new');
+            resetFileMenuRef();
+          }}
+          >
             <ListItemIcon>
               <FlareIcon fontSize="small" />
             </ListItemIcon>
@@ -90,13 +68,21 @@ export const WidgetControlPanelAppBar = observer(() => {
               {`New${workspaceStore.availableWidgetTypes.length > 1 ? '...' : ''}`}
             </Typography>
           </MenuItem>
-          <MenuItem onClick={openSpecHandler}>
+          <MenuItem onClick={() => {
+            dialogManager.activateOpenWidgetFilePicker();
+            resetFileMenuRef();
+          }}
+          >
             <ListItemIcon>
               <FolderOpenIcon fontSize="small" />
             </ListItemIcon>
             <Typography variant="inherit">Open widget spec...</Typography>
           </MenuItem>
-          <MenuItem onClick={saveHandler}>
+          <MenuItem onClick={() => {
+            dialogManager.setDownloadPromptInitialText(selectedStore.fileBasename);
+            resetFileMenuRef();
+          }}
+          >
             <ListItemIcon>
               <Download fontSize="small" />
             </ListItemIcon>
@@ -111,16 +97,13 @@ export const WidgetControlPanelAppBar = observer(() => {
             )}
         </Menu>
         <IconButton
-          onClick={handleSettingsDialogOpen}
+          onClick={() => {
+            dialogManager.setSettingsDialogIsActive(true);
+          }}
         >
           <SettingsIcon />
         </IconButton>
-        <SimpleDialog isOpen={!!workspaceStore.alertDialogContent} handleClose={closeAlertDialog} title="Error">
-          {workspaceStore.alertDialogContent}
-        </SimpleDialog>
-        <SimpleDialog isOpen={settingsDialogIsOpen} handleClose={handleSettingsDialogClose} title="Settings">
-          <PreferencesControls />
-        </SimpleDialog>
+        <ControlPanelDialogs />
       </Toolbar>
     </AppBar>
   );

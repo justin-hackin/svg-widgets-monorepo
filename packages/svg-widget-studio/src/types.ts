@@ -1,6 +1,6 @@
 import { FC, ReactElement } from 'react';
 import { SvgIcon } from '@mui/material';
-import { RefConstructor } from 'mobx-keystone';
+import { RefConstructor, SnapshotInOfModel } from 'mobx-keystone';
 
 import type { DisjunctAssetsDefinition } from './classes/DisjunctAssetsDefinition';
 import type { RegisteredAssetsDefinition } from './classes/RegisteredAssetsDefinition';
@@ -139,3 +139,16 @@ export interface ReferenceRadioMetadata<T extends object> extends ReferenceResol
 export type ReferenceWithOptionsMetadata<T extends object> = ReferenceRadioMetadata<T> | ReferenceSelectMetadata<T>;
 
 export type WorkspaceModel = typeof WorkspaceModelClass;
+
+export type WidgetJSON = {
+  widget: {
+    // it's difficult to create 1-to-1 correspondence between widget model $modelType and persisted spec $modelType
+    // so instead we store the $modelType of the widget model for toggling the active widget upon file open
+    modelType: string,
+    modelSnapshot: SnapshotInOfModel<any>,
+  },
+  metadata: {
+    // for future support of migrations
+    version: number,
+  }
+};
