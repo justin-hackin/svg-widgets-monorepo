@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
 import type { Orientation } from './WidgetWorkspace';
 import { DisjunctAssetsDefinition } from '../classes/DisjunctAssetsDefinition';
@@ -20,6 +20,14 @@ export const WidgetDesignArea = observer(({
   const workspaceStore = useWorkspaceMst();
   const { selectedStore } = workspaceStore;
   assertNotNullish(selectedStore);
+  const { selectedMember, overlayModeEnabled } = (selectedStore.assetDefinition as DisjunctAssetsDefinition);
+
+  useEffect(() => {
+    // assumes there's only one asset definition type with selectedMember, currently true
+    // fit the new asset into view upon change of selected member or overlay mode
+    workspaceStore.zoomPanView.fitToDocument();
+  }, [selectedMember, overlayModeEnabled]);
+
   const definition = selectedStore.assetDefinition;
   let documentArea: DocumentArea;
   let innerContent;
