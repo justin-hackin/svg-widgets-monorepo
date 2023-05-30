@@ -10,9 +10,9 @@ export function App() {
   return (
     <WidgetWorkspaceProvider>
       <WidgetRoute widgetName={POLYHEDRAL_NET_MODEL_TYPE}>
+        <JoyrideTour />
         <FileInputs />
         <TextureEditorDrawer />
-        <JoyrideTour />
       </WidgetRoute>
       <WidgetWorkspace />
       <WidgetSelectionDialog />

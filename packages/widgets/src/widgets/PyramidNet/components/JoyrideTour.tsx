@@ -21,7 +21,7 @@ export const JoyrideTour = observer(() => {
     textureEditor,
     history,
   } = pyramidNetPluginStore;
-  const { needsTour } = preferences ?? {};
+  const { tourIsActive } = preferences ?? {};
   const theme = useTheme();
   const [stepIndex, setStepIndex] = useState<number>(0);
   const incrementStepIndex = (index) => {
@@ -42,12 +42,12 @@ export const JoyrideTour = observer(() => {
     action: string
   }) => {
     if (type === EVENTS.TOUR_STATUS && action === ACTIONS.SKIP) {
-      preferences.setNeedsTour(false);
       // the user could re-activate the tour, rewind
       resetStepIndex();
       textureEditor.clearTexturePattern();
       history?.clearUndo();
       history?.clearRedo();
+      preferences.setTourIsActive(false);
     } else if (type === EVENTS.STEP_AFTER) {
       if (step.nextAction === STEP_ACTIONS.ADD_PATH_TEXTURE) {
         textureEditor.setTextureFromPattern(new PathFaceDecorationPatternModel(SAMPLE_PATH_SNAPSHOT));
@@ -78,7 +78,7 @@ export const JoyrideTour = observer(() => {
           textColor: theme.palette.grey['300'],
         },
       }}
-      run={needsTour}
+      run={tourIsActive}
       showSkipButton
       continuous
       disableCloseOnEsc

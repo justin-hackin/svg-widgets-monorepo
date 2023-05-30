@@ -11,6 +11,8 @@ const DrawerStyled = styled(Drawer)({
     width: '100%',
     overflowY: 'unset',
     position: 'absolute',
+    // the divider between design and controls shows up at anything below this
+    zIndex: 101,
   },
 });
 

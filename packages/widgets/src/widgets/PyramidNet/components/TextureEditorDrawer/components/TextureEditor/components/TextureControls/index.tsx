@@ -368,9 +368,9 @@ export const TextureControls = observer(() => {
         )}
         <IconButton
           onClick={() => {
-            preferences.setNeedsTour(true);
+            preferences.setTourIsActive(true);
           }}
-          aria-label="send texture"
+          aria-label="start tour"
           component="span"
           size="large"
         >
