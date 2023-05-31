@@ -65,7 +65,7 @@ export const TweakableUnlabelledNumberTextInput = observer(({
               setInputStatus(INPUT_STATUS.ERROR);
               return;
             }
-            newPxValue = parsedValue * PIXELS_PER_UNIT[displayUnit];
+            newPxValue = parsedValue * (useUnits ? PIXELS_PER_UNIT[displayUnit] : 1);
             node.setValue(newPxValue);
           } else {
             // displayUnit is inches
