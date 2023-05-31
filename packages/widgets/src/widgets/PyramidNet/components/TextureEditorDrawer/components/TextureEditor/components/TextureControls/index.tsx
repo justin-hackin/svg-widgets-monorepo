@@ -167,7 +167,7 @@ export const TextureControls = observer(() => {
           component="span"
           size="large"
           onClick={() => {
-            window.history.back();
+            widgetModel.setTextureEditorOpen(false);
           }}
         >
           <ArrowForwardIcon fontSize="large" />
