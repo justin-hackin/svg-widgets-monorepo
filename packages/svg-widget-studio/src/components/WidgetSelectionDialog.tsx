@@ -56,7 +56,7 @@ export const WidgetSelectionDialog = () => {
                 key={widgetName}
                 selected={selectedWidgetModelType === widgetName}
                 onClick={() => {
-                  navigate(`/widgets/${widgetName}`);
+                  navigate(`/widgets/${widgetName}`, { replace: true });
                 }}
               >
                 <ListItemAvatar>
