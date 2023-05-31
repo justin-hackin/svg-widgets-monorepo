@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { observer } from 'mobx-react';
 import type { Orientation } from './WidgetWorkspace';
 import { DisjunctAssetsDefinition } from '../classes/DisjunctAssetsDefinition';
@@ -27,6 +27,12 @@ export const WidgetDesignArea = observer(({
     // fit the new asset into view upon change of selected member or overlay mode
     workspaceStore.zoomPanView.fitToDocument();
   }, [selectedMemberIndex, overlayModeEnabled]);
+
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      workspaceStore.zoomPanView.fitToDocument();
+    }, 0);
+  }, [orientation]);
 
   const definition = selectedStore.assetDefinition;
   let documentArea: DocumentArea;
