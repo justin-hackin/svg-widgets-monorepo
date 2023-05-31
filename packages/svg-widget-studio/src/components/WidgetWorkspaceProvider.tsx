@@ -15,10 +15,10 @@ declare module '@mui/styles/defaultTheme' {
 type ProviderProps = {
   baseRoute?: string,
   children: RouterProps['children'],
-  fallbackToNew?: boolean
+  rootRouteRedirectsToNew?: boolean
 };
 
-const HasRouterWrapper = ({ children, fallbackToNew = true }: Omit<ProviderProps, 'baseRoute'>) => {
+const HasRouterWrapper = ({ children, rootRouteRedirectsToNew = true }: Omit<ProviderProps, 'baseRoute'>) => {
   const [location, navigate] = useLocation();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const HasRouterWrapper = ({ children, fallbackToNew = true }: Omit<ProviderProps
   }, [location]);
 
   useEffect(() => {
-    if (location === '/' && fallbackToNew) {
+    if (location === '/' && rootRouteRedirectsToNew) {
       navigate('/new');
     }
   }, []);
@@ -37,7 +37,7 @@ const HasRouterWrapper = ({ children, fallbackToNew = true }: Omit<ProviderProps
 };
 
 const HasStoreWrapper = observer((
-  { children, baseRoute, fallbackToNew }: ProviderProps,
+  { children, baseRoute, rootRouteRedirectsToNew }: ProviderProps,
 ) => {
   const workspaceStore = useWorkspaceMst();
   const darkModeEnabled = workspaceStore.preferences.darkModeEnabled.value;
@@ -48,7 +48,7 @@ const HasStoreWrapper = observer((
         <CssBaseline />
         <Router base={baseRoute || ''}>
           {/* @ts-ignore */}
-          <HasRouterWrapper fallbackToNew={fallbackToNew}>
+          <HasRouterWrapper rootRouteRedirectsToNew={rootRouteRedirectsToNew}>
             {children}
           </HasRouterWrapper>
         </Router>
@@ -57,10 +57,10 @@ const HasStoreWrapper = observer((
   );
 });
 
-export function WidgetWorkspaceProvider({ children, baseRoute, fallbackToNew }: ProviderProps) {
+export function WidgetWorkspaceProvider({ children, baseRoute, rootRouteRedirectsToNew }: ProviderProps) {
   return (
     <WorkspaceStoreProvider>
-      <HasStoreWrapper baseRoute={baseRoute} fallbackToNew={fallbackToNew}>
+      <HasStoreWrapper baseRoute={baseRoute} rootRouteRedirectsToNew={rootRouteRedirectsToNew}>
         {children}
       </HasStoreWrapper>
     </WorkspaceStoreProvider>
