@@ -26,14 +26,8 @@ import fileDownload from 'js-file-download';
 import {
   action, computed, makeObservable, observable, reaction,
 } from 'mobx';
-import ReactDOMServer from 'react-dom/server';
-import React from 'react';
-import { assertNotNullish, boundingBoxAttrsToViewBoxStr } from 'svg-widget-studio';
-import { TextureSvgUnobserved } from '../components/TextureArrangement/components/TextureSvg';
-import type { TextureEditorModel } from './TextureEditorModel';
-import { ImageFaceDecorationPatternModel } from '../../../../../models/ImageFaceDecorationPatternModel';
-import { RawFaceDecorationModel } from '../../../../../models/RawFaceDecorationModel';
-import { PathFaceDecorationPatternModel } from '../../../../../models/PathFaceDecorationPatternModel';
+import { assertNotNullish, Dimensions } from 'svg-widget-studio';
+import { BoundingBoxAttrs } from 'fluent-svg-path-ts';
 
 // shadow casting technique from https://github.com/mrdoob/three.js/blob/dev/examples/webgl_shadowmap_pointlight.html
 
@@ -42,9 +36,7 @@ const resolveSceneFromModelPath = (gltfLoader, path): Promise<Scene> => (new Pro
 }));
 
 export class ShapePreviewModel {
-  constructor(parentTextureEditor: TextureEditorModel, private rendererContainer: HTMLElement) {
-    this.parentTextureEditor = parentTextureEditor;
-
+  constructor(private rendererContainer: HTMLElement) {
     makeObservable(this);
 
     this.renderer = new WebGLRenderer({
@@ -112,34 +104,11 @@ export class ShapePreviewModel {
     }, { fireImmediately: true });
 
     // auto rotate update controls
-    reaction(() => [this.parentTextureEditor.autoRotatePreview], () => {
-      this.controls.autoRotate = this.parentTextureEditor.autoRotatePreview;
-    }, { fireImmediately: true });
-
-    // shape change
-    reaction(() => [this.parentTextureEditor.shapeName.value], async () => {
-      await this.setShape(this.parentTextureEditor.shapeName.value);
-    }, { fireImmediately: true });
 
     // texture change
-    reaction(() => {
-      const { faceDecoration, faceBoundary } = this.parentTextureEditor;
-      const listenProps:any[] = [this.shapeMesh, faceBoundary];
-      if (!faceDecoration || faceDecoration instanceof RawFaceDecorationModel) { return listenProps; }
-      const { pattern, transform: { transformMatrix } } = faceDecoration;
-      listenProps.push(transformMatrix);
-      if (pattern instanceof PathFaceDecorationPatternModel) {
-        listenProps.push(pattern.isPositive, pattern.pathD);
-      } else if (pattern instanceof ImageFaceDecorationPatternModel) {
-        listenProps.push(pattern.imageData, pattern.isBordered);
-      }
-      return listenProps;
-    }, () => {
-      this.applyTextureToMesh();
-    });
 
     // use alpha change
-    reaction(() => [this.resolvedUseAlphaTexturePreview, this.useAlpha], () => {
+    reaction(() => [this.useAlpha], () => {
       this.alphaOnChange();
     });
 
@@ -170,9 +139,6 @@ export class ShapePreviewModel {
   animationFrame: number;
 
   @observable
-    parentTextureEditor: TextureEditorModel;
-
-  @observable
     shapeMesh: Mesh | undefined;
 
   gltfExporter = new GLTFExporter() as GLTFExporter;
@@ -194,14 +160,16 @@ export class ShapePreviewModel {
 
   MARGIN = 1;
 
-  @computed
-  get canvasDimensions() {
-    // defaults allow camera to be initialized before shapePreviewDimensions have been defined
-    const {
-      width = 1,
-      height = 1,
-    } = this.parentTextureEditor.shapePreviewDimensions || {};
-    return { width, height };
+  @observable
+    canvasDimensions: Dimensions = { width: 1, height: 1 };
+
+  @action
+  setCanvasDimensions(dim: Dimensions) {
+    this.canvasDimensions = dim;
+  }
+
+  setAutoRotate(doesRotate: boolean) {
+    this.controls.autoRotate = doesRotate;
   }
 
   @computed
@@ -224,14 +192,12 @@ export class ShapePreviewModel {
     return this.sphereRadius + this.maxCameraRadius + this.MARGIN;
   }
 
-  @computed
-  get resolvedUseAlphaTexturePreview() {
-    return (this.parentTextureEditor.faceDecoration?.pattern as PathFaceDecorationPatternModel)?.useAlphaTexturePreview;
-  }
+  @observable
+    useAlpha = true;
 
-  @computed
-  get useAlpha() {
-    return this.resolvedUseAlphaTexturePreview || !this.parentTextureEditor.faceDecoration.pattern;
+  @action
+  setUseAlpha(useAlpha: boolean) {
+    this.useAlpha = useAlpha;
   }
 
   @action
@@ -321,21 +287,7 @@ export class ShapePreviewModel {
   @action
   setShapeWireframe(wireframe) { this.shapeWireframe = wireframe; }
 
-  async applyTextureToMesh() {
-    const {
-      shapeMesh,
-      parentTextureEditor: { faceDecoration = undefined, faceBoundary: { boundingBoxAttrs = undefined } = {} } = {},
-    } = this;
-    if (!shapeMesh || !boundingBoxAttrs || faceDecoration instanceof RawFaceDecorationModel) {
-      return;
-    }
-
-    const svgStr = ReactDOMServer.renderToString(
-      React.createElement(TextureSvgUnobserved, {
-        viewBox: boundingBoxAttrsToViewBoxStr(boundingBoxAttrs),
-        store: this.parentTextureEditor,
-      }),
-    );
+  async applyTextureToMesh(svgStr: string, boundingBoxAttrs: BoundingBoxAttrs) {
     const {
       width: vbWidth,
       height: vbHeight,
@@ -357,8 +309,8 @@ export class ShapePreviewModel {
     this.shapeMesh.material.map.needsUpdate = true;
   }
 
-  async downloadShapeGLTF() {
-    const defaultPath = `${this.parentTextureEditor.fileBasename}.glb`;
+  async downloadShapeGLTF(fileBasename: string) {
+    const defaultPath = `${fileBasename}.glb`;
     return this.gltfExporter
       // @ts-ignore
       .parse(this.shapeMesh, async (shapeGLTF: ArrayBuffer) => {

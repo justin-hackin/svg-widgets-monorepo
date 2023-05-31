@@ -475,6 +475,6 @@ export class TextureEditorModel {
 
   @action
   createShapePreview(rendererContainer: HTMLElement) {
-    this.shapePreview = new ShapePreviewModel(this, rendererContainer);
+    this.shapePreview = new ShapePreviewModel(rendererContainer);
   }
 }

@@ -163,12 +163,12 @@ export const TextureControls = observer(() => {
         variant="dense"
       >
         <IconButton
-          onClick={() => {
-            widgetModel.setTextureEditorOpen(false);
-          }}
           aria-label="close texture editor"
           component="span"
           size="large"
+          onClick={() => {
+            window.history.back();
+          }}
         >
           <ArrowForwardIcon fontSize="large" />
         </IconButton>
@@ -204,7 +204,7 @@ export const TextureControls = observer(() => {
               <MenuItem
                 key={1}
                 onClick={async () => {
-                  await shapePreview.downloadShapeGLTF();
+                  await shapePreview.downloadShapeGLTF(widgetModel.fileBasename);
                   resetFileMenuRef();
                 }}
               >
