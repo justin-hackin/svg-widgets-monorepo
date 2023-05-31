@@ -11,6 +11,7 @@
     "lint-fix": "eslint . --ext js,ts,tsx --fix",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "watch": "vite",
+    "open": "open  http://localhost:5173/",
     "build": "vite build",
     "serve-build": "http-server dist/ -p 3000"
   },

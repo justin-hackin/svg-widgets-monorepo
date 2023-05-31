@@ -1,46 +1,88 @@
 import { Input } from '@mui/material';
-import React, { createRef, useEffect } from 'react';
-import parseFraction from 'parse-fraction';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 
+import { styled } from '@mui/styles';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { useWorkspaceMst } from '../rootStore';
-import { PIXELS_PER_UNIT, pxToUnitView } from '../helpers/units';
+import {
+  getFractionOrNull, PIXELS_PER_UNIT, pxToUnitView, UNITS,
+} from '../helpers/units';
 import { NumberTextMetadata, SliderWithTextMetadata } from '../types';
+
+enum INPUT_STATUS {
+  SAVED = 'saved', DIRTY = 'dirty', ERROR = 'error',
+}
+
+const getStatusClass = (status: INPUT_STATUS) => `input_status--${status}`;
+
+const StyledInput = styled(Input)(({ theme }) => ({
+  '&:after': {
+    transition: 'border-bottom-color 0.25s cubic',
+  },
+  [`&.${getStatusClass(INPUT_STATUS.ERROR)}:after`]: {
+    borderBottomColor: theme.palette.error.main,
+  },
+  [`&.${getStatusClass(INPUT_STATUS.DIRTY)}:after`]: {
+    borderBottomColor: theme.palette.warning.main,
+  },
+}));
 
 export const TweakableUnlabelledNumberTextInput = observer(({
   node, labelId,
 }: { node: TweakablePrimitiveModel<number, (NumberTextMetadata | SliderWithTextMetadata)>, labelId: string }) => {
   const { preferences: { displayUnit: { value: displayUnit } } } = useWorkspaceMst();
-  const inputRef = createRef<HTMLInputElement>();
+  const [
+    inputStatus, setInputStatus,
+  ] = useState<INPUT_STATUS>(INPUT_STATUS.SAVED);
+
   const { value, valuePath, metadata: { useUnits } } = node;
+
+  const [inputValue, setInputValue] = useState<string>(
+    useUnits ? pxToUnitView(value, displayUnit) : `${value}`,
+  );
+
   useEffect(() => {
-    if (inputRef.current && useUnits) {
-      inputRef.current.value = pxToUnitView(value, displayUnit);
-    }
-  }, [displayUnit]);
+    setInputValue(useUnits ? pxToUnitView(value, displayUnit) : `${value}`);
+  }, [displayUnit, useUnits]);
 
   return (
-    <Input
-      inputRef={inputRef}
-      defaultValue={useUnits ? pxToUnitView(value, displayUnit) : value}
+    <StyledInput
+      className={getStatusClass(inputStatus)}
+      value={inputValue}
       name={valuePath}
+      onChange={(e) => {
+        setInputValue(e.target.value);
+        setInputStatus(INPUT_STATUS.DIRTY);
+      }}
       onKeyPress={(e) => {
         if (e.key === 'Enter') {
-          const stringValue = (e.target as HTMLInputElement).value;
-          if (useUnits) {
-            try {
-              const [num, denom] = parseFraction(stringValue);
-              node.setValue((num / denom) * PIXELS_PER_UNIT[displayUnit]);
-              // eslint-disable-next-line no-empty
-            } catch (_) {
+          let newPxValue;
+          if (!useUnits || displayUnit === UNITS.cm) {
+            // is not in fractional form
+            const parsedValue = parseFloat(inputValue);
+            if (!Number.isFinite(parsedValue)) {
+              setInputStatus(INPUT_STATUS.ERROR);
+              return;
             }
+            newPxValue = parsedValue * PIXELS_PER_UNIT[displayUnit];
+            node.setValue(newPxValue);
           } else {
-            const parsedFloat = parseFloat(stringValue);
-            if (!Number.isNaN(parsedFloat)) {
-              node.setValue(parsedFloat);
+            // displayUnit is inches
+            const maybeFraction = getFractionOrNull(inputValue);
+            if (maybeFraction === null) {
+              setInputStatus(INPUT_STATUS.ERROR);
+              return;
             }
+            const [num, denom] = maybeFraction;
+            newPxValue = (num / denom) * PIXELS_PER_UNIT[displayUnit];
+            node.setValue(newPxValue);
           }
+          if (useUnits) {
+            // the fraction is parsed twice
+            setInputValue(pxToUnitView(newPxValue, displayUnit));
+          }
+          setInputStatus(INPUT_STATUS.SAVED);
         }
       }}
       inputProps={{ 'aria-label': labelId }}

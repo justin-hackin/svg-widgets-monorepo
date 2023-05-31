@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { TweakablePrimitiveModel } from '../models/TweakablePrimitiveModel';
 import { useWorkspaceMst } from '../rootStore';
 import { getNearestHistoryFromAncestorNode } from '../helpers/mobx-keystone';
-import { UNIT_LABEL_FORMAT, UNIT_STEP } from '../helpers/units';
+import { pxToUnitView, UNIT_STEP } from '../helpers/units';
 import { SliderMetadata, SliderWithTextMetadata } from '../types';
 import { INPUT_TYPE } from '../internal/constants';
 
@@ -80,7 +80,7 @@ export const TweakableUnlabelledSlider = observer(({
       components={{
         ValueLabel: ValueLabelComponent,
       }}
-      valueLabelFormat={useUnits ? UNIT_LABEL_FORMAT[displayUnit] : undefined}
+      valueLabelFormat={useUnits ? (val) => pxToUnitView(val, displayUnit) : undefined}
       name={valuePath}
       min={min}
       max={max}
