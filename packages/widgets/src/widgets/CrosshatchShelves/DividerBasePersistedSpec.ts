@@ -1,5 +1,4 @@
-import { numberTextProp } from '../../common/keystone-tweakables/props';
-import { PIXELS_PER_INCH } from '../../common/util/units';
+import { numberTextProp, PIXELS_PER_INCH } from 'svg-widget-studio';
 
 export const dividerBaseModelProps = {
   shelfWidth: numberTextProp(96 * PIXELS_PER_INCH, {

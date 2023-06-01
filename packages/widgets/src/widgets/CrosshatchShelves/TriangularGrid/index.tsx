@@ -2,22 +2,23 @@ import React from 'react';
 import { computed } from 'mobx';
 import { flatten, range } from 'lodash-es';
 import Flatten from '@flatten-js/core';
-import { ExtendedModel } from 'mobx-keystone';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { assertNotNullish } from '@/common/util/assert';
-import { PathData } from 'fluent-svg-path-ts';
-import { numberTextProp, sliderWithTextProp, switchProp } from '../../../common/keystone-tweakables/props';
-import { PIXELS_PER_INCH } from '../../../common/util/units';
+import { getBoundingBoxAttrs, PathData } from 'fluent-svg-path-ts';
 import {
+  assertNotNullish,
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
-} from '../../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { pathDToViewBoxStr } from '../../../common/util/svg';
+  numberTextProp,
+  PIXELS_PER_INCH,
+  sliderWithTextProp,
+  switchProp,
+  viewBoxValuesToBoundingBoxAttrs,
+  WidgetModel,
+  widgetModel,
+} from 'svg-widget-studio';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { closedPolygonPath } from '../../../common/shapes/generic';
 import { TRI_NOTCH_LEVEL, triNotchPanel } from './util';
 import { augmentSegmentEndpoints } from '../util';
-import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from '../previews/triangle-grid-divider.png';
 import point = Flatten.point;
 import segment = Flatten.segment;
@@ -51,7 +52,7 @@ const getPolygonPoints = (radius: number, sides: number) => range(0, sides)
 const POLYGON_SIDES = 6;
 
 @widgetModel('TriangleGridDivider', widgetPreview)
-export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class TriangularGridWidgetModel extends WidgetModel({
   hexagonWidth: numberTextProp(24 * PIXELS_PER_INCH, {
     useUnits: true,
   }),
@@ -174,7 +175,7 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
           const transY = (index * this.hexagonDepth.value + (this.hexagonHeight / 2)) * this.spacingMarginRatio;
           return {
             name: `${triNotchLevelToLabel(notchLevel)}_${index + 1}`,
-            documentAreaProps: { viewBox: `${transX} ${transY} ${segment.length} ${this.hexagonDepth.value}` },
+            documentArea: viewBoxValuesToBoundingBoxAttrs(transX, transY, segment.length, this.hexagonDepth.value),
             copies: isMiddleOfRange(index, this.subdivisions.value + 1) ? 3 : 6,
             Component: () => (
               <g transform={`translate(${transX}, ${transY})`}>
@@ -185,16 +186,11 @@ export class TriangularGridWidgetModel extends ExtendedModel(BaseWidgetClass, {
         }))));
   }
 
-  fileBasename = 'TriangularGrid';
-
-  @computed
   get assetDefinition() {
     return new DisjunctAssetsDefinition([
       {
         name: 'Profile view',
-        documentAreaProps: {
-          viewBox: pathDToViewBoxStr(this.wallSegmentsPathD),
-        },
+        documentArea: getBoundingBoxAttrs(this.wallSegmentsPathD),
         Component: () => (
           <g>
             <path

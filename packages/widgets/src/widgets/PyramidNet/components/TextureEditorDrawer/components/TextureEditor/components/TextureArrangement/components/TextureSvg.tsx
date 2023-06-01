@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 
 import { HookReturnType, UseDragConfig } from 'react-use-gesture/dist/types';
 import { RawPoint } from 'fluent-svg-path-ts';
+import { useSelectedStore } from 'svg-widget-studio';
 import { scalePoint } from '../../../../../../../../../common/util/geom';
 import { TexturePathNodes } from './TexturePathNodes';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
@@ -10,7 +11,6 @@ import { ImageFaceDecorationPatternModel } from '../../../../../../../models/Ima
 import type { TextureEditorModel } from '../../../models/TextureEditorModel';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
 import { PathFaceDecorationPatternModel } from '../../../../../../../models/PathFaceDecorationPatternModel';
-import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
 const normalizedBoxCoords:RawPoint[] = [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }];
 const HOLES_COLOR = '#000';
@@ -35,7 +35,7 @@ export function TextureSvgUnobserved({
     faceBoundary,
     faceFittingScale,
     placementAreaDimensions,
-  } = store || (useWorkspaceMst().selectedStore as PyramidNetWidgetModel).textureEditor;
+  } = store || (useSelectedStore<PyramidNetWidgetModel>()).textureEditor;
   if (
     !decorationBoundaryPathD || faceDecoration instanceof RawFaceDecorationModel
     || !faceBoundary || !decorationBoundaryPathD || !placementAreaDimensions || !faceFittingScale

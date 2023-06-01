@@ -3,7 +3,6 @@ import { CylinderLightboxWidgetModel } from '@/widgets/CylinderLightbox';
 import { SquareGridDividerWidgetModel } from '@/widgets/CrosshatchShelves/SquareGridDividerWidgetModel';
 import { DiamondGridDividerWidgetModel } from '@/widgets/CrosshatchShelves/DiamondGridDividerWidgetModel';
 import { TriangularGridWidgetModel } from '@/widgets/CrosshatchShelves/TriangularGrid';
-import { workspaceStore } from '@/WidgetWorkspace/rootStore';
 
 // eslint-disable-next-line no-console
 console.log('Widgets: ', [
@@ -13,5 +12,4 @@ console.log('Widgets: ', [
   DiamondGridDividerWidgetModel,
   TriangularGridWidgetModel,
 ]);
-
-workspaceStore.widgetsReady();
+export { JoyrideTour } from '@/widgets/PyramidNet/components/JoyrideTour';

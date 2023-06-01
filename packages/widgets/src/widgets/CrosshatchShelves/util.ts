@@ -1,6 +1,6 @@
 import Flatten from '@flatten-js/core';
-import { assertNotNullish } from '@/common/util/assert';
 import { PathData } from 'fluent-svg-path-ts';
+import { assertNotNullish } from 'svg-widget-studio';
 import { hingedPlot, polygonWithFace } from '../../common/util/geom';
 import Segment = Flatten.Segment;
 import Point = Flatten.Point;

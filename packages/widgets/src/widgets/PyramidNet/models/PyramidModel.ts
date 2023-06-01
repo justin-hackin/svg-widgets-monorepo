@@ -1,7 +1,7 @@
 import { getParent, Model, model } from 'mobx-keystone';
 import { isInteger, sortBy, startCase } from 'lodash-es';
+import { radioProp, selectProp } from 'svg-widget-studio';
 import { polyhedra } from '../polyhedra';
-import { radioProp, selectProp } from '../../../common/keystone-tweakables/props';
 
 const getDivisors = (num) => {
   if (!isInteger(num)) {

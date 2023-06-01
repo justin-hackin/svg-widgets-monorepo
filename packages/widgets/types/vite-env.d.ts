@@ -1,4 +1,13 @@
 /* eslint-disable max-len */
+import type { WorkspaceModel } from 'svg-widget-studio';
+
+declare global {
+  interface Window {
+    dataLayer: Array<any>,
+    mobx: object,
+    workspaceStore: WorkspaceModel,
+  }
+}
 
 /// <reference types="vite/client" />
 

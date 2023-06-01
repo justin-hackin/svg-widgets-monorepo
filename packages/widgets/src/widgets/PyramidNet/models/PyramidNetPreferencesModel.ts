@@ -1,21 +1,20 @@
 // Post-launch, migration schemes will be needed upon data shape changes
 // in order to not invalidate localstorage after upgrade
-import { Model, model, prop } from 'mobx-keystone';
+import { Model, model } from 'mobx-keystone';
 import { startCase } from 'lodash-es';
 import {
   colorPickerProp,
   numberTextProp,
+  PIXELS_PER_INCH,
   radioProp,
   sliderWithTextProp,
   switchProp,
-} from '../../../common/keystone-tweakables/props';
-import { PIXELS_PER_CM, PIXELS_PER_INCH } from '../../../common/util/units';
-import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
+} from 'svg-widget-studio';
+import { action, observable } from 'mobx';
+import { PRINT_REGISTRATION_TYPES } from '@/widgets/PyramidNet/types';
 
 @model('PyramidNetPreferencesModel')
 export class PyramidNetPreferencesModel extends Model({
-  documentWidth: numberTextProp(PIXELS_PER_CM * 49.5, { useUnits: true }),
-  documentHeight: numberTextProp(PIXELS_PER_CM * 27.9, { useUnits: true }),
   useClonesForBaseTabs: switchProp(false),
   useClonesForDecoration: switchProp(false),
   outerCutStrokeColor: colorPickerProp('#FF3A5E'),
@@ -28,8 +27,7 @@ export class PyramidNetPreferencesModel extends Model({
     max: 3,
     step: 0.01,
   }),
-  needsTour: prop(true)
-    .withSetter(),
+
   printRegistrationType: radioProp<PRINT_REGISTRATION_TYPES>(PRINT_REGISTRATION_TYPES.LASER_CUTTER, {
     options: Object.values(PRINT_REGISTRATION_TYPES),
     optionLabelMap: (opt: string) => startCase(opt),
@@ -37,6 +35,14 @@ export class PyramidNetPreferencesModel extends Model({
   registrationPadding: numberTextProp(PIXELS_PER_INCH * 0.5, { useUnits: true }),
   registrationMarkLength: numberTextProp(PIXELS_PER_INCH * 0.5, { useUnits: true }),
 }) {
+  @observable
+    tourIsActive = false;
+
+  @action
+  setTourIsActive(need) {
+    this.tourIsActive = need;
+  }
+
   get scoreProps() {
     return {
       stroke: this.scoreStrokeColor.value,

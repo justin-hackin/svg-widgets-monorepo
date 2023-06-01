@@ -1,8 +1,9 @@
 import {
   Model, model, modelAction, prop,
 } from 'mobx-keystone';
-import { appendCurvedLineSegments } from '@/common/shapes/generic';
 import { PathData, RawPoint } from 'fluent-svg-path-ts';
+import { sliderProp, sliderWithTextProp, switchProp } from 'svg-widget-studio';
+import { appendCurvedLineSegments } from '@/common/shapes/generic';
 import {
   distanceBetweenPoints,
   getLineLineIntersection,
@@ -13,7 +14,6 @@ import {
 } from '../../common/util/geom';
 import { DashPatternModel, strokeDashPath } from '../../common/shapes/strokeDashPath';
 import { arrowTabPlots } from '../../common/shapes/symmetricRoundedTab';
-import { sliderProp, sliderWithTextProp, switchProp } from '../../common/keystone-tweakables/props';
 import { ratioSliderProps } from './constants';
 import { DEFAULT_SLIDER_STEP, VERY_LARGE_NUMBER } from '../../common/constants';
 

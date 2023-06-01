@@ -2,13 +2,13 @@ import { observer } from 'mobx-react';
 import React from 'react';
 
 import { useTheme } from '@mui/styles';
-import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
+import { expandBoundingBoxAttrs } from 'svg-widget-studio';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
-import { boundingBoxMinPoint, expandBoundingBoxAttrs, registrationMarksPath } from '../../../common/util/svg';
-import { pointToTranslateString, scalePoint } from '../../../common/util/geom';
+import { registrationMarksPath } from '../../../common/util/svg';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
 import { closedPolygonPath } from '../../../common/shapes/generic';
+import { PRINT_REGISTRATION_TYPES } from '@/widgets/PyramidNet/types';
 
 function PrintGroup({ children }) {
   return (
@@ -48,9 +48,6 @@ export const PrintLayer = observer(({
 
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
-  const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
-    ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
-  const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(dielineRegistrationBB), -1));
 
   if (!faceDecoration || !(faceDecoration instanceof PositionableFaceDecorationModel)) {
     return null;
@@ -82,7 +79,7 @@ export const PrintLayer = observer(({
           <feGaussianBlur stdDeviation={0.5} />
         </filter>
       </defs>
-      <g transform={fitToCanvasTranslationStr}>
+      <g>
         {printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
           && (
             <path

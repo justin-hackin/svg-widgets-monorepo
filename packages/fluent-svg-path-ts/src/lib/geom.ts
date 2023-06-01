@@ -1,5 +1,6 @@
+import SVGPathCommander from 'svg-path-commander';
 import {
-  Coord, PointLike, PointTuple, RawPoint,
+  BoundingBoxAttrs, Coord, PointLike, PointTuple, RawPoint,
 } from './types';
 
 /**
@@ -67,3 +68,15 @@ export function pointLikeToTuple({ x, y }: PointLike):PointTuple {
 export function pointTupleToRawPoint([x, y]: PointTuple):RawPoint {
   return { x, y };
 }
+
+export const getBoundingBoxAttrs = (pathD: string): BoundingBoxAttrs => {
+  const bb = SVGPathCommander.getPathBBox(pathD);
+  return {
+    xmin: bb.x,
+    ymin: bb.y,
+    xmax: bb.x2,
+    ymax: bb.y2,
+    height: bb.height,
+    width: bb.width,
+  };
+};

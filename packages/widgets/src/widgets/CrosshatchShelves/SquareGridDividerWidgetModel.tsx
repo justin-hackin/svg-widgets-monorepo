@@ -1,15 +1,17 @@
-import { ExtendedModel } from 'mobx-keystone';
 import React from 'react';
 import { computed } from 'mobx';
 import { range } from 'lodash-es';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { PathData } from 'fluent-svg-path-ts';
-import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { radioProp } from '../../common/keystone-tweakables/props';
+import {
+  DisjunctAssetsDefinition,
+  radioProp,
+  viewBoxValuesToBoundingBoxAttrs,
+  WidgetModel,
+  widgetModel,
+} from 'svg-widget-studio';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
 import { centeredNotchPanel, getMarginLength } from './util';
-import { BaseWidgetClass } from '../../WidgetWorkspace/widget-types/BaseWidgetClass';
-import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from './previews/square-grid-divider.png';
 
 const REMAINDER_SIZES: string[] = ['small', 'medium', 'large'];
@@ -17,7 +19,7 @@ const cubbiesDecrementOptions = range(0, REMAINDER_SIZES.length);
 const optionLabelMap = (opt) => REMAINDER_SIZES[opt];
 
 @widgetModel('SquareGridDivider', widgetPreview)
-export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class SquareGridDividerWidgetModel extends WidgetModel({
   ...dividerBaseModelProps,
   widthCubbiesDecrement: radioProp(0, {
     labelOverride: 'Left/right section size',
@@ -104,8 +106,6 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
     return path;
   }
 
-  fileBasename = 'CrossHatchShelves';
-
   @computed
   get assetDefinition() {
     const vertTransY = this.shelfHeight.value * this.panelSpacingRatio;
@@ -115,7 +115,7 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
     return new DisjunctAssetsDefinition([
       {
         name: 'Cross-section',
-        documentAreaProps: {
+        documentArea: {
           width: this.shelfWidth.value,
           height: this.shelfHeight.value,
         },
@@ -133,9 +133,8 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
       {
         name: 'Vertical pane',
         copies: this.numCubbiesWide + 1,
-        documentAreaProps: {
-          viewBox: `${0} ${vertTransY} ${this.shelfHeight.value} ${this.shelfDepth.value}`,
-        },
+        documentArea:
+          viewBoxValuesToBoundingBoxAttrs(0, vertTransY, this.shelfHeight.value, this.shelfDepth.value),
         Component: () => (
           <g transform={`translate(0, ${vertTransY})`}>
             <path
@@ -150,9 +149,8 @@ export class SquareGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass,
       {
         name: 'Horizontal pane',
         copies: this.numCubbiesHigh + 1,
-        documentAreaProps: {
-          viewBox: `${0} ${horizTransY} ${this.shelfWidth.value} ${this.shelfDepth.value}`,
-        },
+        documentArea:
+          viewBoxValuesToBoundingBoxAttrs(0, horizTransY, this.shelfWidth.value, this.shelfDepth.value),
         Component: () => (
           <g transform={`translate(0, ${horizTransY})`}>
             <path

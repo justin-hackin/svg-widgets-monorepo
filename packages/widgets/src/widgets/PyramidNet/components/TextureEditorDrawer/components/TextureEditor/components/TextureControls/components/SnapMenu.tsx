@@ -5,16 +5,15 @@ import {
 } from '@mui/material';
 import { observer } from 'mobx-react';
 import { range } from 'lodash-es';
+import { useSelectedStore } from 'svg-widget-studio';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { TOUR_ELEMENT_CLASSES } from '../../../../../../../../../common/util/tour';
-import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
 export const SnapMenu = observer(() => {
   // when truthy, snap menu is open
   const [positionSnapMenuAnchorEl, setPositionSnapMenuAnchorEl] = useState(null);
 
-  const workspaceStore = useWorkspaceMst();
-  const widgetModel = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const widgetModel = useSelectedStore<PyramidNetWidgetModel>();
   const { textureEditor } = widgetModel;
 
   const {

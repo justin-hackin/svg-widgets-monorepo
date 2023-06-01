@@ -1,27 +1,24 @@
 import { computed } from 'mobx';
 import React from 'react';
-import Flatten from '@flatten-js/core';
 import { round } from 'lodash-es';
-import { ExtendedModel } from 'mobx-keystone';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { PathData } from 'fluent-svg-path-ts';
+import { getBoundingBoxAttrs, PathData } from 'fluent-svg-path-ts';
 import {
   DisjunctAssetsDefinition,
   DisjunctWidgetAssetMember,
-} from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
+  switchProp,
+  viewBoxValuesToBoundingBoxAttrs,
+  WidgetModel,
+  widgetModel,
+} from 'svg-widget-studio';
+import {
+  FlattenPoint, FlattenSegment, point, segment,
+} from '@/common/flatten';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
 import { augmentSegmentEndpoints, getPositiveSlopeSlatSegments, notchPanel } from './util';
-import { getBoundingBoxAttrs } from '../../common/util/svg';
-import { switchProp } from '../../common/keystone-tweakables/props';
 import { dividerBaseModelProps } from './DividerBasePersistedSpec';
-import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
 import widgetPreview from './previews/diamond-grid-divider.png';
-import Point = Flatten.Point;
-import point = Flatten.point;
-import segment = Flatten.segment;
-import Segment = Flatten.Segment;
 
-const reflectByWidth = (pt: Point, width: number) => (point(width - pt.x, pt.y));
+const reflectByWidth = (pt: FlattenPoint, width: number) => (point(width - pt.x, pt.y));
 
 interface SegmentInfo {
   length: number,
@@ -30,7 +27,7 @@ interface SegmentInfo {
 }
 
 @widgetModel('DiamondGridDivider', widgetPreview)
-export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class DiamondGridDividerWidgetModel extends WidgetModel({
   ...dividerBaseModelProps,
   flushPostProcess: switchProp(false),
 }) {
@@ -83,7 +80,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
     return ((this.flushPostProcess.value ? 1 : -1) * (this.materialThickness.value / 2));
   }
 
-  getMirroredSegment(seg: Segment) {
+  getMirroredSegment(seg: FlattenSegment) {
     const mirrorStart = reflectByWidth(seg.ps, this.shelfWidth.value);
     const mirrorEnd = reflectByWidth(seg.pe, this.shelfWidth.value);
     return segment(mirrorStart, mirrorEnd);
@@ -129,7 +126,7 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
       const { width, height } = getBoundingBoxAttrs(d);
       return {
         name: `Panel ${index + 1}`,
-        documentAreaProps: { viewBox: `0 ${transY} ${width} ${height}` },
+        documentArea: viewBoxValuesToBoundingBoxAttrs(0, transY, width, height),
         copies,
         Component: () => (
           <g transform={`translate(0, ${transY})`}>
@@ -140,15 +137,13 @@ export class DiamondGridDividerWidgetModel extends ExtendedModel(BaseWidgetClass
     });
   }
 
-  fileBasename = 'DiamondShelves';
-
   @computed
   get assetDefinition() {
     return new DisjunctAssetsDefinition(
       [
         {
           name: 'Profile view',
-          documentAreaProps: {
+          documentArea: {
             width: this.shelfWidth.value,
             height: this.shelfHeight.value,
           },

@@ -1,24 +1,32 @@
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 
-import { ExtendedModel, modelAction, prop } from 'mobx-keystone';
+import { modelAction, prop } from 'mobx-keystone';
 import {
   action, computed, observable, reaction,
 } from 'mobx';
 import { persist } from 'mobx-keystone-persist';
 import { chunk, flatten, range } from 'lodash-es';
 import BrushIcon from '@mui/icons-material/Brush';
-import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { appendContinuationPath } from '@/widgets/PyramidNet/path';
-import { assertNotNullish } from '@/common/util/assert';
 import {
-  PathData, convertTransformObjectToDOMMatrixReadOnly,
+  convertTransformObjectToDOMMatrixReadOnly,
+  getBoundingBoxAttrs,
   getCurrentSegmentStart,
   getLastPosition,
-  RawPoint, PartialTransformObject,
+  PartialTransformObject,
+  PathData,
+  RawPoint,
 } from 'fluent-svg-path-ts';
-import { getBoundingBoxAttrs } from '../../../common/util/svg';
+import {
+  PIXELS_PER_CM,
+  RegisteredAssetsDefinition,
+  sliderWithTextProp,
+  WidgetModel,
+  widgetModel,
+} from 'svg-widget-studio';
+import { assertNotNullish } from 'svg-widget-studio/src/helpers/assert';
+import { LicenseWatermarkContent } from '@/widgets/LicenseWatermarkContent';
+import { appendContinuationPath } from '@/widgets/PyramidNet/path';
 import { RawFaceDecorationModel } from './RawFaceDecorationModel';
 import {
   TextureEditorModel,
@@ -29,8 +37,6 @@ import { PrintLayer } from '../components/PrintLayer';
 import { DielinesLayer } from '../components/DielinesLayer';
 import { PyramidNetPreferencesModel } from './PyramidNetPreferencesModel';
 import { PanelContent } from '../components/PanelContent';
-import { TextureEditorDrawer } from '../components/TextureEditorDrawer';
-import { RegisteredAssetsDefinition } from '../../../WidgetWorkspace/widget-types/RegisteredAssetsDefinition';
 import { PyramidModel } from './PyramidModel';
 import {
   AscendantEdgeConnectionPaths,
@@ -38,14 +44,14 @@ import {
   AscendantEdgeTabsModel,
 } from '../ascendantEdgeConnectionTabs';
 import { baseEdgeConnectionTab, BaseEdgeTabsModel } from '../baseEdgeConnectionTab';
-import { sliderWithTextProp } from '../../../common/keystone-tweakables/props';
-import { degToRad, PIXELS_PER_CM, radToDeg } from '../../../common/util/units';
 import { PositionableFaceDecorationModel } from './PositionableFaceDecorationModel';
 import {
+  degToRad,
   hingedPlot,
   hingedPlotByProjectionDistance,
   offsetPolygonPoints,
   polygonPointsGivenAnglesAndSides,
+  radToDeg,
   scalePoint,
   sumPoints,
   triangleAnglesGivenSides,
@@ -53,11 +59,10 @@ import {
 import { appendCurvedLineSegments, closedPolygonPath, roundedEdgePath } from '../../../common/shapes/generic';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
 import { getBoundedTexturePathD } from '../../../common/util/path-boolean';
-import { widgetModel } from '../../../WidgetWorkspace/models/WorkspaceModel';
 import { additionalFileMenuItemsFactory } from '../components/additionalFileMenuItemsFactory';
-import { FileInputs } from '../components/FileInputs';
-import { DEFAULT_SLIDER_STEP } from '../../../common/constants';
 import previewIcon from '../static/widget-preview.png';
+import { DEFAULT_SLIDER_STEP } from '@/common/constants';
+import { widgetModelCtx } from '@/widgets/PyramidNet/data';
 
 const PREFERENCES_LOCALSTORE_NAME = 'PyramidNetPreferencesModel';
 
@@ -80,8 +85,10 @@ const applyFlap = (
   ], testTabHandleFlapRounding, true);
 };
 
-@widgetModel('PolyhedralNet', previewIcon)
-export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export const POLYHEDRAL_NET_MODEL_TYPE = 'PolyhedralNet';
+
+@widgetModel(POLYHEDRAL_NET_MODEL_TYPE, previewIcon)
+export class PyramidNetWidgetModel extends WidgetModel({
   pyramid: prop<PyramidModel>(() => (new PyramidModel({}))),
   ascendantEdgeTabsSpec: prop<AscendantEdgeTabsModel>(() => (new AscendantEdgeTabsModel({}))),
   baseEdgeTabsSpec: prop<BaseEdgeTabsModel>(() => (new BaseEdgeTabsModel({}))),
@@ -94,6 +101,10 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   useDottedStroke: prop(false).withSetter(),
   baseScoreDashSpec: prop<DashPatternModel>(() => (new DashPatternModel({}))).withSetter(),
   interFaceScoreDashSpec: prop<DashPatternModel>(() => (new DashPatternModel({}))).withSetter(),
+  // this is cruft for snapshot persistence but model has no props
+  // could strip with custom toSnapshot fn
+  // here for context sharing only
+  textureEditor: prop<TextureEditorModel>(() => new TextureEditorModel({})),
 }) {
   @observable
     textureEditorOpen = false;
@@ -113,9 +124,6 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
 
   @observable
     preferences = new PyramidNetPreferencesModel({});
-
-  @observable
-    textureEditor = new TextureEditorModel(this);
 
   testTabHandleFlapDepth = 2;
 
@@ -511,6 +519,11 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
       : this.faceDecoration?.pattern?.sourceFileName;
   }
 
+  onInit() {
+    super.onInit();
+    widgetModelCtx.set(this, this);
+  }
+
   onAttachedToRootStore() {
     this.persistPreferences();
     // history initialized in onInit
@@ -562,19 +575,17 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
     return getBoundingBoxAttrs(this.netPaths.cut.getD());
   }
 
+  BOUNDARY_MARGIN = 0.1;
+
   @computed
-  get documentAreaProps() {
-    return { width: this.preferences.documentWidth.value, height: this.preferences.documentHeight.value };
+  get documentArea() {
+    return this.netPaths.cut.getBoundingBox();
   }
 
   @computed
   get assetDefinition() {
-    const documentAreaProps = {
-      width: this.preferences.documentWidth.value,
-      height: this.preferences.documentHeight.value,
-    };
     return new RegisteredAssetsDefinition(
-      documentAreaProps,
+      this.documentArea,
       [
         {
           name: 'Print',
@@ -641,14 +652,6 @@ export class PyramidNetWidgetModel extends ExtendedModel(BaseWidgetClass, {
   }];
 
   additionalFileMenuItems = additionalFileMenuItemsFactory(this);
-
-  // eslint-disable-next-line class-methods-use-this
-  AdditionalMainContent = () => (
-    <>
-      <FileInputs />
-      <TextureEditorDrawer />
-    </>
-  );
 
   WatermarkContent = LicenseWatermarkContent;
 }

@@ -1,19 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { PRINT_REGISTRATION_TYPES } from '../../../WidgetWorkspace/models/PreferencesModel';
-import {
-  lineLerp, matrixWithTransformOrigin, pointToTranslateString, scalePoint,
-} from '../../../common/util/geom';
-import {
-  boundingBoxMinPoint,
-  expandBoundingBoxAttrs,
-  registrationMarksPath,
-  toRectangleCoordinatesAttrs,
-} from '../../../common/util/svg';
+import { expandBoundingBoxAttrs, toRectangleCoordinatesAttrs } from 'svg-widget-studio';
+import { lineLerp, matrixWithTransformOrigin } from '../../../common/util/geom';
+import { registrationMarksPath } from '../../../common/util/svg';
 import type { PyramidNetWidgetModel } from '../models/PyramidNetWidgetStore';
-import { PathFaceDecorationPatternModel } from '../models/PathFaceDecorationPatternModel';
 import { ImageFaceDecorationPatternModel } from '../models/ImageFaceDecorationPatternModel';
 import { PositionableFaceDecorationModel } from '../models/PositionableFaceDecorationModel';
+import { PRINT_REGISTRATION_TYPES } from '@/widgets/PyramidNet/types';
 
 function DielineGroup({ children }) {
   return (
@@ -63,13 +56,6 @@ export const DielinesLayer = observer(({
   const printRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.NONE
     ? boundingBox : expandBoundingBoxAttrs(boundingBox, registrationPadding);
   // graphtec type frames with rectangle but laser type has registration L marks facing outward
-  const dielineRegistrationBB = printRegistrationType === PRINT_REGISTRATION_TYPES.LASER_CUTTER
-    ? expandBoundingBoxAttrs(printRegistrationBB, registrationMarkLength) : printRegistrationBB;
-  const fittingBB = (
-    faceDecoration instanceof PositionableFaceDecorationModel
-    && faceDecoration.pattern instanceof PathFaceDecorationPatternModel
-  ) ? boundingBox : dielineRegistrationBB;
-  const fitToCanvasTranslationStr = pointToTranslateString(scalePoint(boundingBoxMinPoint(fittingBB), -1));
 
   function DecorationContent() {
     if (!texturePathD || !decorationCutPath) {
@@ -148,7 +134,7 @@ export const DielinesLayer = observer(({
 
   return (
     <DielineGroup>
-      <g transform={fitToCanvasTranslationStr}>
+      <g>
         {
             faceDecoration instanceof PositionableFaceDecorationModel
             && faceDecoration?.pattern instanceof ImageFaceDecorationPatternModel

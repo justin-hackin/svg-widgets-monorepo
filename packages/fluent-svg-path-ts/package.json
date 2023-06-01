@@ -3,22 +3,12 @@
   "private": true,
   "version": "0.0.1-alpha.1",
   "type": "module",
-  "typings": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "main": "./dist/fluent-svg-path-ts.umd.js",
-  "module": "./dist/fluent-svg-path-ts.js",
-  "exports": {
-    ".": {
-      "import": "./dist/fluent-svg-path-ts.js",
-      "require": "./dist/fluent-svg-path-ts.umd.js"
-    }
-  },
-  "types": "./dist/types/index.d.ts",
+  "main": "./src/index.ts",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
     "lint": "eslint . --ext js,ts",
     "lint-fix": "eslint . --ext js,ts --fix",
     "preview": "vite preview",
@@ -29,7 +19,7 @@
     "eslint": "^8.41.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-config-custom": "*",
+    "eslint-config-custom-ts": "*",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
     "rollup-plugin-typescript2": "^0.34.1",
@@ -41,6 +31,6 @@
   "dependencies": {
     "@thednp/dommatrix": "^2.0.4",
     "immer": "^10.0.2",
-    "svg-path-commander": "github:justin-hackin/svg-path-commander"
+    "svg-path-commander": "github:justin-hackin/svg-path-commander#built"
   }
 }

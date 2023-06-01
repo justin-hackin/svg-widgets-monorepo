@@ -4,16 +4,15 @@ import {
 } from 'mobx-keystone';
 
 import { computed, observable } from 'mobx';
-import { Dimensions } from '@/common/util/data';
-import { PathData, getDestinationPoints } from 'fluent-svg-path-ts';
-import { getDimensionsFromPathD } from '../../../common/util/svg';
+import { getBoundingBoxAttrs, getDestinationPoints, PathData } from 'fluent-svg-path-ts';
+import { Dimensions, getNearestHistoryFromAncestorNode } from 'svg-widget-studio';
 import {
   calculateTransformOriginChangeOffset,
   getOriginPoint,
-  getTextureTransformMatrix, scalePoint,
+  getTextureTransformMatrix,
+  scalePoint,
   sumPoints,
 } from '../../../common/util/geom';
-import { getNearestHistoryFromAncestorNode } from '../../../common/util/mobx-keystone';
 import { TransformModel } from './TransformModel';
 import { ImageFaceDecorationPatternModel } from './ImageFaceDecorationPatternModel';
 import { PathFaceDecorationPatternModel } from './PathFaceDecorationPatternModel';
@@ -37,7 +36,8 @@ export class PositionableFaceDecorationModel extends Model({
     if (!this.pattern) { return undefined; }
     if (this.pattern instanceof PathFaceDecorationPatternModel) {
       const { pathD } = this.pattern as PathFaceDecorationPatternModel;
-      return getDimensionsFromPathD(pathD);
+      const { width, height } = getBoundingBoxAttrs(pathD);
+      return { width, height };
     }
     if (this.pattern instanceof ImageFaceDecorationPatternModel) {
       const { dimensions } = this.pattern as ImageFaceDecorationPatternModel;

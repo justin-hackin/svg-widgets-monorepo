@@ -1,20 +1,27 @@
 import { computed } from 'mobx';
 import React from 'react';
-import { ExtendedModel } from 'mobx-keystone';
-import { BaseWidgetClass } from '@/WidgetWorkspace/widget-types/BaseWidgetClass';
-import { PathData, DestinationCommand } from 'fluent-svg-path-ts';
+import { DestinationCommand, getBoundingBoxAttrs, PathData } from 'fluent-svg-path-ts';
 import {
-  angleRelativeToOrigin, getOriginPoint, lineLerp, pointFromPolar, sumPoints,
+  DisjunctAssetsDefinition,
+  PIXELS_PER_CM,
+  sliderProp,
+  sliderWithTextProp,
+  viewBoxValuesToBoundingBoxAttrs,
+  WidgetModel,
+  widgetModel,
+} from 'svg-widget-studio';
+import {
+  angleRelativeToOrigin,
+  getOriginPoint,
+  lineLerp,
+  pointFromPolar,
+  radToDeg,
+  sumPoints,
 } from '../../common/util/geom';
 import { subtractDValues, unifyDValues } from '../../common/util/path-boolean';
-import { PIXELS_PER_CM, radToDeg } from '../../common/util/units';
-import { sliderProp, sliderWithTextProp } from '../../common/keystone-tweakables/props';
 import { appendCurvedLineSegments, closedPolygonPath } from '../../common/shapes/generic';
-import { pathDToViewBoxStr } from '../../common/util/svg';
-import { DisjunctAssetsDefinition } from '../../WidgetWorkspace/widget-types/DisjunctAssetsDefinition';
-import { widgetModel } from '../../WidgetWorkspace/models/WorkspaceModel';
-import { DEFAULT_SLIDER_STEP } from '../../common/constants';
 import widgetPreview from './widget-preview.png';
+import { DEFAULT_SLIDER_STEP } from '@/common/constants';
 
 const getRectanglePoints = ([x1, y1], [x2, y2]) => [
   { x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 },
@@ -28,7 +35,7 @@ const rectanglePathCenteredOnOrigin = (width: number, height:number) => closedPo
 const polygonSideLength = (numSides: number, inRadius: number) => 2 * inRadius * Math.tan(Math.PI / numSides);
 
 @widgetModel('CylinderLightbox', widgetPreview)
-export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, {
+export class CylinderLightboxWidgetModel extends WidgetModel({
   wallsPerArc: sliderProp(4, {
     min: 1, max: 16, step: 1,
   }),
@@ -63,9 +70,6 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     min: 0, max: 1, step: DEFAULT_SLIDER_STEP,
   }),
 }) {
-  // eslint-disable-next-line class-methods-use-this
-  fileBasename = 'cylinder_lightbox';
-
   get ringRadiusVal() {
     return this.ringRadius.value;
   }
@@ -288,9 +292,12 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
     return new DisjunctAssetsDefinition([
       {
         name: 'Face boundaries',
-        documentAreaProps: {
-          viewBox: `${-this.ringRadiusVal} ${-this.ringRadiusVal} ${this.ringRadiusVal * 2} ${this.ringRadiusVal * 2}`,
-        },
+        documentArea: viewBoxValuesToBoundingBoxAttrs(
+          -this.ringRadiusVal,
+          -this.ringRadiusVal,
+          this.ringRadiusVal * 2,
+          this.ringRadiusVal * 2,
+        ),
         Component: () => (
           <g>
             <circle r={this.ringRadius.value} fill="none" stroke="red" />
@@ -307,7 +314,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
             <path d={this.wallPathD} fill="white" stroke="black" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(this.wallPathD) },
+        documentArea: getBoundingBoxAttrs(this.wallPathD),
         copies: this.wallsPerArc.value * this.arcsPerRing.value,
       },
       {
@@ -317,7 +324,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
             <path d={this.sectionPathD} fill="white" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(this.sectionPathD) },
+        documentArea: getBoundingBoxAttrs(this.sectionPathD),
         copies: this.arcsPerRing.value * 2,
       },
       {
@@ -327,7 +334,7 @@ export class CylinderLightboxWidgetModel extends ExtendedModel(BaseWidgetClass, 
             <path d={this.holderTabD} fill="blue" stroke="black" fillRule="evenodd" />
           </g>
         ),
-        documentAreaProps: { viewBox: pathDToViewBoxStr(this.holderTabD) },
+        documentArea: getBoundingBoxAttrs(this.holderTabD),
         copies: this.holderTabsPerArc.value * this.arcsPerRing.value,
       },
     ]);

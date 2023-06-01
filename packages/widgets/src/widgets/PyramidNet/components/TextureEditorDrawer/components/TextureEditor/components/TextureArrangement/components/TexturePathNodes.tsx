@@ -2,11 +2,11 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import clsx from 'clsx';
 import { styled } from '@mui/styles';
-import { PathData, getDestinationPoints } from 'fluent-svg-path-ts';
+import { getDestinationPoints, PathData } from 'fluent-svg-path-ts';
+import { useSelectedStore } from 'svg-widget-studio';
 import type { PyramidNetWidgetModel } from '../../../../../../../models/PyramidNetWidgetStore';
 import { ImageFaceDecorationPatternModel } from '../../../../../../../models/ImageFaceDecorationPatternModel';
 import { RawFaceDecorationModel } from '../../../../../../../models/RawFaceDecorationModel';
-import { useWorkspaceMst } from '../../../../../../../../../WidgetWorkspace/rootStore';
 
 const classes = {
   textureNode: 'texture-node',
@@ -28,8 +28,8 @@ const NodesGroup = styled('g')({
 });
 
 export const TexturePathNodes = observer(() => {
-  const workspaceStore = useWorkspaceMst();
-  const { textureEditor } = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const selectedStore = useSelectedStore<PyramidNetWidgetModel>();
+  const { textureEditor } = selectedStore;
   const {
     faceDecoration, selectedTextureNodeIndex, showNodes, imageCoverScale, viewerModel,
   } = textureEditor;

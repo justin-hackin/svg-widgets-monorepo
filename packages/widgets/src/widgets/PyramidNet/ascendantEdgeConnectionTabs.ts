@@ -1,15 +1,13 @@
 import { range } from 'lodash-es';
 import { Model, model, prop } from 'mobx-keystone';
 import { PathData, RawPoint } from 'fluent-svg-path-ts';
-import {
-  hingedPlot, lineLerp, symmetricHingePlotByProjectionDistance,
-} from '../../common/util/geom';
+import { sliderProp, sliderWithTextProp } from 'svg-widget-studio';
+import { hingedPlot, lineLerp, symmetricHingePlotByProjectionDistance } from '../../common/util/geom';
 import { DashPatternModel, strokeDashPathRatios } from '../../common/shapes/strokeDashPath';
 import { connectedLineSegments } from '../../common/shapes/generic';
-import { sliderProp, sliderWithTextProp } from '../../common/keystone-tweakables/props';
 import { subtractRangeSet } from './range';
 import { ratioSliderProps } from './constants';
-import { DEFAULT_SLIDER_STEP } from '../../common/constants';
+import { DEFAULT_SLIDER_STEP } from '@/common/constants';
 
 @model('AscendantEdgeTabsModel')
 export class AscendantEdgeTabsModel extends Model({

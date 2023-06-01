@@ -1,4 +1,5 @@
-import { getBoundingBoxAttrs } from '../../../../../../../common/util/svg';
+import { getBoundingBoxAttrs } from 'fluent-svg-path-ts';
+
 import { getLineLineIntersection, lineLerp } from '../../../../../../../common/util/geom';
 import { closedPolygonPath } from '../../../../../../../common/shapes/generic';
 

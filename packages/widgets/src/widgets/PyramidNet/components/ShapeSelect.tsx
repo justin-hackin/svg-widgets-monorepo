@@ -1,16 +1,12 @@
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import uuid from 'uuid/v1';
+import { v1 as uuid } from 'uuid';
 import React from 'react';
 import { Avatar, ListItemAvatar, ListItemText } from '@mui/material';
 import { observer } from 'mobx-react';
-
 import { styled } from '@mui/styles';
-import { TweakablePrimitiveWithOptionsModel }
-  from '../../../common/keystone-tweakables/models/TweakablePrimitiveWithOptionsModel';
-import { WithOptionsMetadata } from '../../../common/keystone-tweakables/types';
-import { FormControlStyled } from '../../../common/style/style';
+import { FormControlStyled, TweakablePrimitiveWithOptionsModel, WithOptionsMetadata } from 'svg-widget-studio';
 
 const classes = {
   shapeSelectDisplay: 'shape-select-display',

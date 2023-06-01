@@ -2,15 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 import { startCase } from 'lodash-es';
 import { fromSnapshot } from 'mobx-keystone';
-import { InvisibleTextFileInput } from '../../../../../common/InvisibleTextFileInput';
-import { useWorkspaceMst } from '../../../../../WidgetWorkspace/rootStore';
+import { InvisibleTextFileInput, useWorkspaceMst } from 'svg-widget-studio';
 import { PyramidNetWidgetModel } from '../../../models/PyramidNetWidgetStore';
 import { TextureEditorModel } from './TextureEditor/models/TextureEditorModel';
 import { PositionableFaceDecorationModel } from '../../../models/PositionableFaceDecorationModel';
 
 export const FileInputs = observer(() => {
   const workspaceStore = useWorkspaceMst();
-  const widgetStore = workspaceStore.selectedStore as PyramidNetWidgetModel;
+  const widgetStore = workspaceStore.selectedStore as unknown as PyramidNetWidgetModel;
   const { textureEditor } = widgetStore;
   const { importTextureArrangementDialogActive } = textureEditor as TextureEditorModel;
 
