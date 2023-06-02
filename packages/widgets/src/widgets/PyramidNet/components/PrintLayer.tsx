@@ -36,7 +36,7 @@ export const PrintLayer = observer(({
     borderInsetFaceHoleTransformObject,
     borderInsetFaceHoleTransformMatrix,
     faceDecoration,
-    faceDecorationTransformMatricies,
+    faceDecorationTransformMatrices,
     faceLengthAdjustRatio,
     faceBoundaryPoints,
     preferences: {
@@ -93,7 +93,7 @@ export const PrintLayer = observer(({
         { isBordered && (
         <g id="bleed-stroke-group">
           {
-            faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
+            faceDecorationTransformMatrices.map((cloneTransformMatrix, index) => (index === 0
               ? (
                 <g key={index} id={PRINT_BLEED_PATH_ID}>
                   <use
@@ -117,7 +117,7 @@ export const PrintLayer = observer(({
         )}
         <g id="print-decoration-group">
           {
-            faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
+            faceDecorationTransformMatrices.map((cloneTransformMatrix, index) => (index === 0
               ? (
                 <g key={index} id={PRINT_IMAGE_ID}>
                   <use id="border-fill" xlinkHref={`#${FACE_BOUNDARY_PATH_ID}`} />

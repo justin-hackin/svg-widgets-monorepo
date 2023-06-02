@@ -38,7 +38,7 @@ export const DielinesLayer = observer(({
     netPaths: { cut, score },
     pyramid: { faceIsSymmetrical },
     decorationCutPath,
-    faceDecorationTransformMatricies,
+    faceDecorationTransformMatrices,
     texturePathD, pathScaleMatrix, borderInsetFaceHoleTransformMatrix,
     faceBoundaryPoints,
     femaleAscendantFlap, ascendantEdgeTabs, nonTabbedAscendantScores,
@@ -68,7 +68,7 @@ export const DielinesLayer = observer(({
     const CUT_HOLES_ID = 'cut-holes-master';
     return (
       <g id={DECORATION_CUT_ID}>
-        {faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => (index === 0
+        {faceDecorationTransformMatrices.map((cloneTransformMatrix, index) => (index === 0
           ? (
             <g key={`${index}-decoration`} id={CUT_HOLES_ID} transform={borderInsetFaceHoleTransformMatrix.toString()}>
               {texturePathD && (
@@ -107,7 +107,7 @@ export const DielinesLayer = observer(({
         <path d={femaleAscendantFlap.getD()} {...outerCutProps} />
         <path d={nonTabbedAscendantScores.getD()} {...scoreProps} />
 
-        {faceDecorationTransformMatricies.map((cloneTransformMatrix, index) => {
+        {faceDecorationTransformMatrices.map((cloneTransformMatrix, index) => {
           const isMirrored = !!(index % 2) && !faceIsSymmetrical;
           const key = `${index}-base-tab`;
           return index === 0
