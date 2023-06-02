@@ -161,7 +161,7 @@ export class ShapePreviewModel {
   MARGIN = 1;
 
   @observable
-    canvasDimensions: Dimensions = { width: 1, height: 1 };
+    canvasDimensions: Dimensions = { width: window.innerWidth / 2, height: window.innerHeight };
 
   @action
   setCanvasDimensions(dim: Dimensions) {

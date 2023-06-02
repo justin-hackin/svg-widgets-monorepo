@@ -438,8 +438,8 @@ export class PyramidNetWidgetModel extends WidgetModel({
     const insetDecorationPath = (new PathData(this.texturePathD))
       .transformByObject({ scale: this.faceLengthAdjustRatio })
       .transformByObject(this.borderInsetFaceHoleTransformObject);
-    for (const trans of this.faceDecorationTransformObjects) {
-      const tiledDecorationPath = insetDecorationPath.clone().transformByObject(trans);
+    for (const trans of this.faceDecorationTransformMatrices) {
+      const tiledDecorationPath = insetDecorationPath.clone().transformByMatrix(trans);
       cut.concatPath(tiledDecorationPath);
     }
     return cut;
@@ -492,13 +492,8 @@ export class PyramidNetWidgetModel extends WidgetModel({
   }
 
   @computed
-  get faceDecorationTransformMatricies(): DOMMatrixReadOnly[] {
-    return this.faceDecorationTransformObjects.map(convertTransformObjectToDOMMatrixReadOnly);
-  }
-
-  @computed
-  get faceDecorationTransformObjects(): PartialTransformObject[] {
-    const matrices: PartialTransformObject[] = [];
+  get faceDecorationTransformMatrices(): DOMMatrixReadOnly[] {
+    const matrices: DOMMatrixReadOnly[] = [];
 
     for (let i = 0; i < this.pyramid.facesPerNet; i += 1) {
       const isMirrored = !!(i % 2) && !this.pyramid.faceIsSymmetrical;
@@ -507,7 +502,8 @@ export class PyramidNetWidgetModel extends WidgetModel({
         ? this.faceInteriorAngles[2] - 2 * ((Math.PI / 2) - this.faceInteriorAngles[0]) : 0;
       const baseTabRotationRad = -1 * i * this.faceInteriorAngles[2];
       const decorationRotationRad = xScale * baseTabRotationRad + asymmetryNudge;
-      matrices.push({ scale: [xScale, 1], rotate: radToDeg(decorationRotationRad) });
+      matrices.push((new DOMMatrixReadOnly())
+        .scale(xScale, 1).rotate(radToDeg(decorationRotationRad)));
     }
     return matrices;
   }
